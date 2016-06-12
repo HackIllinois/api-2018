@@ -1,0 +1,11 @@
+{
+  "name": "hackillinois-api-2017",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+	"body-parser": "~1.15.1",
+	"debug": "~2.2.0",
+	"express": "~4.13.4",
+	"winston": "^2.2.0"
+  }
+}
