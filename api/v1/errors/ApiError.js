@@ -15,8 +15,8 @@ function ApiError(detail, source) {
   this.isApiError = true;
 }
 
-HackspaceApiError.prototype = Object.create(Error.prototype);
-HackspaceApiError.prototype.toJSON = function() {
+ApiError.prototype = Object.create(Error.prototype);
+ApiError.prototype.toJSON = function() {
   return {
 	type: this.type,
 	code: this.code,

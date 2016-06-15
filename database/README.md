@@ -24,7 +24,7 @@ Although FlywayDB does not have the ability to revert migrations for us, having 
 You can typically just use the same output from the `migration.sh` script to name your revert, taking care to add the `.revert.sql` filename ending.
 
 ### Table and Column Naming
-Let's have tables always represent the data that they hold per row, as a singular entity. For example, always make a table like `foo`, not like `foos`,
+Let's have tables always represent the data that they hold per row, as a plural entity. For example, always make a table like `foos`, not like `foo`,
 `Foo`, or `Foos`.
 
 Column names should be the opposite, just to make sure that we don't accidentally mix up column names and table names. Let's represent column
