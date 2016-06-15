@@ -1,3 +1,5 @@
+cd "$(dirname ${BASH_SOURCE[0]})"
+
 USER=${LOCAL_MYSQL_USER:='root'}
 PASSWORD=${LOCAL_MYSQL_PASSWORD:=''}
 DB='hackillinois-2017'

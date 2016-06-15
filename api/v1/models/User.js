@@ -1,39 +1,20 @@
-/* jshint esversion: 6 */
-
 var promise = require('bluebird');
 var bcrypt = promise.promisifyAll(require('bcrypt'));
-var inflection = require('inflection');
-var _ = require('lodash');
-
-var databaseManager = require('../managers/databaseManager');
 var crypto = require('../utils/crypto');
 
 var SALT_ROUNDS = 12;
 
-var bookshelf = databaseManager.instance();
-var User = bookshelf.Model.extend({
+var Model = require('./Model');
+var User = Model.extend({
 	tableName: 'users',
-	hasTimestamps: ['Created', 'Updated'],
-	idAttribute: 'ID',
+	hasTimestamps: ['created', 'updated'],
+	idAttribute: 'id',
 });
-
-User.prototype.format = function (attrs) {
-	return _
-		.chain(attrs)
-		.mapKeys(attrs, key => inflection.titleize(key))
-		.mapKeys(attrs, key => inflection.underscore(key, true));
-};
-
-User.prototype.parse = function (attrs) {
-	return _
-		.chain(attrs)
-		.mapKeys(attrs, key => inflection.camelize(key, true));
-};
 
 User.prototype.setPassword = function (password) {
 	password = crypto.hashWeak(password);
 	return bcrypt.hashAsync(password, SALT_ROUNDS).bind(this).then(function (p) {
-		return promise.resolve(this.set('password', p));
+		return promise.resolve(this.set({ password: p }));
 	});
 };
 
@@ -42,6 +23,17 @@ User.prototype.hasPassword = function (password) {
 	return bcrypt.compareAsync(password, this.get('password'));
 };
 
-// TODO check the format/parse functions
+// example usage
+// var test = User.forge({email: 'admin@example.com', role:'HACKER'});
+// test.setPassword('password7').then(function (model) {
+// 	return model.save();
+// }).then(function() {
+// 	return User.query().where({email: 'admin@example.com'}).select();
+// }).then(function (r) {
+// 	var u = User.forge(r[0], { parse: true });
+// 	return u.hasPassword('password');
+// }).then(function (r) {
+// 	console.log(r);
+// });
 
 module.exports = User;
