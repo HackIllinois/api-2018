@@ -7,9 +7,10 @@ var utils = require('../utils');
 
 module.exports.createUser = function(email, password, role) {
 	email = email.toLowerCase();
-
 	var user = User.forge({ email: email, password: password, role: role });
-	return user.validate()
+
+	return user
+		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
 			return User.query().where({ email: email }).select();
@@ -21,6 +22,10 @@ module.exports.createUser = function(email, password, role) {
 				throw new InvalidParameterError(errorDetail, errorSource);
 			}
 
+			return user.setPassword(password);
+		})
+		.then(function () {
+			// TODO: add user to mailing list
 			return user.save();
 		});
 };

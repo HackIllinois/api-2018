@@ -1,3 +1,3 @@
 module.exports = {
-	databaseManager: require('./databaseManager')
+	database: require('./database')
 };
