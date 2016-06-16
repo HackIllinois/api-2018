@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 
+var checkit = require('checkit');
 var inflection = require('inflection');
 var _ = require('lodash');
 

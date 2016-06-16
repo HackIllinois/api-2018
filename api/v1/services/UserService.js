@@ -1,11 +1,26 @@
+var Checkit = require('checkit');
+var _ = require('lodash');
+
+var InvalidParameterError = require('../errors/InvalidParameterError');
 var User = require('../models/User');
+var utils = require('../utils');
 
-function UserService() { }
+module.exports.createUser = function(email, password, role) {
+	email = email.toLowerCase();
 
-UserService.prototype.constructor = UserService;
+	var user = User.forge({ email: email, password: password, role: role });
+	return user.validate()
+		.catch(Checkit.Error, utils.errors.handleValidationError)
+		.then(function (validated) {
+			return User.query().where({ email: email }).select();
+		})
+		.then(function (result) {
+			if (!_.isEmpty(result)) {
+				var errorDetail = "A user with the given email already exists";
+				var errorSource = "email";
+				throw new InvalidParameterError(errorDetail, errorSource);
+			}
 
-UserService.prototype.createUser = function(email, password, role) {
-	
+			return user.save();
+		});
 };
-
-module.exports = UserService;

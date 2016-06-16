@@ -1,4 +1,4 @@
-var UnprocessableRequestError = require('./UnprocessableRequestError');
+var UnprocessableRequestError = require('./UnprocessableRequestError.js');
 
 var ERROR_TYPE = 'InvalidParameterError';
 var ERROR_TITLE = 'Invalid Parameter';

@@ -28,17 +28,4 @@ User.prototype.hasPassword = function (password) {
 	return bcrypt.compareAsync(password, this.get('password'));
 };
 
-// example usage
-// var test = User.forge({email: 'admin@example.com', role:'HACKER'});
-// test.setPassword('password7').then(function (model) {
-// 	return model.save();
-// }).then(function() {
-// 	return User.query().where({email: 'admin@example.com'}).select();
-// }).then(function (r) {
-// 	var u = User.forge(r[0], { parse: true });
-// 	return u.hasPassword('password');
-// }).then(function (r) {
-// 	console.log(r);
-// });
-
 module.exports = User;

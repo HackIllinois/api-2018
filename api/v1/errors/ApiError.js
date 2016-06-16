@@ -6,7 +6,6 @@ var DEFAULT_DETAIL = "An error occurred. If this persists, please contact us.";
 
 function ApiError(detail, source) {
   this.type = ERROR_TYPE;
-  this.code = ERROR_CODE;
   this.status = STATUS_CODE;
   this.title = ERROR_TITLE;
   this.detail = (detail) ? detail : DEFAULT_DETAIL;
@@ -19,7 +18,7 @@ ApiError.prototype = Object.create(Error.prototype);
 ApiError.prototype.toJSON = function() {
   return {
 	type: this.type,
-	code: this.code,
+	status: this.status,
 	title: this.title,
 	detail: this.detail,
 	source: this.source

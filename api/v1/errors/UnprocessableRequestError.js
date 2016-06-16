@@ -10,7 +10,6 @@ function UnprocessableRequestError(detail, source) {
   ApiError.call(this, detail, source);
 
   this.type = ERROR_TYPE;
-  this.code = ERROR_CODE;
   this.status = STATUS_CODE;
   this.title = ERROR_TITLE;
   this.detail = (detail) ? detail : DEFAULT_DETAIL;
