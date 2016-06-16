@@ -7,8 +7,13 @@ var SALT_ROUNDS = 12;
 var Model = require('./Model');
 var User = Model.extend({
 	tableName: 'users',
-	hasTimestamps: ['created', 'updated'],
 	idAttribute: 'id',
+	hasTimestamps: ['created', 'updated'],
+	validations: {
+		email: ['required', 'email'],
+		password: ['required', 'string', 'minLength:8'],
+		role: ['required', 'string']
+	}
 });
 
 User.prototype.setPassword = function (password) {
