@@ -1,7 +1,10 @@
 var errors = require('../errors');
+var middleware = require('../middleware');
 var UserService = require('../services/UserService');
 
-module.exports.create_hacker = function (req, res, next) {
+var router = require('express').Router();
+
+function createHacker (req, res, next) {
 	if (req.body.password !== req.body.confirmedPassword){
 		var detail = "Passwords do not match";
 		var source = "confirmedPassword";
@@ -10,7 +13,7 @@ module.exports.create_hacker = function (req, res, next) {
 	}
 
 	UserService
-		.create_user(req.body.email, req.body.password, 'HACKER')
+		.createUser(req.body.email, req.body.password, 'HACKER')
 		.then(function (user) {
 			// TODO create a JWT here
 			next();
@@ -18,4 +21,9 @@ module.exports.create_hacker = function (req, res, next) {
 		.catch(function (error) {
 			next(error);
 		});
-};
+}
+
+router.post('/', createHacker, middleware.response);
+
+module.exports.createHacker = createHacker;
+module.exports.router = router;

@@ -9,7 +9,7 @@ function audit(req, required) {
 
 	if (!data) {
 		var errorDetail = 'The request body could not be parsed';
-		throw new Errors.UnprocessableRequest(errorDetail, null);
+		throw new errors.UnprocessableRequestError(errorDetail, null);
 	}
 
 	_.forEach(required, function(requiredParameter) {
@@ -18,14 +18,15 @@ function audit(req, required) {
 	});
 
 	if (missingParameters.length)
-		throw new Errors.MissingParameter(null, missingParameters);
+		throw new errors.MissingParameterError(null, missingParameters);
 }
 
-function marshal(req, allowed) {
-  req.body = _.pick(req.body, allowed);
+function marshal(req, required, allowed) {
+  req.body = _.pick(req.body, _.merge(required, allowed));
+  return req;
 }
 
-module.exports.handleRequest = function(req, res, next) {
+module.exports = function(req, res, next) {
 	var pathParameters = endpoints[req.path];
 	var endpointParameters = (pathParameters) ? pathParameters[req.method] : undefined;
 
@@ -36,7 +37,7 @@ module.exports.handleRequest = function(req, res, next) {
 	var allowed = endpointParameters.allowed;
 
 	audit(req, (required) ? required : []);
-	marshal(req, (allowed) ? allowed : []);
+	marshal(req, (required) ? required : [], (allowed) ? allowed : []);
 
 	return next();
 };

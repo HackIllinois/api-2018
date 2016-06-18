@@ -17,19 +17,6 @@ var isDevelopment = env === 'development';
 // TODO log warning when in development mode
 // TODO handle global not-found error as 404
 
-// generic development error handler (with stack trace)
-if (api.get('env') === 'development') {
-  api.use(function(err, req, res, next) {
-	// TODO: send back err.message as trace using
-	// appropriate service/middleware
-  });
-}
-
-// generic production error handler (no stack trace)
-api.use(function(err, req, res, next) {
-  // TODO: send back error using appropriate service/middleware
-});
-
 // set the versioned components' routes
 api.use('/v1', v1);
 

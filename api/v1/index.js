@@ -1,8 +1,13 @@
 var express = require('express');
 
-var v1 = express.Router(['caseSensitive']);
+var controllers = require('./controllers');
+var middleware = require('./middleware');
 
-// TODO set up v1 using controllers' routers
-// and any necessary middleware
+var v1 = express.Router();
+
+v1.use(middleware.request);
+v1.use(middleware.errors);
+
+v1.use('/user', controllers.UserController.router);
 
 module.exports = v1;
