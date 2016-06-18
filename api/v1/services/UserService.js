@@ -7,6 +7,7 @@ var utils = require('../utils');
 
 module.exports.createUser = function(email, password, role) {
 	email = email.toLowerCase();
+	password = (password) ? password : utils.crypto.generatePassword();
 	var user = User.forge({ email: email, password: password, role: role });
 
 	return user

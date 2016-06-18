@@ -11,7 +11,7 @@ function InvalidParameterError(detail, source) {
   this.type = ERROR_TYPE;
   this.title = ERROR_TITLE;
   this.detail = (detail) ? detail : DEFAULT_DETAIL;
-  this.source = (source) ? source : undefined;
+  this.source = (source) ? source : null;
 }
 
 InvalidParameterError.prototype = Object.create(UnprocessableRequestError.prototype);

@@ -13,7 +13,7 @@ function UnprocessableRequestError(detail, source) {
   this.status = STATUS_CODE;
   this.title = ERROR_TITLE;
   this.detail = (detail) ? detail : DEFAULT_DETAIL;
-  this.source = (source) ? source : undefined;
+  this.source = (source) ? source : null;
 }
 
 UnprocessableRequestError.prototype = Object.create(ApiError.prototype);
