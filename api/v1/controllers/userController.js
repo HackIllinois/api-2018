@@ -1,5 +1,4 @@
 var errors = require('../errors');
-var middleware = require('../middleware');
 var UserService = require('../services/UserService');
 
 var router = require('express').Router();
@@ -23,7 +22,7 @@ function createHacker (req, res, next) {
 		});
 }
 
-router.post('/', createHacker, middleware.response);
+router.post('/', createHacker);
 
 module.exports.createHacker = createHacker;
 module.exports.router = router;
