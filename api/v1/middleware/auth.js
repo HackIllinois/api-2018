@@ -8,7 +8,7 @@ module.exports = function (req, res, next) {
 	var auth = req.header(AUTH_HEADER);
 
 	if (!auth)
-		next();
+		return next();
 
 	AuthService.verify(auth)
 		.then(function (decoded) {

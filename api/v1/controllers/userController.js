@@ -1,5 +1,6 @@
 var errors = require('../errors');
 var UserService = require('../services/UserService');
+var AuthService = require('../services/AuthService');
 
 var router = require('express').Router();
 
@@ -14,7 +15,12 @@ function createHacker (req, res, next) {
 	UserService
 		.createUser(req.body.email, req.body.password, 'HACKER')
 		.then(function (user) {
-			// TODO create a JWT here
+			return AuthService.issueForUser(user);
+		})
+		.then(function (auth) {
+			res.body = {};
+			res.body.auth = auth;
+
 			next();
 		})
 		.catch(function (error) {
@@ -22,7 +28,7 @@ function createHacker (req, res, next) {
 		});
 }
 
-router.post('/', createHacker);
+router.post('', createHacker);
 
 module.exports.createHacker = createHacker;
 module.exports.router = router;

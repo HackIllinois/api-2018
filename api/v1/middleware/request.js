@@ -27,7 +27,7 @@ function marshal(req, required, allowed) {
 }
 
 module.exports = function(req, res, next) {
-	var pathParameters = endpoints[req.path];
+	var pathParameters = endpoints[req.path.replace(/\/+$/, "")];
 	var endpointParameters = (pathParameters) ? pathParameters[req.method] : undefined;
 
 	if (!endpointParameters)

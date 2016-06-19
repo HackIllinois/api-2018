@@ -1,6 +1,8 @@
 var Promise = require('bluebird');
+
 var jwt = Promise.promisifyAll(require('jsonwebtoken'));
 var logger = require('winston');
+var _ = require('lodash');
 
 var errors = require('../errors');
 
@@ -16,12 +18,22 @@ if (JWT_SECRET == 'NONE') {
 }
 
 module.exports.issue = function(payload, subject) {
-	var parameters = new Map(JWT_CONFIG);
+	var parameters = _.clone(JWT_CONFIG);
 	if (arguments.length > 1) {
 		parameters.subject = subject;
 	}
 
 	return jwt.signAsync(payload, JWT_SECRET, parameters);
+};
+
+module.exports.issueForUser = function (user) {
+	var subject = user.id.toString();
+	var payload = {
+		email: user.email,
+		role: user.role
+	};
+
+	return module.exports.issue(payload, subject);
 };
 
 module.exports.verify = function(token) {

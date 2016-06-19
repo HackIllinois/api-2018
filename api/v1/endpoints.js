@@ -1,11 +1,11 @@
 var endpoints = {};
 
-endpoints['/user/'] = {
+endpoints['/user'] = {
 	POST: {
 		required: ['email', 'password', 'confirmedPassword']
 	}
 };
-endpoints['/auth/'] = {
+endpoints['/auth'] = {
 	POST: {
 		required: ['email', 'password']
 	}
