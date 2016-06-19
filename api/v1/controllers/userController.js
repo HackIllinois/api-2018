@@ -2,7 +2,14 @@ var errors = require('../errors');
 var UserService = require('../services/UserService');
 var AuthService = require('../services/AuthService');
 
+var middleware = require('../middleware');
+var roles = require('../utils/roles');
+
 var router = require('express').Router();
+
+function isRequester(req) {
+	return parseInt(req.auth.sub) == req.params.id;
+}
 
 function createHacker (req, res, next) {
 	if (req.body.password !== req.body.confirmedPassword){
@@ -28,7 +35,23 @@ function createHacker (req, res, next) {
 		});
 }
 
+function getUser (req, res, next) {
+	var id = req.params.id;
+	var forge = true;
+
+	UserService
+		.findUserById(id, forge)
+		.then(function (user) {
+			res.body = user.toJSON();
+			next();
+		})
+		.catch(function (error) {
+			next(error);
+		});
+}
+
 router.post('', createHacker);
+router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
 module.exports.createHacker = createHacker;
 module.exports.router = router;

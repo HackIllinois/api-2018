@@ -8,7 +8,7 @@ var DEFAULT_MESSAGE = "The requested resource cannot be accessed with the " +
 var STATUS_CODE = 401;
 
 function UnauthorizedError(message, source) {
-  HackspaceApiError.call(this, message, source);
+  ApiError.call(this, message, source);
 
   this.type = ERROR_TYPE;
   this.status = STATUS_CODE;

@@ -6,10 +6,18 @@ var User = require('../models/User');
 var errors = require('../errors');
 var utils = require('../utils');
 
-function _findUserByEmail(email) {
+function _findUserByEmail (email) {
 	if (email) {
 		email = email.toLowerCase();
-		return User.query().where({ email: email }).select();
+		return User.query().where('Email', email).select();
+	}
+
+	return Promise.resolve([]);
+}
+
+function _findUserById (id) {
+	if (id) {
+		return User.query().where('ID', id).select();
 	}
 
 	return Promise.resolve([]);
@@ -41,6 +49,21 @@ module.exports.createUser = function (email, password, role) {
 		});
 };
 
+module.exports.findUserById = function (id, forge) {
+	return _findUserById(id)
+		.then(function (result) {
+			if (_.isEmpty(result)) {
+				var message = "A user with the given ID cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
+
+			if (forge)
+				return Promise.resolve(User.forge(_.head(result)));
+			return Promise.resolve(_.head(result));
+		});
+};
+
 module.exports.findUserByEmail = function (email) {
 	return _findUserByEmail(email)
 		.then(function (result) {
@@ -50,6 +73,8 @@ module.exports.findUserByEmail = function (email) {
 				throw new errors.NotFoundError(message, source);
 			}
 
+			if (forge)
+				return Promise.resolve(User.forge(_.head(result)));
 			return Promise.resolve(_.head(result));
 		});
 };
