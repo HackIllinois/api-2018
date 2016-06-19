@@ -2,13 +2,13 @@ var ERROR_TYPE = 'ApiError';
 var ERROR_TITLE = 'API Error';
 var STATUS_CODE = 500;
 
-var DEFAULT_DETAIL = "An error occurred. If this persists, please contact us.";
+var DEFAULT_MESSAGE = "An error occurred. If this persists, please contact us";
 
-function ApiError(detail, source) {
+function ApiError(message, source) {
   this.type = ERROR_TYPE;
   this.status = STATUS_CODE;
   this.title = ERROR_TITLE;
-  this.detail = (detail) ? detail : DEFAULT_DETAIL;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
   this.source = (source) ? source : null;
 
   this.isApiError = true;
@@ -20,7 +20,7 @@ ApiError.prototype.toJSON = function() {
 	type: this.type,
 	status: this.status,
 	title: this.title,
-	detail: this.detail,
+	message: this.message,
 	source: this.source
   };
 };

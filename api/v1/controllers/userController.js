@@ -5,10 +5,10 @@ var router = require('express').Router();
 
 function createHacker (req, res, next) {
 	if (req.body.password !== req.body.confirmedPassword){
-		var detail = "Passwords do not match";
+		var message = "Passwords do not match";
 		var source = "confirmedPassword";
 
-		return next(new errors.InvalidParameterError(detail, source));
+		return next(new errors.InvalidParameterError(message, source));
 	}
 
 	UserService

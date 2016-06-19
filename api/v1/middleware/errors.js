@@ -1,3 +1,5 @@
+var logger = require('winston');
+
 var ApiError = require('../errors/ApiError');
 
 function marshalError(error) {
@@ -6,13 +8,14 @@ function marshalError(error) {
 
 module.exports = function (err, req, res, next) {
 	if (!(err instanceof Error)) {
-		console.log("Caught error of uknown type:");
-		console.log(err);
+		logger.info("caught error of uknown type");
+		logger.error(err);
 
 		err = new ApiError();
 	}
 	else if (!err.isApiError) {
-		console.log(err.stack);
+		logger.info("caught unhandled internal error");
+		logger.error(err.stack);
 
 		err = new ApiError();
 	}
@@ -22,5 +25,5 @@ module.exports = function (err, req, res, next) {
 		error: marshalError(err)
 	};
 
-	res.json(response);
+	res.status(err.status).json(response);
 };

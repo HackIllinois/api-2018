@@ -5,6 +5,7 @@ var middleware = require('./middleware');
 
 var v1 = express.Router();
 
+v1.use(middleware.auth);
 v1.use(middleware.request);
 
 v1.use('/user', controllers.UserController.router);

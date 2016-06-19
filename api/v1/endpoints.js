@@ -5,5 +5,10 @@ endpoints['/user/'] = {
 		required: ['email', 'password', 'confirmedPassword']
 	}
 };
+endpoints['/auth/'] = {
+	POST: {
+		required: ['email', 'password']
+	}
+};
 
 module.exports = endpoints;

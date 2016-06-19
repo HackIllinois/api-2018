@@ -4,15 +4,15 @@ var ERROR_TYPE = 'UnprocessableRequestError';
 var ERROR_TITLE = 'Unprocessable Request';
 var STATUS_CODE = 400;
 
-var DEFAULT_DETAIL = "The server received a request that could not be processed.";
+var DEFAULT_MESSAGE = "The server received a request that could not be processed";
 
-function UnprocessableRequestError(detail, source) {
-  ApiError.call(this, detail, source);
+function UnprocessableRequestError(message, source) {
+  ApiError.call(this, message, source);
 
   this.type = ERROR_TYPE;
   this.status = STATUS_CODE;
   this.title = ERROR_TITLE;
-  this.detail = (detail) ? detail : DEFAULT_DETAIL;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
   this.source = (source) ? source : null;
 }
 

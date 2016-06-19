@@ -3,14 +3,14 @@ var UnprocessableRequestError = require('./UnprocessableRequestError.js');
 var ERROR_TYPE = 'InvalidParameterError';
 var ERROR_TITLE = 'Invalid Parameter';
 
-var DEFAULT_DETAIL = "One or more parameters present in the request were invalid.";
+var DEFAULT_MESSAGE = "One or more parameters present in the request were invalid";
 
-function InvalidParameterError(detail, source) {
-  UnprocessableRequestError.call(this, detail, source);
+function InvalidParameterError(message, source) {
+  UnprocessableRequestError.call(this, message, source);
 
   this.type = ERROR_TYPE;
   this.title = ERROR_TITLE;
-  this.detail = (detail) ? detail : DEFAULT_DETAIL;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
   this.source = (source) ? source : null;
 }
 

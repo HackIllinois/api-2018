@@ -20,10 +20,13 @@ var isDevelopment = env === 'development';
 // set the versioned components' routes
 api.use('/v1', v1);
 
+// get rid of the default 'X-Powered-By' header
+api.disable('x-powered-by');
+
 // TODO use global configuration here
 var port = 8080;
 var instance = api.listen(port, function() {
-	logger.info("Instance available on port %d", port);
+	logger.info("instance available on port %d", port);
 });
 
 module.exports = api;
