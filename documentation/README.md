@@ -1,4 +1,4 @@
-# Documentation
+# HackIllinois Documentation
 
 The documentation for the API is versioned to correspond with the API itself.
 
