@@ -7,7 +7,7 @@ var _ = require('lodash');
 var errors = require('../errors');
 
 // TODO handle all of this in global config
-var JWT_SECRET = process.env.AUTH_SECRET || 'NONE';
+var JWT_SECRET = process.env.MASTER_SECRET || 'NONE';
 var JWT_CONFIG = {
   expiresIn: "7d"
 };
