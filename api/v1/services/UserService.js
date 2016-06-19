@@ -64,7 +64,7 @@ module.exports.findUserById = function (id, forge) {
 		});
 };
 
-module.exports.findUserByEmail = function (email) {
+module.exports.findUserByEmail = function (email, forge) {
 	return _findUserByEmail(email)
 		.then(function (result) {
 			if (_.isEmpty(result)) {
