@@ -5,13 +5,15 @@ var STATUS_CODE = 500;
 var DEFAULT_MESSAGE = "An error occurred. If this persists, please contact us";
 
 function ApiError(message, source) {
-  this.type = ERROR_TYPE;
-  this.status = STATUS_CODE;
-  this.title = ERROR_TITLE;
-  this.message = (message) ? message : DEFAULT_MESSAGE;
-  this.source = (source) ? source : null;
+	Error.call(this, message);
 
-  this.isApiError = true;
+	this.type = ERROR_TYPE;
+	this.status = STATUS_CODE;
+	this.title = ERROR_TITLE;
+	this.message = (message) ? message : DEFAULT_MESSAGE;
+	this.source = (source) ? source : null;
+
+	this.isApiError = true;
 }
 
 ApiError.prototype = Object.create(Error.prototype);
