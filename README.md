@@ -58,11 +58,17 @@ The following environment variables can be used to configure the API for your sy
 
 | Variable | Possible Values | Purpose |
 | -------- | --------------- | ------- |
-| MASTER_SECRET | Any string | Provides the secret for signing all claims |
+| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
+| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
 | LOCAL_MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') |
 | LOCAL_MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') |
 | LOCAL_MYSQL_HOST | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
 | LOCAL_MYSQL_PORT | Any valid port number | Overrides default MySQL port (3306) |
+
+You should set `NODE_ENV` to `development`, as this variable is required. The API
+will exit with an unsuccessful error code if it finds that this variable is missing.
+To save time, you might add this variable to your PATH, or to a `bash_profile` as
+an export.
 
 ## Starting Up
 
@@ -73,8 +79,8 @@ the root of the project directory:
 node api.js
 ```
 
-Use `Control-C` to kill the server. In the future, we will have a more robust server
-runner. Until then, we will use the built-in runner.
+Use `Control-C` to kill the server. Note that Windows users will need to use
+Powershell or this command will fail!
 
 ## Issues
 

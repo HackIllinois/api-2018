@@ -4,7 +4,7 @@ var checkit = require('checkit');
 var inflection = require('inflection');
 var _ = require('lodash');
 
-var database = require('../managers/database');
+var database = require('../../database');
 var bookshelf = database.instance();
 var Model = bookshelf.Model.extend({
 	validations: {}

@@ -1,19 +1,21 @@
+var Promise = require('bluebird');
+
 var errors = require('../errors');
 var AuthService = require('../services/AuthService');
 var UserService = require('../services/UserService');
 
 var router = require('express').Router();
 
-function _issueByEmail(email) {
+function _issueByEmail(email, password) {
 	return UserService
 		.findUserByEmail(email)
 		.then(function (user) {
-			return AuthService.issueForUser(user);
+			return AuthService.issueForUser(user, password);
 		});
 }
 
 function createToken (req, res, next) {
-	_issueByEmail(req.body.email)
+	_issueByEmail(req.body.email, req.body.password)
 		.then(function (auth) {
 			res.body = {};
 			res.body.auth = auth;

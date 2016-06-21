@@ -49,7 +49,7 @@ module.exports.createUser = function (email, password, role) {
 		});
 };
 
-module.exports.findUserById = function (id, forge) {
+module.exports.findUserById = function (id) {
 	return _findUserById(id)
 		.then(function (result) {
 			if (_.isEmpty(result)) {
@@ -58,13 +58,11 @@ module.exports.findUserById = function (id, forge) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			if (forge)
-				return Promise.resolve(User.forge(_.head(result)));
-			return Promise.resolve(_.head(result));
+			return Promise.resolve(User.forge(_.head(result)));
 		});
 };
 
-module.exports.findUserByEmail = function (email, forge) {
+module.exports.findUserByEmail = function (email) {
 	return _findUserByEmail(email)
 		.then(function (result) {
 			if (_.isEmpty(result)) {
@@ -73,8 +71,6 @@ module.exports.findUserByEmail = function (email, forge) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			if (forge)
-				return Promise.resolve(User.forge(_.head(result)));
-			return Promise.resolve(_.head(result));
+			return Promise.resolve(User.forge(_.head(result)));
 		});
 };

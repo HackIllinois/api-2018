@@ -1,39 +1,44 @@
 var Promise = require('bluebird');
 
 var jwt = Promise.promisifyAll(require('jsonwebtoken'));
-var logger = require('winston');
 var _ = require('lodash');
 
+var config = require('../../config');
 var errors = require('../errors');
+var logger = require('../../logging');
 
-// TODO handle all of this in global config
-var JWT_SECRET = process.env.MASTER_SECRET || 'NONE';
+var JWT_SECRET = config.auth.secret;
 var JWT_CONFIG = {
-  expiresIn: "7d"
+  expiresIn: config.auth.expiration
 };
 
-// keep this here until we have the gobal config set up
-if (JWT_SECRET == 'NONE') {
-	logger.warn("the default JWT secret is in use!");
-}
-
-module.exports.issue = function(payload, subject) {
+function _issue(payload, subject) {
 	var parameters = _.clone(JWT_CONFIG);
 	if (arguments.length > 1) {
 		parameters.subject = subject;
 	}
 
 	return jwt.signAsync(payload, JWT_SECRET, parameters);
-};
+}
 
-module.exports.issueForUser = function (user) {
-	var subject = user.id.toString();
-	var payload = {
-		email: user.email,
-		role: user.role
-	};
+module.exports.issueForUser = function (user, password) {
+	return user
+		.hasPassword(password)
+		.then(function (result) {
+			if (!result) {
+				var message = "The provided password was incorrect";
+				var source = "password";
+				throw new errors.InvalidParameterError(message, source);
+			}
 
-	return module.exports.issue(payload, subject);
+			var subject = user.id.toString();
+			var payload = {
+				email: user.email,
+				role: user.role
+			};
+
+			return _issue(payload, subject);
+		});
 };
 
 module.exports.verify = function(token) {

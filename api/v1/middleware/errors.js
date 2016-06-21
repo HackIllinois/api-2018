@@ -1,6 +1,5 @@
-var logger = require('winston');
-
 var ApiError = require('../errors/ApiError');
+var logger = require('../../logging');
 
 function marshalError(error) {
 	return error.toJSON();

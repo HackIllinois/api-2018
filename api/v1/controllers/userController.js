@@ -37,10 +37,9 @@ function createHacker (req, res, next) {
 
 function getUser (req, res, next) {
 	var id = req.params.id;
-	var forge = true;
 
 	UserService
-		.findUserById(id, forge)
+		.findUserById(id)
 		.then(function (user) {
 			res.body = user.toJSON();
 			next();
