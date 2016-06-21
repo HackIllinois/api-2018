@@ -79,10 +79,18 @@ the root of the project directory:
 node api.js
 ```
 
-Use `Control-C` to kill the server. Note that Windows users will need to use
-Powershell or this command will fail!
+Use `Control-C` to kill the server. Note that `node` must be on your path.
+
+## Documentation
+
+All documentation is available on the [project wiki](https://github.com/HackIllinois/api-2017/wiki).
 
 ## Issues
 
 Please use the issue tracker to submit issues about features currently in `master`
 or `staging`.
+
+Any issues found in a feature branch (i.e. not in `master` or `staging`)
+should be communicated to the active developer(s) directly, unless there is an open
+pull-request for that feature branch. In the latter case, just leave a comment on
+the pull-request detailing the issue preventing a merge.
