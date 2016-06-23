@@ -1,14 +1,7 @@
 # HackIllinois Database
 
-### Getting Started
-If you don't have it already, you will need the [FlywayDB command line tool](http://flywaydb.org/documentation/commandline/). Further, you'll need to create a schema called `hackillinois-2017` on your local MySQL instance.
-
-Once you have both of these tasks completed, run `flyway.sh migrate` from the current directory. This will run all migration scripts available to-date.
-
-Note that if you're just looking to have an API instance on your local machine (but not commit code changes to this repository), you can stop reading here.
-
 ### Migrations
-We'll be using FlywayDB to keep our database schema in sync. The `migration` folder will keep track of all migrations, with each migration following this naming convention:
+We'll be using FlywayDB to keep our database schema in sync (you should have this command line utility from when you set up your database initially). The `migration` folder will keep track of all migrations, with each migration following this naming convention:
 > [YYYYmmDD]\_[HHMM]\__[description].sql
 
 A migration that creates a new table called `foo` on 6/15/2016 at 12:00 PM might look like this:

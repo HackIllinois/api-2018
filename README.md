@@ -35,23 +35,6 @@ although some mirrors may have this version available. Instead, it is sufficient
 get the latest 5.7.x download from [here](http://dev.mysql.com/downloads/mysql/) or
 from your favorite package manager.
 
-## Installation
-
-#### Dependencies
-A typical `package.json` is present in the root of the project directory. You can
-use it to install all of the dependencies at once by running the following:
-
-```
-npm install
-```
-
-Note that your current directory must be the root of the project.
-
-#### Database
-
-All database-specific installation is described in the [database README](/database/README.md). Please refer to it for details on how to get a local
-database instance running that can accommodate our API.
-
 ## Configuration
 
 The following environment variables can be used to configure the API for your system:
@@ -69,6 +52,33 @@ You should set `NODE_ENV` to `development`, as this variable is required. The AP
 will exit with an unsuccessful error code if it finds that this variable is missing.
 To save time, you might add this variable to your PATH, or to a `bash_profile` as
 an export.
+
+## Installation
+
+#### Dependencies
+A typical `package.json` is present in the root of the project directory. You can
+use it to install all of the dependencies at once by running the following:
+
+```
+npm install
+```
+
+Note that your current directory must be the root of the project.
+
+#### Database
+
+To begin, you will need the [FlywayDB command line tool](http://flywaydb.org/documentation/commandline/).
+Further, you'll need to create a schema called `hackillinois-2017` on your local MySQL instance.
+
+Once you have both of these tasks completed, run `./database/flyway.sh migrate`
+from the root of the project directory. This will run all migration scripts available to-date.
+If you see any errors, such as an inability to access the database, make sure you have
+set up the schema correctly and that you have set any necessary MySQL environment
+variables listed in the configuration section above.
+
+Note that if you're looking to contribute to this codebase, you should read the
+[database README](/database/README.md) as well. It contains important information that all
+contributors should be familiar with.
 
 ## Starting Up
 
