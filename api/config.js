@@ -16,7 +16,7 @@ if (!isProduction && !isDevelopment) {
 	process.exit(1);
 }
 
-if (secret) {
+if (!secret) {
 	if (isProduction) {
 		logger.error("the secret was not provided");
 		logger.error("set HACKILLINOIS_SECRET to a secure, random string");

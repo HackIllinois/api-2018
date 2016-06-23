@@ -36,7 +36,11 @@ User.prototype.setPassword = function (password) {
 
 User.prototype.hasPassword = function (password) {
 	password = crypto.hashWeak(password);
-	return bcrypt.compareAsync(password, this.get('password'));
+	return promise
+		.bind(this)
+		.then(function() {
+			return bcrypt.compareAsync(password, this.get('password'));
+		});
 };
 
 User.prototype.toJSON = function () {

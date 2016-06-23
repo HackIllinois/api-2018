@@ -29,9 +29,11 @@ function createHacker (req, res, next) {
 			res.body.auth = auth;
 
 			next();
+			return null;
 		})
 		.catch(function (error) {
 			next(error);
+			return null;
 		});
 }
 
@@ -42,10 +44,13 @@ function getUser (req, res, next) {
 		.findUserById(id)
 		.then(function (user) {
 			res.body = user.toJSON();
+
 			next();
+			return null;
 		})
 		.catch(function (error) {
 			next(error);
+			return null;
 		});
 }
 

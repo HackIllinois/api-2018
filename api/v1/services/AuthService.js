@@ -1,6 +1,6 @@
 var Promise = require('bluebird');
 
-var jwt = Promise.promisifyAll(require('jsonwebtoken'));
+var jwt = require('jsonwebtoken');
 var _ = require('lodash');
 
 var config = require('../../config');
@@ -18,31 +18,27 @@ function _issue(payload, subject) {
 		parameters.subject = subject;
 	}
 
-	return jwt.signAsync(payload, JWT_SECRET, parameters);
+	return jwt.sign(payload, JWT_SECRET, parameters);
 }
 
-module.exports.issueForUser = function (user, password) {
-	return user
-		.hasPassword(password)
-		.then(function (result) {
-			if (!result) {
-				var message = "The provided password was incorrect";
-				var source = "password";
-				throw new errors.InvalidParameterError(message, source);
-			}
+module.exports.issueForUser = function (user) {
+	var subject = user.get("id").toString();
+	var payload = {
+		email: user.get("email"),
+		role: user.get("role")
+	};
 
-			var subject = user.id.toString();
-			var payload = {
-				email: user.email,
-				role: user.role
-			};
-
-			return _issue(payload, subject);
+	return Promise
+		.try(function () {
+			return Promise.resolve(_issue(payload, subject));
 		});
 };
 
 module.exports.verify = function(token) {
-	return jwt.verifyAsync(token, JWT_SECRET)
+	return Promise
+		.try(function () {
+			return Promise.resolve(jwt.verify(token, JWT_SECRET));
+		})
 		.catch(jwt.JsonWebTokenError, function (error) {
 			var message = error.message;
 			throw new errors.UnprocessableRequestError(message);

@@ -46,6 +46,9 @@ module.exports.createUser = function (email, password, role) {
 		.then(function () {
 			// TODO: add user to mailing list
 			return user.save();
+		})
+		.then(function (user) {
+			return Promise.resolve(user);
 		});
 };
 
@@ -72,5 +75,19 @@ module.exports.findUserByEmail = function (email) {
 			}
 
 			return Promise.resolve(User.forge(_.head(result)));
+		});
+};
+
+module.exports.verifyPassword = function (user, password) {
+	return user
+		.hasPassword(password)
+		.then(function (result) {
+			if (!result) {
+				var message = "The provided password is incorrect";
+				var source = "password";
+				throw new errors.InvalidParameterError(message, source);
+			}
+
+			return Promise.resolve(true);
 		});
 };

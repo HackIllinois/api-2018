@@ -10,10 +10,12 @@ module.exports = function (req, res, next) {
 	if (!auth)
 		return next();
 
-	AuthService.verify(auth)
+	return AuthService.verify(auth)
 		.then(function (decoded) {
 			req.auth = decoded;
+
 			next();
+			return null;
 		})
 		.catch(errors.UnprocessableRequestError, function (error) {
 			var message = "The provided token was invalid (" +
@@ -21,5 +23,6 @@ module.exports = function (req, res, next) {
 			var source = AUTH_HEADER;
 
 			next(new errors.InvalidHeaderError(message, source));
+			return null;
 		});
 };

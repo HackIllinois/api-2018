@@ -4,7 +4,7 @@
 	"private": true,
 	"dependencies": {
 		"bcrypt": "^0.8.7",
-		"bluebird": "^3.4.0",
+		"bluebird": "^3.4.1",
 		"body-parser": "^1.15.1",
 		"bookshelf": "^0.9.5",
 		"checkit": "^0.6.0",
