@@ -1,14 +1,12 @@
+var requests = require('./requests');
+
 var endpoints = {};
 
 endpoints['/user'] = {
-	POST: {
-		required: ['email', 'password', 'confirmedPassword']
-	}
+	POST: requests.HackerCreationRequest
 };
 endpoints['/auth'] = {
-	POST: {
-		required: ['email', 'password']
-	}
+	POST: requests.AuthTokenRequest
 };
 
 module.exports = endpoints;

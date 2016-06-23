@@ -27,7 +27,6 @@ function _issueByEmail(email, password) {
 }
 
 function createToken (req, res, next) {
-
 	_issueByEmail(req.body.email, req.body.password)
 		.then(function (auth) {
 			res.body = {};

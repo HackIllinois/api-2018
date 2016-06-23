@@ -1,43 +1,28 @@
-var _ = require('lodash');
+var CheckitError = require('checkit').Error;
 
 var endpoints = require('../endpoints');
 var errors = require('../errors');
-
-function audit(req, required) {
-	var data = req.body;
-	var missingParameters = [];
-
-	if (!data) {
-		var errorDetail = 'The request body could not be parsed';
-		throw new errors.UnprocessableRequestError(errorDetail, null);
-	}
-
-	_.forEach(required, function(requiredParameter) {
-		if (_.isUndefined(data[requiredParameter]))
-			missingParameters.push(requiredParameter);
-	});
-
-	if (missingParameters.length)
-		throw new errors.MissingParameterError(null, missingParameters);
-}
-
-function marshal(req, required, allowed) {
-  req.body = _.pick(req.body, _.merge(required, allowed));
-  return req;
-}
+var errorUtils = require('../utils/errors');
 
 module.exports = function(req, res, next) {
-	var pathParameters = endpoints[req.path.replace(/\/+$/, "")];
-	var endpointParameters = (pathParameters) ? pathParameters[req.method] : undefined;
+	var pathRequests = endpoints[req.path.replace(/\/+$/, "")];
+	var MethodRequest = (pathRequests) ? pathRequests[req.method] : undefined;
 
-	if (!endpointParameters)
+	if (!MethodRequest)
 		return next();
 
-	var required = endpointParameters.required;
-	var allowed = endpointParameters.allowed;
+	var request = new MethodRequest(req.body);
+	request.validate()
+		.then(function (validated) {
+			req.body = request.body;
 
-	audit(req, (required) ? required : []);
-	marshal(req, (required) ? required : [], (allowed) ? allowed : []);
+			next();
+			return null;
+		})
+		.catch(CheckitError, errorUtils.handleValidationError)
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
 
-	return next();
 };
