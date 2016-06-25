@@ -1,13 +1,9 @@
 var ApiError = require('../errors/ApiError');
 var logger = require('../../logging');
 
-function marshalError(error) {
-	return error.toJSON();
-}
-
 module.exports = function (err, req, res, next) {
 	if (!(err instanceof Error)) {
-		logger.info("caught error of uknown type");
+		logger.info("caught error of unknown type");
 		logger.error(err);
 
 		err = new ApiError();
@@ -21,7 +17,7 @@ module.exports = function (err, req, res, next) {
 
 	var response = {
 		meta: null,
-		error: marshalError(err)
+		error: err.toJSON()
 	};
 
 	res.status(err.status).json(response);

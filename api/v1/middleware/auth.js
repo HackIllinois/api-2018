@@ -7,8 +7,9 @@ var AUTH_HEADER = config.auth.header;
 module.exports = function (req, res, next) {
 	var auth = req.header(AUTH_HEADER);
 
-	if (!auth)
+	if (!auth) {
 		return next();
+	}
 
 	return AuthService.verify(auth)
 		.then(function (decoded) {

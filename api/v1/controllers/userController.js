@@ -7,6 +7,12 @@ var roles = require('../utils/roles');
 
 var router = require('express').Router();
 
+/**
+ * Determines whether or not the requester is requesting its own
+ * user information
+ * @param  {Request}  req an Express request with auth and parameter information
+ * @return {Boolean} whether or not the requester is requesting itself
+ */
 function isRequester(req) {
 	return parseInt(req.auth.sub) == req.params.id;
 }

@@ -6,6 +6,11 @@ var User = require('../models/User');
 var errors = require('../errors');
 var utils = require('../utils');
 
+/**
+ * Finds a user by its email address
+ * @param  {String} email the email to query
+ * @return {Array} the possible (one) matching user, or an empty array
+ */
 function _findUserByEmail (email) {
 	if (email) {
 		email = email.toLowerCase();
@@ -15,6 +20,11 @@ function _findUserByEmail (email) {
 	return Promise.resolve([]);
 }
 
+/**
+ * Finds a user by its datastore ID
+ * @param  {Number} id the ID to query
+ * @return {Array} the possible (one) matching user, or an empty array
+ */
 function _findUserById (id) {
 	if (id) {
 		return User.query().where('ID', id).select();
@@ -23,10 +33,22 @@ function _findUserById (id) {
 	return Promise.resolve([]);
 }
 
+/**
+ * Creates a user of the specified role. When a password is not specified, a
+ * password will be generated for it
+ * @param  {String} email the email identifying the user
+ * @param  {String} password the password associated with the user (optional)
+ * @param  {String} role a role to assign to the user
+ * @return {Promise} resolving to the newly-created user
+ * @throws InvalidParameterError when a user exists with the specified email
+ */
 module.exports.createUser = function (email, password, role) {
 	email = email.toLowerCase();
 	password = (password) ? password : utils.crypto.generatePassword();
 	var user = User.forge({ email: email, password: password, role: role });
+
+	// TODO: send user an email requiring a password reset when
+	// the password is automatically generated
 
 	return user
 		.validate()
@@ -52,6 +74,12 @@ module.exports.createUser = function (email, password, role) {
 		});
 };
 
+/**
+ * Finds a user by querying for the given ID
+ * @param  {Number} id the ID to query
+ * @return {Promise} resolving to the associated User model
+ * @throws {NotFoundError} when the requested user cannot be found
+ */
 module.exports.findUserById = function (id) {
 	return _findUserById(id)
 		.then(function (result) {
@@ -65,6 +93,12 @@ module.exports.findUserById = function (id) {
 		});
 };
 
+/**
+ * Finds a user by querying for the given email
+ * @param  {String} email the email to query
+ * @return {Promise} resolving to the associated User model
+ * @throws {NotFoundError} when the requested user cannot be found
+ */
 module.exports.findUserByEmail = function (email) {
 	return _findUserByEmail(email)
 		.then(function (result) {
@@ -78,6 +112,13 @@ module.exports.findUserByEmail = function (email) {
 		});
 };
 
+/**
+ * Verifies that the provided password matches that of the user's password
+ * @param  {User} user a User model
+ * @param  {String} password the value to verify
+ * @return {Promise} resolving to the validity of the provided password
+ * @throws {InvalidParameterError} when the password is invalid
+ */
 module.exports.verifyPassword = function (user, password) {
 	return user
 		.hasPassword(password)

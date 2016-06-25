@@ -6,17 +6,23 @@ var UserService = require('../services/UserService');
 
 var router = require('express').Router();
 
+/**
+ * Issues a token using the provided email address,
+ * optionally checking a password against the associated
+ * user's password
+ * @param  {String} email    a user's email address
+ * @param  {String} password the associated user's password (optional)
+ * @return {Promise} a promise resolving to an auth token
+ * @throws {NotFoundError} when there is no user associated with the email
+ * @throws {InvalidParameterError} when the provided password is incorrect
+ */
 function _issueByEmail(email, password) {
-	if (!password && password !== null) {
-		throw new TypeError("To issue a token by email without checking the " +
-			"user's password, you must pass the password as the null type");
-	}
-
 	return UserService
 		.findUserByEmail(email)
 		.then(function (user) {
-			if (!password)
+			if (!password) {
 				return AuthService.issueForUser(user);
+			}
 
 			return UserService
 				.verifyPassword(user, password)
@@ -27,6 +33,7 @@ function _issueByEmail(email, password) {
 }
 
 function createToken (req, res, next) {
+	// the requester must have a valid password to receive a new token
 	_issueByEmail(req.body.email, req.body.password)
 		.then(function (auth) {
 			res.body = {};
@@ -47,7 +54,9 @@ function refreshToken (req, res, next) {
 		return next(new errors.InvalidHeaderError(message));
 	}
 
-	_issueByEmail(req.auth.email, null)
+	// the requester's token must be valid and present, so we can re-issue
+	// without requiring a password
+	_issueByEmail(req.auth.email)
 		.then(function (auth) {
 			res.body = {};
 			res.body.auth = auth;
