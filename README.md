@@ -42,6 +42,7 @@ The following environment variables can be used to configure the API for your sy
 | Variable | Possible Values | Purpose |
 | -------- | --------------- | ------- |
 | NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
+| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
 | HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
 | LOCAL_MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') |
 | LOCAL_MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') |
