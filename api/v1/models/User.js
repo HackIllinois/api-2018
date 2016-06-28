@@ -9,20 +9,6 @@ var roles = require('../utils/roles');
 
 const SALT_ROUNDS = 12;
 
-/**
- * Validates whether or not a provided role is valid for a User model
- * @param  {String}  value the value to examine
- * @return {Boolean} true if the value is a valid role
- * @throws {TypeError} when value is not a valid role
- */
-function hasValidRole(value) {
-	if (roles.ALL.indexOf(value) < 0) {
-		throw new TypeError(value + " is not a valid role");
-	}
-
-	return true;
-}
-
 var Model = require('./Model');
 var User = Model.extend({
 	tableName: 'users',
@@ -31,7 +17,7 @@ var User = Model.extend({
 	validations: {
 		email: ['required', 'email'],
 		password: ['required', 'string', 'minLength:8'],
-		role: ['required', 'string', hasValidRole]
+		role: ['required', 'string', roles.verifyRole]
 	}
 });
 

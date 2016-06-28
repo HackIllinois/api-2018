@@ -3,7 +3,10 @@ var requests = require('./requests');
 var endpoints = {};
 
 endpoints['/user'] = {
-	POST: requests.HackerCreationRequest
+	POST: requests.HackerUserCreationRequest
+};
+endpoints['/user/accredited'] = {
+	POST: requests.AccreditedUserCreationRequest
 };
 endpoints['/auth'] = {
 	POST: requests.AuthTokenRequest

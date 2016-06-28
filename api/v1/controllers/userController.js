@@ -17,7 +17,7 @@ function isRequester(req) {
 	return parseInt(req.auth.sub) == req.params.id;
 }
 
-function createHacker (req, res, next) {
+function createHackerUser (req, res, next) {
 	UserService
 		.createUser(req.body.email, req.body.password, 'HACKER')
 		.then(function (user) {
@@ -34,6 +34,11 @@ function createHacker (req, res, next) {
 			next(error);
 			return null;
 		});
+}
+
+function createAccreditedUser (req, res, next) {
+	// TODO call service function
+	next();
 }
 
 function getUser (req, res, next) {
@@ -53,8 +58,10 @@ function getUser (req, res, next) {
 		});
 }
 
-router.post('', createHacker);
+router.post('', createHackerUser);
+router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
-module.exports.createHacker = createHacker;
+module.exports.createHackerUser = createHackerUser;
+module.exports.createAccreditedUser = createAccreditedUser;
 module.exports.router = router;

@@ -1,4 +1,5 @@
 module.exports = {
+	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
 	AuthTokenRequest: require('./AuthTokenRequest'),
-	HackerCreationRequest: require('./HackerCreationRequest')
+	HackerUserCreationRequest: require('./HackerUserCreationRequest')
 };
