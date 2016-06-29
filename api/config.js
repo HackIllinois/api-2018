@@ -5,6 +5,8 @@ PRODUCTION_IDENTIFIER = 'production';
 
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
+var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
+var superuserPassword = process.env.HACKKILLINOIS_SUPERUSER_PASSWORD;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
@@ -27,7 +29,30 @@ if (!secret) {
 	secret = 'NONE';
 }
 
+if (!superuserEmail) {
+	if (isProduction) {
+		logger.error("the superuser email was not set");
+		logger.error("set HACKILLINOIS_SUPERUSER_EMAIL to the admin email");
+
+		process.exit(1);
+	}
+
+	superuserEmail = 'admin@example.com';
+}
+
+if (!superuserPassword) {
+	if (isProduction) {
+		logger.error("the superuser password was not set");
+		logger.error("set HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
+
+		process.exit(1);
+	}
+
+	superuserPassword = 'ABCD1234!';
+}
+
 var config = {};
+config.superuser = {};
 config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
@@ -35,6 +60,9 @@ config.database.primary = { pool: {} };
 config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT || 8080;
+
+config.superuser.email = superuserEmail;
+config.superuser.password = superuserPassword;
 
 config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
