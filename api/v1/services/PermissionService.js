@@ -24,5 +24,5 @@ module.exports.canCreateUser = function (creatorRole, userRole) {
 	}
 
 	var message = "The requested user cannot be created with the provided credentials";
-	return Promise.reject(errors.UnauthorizedError(message));
+	return Promise.reject(new errors.UnauthorizedError(message));
 };

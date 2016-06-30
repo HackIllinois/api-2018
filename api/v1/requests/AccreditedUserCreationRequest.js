@@ -1,13 +1,9 @@
 var roles = require('../utils/roles');
 var Request = require('./Request');
 
-var required = ['email', 'confirmedPassword', 'role'];
-var allowed = ['password'];
+var required = ['email', 'role'];
 var validations = {
 	'email': ['email'],
-	'password': ['string', 'minLength:8'],
-	'confirmedPassword': [{ rule: 'matchesField:password',
-		message: "The confirmed password must match the password" }],
 	'role': ['string', roles.verifyRole]
 };
 
@@ -16,7 +12,6 @@ function AccreditedUserCreationRequest(parameters) {
 	Request.call(this, parameters);
 
 	this.required = required;
-	this.allowed = allowed;
 	this.validations = validations;
 }
 

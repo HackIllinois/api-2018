@@ -6,7 +6,7 @@ const SHA_TYPE = "SHA-256";
 const SHA_INPUT_TYPE = "TEXT";
 const SHA_OUTPUT_TYPE = "HEX";
 
-const PASSWORD_RADIUS = 31;
+const PASSWORD_RADIX = 31;
 const PASSWORD_LENGTH = 33;
 
 /**
@@ -26,5 +26,5 @@ module.exports.hashWeak = function (text) {
  * @return {String} a significantly-long, pseudo-random string
  */
 module.exports.generatePassword = function () {
-	return Math.random().toString(PASSWORD_RADIUS).substring(0, PASSWORD_LENGTH);
+	return Math.random().toString(PASSWORD_RADIX).substring(0, PASSWORD_LENGTH);
 };
