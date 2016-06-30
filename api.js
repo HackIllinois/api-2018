@@ -5,17 +5,16 @@ var fs = require('fs');
 var config = require('./api/config');
 var database = require('./api/database');
 var logger = require('./api/logging');
-var v1 = require('./api/v1/');
 
-var api = express();
-api.use(bodyParser.json());
-api.use(bodyParser.urlencoded({ extended: false }));
-api.disable('x-powered-by');
+var api = require('./api/');
 
-api.use('/v1', v1);
+var instance = express();
+instance.use(bodyParser.json());
+instance.use(bodyParser.urlencoded({ extended: false }));
+instance.disable('x-powered-by');
 
-var instance = api.listen(config.port, function() {
+instance.use('/v1', api.v1);
+
+var instance = instance.listen(config.port, function() {
 	logger.info("initialized api (http://localhost:%d)", config.port);
 });
-
-module.exports = api;

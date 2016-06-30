@@ -26,8 +26,12 @@ function DatabaseManager() {
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
-DatabaseManager.prototype.instance = function() {
+
+DatabaseManager.prototype.instance = function () {
 	return this._bookshelf;
+};
+DatabaseManager.prototype.connection = function () {
+	return this._knex;
 };
 
 logger.info("connected to database as %s", config.database.primary.user);

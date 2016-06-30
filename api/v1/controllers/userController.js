@@ -1,6 +1,5 @@
 var errors = require('../errors');
-var UserService = require('../services/UserService');
-var AuthService = require('../services/AuthService');
+var services = require('../services');
 
 var middleware = require('../middleware');
 var roles = require('../utils/roles');
@@ -17,11 +16,11 @@ function isRequester(req) {
 	return parseInt(req.auth.sub) == req.params.id;
 }
 
-function createHacker (req, res, next) {
-	UserService
+function createHackerUser (req, res, next) {
+	services.UserService
 		.createUser(req.body.email, req.body.password, 'HACKER')
 		.then(function (user) {
-			return AuthService.issueForUser(user);
+			return services.AuthService.issueForUser(user);
 		})
 		.then(function (auth) {
 			res.body = {};
@@ -36,10 +35,31 @@ function createHacker (req, res, next) {
 		});
 }
 
+function createAccreditedUser (req, res, next) {
+	var requesterRole = req.auth.role;
+
+	services.PermissionService
+		.canCreateUser(requesterRole, req.body.role)
+		.then(function (verified) {
+			return services.UserService
+				.createUser(req.body.email, req.body.password, req.body.role);
+		})
+		.then(function (user) {
+			res.body = user.toJSON();
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 function getUser (req, res, next) {
 	var id = req.params.id;
 
-	UserService
+	services.UserService
 		.findUserById(id)
 		.then(function (user) {
 			res.body = user.toJSON();
@@ -53,8 +73,10 @@ function getUser (req, res, next) {
 		});
 }
 
-router.post('', createHacker);
+router.post('', createHackerUser);
+router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
-module.exports.createHacker = createHacker;
+module.exports.createHackerUser = createHackerUser;
+module.exports.createAccreditedUser = createAccreditedUser;
 module.exports.router = router;
