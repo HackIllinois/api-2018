@@ -1,12 +1,17 @@
+/* jshint esversion: 6 */
+
 var logger = require('./logging');
 
-DEVELOPMENT_IDENTIFIER = 'development';
-PRODUCTION_IDENTIFIER = 'production';
+const DEVELOPMENT_IDENTIFIER = 'development';
+const PRODUCTION_IDENTIFIER = 'production';
+const DEVELOPMENT_MAIL_DOMAIN = 'sandboxcdef5b02a79843feb5e5216dca5edf3c.mailgun.org';
+const PRODUCTION_MAIL_DOMAIN = 'hackillinois.org';
 
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
 var superuserPassword = process.env.HACKKILLINOIS_SUPERUSER_PASSWORD;
+var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
@@ -27,6 +32,20 @@ if (!secret) {
 	}
 
 	secret = 'NONE';
+}
+
+if (!mailApiKey) {
+	if (isProduction) {
+		logger.error("the mail service API key was not set");
+		logger.error("set HACKILLINOIS_MAIL_KEY to the API key");
+
+		process.exit(1);
+	} else {
+		logger.warn("the mail server API key was not set");
+		logger.warn("some mail service functionality may malfunction");
+	}
+
+	mailApiKey = '';
 }
 
 if (!superuserEmail) {
@@ -56,6 +75,7 @@ config.superuser = {};
 config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
+config.mail = {};
 
 config.isDevelopment = isDevelopment;
 config.secret = secret;
@@ -76,6 +96,9 @@ config.database.primary.name = process.env.RDS_DB_NAME || 'hackillinois-2017';
 config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = 5 * 1000; // in millseconds
+
+config.mail.domain = (isProduction) ? PRODUCTION_MAIL_DOMAIN : DEVELOPMENT_MAIL_DOMAIN;
+config.mail.key = mailApiKey;
 
 logger.info("prepared environment for %s", environment);
 
