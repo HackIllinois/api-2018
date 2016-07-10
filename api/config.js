@@ -4,8 +4,6 @@ var logger = require('./logging');
 
 const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
-const DEVELOPMENT_MAIL_DOMAIN = 'sandboxcdef5b02a79843feb5e5216dca5edf3c.mailgun.org';
-const PRODUCTION_MAIL_DOMAIN = 'hackillinois.org';
 
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
@@ -25,9 +23,7 @@ if (!isProduction && !isDevelopment) {
 
 if (!secret) {
 	if (isProduction) {
-		logger.error("the secret was not provided");
 		logger.error("set HACKILLINOIS_SECRET to a secure, random string");
-
 		process.exit(1);
 	}
 
@@ -36,9 +32,7 @@ if (!secret) {
 
 if (!mailApiKey) {
 	if (isProduction) {
-		logger.error("the mail service API key was not set");
 		logger.error("set HACKILLINOIS_MAIL_KEY to the API key");
-
 		process.exit(1);
 	} else {
 		logger.warn("the mail server API key was not set");
@@ -50,9 +44,7 @@ if (!mailApiKey) {
 
 if (!superuserEmail) {
 	if (isProduction) {
-		logger.error("the superuser email was not set");
 		logger.error("set HACKILLINOIS_SUPERUSER_EMAIL to the admin email");
-
 		process.exit(1);
 	}
 
@@ -97,8 +89,9 @@ config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = 5 * 1000; // in millseconds
 
-config.mail.domain = (isProduction) ? PRODUCTION_MAIL_DOMAIN : DEVELOPMENT_MAIL_DOMAIN;
 config.mail.key = mailApiKey;
+config.mail.sinkhole = '.sink.sparkpostmail.com';
+config.mail.whitelist = ['@hackillinois.org']; // development whitelist
 
 logger.info("prepared environment for %s", environment);
 
