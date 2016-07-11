@@ -14,7 +14,7 @@ var utils = require('../utils');
 function _findUserByEmail (email) {
 	if (email) {
 		email = email.toLowerCase();
-		return User.query().where('Email', email).select();
+		return User.query().where('email', email).select();
 	}
 
 	return Promise.resolve([]);
@@ -27,7 +27,7 @@ function _findUserByEmail (email) {
  */
 function _findUserById (id) {
 	if (id) {
-		return User.query().where('ID', id).select();
+		return User.query().where('id', id).select();
 	}
 
 	return Promise.resolve([]);

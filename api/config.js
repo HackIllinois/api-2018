@@ -91,7 +91,8 @@ config.database.primary.pool.idleTimeout = 5 * 1000; // in millseconds
 
 config.mail.key = mailApiKey;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
-config.mail.whitelist = ['@hackillinois.org']; // development whitelist
+config.mail.whitelistedDomains = ['@hackillinois.org'];
+config.mail.whitelistedLists = ['test'];
 
 logger.info("prepared environment for %s", environment);
 
