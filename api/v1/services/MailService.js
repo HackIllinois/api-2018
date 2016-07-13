@@ -6,9 +6,13 @@ var _ = require('lodash');
 
 var config = require('../../config');
 var logger = require('../../logging');
+var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
+var MailingListUser = require('../models/MailingListUser');
 
-var client = Promise.promisifyAll(new SparkPost(config.mail.key));
+var client = new SparkPost(config.mail.key || 'NONE');
+var transmissionsAsync = Promise.promisifyAll(client.transmissions);
+var recipientsAsync = Promise.promisifyAll(client.recipientLists);
 client.isEnabled = !!config.mail.key;
 
 const CLIENT_DISABLED_REASON = "the client is disabled";
@@ -65,12 +69,20 @@ function _formatRecipientsList(list) {
 		});
 }
 
-function _handleClientError(errorResponse) {
-	var error = errorResponse.errors[0];
-	var message = "The mail client returned an error: " +
-		error.message + " (" + error.description + ")";
+function _buildMailingListUser(user, list) {
+	var mailingListUserParams = { user_id: user.id, mailing_list_id: list.id };
+	return MailingListUser.forge(mailingListUserParams);
+}
 
-	throw new errors.ExternalProviderError(message);
+function _handleClientError(error) {
+	var message = "The mail client returned an error: ";
+	if (error.cause) {
+		message += error.cause.message;
+	} else {
+		message += error.errors[0] + "(" + error.description + ")";
+	}
+
+	throw new ExternalProviderError(message);
 }
 
 /**
@@ -88,8 +100,8 @@ function send(recipients, template, substitutions) {
 		substitution_data: (substitutions) ? substitutions : {}
 	};
 
-	return client.transmissions
-		.sendAsync(transmission)
+	return transmissionsAsync
+		.sendAsync({ transmissionBody: transmission })
 		.then(function (result) {
 			return true;
 		})
@@ -123,10 +135,10 @@ function sendToList(list, template, substitutions) {
 	return _formatListRecipients(list)
 		.then(function (recipients) {
 			recipientList.recipients = recipients;
-			return client.updateAsync(recipientList);
+			return recipientsAsync.updateAsync(recipientList);
 		})
 		.then(function (result) {
-			return client.transmissions.sendAsync(transmission);
+			return transmissionsAsync.sendAsync({ transmissionBody: transmission });
 		})
 		.then(function (result) {
 			return true;
@@ -137,23 +149,32 @@ function sendToList(list, template, substitutions) {
 /**
  * Adds a user to a mailing list. Does not check whether or not the user
  * is already on the desired list
- * @param {User} user		the user to add to the list
- * @param {String} list		the list to receive this user
- * @returns {Promise}		an empty promise
+ * @param {User} user						the user to add to the list
+ * @param {String} list						the list to receive this user
+ * @returns {Promise<MailingListUser>}		an promise with the save result
  */
 function addToList(user, list) {
-	var listEntry = MailingListUser.forge({ user_id: user.id, list: list });
-	return listEntry.save();
+	MailingList
+		.findByName(list)
+		.then(function (mailingList) {
+			var mailingListUser = _buildMailingListUser(user, mailingList);
+			return mailingListUser.save();
+		});
 }
 
 /**
  * Removes a user from a mailing list
- * @param  {User} user		the user to remove from the list
- * @param  {String} list	the list that the user is currently on
- * @return {Promise}		an empty promise
+ * @param  {User} user					the user to remove from the list
+ * @param  {String} list				the list that the user is currently on
+ * @return {Promise<MailingListUser>}	a promise with the deleted result
  */
 function removeFromList(user, list) {
-	return MailingListUser.where('user_id', user.id).where('list', list).del();
+	MailingList
+		.findByName(list)
+		.then(function (mailingList) {
+			var mailingListUser = _buildMailingListUser(user, mailingList);
+			return mailingListUser.del();
+		});
 }
 
 function sendDisabled(recipients, template, substitutions) {

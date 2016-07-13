@@ -38,8 +38,6 @@ if (!mailApiKey) {
 		logger.warn("the mail server API key was not set");
 		logger.warn("some mail service functionality may malfunction");
 	}
-
-	mailApiKey = '';
 }
 
 if (!superuserEmail) {

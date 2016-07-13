@@ -17,14 +17,4 @@ instance.use('/v1', api.v1);
 
 var instance = instance.listen(config.port, function() {
 	logger.info("initialized api (http://localhost:%d)", config.port);
-
-
-	var MailingList = require('./api/v1/models/MailingList');
-	MailingList.findByName('idlers').then(function (list){
-		return list.members();
-	}). then (function (members) {
-		members.forEach(function (e) {
-			console.log(e.email);
-		})
-	});
 });

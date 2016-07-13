@@ -4,8 +4,7 @@ var MailingListUser = require('./MailingListUser');
 
 var MailingList = Model.extend({
 	tableName: 'mailing_lists',
-	idAttribute: 'id',
-	validations: { }
+	idAttribute: 'id'
 });
 
 /**
