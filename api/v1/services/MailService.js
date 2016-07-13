@@ -1,10 +1,12 @@
+/* jshint esversion: 6 */
+
 var Promise = require('bluebird');
 var SparkPost = require('sparkpost');
 var _ = require('lodash');
 
 var config = require('../../config');
 var logger = require('../../logging');
-var MailingListEntry = require('../models/MailingListEntry');
+var MailingList = require('../models/MailingList');
 
 var client = Promise.promisifyAll(new SparkPost(config.mail.key));
 client.isEnabled = !!config.mail.key;
@@ -52,8 +54,15 @@ function _formatRecipients (recipients, useWhitelist) {
 }
 
 function _formatRecipientsList(list) {
-	// TODO select email of all users in given list
-	// TODO format into recipient object
+	return MailingList.findByName(list)
+		.then(function (mailingList) {
+			return mailingList.members();
+		})
+		.then(function (memberCollection) {
+			return memberCollection.map (function (member) {
+				return { address: member };
+			});
+		});
 }
 
 function _handleClientError(errorResponse) {
@@ -67,7 +76,7 @@ function _handleClientError(errorResponse) {
 /**
  * Sends a templated email to the requested recipients
  * @param  {String|Array} recipients	a list of the recipients
- * @param  {String} template			the id of the template to use
+ * @param  {String} template			the template identifier to use
  * @param  {Object} substitutions		a mapping of keys to their substitution values (optional)
  * @return {Promise}					an empty promise
  * @throws {ExternalProviderError} 		when the mail client returns an error
@@ -87,6 +96,14 @@ function send(recipients, template, substitutions) {
 		.catch(_handleClientError);
 }
 
+/**
+ * Sends a templated email to the requested email list
+ * @param  {String} list          	the list identifier to use
+ * @param  {String} template      	the template identifier to use
+ * @param  {Object} substitutions 	a mapping of keys to their substitution values (optional)
+ * @return {Promise}				an empty promise
+ * @throws {ExternalProviderError}	when the mail client returns an error
+ */
 function sendToList(list, template, substitutions) {
 	if (config.isDevelopment && !_isWhitelistedList(list)) {
 		logDisabled(template, list, substitutions, LIST_NOT_WHITELISTED_REASON);
@@ -95,22 +112,26 @@ function sendToList(list, template, substitutions) {
 
 	var recipientList = {
 		id: list,
-		recipients: _formatListRecipients(list)
+		recipients: [] // unknown until we gather the recipients from the datastore
 	};
 	var transmission = {
 		content: { template_id: template },
 		recipients: { list_id: list },
 		substitution_data: (substitutions) ? substitutions : {}
 	};
-	client.recipientLists
-		.updateAsync(recipientList)
+
+	return _formatListRecipients(list)
+		.then(function (recipients) {
+			recipientList.recipients = recipients;
+			return client.updateAsync(recipientList);
+		})
 		.then(function (result) {
 			return client.transmissions.sendAsync(transmission);
 		})
 		.then(function (result) {
 			return true;
 		})
-		.catch(_handleClientError);	
+		.catch(_handleClientError);
 }
 
 /**
@@ -121,7 +142,7 @@ function sendToList(list, template, substitutions) {
  * @returns {Promise}		an empty promise
  */
 function addToList(user, list) {
-	var listEntry = MailingListEntry.forge({ user_id: user.id, list: list });
+	var listEntry = MailingListUser.forge({ user_id: user.id, list: list });
 	return listEntry.save();
 }
 
@@ -132,7 +153,7 @@ function addToList(user, list) {
  * @return {Promise}		an empty promise
  */
 function removeFromList(user, list) {
-	return MailingListEntry.where('user_id', user.id).where('list', list).del();
+	return MailingListUser.where('user_id', user.id).where('list', list).del();
 }
 
 function sendDisabled(recipients, template, substitutions) {

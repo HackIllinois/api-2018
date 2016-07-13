@@ -14,6 +14,26 @@ var Model = bookshelf.Model.extend({
 });
 
 /**
+ * Produces datastore transaction
+ * @param  {Function} callback	method to start transaction
+ * @return {Promise} 			the result of the callback
+ */
+Model.transaction = function (callback) {
+	return bookshelf.transaction(callback);
+};
+
+/**
+ * Fetches a model by its ID
+ * @param  {Number|String} id	the ID of the model with the appropriate type
+ * @return {Promise<Model>}		a Promise resolving to the resulting model or null
+ */
+Model.findById = function (id) {
+	var queryWhere = {};
+	queryWhere[this.idAttribute] = id;
+	return this.collection().query({ where: queryWhere }).fetchOne();
+};
+
+/**
  * Initializes the model by setting up all event handlers
  */
 Model.prototype.initialize = function () {
