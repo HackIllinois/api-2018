@@ -1,9 +1,10 @@
 module.exports.templates = {};
 module.exports.lists = {};
 
-// this is an example template id, since we don't have any prepared yet
-module.exports.templates.example = 'example-template-id';
+// mapping internal template identifiers to client template identifiers
+module.exports.templates.test = 'test';
 
+// mapping internal list identifiers to client list identifiers
 module.exports.lists.test = 'test';
 module.exports.lists.idlers = 'idlers-2017';
 module.exports.lists.applicants = 'applicants-2017';
@@ -18,6 +19,7 @@ module.exports.lists.sponsors = 'sponsors-2017';
 module.exports.lists.mentors = 'mentors-2017';
 module.exports.lists.volunteers = 'volunteers-2017';
 
+// expose all available internal list identifiers
 for (var list in module.exports.lists) {
-	module.exports[list.toUpperCase()] = list;
+	module.exports[list + "_list"] = list;
 }

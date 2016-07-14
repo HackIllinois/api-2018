@@ -1,11 +1,17 @@
 /* jshint esversion: 6 */
 
+// NOTE: successful requests are not logged, since all mail activity is logged
+// by the client itself.
+// NOTE: the sink is active during development! use whitelisted domains to avoid
+// wasting messages on emails that lack a whitelisted domain (and other frustrations)
+
 var Promise = require('bluebird');
 var SparkPost = require('sparkpost');
 var _ = require('lodash');
 
 var config = require('../../config');
 var logger = require('../../logging');
+var mail = require('../utils/mail');
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
 var MailingListUser = require('../models/MailingListUser');
@@ -15,7 +21,9 @@ var transmissionsAsync = Promise.promisifyAll(client.transmissions);
 var recipientsAsync = Promise.promisifyAll(client.recipientLists);
 client.isEnabled = !!config.mail.key;
 
+const CLIENT_NAME = 'SparkPost';
 const CLIENT_DISABLED_REASON = "the client is disabled";
+const RECIPIENTS_NOT_WHITELISTED_REASON = "none of the recipients are whitelisted";
 const LIST_NOT_WHITELISTED_REASON = "this list cannot recieve development messages";
 
 function logDisabled(template, recipients, substitutions, reason) {
@@ -49,11 +57,11 @@ function _formatRecipients (recipients, useWhitelist) {
 		recipients = [recipients];
 	}
 
-	return _.map(function (recipient) {
+	return _.map(recipients, function (recipient) {
 		if (useWhitelist && !_hasWhitelistedDomain(recipient)) {
 			recipient += config.mail.sinkhole;
 		}
-		return { address: recipient };
+		return { address: { email: recipient } };
 	});
 }
 
@@ -64,7 +72,7 @@ function _formatRecipientsList(list) {
 		})
 		.then(function (memberCollection) {
 			return memberCollection.map (function (member) {
-				return { address: member };
+				return { address: { email: member.attributes.email } };
 			});
 		});
 }
@@ -75,14 +83,18 @@ function _buildMailingListUser(user, list) {
 }
 
 function _handleClientError(error) {
-	var message = "The mail client returned an error: ";
-	if (error.cause) {
-		message += error.cause.message;
-	} else {
-		message += error.errors[0] + "(" + error.description + ")";
-	}
+	var responseError = error.errors[0];
+	var responseErrorCode = (responseError.code) ? responseErrorCode : "no error code";
 
-	throw new ExternalProviderError(message);
+	var message;
+	if (_.has(responseError, 'description')) {
+		message = responseError.description;
+	} else {
+		message = "the mailing client received an error";
+	}
+	message += " (\"" + responseError.message + "\", " + responseErrorCode + ")";
+
+	throw new ExternalProviderError(message, CLIENT_NAME);
 }
 
 /**
@@ -100,6 +112,11 @@ function send(recipients, template, substitutions) {
 		substitution_data: (substitutions) ? substitutions : {}
 	};
 
+	if (_.isEmpty(transmission.recipients)) {
+		logDisabled(template, recipients, substitutions, RECIPIENTS_NOT_WHITELISTED_REASON);
+		return Promise.resolve(true);
+	}
+
 	return transmissionsAsync
 		.sendAsync({ transmissionBody: transmission })
 		.then(function (result) {
@@ -110,7 +127,7 @@ function send(recipients, template, substitutions) {
 
 /**
  * Sends a templated email to the requested email list
- * @param  {String} list          	the list identifier to use
+ * @param  {String} list          	the (internal) list identifier to use (see mail.js)
  * @param  {String} template      	the template identifier to use
  * @param  {Object} substitutions 	a mapping of keys to their substitution values (optional)
  * @return {Promise}				an empty promise
@@ -123,16 +140,16 @@ function sendToList(list, template, substitutions) {
 	}
 
 	var recipientList = {
-		id: list,
+		id: mail.lists[list],
 		recipients: [] // unknown until we gather the recipients from the datastore
 	};
 	var transmission = {
 		content: { template_id: template },
-		recipients: { list_id: list },
+		recipients: { list_id: mail.lists[list] },
 		substitution_data: (substitutions) ? substitutions : {}
 	};
 
-	return _formatListRecipients(list)
+	return _formatRecipientsList(list)
 		.then(function (recipients) {
 			recipientList.recipients = recipients;
 			return recipientsAsync.updateAsync(recipientList);
@@ -154,7 +171,7 @@ function sendToList(list, template, substitutions) {
  * @returns {Promise<MailingListUser>}		an promise with the save result
  */
 function addToList(user, list) {
-	MailingList
+	return MailingList
 		.findByName(list)
 		.then(function (mailingList) {
 			var mailingListUser = _buildMailingListUser(user, mailingList);
@@ -169,11 +186,11 @@ function addToList(user, list) {
  * @return {Promise<MailingListUser>}	a promise with the deleted result
  */
 function removeFromList(user, list) {
-	MailingList
+	return MailingList
 		.findByName(list)
 		.then(function (mailingList) {
 			var mailingListUser = _buildMailingListUser(user, mailingList);
-			return mailingListUser.del();
+			return mailingListUser.query().del();
 		});
 }
 
@@ -182,6 +199,7 @@ function sendDisabled(recipients, template, substitutions) {
 	return Promise.resolve(true);
 }
 
+module.exports.clientName = CLIENT_NAME;
 module.exports.addToList = addToList;
 module.exports.removeFromList = removeFromList;
 if (client.isEnabled) {

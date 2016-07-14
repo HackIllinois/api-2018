@@ -34,3 +34,4 @@ INSERT INTO `mailing_lists` (`name`) VALUES ('staff');
 INSERT INTO `mailing_lists` (`name`) VALUES ('sponsors');
 INSERT INTO `mailing_lists` (`name`) VALUES ('mentors');
 INSERT INTO `mailing_lists` (`name`) VALUES ('volunteers');
+INSERT INTO `mailing_lists` (`name`) VALUES ('test');
