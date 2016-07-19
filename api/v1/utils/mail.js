@@ -4,22 +4,17 @@ module.exports.lists = {};
 // mapping internal template identifiers to client template identifiers
 module.exports.templates.test = 'test';
 
-// mapping internal list identifiers to client list identifiers
-module.exports.lists.test = 'test';
-module.exports.lists.idlers = 'idlers-2017';
-module.exports.lists.applicants = 'applicants-2017';
-module.exports.lists.accepted = 'accepted-2017';
-module.exports.lists.waitlisted = 'waitlisted-2017';
-module.exports.lists.software = 'software-2017';
-module.exports.lists.hardware = 'hardware-2017';
-module.exports.lists.open_source = 'open-source-2017';
-module.exports.lists.admins = 'admins-2017';
-module.exports.lists.staff = 'staff-2017';
-module.exports.lists.sponsors = 'sponsors-2017';
-module.exports.lists.mentors = 'mentors-2017';
-module.exports.lists.volunteers = 'volunteers-2017';
-
-// expose all available internal list identifiers
-for (var list in module.exports.lists) {
-	module.exports[list + "_list"] = list;
-}
+// mapping internal list identifiers to internal-client representation
+module.exports.lists.test = { name: 'test', id: 'test' };
+module.exports.lists.idlers = { name: 'idlers', id: 'idlers-2017' };
+module.exports.lists.applicants = { name: 'applicants', id: 'applicants-2017' };
+module.exports.lists.accepted = { name: 'accepted', id: 'accepted-2017' };
+module.exports.lists.waitlisted = { name: 'waitlisted', id: 'waitlisted-2017' };
+module.exports.lists.software = { name: 'software', id: 'software-2017' };
+module.exports.lists.hardware = { name: 'hardware', id: 'hardware-2017' };
+module.exports.lists.open_source = { name: 'open_source', id: 'open-source-2017' };
+module.exports.lists.admins = { name: 'admins', id: 'admins-2017' };
+module.exports.lists.staff = { name: 'staff', id: 'staff-2017' };
+module.exports.lists.sponsors = { name: 'sponsors', id: 'sponsors-2017' };
+module.exports.lists.mentors = { name: 'mentors', id: 'mentors-2017' };
+module.exports.lists.volunteers = { name: 'volunteers', id: 'volunteers-2017' };

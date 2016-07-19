@@ -11,7 +11,6 @@ var _ = require('lodash');
 
 var config = require('../../config');
 var logger = require('../../logging');
-var mail = require('../utils/mail');
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
 var MailingListUser = require('../models/MailingListUser');
@@ -27,7 +26,7 @@ const RECIPIENTS_NOT_WHITELISTED_REASON = "none of the recipients are whiteliste
 const LIST_NOT_WHITELISTED_REASON = "this list cannot recieve development messages";
 
 function logDisabled(template, recipients, substitutions, reason) {
-	logger.info("mail transmission with template '%s' requested to %j with substitutations %j but %s.",
+	logger.warn("mail transmission with template '%s' requested to %j with substitutations %j but %s",
 		 template, recipients, substitutions, reason);
 }
 
@@ -77,22 +76,15 @@ function _formatRecipientsList(list) {
 		});
 }
 
-function _buildMailingListUser(user, list) {
-	var mailingListUserParams = { user_id: user.id, mailing_list_id: list.id };
-	return MailingListUser.forge(mailingListUserParams);
-}
-
 function _handleClientError(error) {
 	var responseError = error.errors[0];
-	var responseErrorCode = (responseError.code) ? responseErrorCode : "no error code";
-
 	var message;
 	if (_.has(responseError, 'description')) {
 		message = responseError.description;
 	} else {
 		message = "the mailing client received an error";
 	}
-	message += " (\"" + responseError.message + "\", " + responseErrorCode + ")";
+	message += " (" + responseError.message + ")";
 
 	throw new ExternalProviderError(message, CLIENT_NAME);
 }
@@ -120,6 +112,7 @@ function send(recipients, template, substitutions) {
 	return transmissionsAsync
 		.sendAsync({ transmissionBody: transmission })
 		.then(function (result) {
+			// get rid of the transmission response
 			return true;
 		})
 		.catch(_handleClientError);
@@ -127,37 +120,55 @@ function send(recipients, template, substitutions) {
 
 /**
  * Sends a templated email to the requested email list
- * @param  {String} list          	the (internal) list identifier to use (see mail.js)
+ * @param  {Object} list          	the (internal-client) list representation (see mail.js)
  * @param  {String} template      	the template identifier to use
  * @param  {Object} substitutions 	a mapping of keys to their substitution values (optional)
  * @return {Promise}				an empty promise
  * @throws {ExternalProviderError}	when the mail client returns an error
  */
 function sendToList(list, template, substitutions) {
-	if (config.isDevelopment && !_isWhitelistedList(list)) {
-		logDisabled(template, list, substitutions, LIST_NOT_WHITELISTED_REASON);
+	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
+		logDisabled(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
 		return Promise.resolve(true);
 	}
 
 	var recipientList = {
-		id: mail.lists[list],
+		id: list.id,
 		recipients: [] // unknown until we gather the recipients from the datastore
 	};
 	var transmission = {
 		content: { template_id: template },
-		recipients: { list_id: mail.lists[list] },
+		recipients: { list_id: list.id },
 		substitution_data: (substitutions) ? substitutions : {}
 	};
+	var isViableList = true;
 
-	return _formatRecipientsList(list)
+	return _formatRecipientsList(list.name)
 		.then(function (recipients) {
 			recipientList.recipients = recipients;
-			return recipientsAsync.updateAsync(recipientList);
+			if (recipients.length >= 1) {
+				// we cannot update a list with any less than 1 member
+				return recipientsAsync.updateAsync(recipientList);
+			}
+
+			return true;
 		})
-		.then(function (result) {
+		.then(function () {
+			if (recipientList.recipients.length === 0) {
+				logDisabled(template, list.name, substitutions, "the recipient list was empty");
+				return true;
+			}
+			if (recipientList.recipients.length === 1) {
+				logDisabled(template, list.name, substitutions, "the recipient list held only" +
+					" one recipient; sending via regular transmission");
+
+				var recipient = recipientList.recipients[0].address.email;
+				return send(recipient, template, substitutions);
+			}
 			return transmissionsAsync.sendAsync({ transmissionBody: transmission });
 		})
-		.then(function (result) {
+		.then(function () {
+			// get rid of the transmission response, if there is one
 			return true;
 		})
 		.catch(_handleClientError);
@@ -167,14 +178,14 @@ function sendToList(list, template, substitutions) {
  * Adds a user to a mailing list. Does not check whether or not the user
  * is already on the desired list
  * @param {User} user						the user to add to the list
- * @param {String} list						the list to receive this user
+ * @param {Object} list						the internal list representation to receive this user
  * @returns {Promise<MailingListUser>}		an promise with the save result
  */
 function addToList(user, list) {
 	return MailingList
-		.findByName(list)
+		.findByName(list.name)
 		.then(function (mailingList) {
-			var mailingListUser = _buildMailingListUser(user, mailingList);
+			var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: mailingList.id });
 			return mailingListUser.save();
 		});
 }
@@ -182,15 +193,16 @@ function addToList(user, list) {
 /**
  * Removes a user from a mailing list
  * @param  {User} user					the user to remove from the list
- * @param  {String} list				the list that the user is currently on
+ * @param  {Object} list				the internal list representation that the user is currently on
  * @return {Promise<MailingListUser>}	a promise with the deleted result
  */
 function removeFromList(user, list) {
 	return MailingList
-		.findByName(list)
+		.findByName(list.name)
 		.then(function (mailingList) {
-			var mailingListUser = _buildMailingListUser(user, mailingList);
-			return mailingListUser.query().del();
+			return MailingListUser
+				.where({ user_id: user.id, mailing_list_id: mailingList.id })
+				.destroy();
 		});
 }
 
