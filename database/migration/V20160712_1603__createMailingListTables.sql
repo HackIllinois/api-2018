@@ -2,7 +2,7 @@ CREATE TABLE `mailing_lists` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `mailing_lists_name_idx` (`name`));
+  UNIQUE INDEX `mailing_lists_name_UNIQUE` (`name` ASC));
 
 CREATE TABLE `mailing_lists_users` (
   `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -10,14 +10,14 @@ CREATE TABLE `mailing_lists_users` (
   `user_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),
   INDEX `fk_mailing_lists_users_user_id_idx` (`user_id` ASC),
-  INDEX `fk_mailing_lists_users_list_id_idx` (`list_id` ASC),
+  INDEX `fk_mailing_lists_users_mailing_list_id_idx` (`mailing_list_id` ASC),
   CONSTRAINT `fk_mailing_lists_users_user_id`
 	FOREIGN KEY (`user_id`)
 	REFERENCES `users` (`id`)
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION,
-  CONSTRAINT `fk_mailing_lists_users_list_id`
-	FOREIGN KEY (`list_id`)
+  CONSTRAINT `fk_mailing_lists_users_mailing_list_id`
+	FOREIGN KEY (`mailing_list_id`)
 	REFERENCES `mailing_lists` (`id`)
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION);
