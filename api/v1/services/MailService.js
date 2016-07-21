@@ -11,6 +11,8 @@ var _ = require('lodash');
 
 var config = require('../../config');
 var logger = require('../../logging');
+var files = require('../../files');
+
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
 var MailingListUser = require('../models/MailingListUser');
@@ -24,10 +26,16 @@ const CLIENT_NAME = 'SparkPost';
 const CLIENT_DISABLED_REASON = "the client is disabled";
 const RECIPIENTS_NOT_WHITELISTED_REASON = "none of the recipients are whitelisted";
 const LIST_NOT_WHITELISTED_REASON = "this list cannot recieve development messages";
+const LIST_EMPTY_REASON = "the recipient list was empty";
+const LIST_SINGULAR_REASON = "the recipient list held only one recipient; sending" +
+	" via regular transmission";
 
-function logDisabled(template, recipients, substitutions, reason) {
-	logger.warn("mail transmission with template '%s' requested to %j with substitutations %j but %s",
-		 template, recipients, substitutions, reason);
+function handleOperationUnsuccessful(template, recipients, substitutions, reason) {
+	logger.warn("%s tranmission '%s' not sent to %j because %s", CLIENT_NAME, template, recipients, reason);
+	if (config.isDevelopment) {
+		logger.info("writing transmission details to temp folder");
+		files.writeMail(recipients, template, substitutions);
+	}
 }
 
 function _hasWhitelistedDomain(recipient) {
@@ -105,7 +113,7 @@ function send(recipients, template, substitutions) {
 	};
 
 	if (_.isEmpty(transmission.recipients)) {
-		logDisabled(template, recipients, substitutions, RECIPIENTS_NOT_WHITELISTED_REASON);
+		handleOperationUnsuccessful(template, recipients, substitutions, RECIPIENTS_NOT_WHITELISTED_REASON);
 		return Promise.resolve(true);
 	}
 
@@ -128,7 +136,7 @@ function send(recipients, template, substitutions) {
  */
 function sendToList(list, template, substitutions) {
 	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
-		logDisabled(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
+		handleOperationUnsuccessful(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
 		return Promise.resolve(true);
 	}
 
@@ -155,12 +163,11 @@ function sendToList(list, template, substitutions) {
 		})
 		.then(function () {
 			if (recipientList.recipients.length === 0) {
-				logDisabled(template, list.name, substitutions, "the recipient list was empty");
+				handleOperationUnsuccessful(template, list.name, substitutions, LIST_EMPTY_REASON);
 				return true;
 			}
 			if (recipientList.recipients.length === 1) {
-				logDisabled(template, list.name, substitutions, "the recipient list held only" +
-					" one recipient; sending via regular transmission");
+				handleOperationUnsuccessful(template, list.name, substitutions, LIST_SINGULAR_REASON);
 
 				var recipient = recipientList.recipients[0].address.email;
 				return send(recipient, template, substitutions);
@@ -207,7 +214,7 @@ function removeFromList(user, list) {
 }
 
 function sendDisabled(recipients, template, substitutions) {
-	logDisabled(template, recipients, substitutions, CLIENT_DISABLED_REASON);
+	handleOperationUnsuccessful(template, recipients, substitutions, CLIENT_DISABLED_REASON);
 	return Promise.resolve(true);
 }
 

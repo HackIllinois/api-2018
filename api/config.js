@@ -34,10 +34,9 @@ if (!mailApiKey) {
 	if (isProduction) {
 		logger.error("set HACKILLINOIS_MAIL_KEY to the API key");
 		process.exit(1);
-	} else {
-		logger.warn("the mail server API key was not set");
-		logger.warn("some mail service functionality may malfunction");
 	}
+
+	mailApiKey = undefined;
 }
 
 if (!superuserEmail) {

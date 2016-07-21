@@ -17,4 +17,7 @@ instance.use('/v1', api.v1);
 
 var instance = instance.listen(config.port, function() {
 	logger.info("initialized api (http://localhost:%d)", config.port);
+
+	var MailService = require('./api/v1/services/MailService');
+	MailService.sendToList({id: 'admins', name: 'admins'}, 'test');
 });
