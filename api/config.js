@@ -23,7 +23,7 @@ if (!isProduction && !isDevelopment) {
 
 if (!secret) {
 	if (isProduction) {
-		logger.error("set HACKILLINOIS_SECRET to a secure, random string");
+		logger.error("set ENV variable HACKILLINOIS_SECRET to a secure, random string");
 		process.exit(1);
 	}
 
@@ -32,7 +32,7 @@ if (!secret) {
 
 if (!mailApiKey) {
 	if (isProduction) {
-		logger.error("set HACKILLINOIS_MAIL_KEY to the API key");
+		logger.error("set ENV variable HACKILLINOIS_MAIL_KEY to the mailing provider's API key");
 		process.exit(1);
 	}
 
@@ -41,7 +41,7 @@ if (!mailApiKey) {
 
 if (!superuserEmail) {
 	if (isProduction) {
-		logger.error("set HACKILLINOIS_SUPERUSER_EMAIL to the admin email");
+		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email");
 		process.exit(1);
 	}
 
@@ -50,9 +50,7 @@ if (!superuserEmail) {
 
 if (!superuserPassword) {
 	if (isProduction) {
-		logger.error("the superuser password was not set");
-		logger.error("set HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
-
+		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
 		process.exit(1);
 	}
 
