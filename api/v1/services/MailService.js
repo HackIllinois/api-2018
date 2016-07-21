@@ -5,7 +5,7 @@
 // NOTE: the sink is active during development! use whitelisted domains to avoid
 // wasting messages on emails that lack a whitelisted domain (and other frustrations)
 
-var Promise = require('bluebird');
+var promise = require('bluebird');
 var SparkPost = require('sparkpost');
 var _ = require('lodash');
 
@@ -15,11 +15,10 @@ var files = require('../../files');
 
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
-var MailingListUser = require('../models/MailingListUser');
 
 var client = new SparkPost(config.mail.key || 'NONE');
-var transmissionsAsync = Promise.promisifyAll(client.transmissions);
-var recipientsAsync = Promise.promisifyAll(client.recipientLists);
+var transmissionsAsync = promise.promisifyAll(client.transmissions);
+var recipientsAsync = promise.promisifyAll(client.recipientLists);
 client.isEnabled = !!config.mail.key;
 
 const CLIENT_NAME = 'SparkPost';
@@ -30,9 +29,9 @@ const LIST_EMPTY_REASON = "the recipient list was empty";
 const LIST_SINGULAR_REASON = "the recipient list held only one recipient; sending" +
 	" via regular transmission";
 
-function handleOperationUnsuccessful(template, recipients, substitutions, reason) {
+function handleOperationUnsuccessful(template, recipients, substitutions, reason, supressOutput) {
 	logger.warn("%s tranmission '%s' not sent to %j because %s", CLIENT_NAME, template, recipients, reason);
-	if (config.isDevelopment) {
+	if (config.isDevelopment && !supressOutput) {
 		logger.info("writing transmission details to temp folder");
 		files.writeMail(recipients, template, substitutions);
 	}
@@ -102,7 +101,7 @@ function _handleClientError(error) {
  * @param  {String|Array} recipients	a list of the recipients
  * @param  {String} template			the template identifier to use
  * @param  {Object} substitutions		a mapping of keys to their substitution values (optional)
- * @return {Promise}					an empty promise
+ * @return {Promise<>}					an empty promise
  * @throws {ExternalProviderError} 		when the mail client returns an error
  */
 function send(recipients, template, substitutions) {
@@ -114,7 +113,7 @@ function send(recipients, template, substitutions) {
 
 	if (_.isEmpty(transmission.recipients)) {
 		handleOperationUnsuccessful(template, recipients, substitutions, RECIPIENTS_NOT_WHITELISTED_REASON);
-		return Promise.resolve(true);
+		return promise.resolve(true);
 	}
 
 	return transmissionsAsync
@@ -131,13 +130,13 @@ function send(recipients, template, substitutions) {
  * @param  {Object} list          	the (internal-client) list representation (see mail.js)
  * @param  {String} template      	the template identifier to use
  * @param  {Object} substitutions 	a mapping of keys to their substitution values (optional)
- * @return {Promise}				an empty promise
+ * @return {Promise<>}				an empty promise
  * @throws {ExternalProviderError}	when the mail client returns an error
  */
 function sendToList(list, template, substitutions) {
 	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
 		handleOperationUnsuccessful(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
-		return Promise.resolve(true);
+		return promise.resolve(true);
 	}
 
 	var recipientList = {
@@ -149,7 +148,6 @@ function sendToList(list, template, substitutions) {
 		recipients: { list_id: list.id },
 		substitution_data: (substitutions) ? substitutions : {}
 	};
-	var isViableList = true;
 
 	return _formatRecipientsList(list.name)
 		.then(function (recipients) {
@@ -167,7 +165,7 @@ function sendToList(list, template, substitutions) {
 				return true;
 			}
 			if (recipientList.recipients.length === 1) {
-				handleOperationUnsuccessful(template, list.name, substitutions, LIST_SINGULAR_REASON);
+				handleOperationUnsuccessful(template, list.name, substitutions, LIST_SINGULAR_REASON, true);
 
 				var recipient = recipientList.recipients[0].address.email;
 				return send(recipient, template, substitutions);
@@ -192,8 +190,7 @@ function addToList(user, list) {
 	return MailingList
 		.findByName(list.name)
 		.then(function (mailingList) {
-			var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: mailingList.id });
-			return mailingListUser.save();
+			return mailingList.addUser(user);
 		});
 }
 
@@ -207,15 +204,13 @@ function removeFromList(user, list) {
 	return MailingList
 		.findByName(list.name)
 		.then(function (mailingList) {
-			return MailingListUser
-				.where({ user_id: user.id, mailing_list_id: mailingList.id })
-				.destroy();
+			return mailingList.removeUser(user);
 		});
 }
 
 function sendDisabled(recipients, template, substitutions) {
 	handleOperationUnsuccessful(template, recipients, substitutions, CLIENT_DISABLED_REASON);
-	return Promise.resolve(true);
+	return promise.resolve(true);
 }
 
 module.exports.clientName = CLIENT_NAME;
