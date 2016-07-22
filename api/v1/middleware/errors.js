@@ -9,7 +9,7 @@ module.exports = function (err, req, res, next) {
 		err = new ApiError();
 	}
 	else if (!err.isApiError) {
-		logger.info("caught unhandled internal error");
+		logger.info("caught unhandled error");
 		logger.error(err.stack);
 
 		err = new ApiError();

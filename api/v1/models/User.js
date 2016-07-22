@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
-var promise = require('bluebird');
-var bcrypt = promise.promisifyAll(require('bcrypt'));
+var Promise = require('bluebird');
+var bcrypt = Promise.promisifyAll(require('bcrypt'));
 var _ = require('lodash');
 
 var crypto = require('../utils/crypto');
@@ -22,6 +22,16 @@ var User = Model.extend({
 });
 
 /**
+ * Finds a user by its email address
+ * @param  {String} 			email the email address
+ * @return {Promise<User>}      the found user, or null
+ */
+User.findByEmail = function (email) {
+	email = email.toLowerCase();
+	return this.collection().query({ where: { email: email } }).fetchOne();
+};
+
+/**
  * Securely sets a user's password without persisting any changes
  * @param {String} password a secure password of arbitrarily-long length
  * @return {Promise} a Promise resolving to the updated User model
@@ -32,7 +42,7 @@ User.prototype.setPassword = function (password) {
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
 		.then(function (p) {
-			return promise.resolve(this.set({ password: p }));
+			return Promise.resolve(this.set({ password: p }));
 		});
 };
 
@@ -44,7 +54,7 @@ User.prototype.setPassword = function (password) {
  */
 User.prototype.hasPassword = function (password) {
 	password = crypto.hashWeak(password);
-	return promise
+	return Promise
 		.bind(this)
 		.then(function() {
 			return bcrypt.compareAsync(password, this.get('password'));

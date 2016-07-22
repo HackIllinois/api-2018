@@ -1,12 +1,15 @@
+/* jshint esversion: 6 */
+
 var logger = require('./logging');
 
-DEVELOPMENT_IDENTIFIER = 'development';
-PRODUCTION_IDENTIFIER = 'production';
+const DEVELOPMENT_IDENTIFIER = 'development';
+const PRODUCTION_IDENTIFIER = 'production';
 
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
 var superuserPassword = process.env.HACKKILLINOIS_SUPERUSER_PASSWORD;
+var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
@@ -20,20 +23,25 @@ if (!isProduction && !isDevelopment) {
 
 if (!secret) {
 	if (isProduction) {
-		logger.error("the secret was not provided");
-		logger.error("set HACKILLINOIS_SECRET to a secure, random string");
-
+		logger.error("set ENV variable HACKILLINOIS_SECRET to a secure, random string");
 		process.exit(1);
 	}
 
 	secret = 'NONE';
 }
 
+if (!mailApiKey) {
+	if (isProduction) {
+		logger.error("set ENV variable HACKILLINOIS_MAIL_KEY to the mailing provider's API key");
+		process.exit(1);
+	}
+
+	mailApiKey = undefined;
+}
+
 if (!superuserEmail) {
 	if (isProduction) {
-		logger.error("the superuser email was not set");
-		logger.error("set HACKILLINOIS_SUPERUSER_EMAIL to the admin email");
-
+		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email");
 		process.exit(1);
 	}
 
@@ -42,9 +50,7 @@ if (!superuserEmail) {
 
 if (!superuserPassword) {
 	if (isProduction) {
-		logger.error("the superuser password was not set");
-		logger.error("set HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
-
+		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
 		process.exit(1);
 	}
 
@@ -56,6 +62,7 @@ config.superuser = {};
 config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
+config.mail = {};
 
 config.isDevelopment = isDevelopment;
 config.secret = secret;
@@ -76,6 +83,11 @@ config.database.primary.name = process.env.RDS_DB_NAME || 'hackillinois-2017';
 config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = 5 * 1000; // in millseconds
+
+config.mail.key = mailApiKey;
+config.mail.sinkhole = '.sink.sparkpostmail.com';
+config.mail.whitelistedDomains = ['@hackillinois.org'];
+config.mail.whitelistedLists = ['test'];
 
 logger.info("prepared environment for %s", environment);
 
