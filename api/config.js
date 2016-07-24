@@ -8,7 +8,7 @@ const PRODUCTION_IDENTIFIER = 'production';
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
-var superuserPassword = process.env.HACKKILLINOIS_SUPERUSER_PASSWORD;
+var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
