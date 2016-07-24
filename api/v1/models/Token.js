@@ -1,11 +1,11 @@
 var Model = require('./Model');
 var User = require('./User');
 
-var PasswordToken = Model.extend({
-	tableName: 'password_tokens',
+var Token = Model.extend({
+	tableName: 'tokens',
 	idAttribute: 'id',
 	hasTimestamps: ['created', 'updated']
 });
 
 
-module.exports = PasswordToken;
+module.exports = Token;
