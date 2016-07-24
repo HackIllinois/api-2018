@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 
 var User = require('../models/User');
+var Token = require('../models/Token');
 var errors = require('../errors');
 var utils = require('../utils');
 
@@ -104,5 +105,46 @@ module.exports.verifyPassword = function (user, password) {
 			}
 
 			return Promise.resolve(true);
+		});
+};
+
+/**
+ * Finds a token given the Token ID
+ * @param {String|Number} id The Token's ID
+ * @return {Promise} resolving to the associated Token Model
+ * @throws {NotFoundError} when the requested token cannot be found
+ */
+Token.findTokenById = function(id) {
+	return Token
+		.findById(id)
+		.then(function(result) {
+			if (!result) {
+				var message = "Could not find the provided token to reset password";
+				var source = "token";
+				throw new errors.InvalidParameterError(message, source);
+			}
+			// TODO: Check expiry
+			return Promise.resolve(result);
+		});
+};
+
+/**
+ * Resets the User's password given that the token is the same as the one
+ * generated when the user requests a password change
+ * @param {String} token the Token user has obtained to reset password
+ * @param {String} password the password the User would like to change it to
+ * @return {Promise} resolving to the validity of the provided password
+ * @throws {InvalidParameterError} when the requested token cannot be found
+ */
+module.exports.resetPassword = function(token, password) {
+	/*
+	 * TODO: Check if the token's ID is secure enough to
+	 * allow the user to change the password.
+	 * HINT: It's probably not enough...
+	 */
+	return Token
+		.findTokenById(token)
+		.then(function(result) {
+			return Promise.resolve(result.resetUserPassword(password));
 		});
 };
