@@ -26,5 +26,14 @@ module.exports.hashWeak = function (text) {
  * @return {String} a significantly-long, pseudo-random string
  */
 module.exports.generatePassword = function () {
-	return Math.random().toString(PASSWORD_RADIX).substring(0, PASSWORD_LENGTH);
+	return createRandomString(PASSWORD_LENGTH);
 };
+
+// TODO: Determine the length of the token
+module.exports.generateResetToken = function (){
+	return createRandomString(PASSWORD_LENGTH)
+};
+
+function createRandomString(length){
+	return Math.random().toString(PASSWORD_RADIX).substring(0, length);
+}

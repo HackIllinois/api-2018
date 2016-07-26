@@ -3,9 +3,11 @@ var Promise = require('bluebird');
 var jwt = require('jsonwebtoken');
 var _ = require('lodash');
 
+var utils = require('../utils');
 var config = require('../../config');
 var errors = require('../errors');
 var logger = require('../../logging');
+var Token = require('../models/Token');
 
 var JWT_SECRET = config.auth.secret;
 var JWT_CONFIG = {
@@ -65,3 +67,19 @@ module.exports.verify = function(token) {
 			throw new errors.UnprocessableRequestError(message);
 		});
 };
+
+
+module.exports.generateToken = function(user, scope){
+	var tokenVal = utils.crypto.generateResetToken();
+	var user_id = user.get('id');
+
+	return Token
+		.where({user_id: user_id}).fetchAll()
+		.then(function(tokens) {
+			return tokens.invokeThen('destroy')
+				.then(function() {
+					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
+					return token.save().then(function(){return true});
+				})
+		});
+}

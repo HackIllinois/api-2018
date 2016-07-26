@@ -6,9 +6,9 @@ var User = require('./User');
 var Token = Model.extend({
 	tableName: 'tokens',
 	idAttribute: 'id',
-	hasTimestamps: ['created', 'updated'],
-	validations: {
-		userId: ['required', 'userId']
+	hasTimestamps: ['created'],
+	user: function(){
+		return this.belongsTo(User, 'user_id');
 	}
 });
 
@@ -48,3 +48,5 @@ Token.prototype.resetUserPassword = function(password) {
 	var user = User.findById(this.get('userId'));
 	return user.setPassword(password);
 };
+
+module.exports = Token;
