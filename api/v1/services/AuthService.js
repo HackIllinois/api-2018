@@ -92,14 +92,14 @@ module.exports.generateToken = function(user, scope){
 };
 
 /**
- * Finds a token given the Token ID
- * @param {String|Number} id The Token's ID
+ * Finds a token given the Token value
+ * @param {String} value The Token's value
  * @return {Promise} resolving to the associated Token Model
  * @throws {NotFoundError} when the requested token cannot be found
  */
-module.exports.findTokenById = function(id) {
+module.exports.findTokenByValue = function(value) {
 	return Token
-		.findById(id)
+		.findByValue(value)
 		.then(function(result) {
 			if (!result) {
 				var message = "Could not find the provided token to reset password";
@@ -114,20 +114,11 @@ module.exports.findTokenById = function(id) {
 /**
  * Resets the User's password given that the token is the same as the one
  * generated when the user requests a password change
- * @param {String} token the Token user has obtained to reset password
+ * @param {Token} token the Token user has obtained to reset password
  * @param {String} password the password the User would like to change it to
  * @return {Promise} resolving to the validity of the provided password
  * @throws {InvalidParameterError} when the requested token cannot be found
  */
 module.exports.resetPassword = function(token, password) {
-	/*
-	 * TODO: Check if the token's ID is secure enough to
-	 * allow the user to change the password.
-	 * HINT: It's probably not enough...
-	 */
-	return Token
-		.findTokenById(token)
-		.then(function(result) {
-			return Promise.resolve(result.resetUserPassword(password));
-		});
+	return Promise.resolve(token.resetUserPassword(password));
 };
