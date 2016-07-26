@@ -73,7 +73,8 @@ module.exports.verify = function(token) {
  * Generates a token.
  * @param {User} user The user object to create a reset token for.
  * @param {String} scope The scope to create the token for.
- * @return {Bool} Returns true on a successful token creation.
+ * @return {Promise<Bool>} Returns a Promise that resolves to
+ *                         true on a successful token creation.
  */
 module.exports.generateToken = function(user, scope){
 	var tokenVal = utils.crypto.generateResetToken();
