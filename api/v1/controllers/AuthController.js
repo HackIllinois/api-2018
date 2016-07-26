@@ -1,6 +1,7 @@
 var Promise = require('bluebird');
 
 var errors = require('../errors');
+var utils = require('../utils');
 var AuthService = require('../services/AuthService');
 var UserService = require('../services/UserService');
 
@@ -70,8 +71,31 @@ function refreshToken (req, res, next) {
 		});
 }
 
+function requestPasswordReset (req, res, next) {
+	var userEmail = req.query.email;
+
+	UserService
+		.findUserByEmail(userEmail)
+		.then(function (user){
+			var token = utils.crypto.generateResetToken();
+			return AuthService.createNewPasswordToken(token, user.get('id'));
+		})
+		.then(function (status){
+			res.body = {}
+			res.body.status = status;
+			next();
+			return null;
+		})
+		.catch(function (error){
+			next(error);
+			return null;
+		});
+}
+
+
 router.post('', createToken);
 router.get('/refresh', refreshToken);
+router.get('/reset', requestPasswordReset)
 
 module.exports.createToken = createToken;
 module.exports.router = router;
