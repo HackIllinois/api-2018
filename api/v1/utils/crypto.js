@@ -31,7 +31,7 @@ module.exports.generatePassword = function () {
 
 // TODO: Determine the length of the token
 module.exports.generateResetToken = function (){
-	return createRandomString(PASSWORD_LENGTH)
+	return createRandomString(PASSWORD_LENGTH);
 };
 
 function createRandomString(length){
