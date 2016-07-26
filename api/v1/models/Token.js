@@ -10,9 +10,4 @@ var Token = Model.extend({
 	}
 });
 
-Token.findByEmail = function(email){
-	email = email.toLowerCase();
-	return this.collection().query({ where: { email: email } }).fetch();
-}
-
 module.exports = Token;

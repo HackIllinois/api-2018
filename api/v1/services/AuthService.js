@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var jwt = require('jsonwebtoken');
 var _ = require('lodash');
 
+var utils = require('../utils');
 var config = require('../../config');
 var errors = require('../errors');
 var logger = require('../../logging');
@@ -68,14 +69,17 @@ module.exports.verify = function(token) {
 };
 
 
-module.exports.createNewPasswordToken = function(value, user_id){
+module.exports.generateToken = function(user, scope){
+	var tokenVal = utils.crypto.generateResetToken();
+	var user_id = user.get('id');
+
 	return Token
 		.where({user_id: user_id}).fetchAll()
 		.then(function(tokens) {
 			return tokens.invokeThen('destroy')
 				.then(function() {
-					var token = Token.forge({type: 'AUTH', value: value, 'user_id': user_id});
-					return token.save().then(function(){return "success"});
+					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
+					return token.save().then(function(){return true});
 				})
 		});
 }
