@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var Checkit = require('checkit');
 
 var jwt = require('jsonwebtoken');
 var _ = require('lodash');
@@ -70,7 +71,8 @@ module.exports.verify = function(token) {
 
 
 /**
- * Generates a token.
+ * Generates a token and deletes all existing tokens
+ * with the same scope.
  * @param {User} user The user object to create a reset token for.
  * @param {String} scope The scope to create the token for.
  * @return {Promise<Bool>} Returns a Promise that resolves to
@@ -81,12 +83,20 @@ module.exports.generateToken = function(user, scope){
 	var user_id = user.get('id');
 
 	return Token
-		.where({user_id: user_id}).fetchAll()
+		.where({user_id: user_id, type: scope}).fetchAll()
 		.then(function(tokens) {
 			return tokens.invokeThen('destroy')
 				.then(function() {
 					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
-					return token.save().then(function () { return true; });
+					return token
+						.validate()
+						.catch(Checkit.Error, utils.errors.handleValidationError)
+						.then(function(validated) {
+							return token.save();
+						})
+						.then(function () { 
+							return true; 
+						});
 				});
 		});
 };

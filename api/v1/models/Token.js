@@ -4,7 +4,7 @@ var Model = require('./Model');
 var User = require('./User');
 var Crypto = require('../utils/crypto');
 
-const PASSWORD_VALIDATION = 'minlength:' + Crypto.PASSWORD_LENGTH;
+const PASSWORD_VALIDATION = 'minLength:' + Crypto.PASSWORD_LENGTH;
 
 var Token = Model.extend({
 	tableName: 'tokens',
@@ -18,8 +18,6 @@ var Token = Model.extend({
 		// TODO: Add the reference to user as a requirement
 	}
 });
-
-module.exports = Token;
 
 /**
  * Finds a token given the Token value
