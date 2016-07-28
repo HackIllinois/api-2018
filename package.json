@@ -10,6 +10,7 @@
     "checkit": "^0.6.0",
     "debug": "^2.2.0",
     "express": "^4.13.4",
+    "file-type": "^3.8.0",
     "inflection": "^1.10.0",
     "jsonwebtoken": "^7.0.1",
     "jssha": "^2.1.0",
