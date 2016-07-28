@@ -1,3 +1,5 @@
+const MINIMUM_PASSWORD_LENGTH = 8;  // Default minimum length for password
+
 var Promise = require('bluebird');
 
 var errors = require('../errors');
@@ -5,6 +7,9 @@ var utils = require('../utils');
 var scopes = utils.scopes;
 var AuthService = require('../services/AuthService');
 var UserService = require('../services/UserService');
+var config = require('../../config');
+
+var logger = require('../../logging');
 
 var router = require('express').Router();
 
@@ -73,6 +78,7 @@ function refreshToken (req, res, next) {
 }
 
 function requestPasswordReset (req, res, next) {
+
 	var userEmail = req.query.email;
 
 	UserService
@@ -81,7 +87,7 @@ function requestPasswordReset (req, res, next) {
 			return AuthService.generateToken(user, scopes.AUTH);
 		})
 		.then(function (status){
-			res.body = {}
+			res.body = {};
 			next();
 			return null;
 		})
@@ -91,10 +97,45 @@ function requestPasswordReset (req, res, next) {
 		});
 }
 
+function passwordReset(req, res, next) {
+	AuthService
+		.findTokenByValue(req.body.token)
+		.then(function (token) {
+			var tokenExpire = Date.parse(token.get('created')) + config.tokenExpiration.AUTH;
+			if (tokenExpire < Date.now())
+			{
+				console.log('invalid token');
+				// Invalid token (expired)
+				token.destroy().then(function () {
+					var message = 'Cannot reset password: current token is expired.' +
+						    ' Please request a new token via API';
+					return next(new errors.TokenExpirationError(message));
+				});
+			}
+			else
+			{
+				var user = AuthService.resetPassword(token, req.body.password);
+
+				// Return the new auth token for the user
+				AuthService.issueForUser(user).then(function (auth) {
+					res.body = {};
+					res.body.auth = auth;
+					next();
+					return null;
+				});
+			}
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 
 router.post('', createToken);
 router.get('/refresh', refreshToken);
-router.get('/reset', requestPasswordReset)
+router.get('/reset', requestPasswordReset);
+router.post('/reset', passwordReset);
 
 module.exports.createToken = createToken;
 module.exports.router = router;

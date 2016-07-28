@@ -107,3 +107,5 @@ module.exports.verifyPassword = function (user, password) {
 			return Promise.resolve(true);
 		});
 };
+
+// Expose function that creates a token, check for existing tokens, etc.

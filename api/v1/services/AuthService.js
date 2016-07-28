@@ -88,6 +88,7 @@ module.exports.generateToken = function(user, scope){
 			return tokens.invokeThen('destroy')
 				.then(function() {
 					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
+					logger.info('Password recovery token generated:' + tokenVal);
 					return token
 						.validate()
 						.catch(Checkit.Error, utils.errors.handleValidationError)
@@ -116,7 +117,6 @@ module.exports.findTokenByValue = function(value) {
 				var source = "token";
 				throw new errors.InvalidParameterError(message, source);
 			}
-			// TODO: Check expiry
 			return Promise.resolve(result);
 		});
 };

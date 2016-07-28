@@ -4,8 +4,6 @@ var Model = require('./Model');
 var User = require('./User');
 var Crypto = require('../utils/crypto');
 
-const PASSWORD_VALIDATION = 'minLength:' + Crypto.PASSWORD_LENGTH;
-
 var Token = Model.extend({
 	tableName: 'tokens',
 	idAttribute: 'id',
@@ -14,7 +12,7 @@ var Token = Model.extend({
 		return this.belongsTo(User, 'user_id');
 	},
 	validations: {
-		value: ['required', 'string', PASSWORD_VALIDATION]
+		value: ['required', 'string']
 		// TODO: Add the reference to user as a requirement
 	}
 });
@@ -26,18 +24,7 @@ var Token = Model.extend({
  * @throws {NotFoundError} when the requested token cannot be found
  */
 Token.findByValue = function(value) {
-	return Token
-		.where({ value: value }).fetchOne()  // Should only be one token available
-		.then(function(result) {
-			if (!result) {
-				var message = "Could not find the provided token to reset password";
-				var source = "value";
-				throw new errors.InvalidParameterError(message, source);
-			}
-			// TODO: Check expiry
-			// && Throw error if the token has expired already
-			return Promise.resolve(result);
-		});
+	return this.collection().query({ where: { value: value }}).fetchOne();
 };
 
 /**
@@ -50,8 +37,14 @@ Token.prototype.resetUserPassword = function(password) {
 	 * TODO: Validate current Token before proceeding
 	 * Check for expiration
 	 */
-	var user = User.findById(this.get('user'));
-	return user.setPassword(password).save();
+	var id = this.get('userId');
+	return User
+		.findById(id)
+		.then(function (user) {
+			return user.setPassword(password).then(function (updatedUser) {
+				return updatedUser.save();
+			});
+		});
 };
 
 module.exports = Token;
