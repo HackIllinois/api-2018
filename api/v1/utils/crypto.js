@@ -10,11 +10,6 @@ const PASSWORD_RADIX = 31;
 const PASSWORD_LENGTH = 33;
 
 /**
- * Provide the Global password length to other modules, for DRY
- */
-module.exports.PASSWORD_LENGTH = PASSWORD_LENGTH;
-
-/**
  * Provides a weak hash of the provided text
  * @param  {String} text the value to hash
  * @return {String} the hashed value

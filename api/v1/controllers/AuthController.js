@@ -98,6 +98,13 @@ function requestPasswordReset (req, res, next) {
 }
 
 function passwordReset(req, res, next) {
+	if (req.body.password.length < MINIMUM_PASSWORD_LENGTH)
+	{
+		var message = 'Password must be at least ' + MINIMUM_PASSWORD_LENGTH + ' characters long';
+		next(new errors.InvalidParameterError(message, 'password'));
+		return;
+	}
+
 	AuthService
 		.findTokenByValue(req.body.token)
 		.then(function (token) {
@@ -129,7 +136,7 @@ function passwordReset(req, res, next) {
 			next(error);
 			return null;
 		});
-}
+};
 
 
 router.post('', createToken);
