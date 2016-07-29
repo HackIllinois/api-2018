@@ -63,6 +63,7 @@ config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
 config.mail = {};
+config.storage = {};
 
 config.isDevelopment = isDevelopment;
 config.secret = secret;
@@ -88,6 +89,8 @@ config.mail.key = mailApiKey;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
 config.mail.whitelistedDomains = ['@hackillinois.org'];
 config.mail.whitelistedLists = ['test'];
+
+config.storage.maxLength = 2 * 1000000; // in bytes
 
 logger.info("prepared environment for %s", environment);
 

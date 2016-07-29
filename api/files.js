@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
-var promise = require('bluebird');
-var fs = promise.promisifyAll(require('fs'), {
+var _Promise = require('bluebird');
+var fs = _Promise.promisifyAll(require('fs'), {
 	filter: function(n, f, t, d) { return d && !n.includes('Sync'); }
 });
 var mkdirp = require('mkdirp');
@@ -9,10 +9,14 @@ var _ = require('lodash');
 
 var config = require('./config');
 var logger = require('./logging');
+var time = require('./v1/utils/time');
 
 // NOTE all paths are relative to the root of the project directory
 const TEMP_DIRECTORY = './temp/';
 const MAIL_DIRECTORY = TEMP_DIRECTORY + 'mail/';
+const STORAGE_DIRECTORY = TEMP_DIRECTORY + 'storage/';
+
+const DEFAULT_STORAGE_EXTENSION = 'bin';
 
 /**
  * Writes a new mail entry to the temp directory. When called in non-development
@@ -24,12 +28,10 @@ const MAIL_DIRECTORY = TEMP_DIRECTORY + 'mail/';
  */
 module.exports.writeMail = function (recipients, template, substitutions) {
 	if (!config.isDevelopment) {
-		// we will never write directly to the filesystem running our
-		// instance on production, so do nothing
-		return promise.resolve(null);
+		return _Promise.resolve(null);
 	}
 
-	var fileName = template + "-" + Math.floor(new Date() / 1000) + ".txt";
+	var fileName = template + "-" + time.unix() + ".txt";
 	var filePath = MAIL_DIRECTORY + fileName;
 
 	var fileContent = "A transmission was prepared for ";
@@ -49,4 +51,22 @@ module.exports.writeMail = function (recipients, template, substitutions) {
 	// to ensure we don't have any temp directories written in production
 	mkdirp.sync(MAIL_DIRECTORY);
 	return fs.writeFileAsync(filePath, fileContent);
+};
+
+/**
+ * Writes a Buffer to the temp directory. When called in non-development environments,
+ * this method does nothing
+ * @param {Buffer} content		the content to write
+ * @param {String} key			the key by which the content will be retrieved
+ * @return {Promise<>}			a resolved promise
+ */
+module.exports.writeStream = function (content, key) {
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
+
+	var filePath = STORAGE_DIRECTORY + key;
+
+	mkdirp.sync(STORAGE_DIRECTORY);
+	return fs.writeFileAsync(filePath, content);
 };
