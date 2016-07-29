@@ -5,8 +5,10 @@ var Promise = require('bluebird');
 var errors = require('../errors');
 var utils = require('../utils');
 var scopes = utils.scopes;
+var mail = utils.mail;
 var AuthService = require('../services/AuthService');
 var UserService = require('../services/UserService');
+var MailService = require('../services/MailService');
 var config = require('../../config');
 
 var logger = require('../../logging');
@@ -78,7 +80,6 @@ function refreshToken (req, res, next) {
 }
 
 function requestPasswordReset (req, res, next) {
-
 	var userEmail = req.query.email;
 
 	UserService
@@ -86,7 +87,12 @@ function requestPasswordReset (req, res, next) {
 		.then(function (user){
 			return AuthService.generateToken(user, scopes.AUTH);
 		})
-		.then(function (status){
+		.then(function (tokenVal){
+			tokenURL = tokenVal;
+			var substitutions = {'resetURL': tokenURL};
+			return MailService.send(userEmail, mail.templates.passwordReset, substitutions);
+		})
+		.then(function(){
 			res.body = {};
 			next();
 			return null;

@@ -96,7 +96,7 @@ module.exports.generateToken = function(user, scope){
 							return token.save();
 						})
 						.then(function () { 
-							return true; 
+							return tokenVal; 
 						});
 				});
 		});
