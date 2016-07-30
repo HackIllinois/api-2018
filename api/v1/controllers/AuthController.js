@@ -2,6 +2,7 @@ const MINIMUM_PASSWORD_LENGTH = 8;  // Default minimum length for password
 
 var Promise = require('bluebird');
 
+var config = require('../../config');
 var errors = require('../errors');
 var utils = require('../utils');
 var scopes = utils.scopes;
@@ -88,7 +89,8 @@ function requestPasswordReset (req, res, next) {
 			return AuthService.generateToken(user, scopes.AUTH);
 		})
 		.then(function (tokenVal){
-			tokenURL = tokenVal;
+			//TODO: Determine exact url route for reset page
+			tokenURL = (config.isDevelopment ? "localhost:8080/" : "hackillinois.org/") + "v1/auth/resetpage?token=" + tokenVal;
 			var substitutions = {'resetURL': tokenURL};
 			return MailService.send(userEmail, mail.templates.passwordReset, substitutions);
 		})
