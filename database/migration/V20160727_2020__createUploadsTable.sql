@@ -4,7 +4,10 @@ CREATE TABLE `uploads` (
   `key` VARCHAR(255) NOT NULL,
   `bucket` VARCHAR(255) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
-  `disposition` ENUM('PDF', 'UNKNOWN') NOT NULL,
+  `disposition` ENUM('PDF', 'UNKNOWN') DEFAULT 'UNKNOWN',
+  `status` ENUM('EMPTY', 'SENT', 'STORED', 'DROPPED') NULL DEFAULT 'EMPTY',
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `fk_uploads_owner_id_idx` (`owner_id` ASC),
   CONSTRAINT `fk_uploads_owner_id`
