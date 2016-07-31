@@ -70,3 +70,33 @@ module.exports.writeStream = function (content, key) {
 	mkdirp.sync(STORAGE_DIRECTORY);
 	return fs.writeFileAsync(filePath, content);
 };
+
+/**
+ * Retrieves a Buffer from the temp directory. When called in non-development environments,
+ * this method does nothing
+ * @param  {String} key			the key by which the content was stored
+ * @return {Promise<Buffer>}	a promise resolving to a raw buffer
+ */
+module.exports.getStream = function (key) {
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
+
+	var filePath = STORAGE_DIRECTORY + key;
+	return fs.readFileAsync(filePath);
+};
+
+/**
+ * Removes a Buffer from the temp directory. When called in non-development environments,
+ * this method does nothing
+ * @param  {String} key		the key by which the content was stored
+ * @return {Promise<>}		a resolved promise
+ */
+module.exports.removeStream = function (key) {
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
+
+	var filePath = STORAGE_DIRECTORY + key;
+	return fs.unlinkAsync(filePath);
+};
