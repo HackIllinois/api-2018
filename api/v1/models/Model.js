@@ -30,7 +30,7 @@ Model.transaction = function (callback) {
 Model.findById = function (id) {
 	var queryWhere = {};
 	// queryWhere[this.idAttribute] = id;
-	// TODO: Resolve temporary fix
+	// MARK: fixed in stanging branch, remove when merging
 	queryWhere['id'] = id;
 	return this.collection().query({ where: queryWhere }).fetchOne();
 };

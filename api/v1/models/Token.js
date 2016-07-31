@@ -13,7 +13,6 @@ var Token = Model.extend({
 	},
 	validations: {
 		value: ['required', 'string']
-		// TODO: Add the reference to user as a requirement
 	}
 });
 

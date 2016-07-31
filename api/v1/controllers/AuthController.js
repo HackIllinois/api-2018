@@ -130,9 +130,10 @@ function passwordReset(req, res, next) {
 			else
 			{
 				var user = AuthService.resetPassword(token, req.body.password);
-
 				// Return the new auth token for the user
 				AuthService.issueForUser(user).then(function (auth) {
+					// remove token before issuing
+					token.destroy();
 					res.body = {};
 					res.body.auth = auth;
 					next();
