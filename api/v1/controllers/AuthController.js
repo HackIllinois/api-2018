@@ -106,12 +106,15 @@ function requestPasswordReset (req, res, next) {
 }
 
 function passwordReset(req, res, next) {
+	// MARK - Should be able to remove this and let middleware handle the requirements
+	/* 
 	if (req.body.password.length < MINIMUM_PASSWORD_LENGTH)
 	{
 		var message = 'Password must be at least ' + MINIMUM_PASSWORD_LENGTH + ' characters long';
 		next(new errors.InvalidParameterError(message, 'password'));
 		return;
 	}
+	*/
 
 	AuthService
 		.findTokenByValue(req.body.token)
@@ -119,7 +122,6 @@ function passwordReset(req, res, next) {
 			var tokenExpire = Date.parse(token.get('created')) + config.tokenExpiration.AUTH;
 			if (tokenExpire < Date.now())
 			{
-				console.log('invalid token');
 				// Invalid token (expired)
 				token.destroy().then(function () {
 					var message = 'Cannot reset password: current token is expired.' +
@@ -129,16 +131,21 @@ function passwordReset(req, res, next) {
 			}
 			else
 			{
-				var user = AuthService.resetPassword(token, req.body.password);
-				// Return the new auth token for the user
-				AuthService.issueForUser(user).then(function (auth) {
-					// remove token before issuing
-					token.destroy();
-					res.body = {};
-					res.body.auth = auth;
-					next();
-					return null;
-				});
+				AuthService
+					.resetPassword(token, req.body.password)
+					.then(function (user) {
+						return AuthService
+							.issueForUser(user)
+							.then(function (auth) {
+								// remove token before issuing
+								token.destroy();
+
+								res.body = {};
+								res.body.auth = auth;
+								next();
+								return null;
+							});
+					});
 			}
 		})
 		.catch(function (error) {
