@@ -69,39 +69,6 @@ module.exports.verify = function(token) {
 		});
 };
 
-
-/**
- * Generates a token and deletes all existing tokens
- * with the same scope.
- * @param {User} user The user object to create a reset token for.
- * @param {String} scope The scope to create the token for.
- * @return {Promise<Bool>} Returns a Promise that resolves to
- *                         true on a successful token creation.
- */
-module.exports.generateToken = function(user, scope){
-	var tokenVal = utils.crypto.generateResetToken();
-	var user_id = user.get('id');
-
-	return Token
-		.where({user_id: user_id, type: scope}).fetchAll()
-		.then(function(tokens) {
-			return tokens.invokeThen('destroy')
-				.then(function() {
-					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
-					logger.info('Password recovery token generated:' + tokenVal);
-					return token
-						.validate()
-						.catch(Checkit.Error, utils.errors.handleValidationError)
-						.then(function(validated) {
-							return token.save();
-						})
-						.then(function () { 
-							return tokenVal; 
-						});
-				});
-		});
-};
-
 /**
  * Resets the User's password given that the token is the same as the one
  * generated when the user requests a password change

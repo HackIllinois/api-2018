@@ -85,7 +85,7 @@ function requestPasswordReset (req, res, next) {
 	UserService
 		.findUserByEmail(userEmail)
 		.then(function (user){
-			return AuthService.generateToken(user, scopes.AUTH);
+			return TokenService.generateToken(user, scopes.AUTH);
 		})
 		.then(function (tokenVal){
 			//TODO: Determine exact url route for reset page
