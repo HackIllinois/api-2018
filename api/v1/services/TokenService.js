@@ -24,11 +24,11 @@ module.exports.findTokenByValue = function(value, scope) {
 				var warning = 'The scope currently accessed has the DEFAULT scope, '
 				    + 'you may have forgotten to create a new scope in config.js';
 				logger.warn(warning);
-				return config.tokenExpiration['DEFAULT'];
+				return config.token.expiration['DEFAULT'];
 			};
 
 			// Check expiration
-			let expiration = config.tokenExpiration[scope.toUpperCase()]
+			let expiration = config.token.expiration[scope.toUpperCase()]
 						 || defaultExpiration();
 			var tokenExpire = Date.parse(result.get('created')) + expiration;
 			if (tokenExpire < Date.now())

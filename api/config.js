@@ -63,7 +63,7 @@ config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
 config.mail = {};
-config.tokenExpiration = {};
+config.token = { expiration: {} };
 
 config.isDevelopment = isDevelopment;
 config.secret = secret;
@@ -80,10 +80,9 @@ config.auth.expiration = '7d';
 const MILLISECONDS_PER_HOUR = 3600000;
 const HOURS_PER_DAY = 24;
 const DAYS_PER_WEEK = 7;
-config.tokenExpiration = {};
-config.tokenExpiration['AUTH'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
-config.tokenExpiration['OTHER'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
-config.tokenExpiration['DEFAULT'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration['AUTH'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration['OTHER'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration['DEFAULT'] = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
 
 config.database.primary.host = process.env.RDS_HOSTNAME || process.env.LOCAL_MYSQL_HOST || '127.0.0.1';
 config.database.primary.port = process.env.RDS_PORT || process.env.LOCAL_MYSQL_PORT || 3306;
