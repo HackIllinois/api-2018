@@ -1,6 +1,7 @@
 var Token = require('../models/Token');
 var config = require('../../config');
 var logger = require('../../logging');
+var errors = require('../errors');
 
 /**
  * Finds a token given the Token value

@@ -89,7 +89,7 @@ function requestPasswordReset (req, res, next) {
 		})
 		.then(function (tokenVal){
 			//TODO: Determine exact url route for reset page
-			tokenURL = (config.isDevelopment ? "localhost:8080/" : "hackillinois.org/") + "v1/auth/resetpage?token=" + tokenVal;
+			tokenURL = config.uri.passwordReset + tokenVal;
 			var substitutions = {'resetURL': tokenURL};
 			return MailService.send(userEmail, mail.templates.passwordReset, substitutions);
 		})
