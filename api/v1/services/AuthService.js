@@ -103,25 +103,6 @@ module.exports.generateToken = function(user, scope){
 };
 
 /**
- * Finds a token given the Token value
- * @param {String} value The Token's value
- * @return {Promise} resolving to the associated Token Model
- * @throws {NotFoundError} when the requested token cannot be found
- */
-module.exports.findTokenByValue = function(value) {
-	return Token
-		.findByValue(value)
-		.then(function(result) {
-			if (!result) {
-				var message = "Could not find the provided token to reset password";
-				var source = "token";
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return Promise.resolve(result);
-		});
-};
-
-/**
  * Resets the User's password given that the token is the same as the one
  * generated when the user requests a password change
  * @param {Token} token the Token user has obtained to reset password

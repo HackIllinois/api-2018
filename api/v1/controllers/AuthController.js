@@ -1,5 +1,3 @@
-const MINIMUM_PASSWORD_LENGTH = 8;  // Default minimum length for password
-
 var Promise = require('bluebird');
 
 var config = require('../../config');
@@ -7,10 +5,11 @@ var errors = require('../errors');
 var utils = require('../utils');
 var scopes = utils.scopes;
 var mail = utils.mail;
+
 var AuthService = require('../services/AuthService');
-var UserService = require('../services/UserService');
 var MailService = require('../services/MailService');
-var config = require('../../config');
+var TokenService = require('../services/TokenService');
+var UserService = require('../services/UserService');
 
 var logger = require('../../logging');
 
@@ -106,47 +105,24 @@ function requestPasswordReset (req, res, next) {
 }
 
 function passwordReset(req, res, next) {
-	// MARK - Should be able to remove this and let middleware handle the requirements
-	/* 
-	if (req.body.password.length < MINIMUM_PASSWORD_LENGTH)
-	{
-		var message = 'Password must be at least ' + MINIMUM_PASSWORD_LENGTH + ' characters long';
-		next(new errors.InvalidParameterError(message, 'password'));
-		return;
-	}
-	*/
-
-	AuthService
-		.findTokenByValue(req.body.token)
+	TokenService
+		.findTokenByValue(req.body.token, 'AUTH')
 		.then(function (token) {
-			var tokenExpire = Date.parse(token.get('created')) + config.tokenExpiration.AUTH;
-			if (tokenExpire < Date.now())
-			{
-				// Invalid token (expired)
-				token.destroy().then(function () {
-					var message = 'Cannot reset password: current token is expired.' +
-						    ' Please request a new token via API';
-					return next(new errors.TokenExpirationError(message));
+			return token
+				.getUser()
+				.then(function (user) {
+					token.destroy();
+					return UserService.resetPassword(user, req.body.password);
 				});
-			}
-			else
-			{
-				AuthService
-					.resetPassword(token, req.body.password)
-					.then(function (user) {
-						return AuthService
-							.issueForUser(user)
-							.then(function (auth) {
-								// remove token before issuing
-								token.destroy();
-
-								res.body = {};
-								res.body.auth = auth;
-								next();
-								return null;
-							});
-					});
-			}
+		})
+		.then(function (user) {
+			return AuthService.issueForUser(user);
+		})
+		.then(function (auth) {
+			res.body = {};
+			res.body.auth = auth;
+			next();
+			return null;
 		})
 		.catch(function (error) {
 			next(error);

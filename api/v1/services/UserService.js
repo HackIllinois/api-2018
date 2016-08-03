@@ -108,4 +108,16 @@ module.exports.verifyPassword = function (user, password) {
 		});
 };
 
-// Expose function that creates a token, check for existing tokens, etc.
+/**
+ * Verifies that the provided password matches that of the user's password
+ * @param  {User} user a User model
+ * @param  {String} password the password to change to
+ * @return {Promise} resolving to the new User model
+ */
+module.exports.resetPassword = function (user, password) {
+	return user
+		.setPassword(password)
+		.then(function (updated) {
+			return updated.save();
+		});
+};

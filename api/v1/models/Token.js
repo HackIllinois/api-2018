@@ -27,23 +27,12 @@ Token.findByValue = function(value) {
 };
 
 /**
- * Securely sets a user's password persisting any changes
- * @param {String} password The new password to set of arbiturary length
+ * Obtains the user model this token refers to
  * @return {Promise} resolving to the associated User model
  */
-Token.prototype.resetUserPassword = function(password) {
-	/*
-	 * TODO: Validate current Token before proceeding
-	 * Check for expiration
-	 */
+Token.prototype.getUser = function () {
 	var id = this.get('userId');
-	return User
-		.findById(id)
-		.then(function (user) {
-			return user.setPassword(password).then(function (updatedUser) {
-				return updatedUser.save();
-			});
-		});
+	return User.findById(id);
 };
 
 module.exports = Token;
