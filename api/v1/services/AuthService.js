@@ -68,15 +68,3 @@ module.exports.verify = function(token) {
 			throw new errors.UnprocessableRequestError(message);
 		});
 };
-
-/**
- * Resets the User's password given that the token is the same as the one
- * generated when the user requests a password change
- * @param {Token} token the Token user has obtained to reset password
- * @param {String} password the password the User would like to change it to
- * @return {Promise} resolving to the validity of the provided password
- * @throws {InvalidParameterError} when the requested token cannot be found
- */
-module.exports.resetPassword = function(token, password) {
-	return Promise.resolve(token.resetUserPassword(password));
-};

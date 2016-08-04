@@ -109,7 +109,7 @@ module.exports.verifyPassword = function (user, password) {
 };
 
 /**
- * Verifies that the provided password matches that of the user's password
+ * Resets the user's password and saves it.
  * @param  {User} user a User model
  * @param  {String} password the password to change to
  * @return {Promise} resolving to the new User model

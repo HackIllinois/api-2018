@@ -6,7 +6,6 @@ var validations = {
 	'password': ['string', 'minLength:8']
 };
 
-// usable whenever a request is made to obtain an token
 function TokenRequest(parameters) {
 	Request.call(this, parameters);
 
