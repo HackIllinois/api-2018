@@ -12,17 +12,37 @@ module.exports = function(allowed, isOwner) {
 		if (!req.auth) {
 			// there is no auth information, so the requester cannot be allowed
 			return next(new errors.UnauthorizedError());
-		} if (isOwner && !isOwner(req)) {
-			// the endpoint defined a method for determining whether the
-			// requester owns the resource, but this was not true
-			return next(new errors.UnauthorizedError());
-		} if (!isOwner && !_.includes(allowed, req.auth.role)) {
+		}
+
+		if (isOwner) {
+			// the endpoint defined an ownership method
+			if ('function' === typeof isOwner.then) {
+				// the ownership method is async, so resolve its promise
+				isOwner(req).then(function (truth) {
+					if (!truth) {
+						next(new errors.UnauthorizedError());
+					} else {
+						next();
+					}
+				})
+				.catch(function (error) {
+					next(error);
+				});
+			} else if (!isOwner(req)) {
+				// the ownership method is synchronous (but failed)
+				return next(new errors.UnauthorizedError());
+			} else {
+				// the ownership method is synchronous (and succeeded)
+				next();
+			}
+		}
+		else if (!_.includes(allowed, req.auth.role)) {
 			// the endpoint did not define an ownership method, and the
 			// requester did not have the role necessary to continue
 			return next(new errors.UnauthorizedError());
+		} else {
+			// the requester is authorized
+			next();
 		}
-
-		// the requester must be authorized by this point
-		next();
 	};
 };

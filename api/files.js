@@ -16,7 +16,8 @@ const TEMP_DIRECTORY = './temp/';
 const MAIL_DIRECTORY = TEMP_DIRECTORY + 'mail/';
 const STORAGE_DIRECTORY = TEMP_DIRECTORY + 'storage/';
 
-const DEFAULT_STORAGE_EXTENSION = 'bin';
+const META_EXTENSION = '.meta';
+const META_SEPARATOR = '^|';
 
 /**
  * Writes a new mail entry to the temp directory. When called in non-development
@@ -54,49 +55,74 @@ module.exports.writeMail = function (recipients, template, substitutions) {
 };
 
 /**
- * Writes a Buffer to the temp directory. When called in non-development environments,
+ * Writes a file to the temp directory. When called in non-development environments,
  * this method does nothing
  * @param {Buffer} content		the content to write
- * @param {String} key			the key by which the content will be retrieved
+ * @param {Object} params		an object containing a `key`, `name`, and `mimetype`
  * @return {Promise<>}			a resolved promise
  */
-module.exports.writeStream = function (content, key) {
+module.exports.writeFile = function (content, params) {
 	if (!config.isDevelopment) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + key;
+	var filePath = STORAGE_DIRECTORY + params.key;
+	var metaFilePath = filePath + META_EXTENSION;
+
+	var metaContent = [params.name, params.mimetype].join(META_SEPARATOR);
 
 	mkdirp.sync(STORAGE_DIRECTORY);
-	return fs.writeFileAsync(filePath, content);
+	return [fs.writeFileAsync(filePath, content), fs.writeFileAsync(metaFilePath, Buffer.from(metaContent))]
+		.spread(function (fileResult, metaResult) {
+			return _Promise.resolve(null);
+		});
 };
 
 /**
- * Retrieves a Buffer from the temp directory. When called in non-development environments,
+ * Retrieves a file from the temp directory. When called in non-development environments,
  * this method does nothing
  * @param  {String} key			the key by which the content was stored
- * @return {Promise<Buffer>}	a promise resolving to a raw buffer
+ * @return {Promise<Object>}	a promise resolving to an object containing the `content` Buffer
+ *                             	as well as `name`, `mimetype`, and `encoding`
  */
-module.exports.getStream = function (key) {
+module.exports.getFile = function (key) {
 	if (!config.isDevelopment) {
 		return _Promise.resolve(null);
 	}
 
 	var filePath = STORAGE_DIRECTORY + key;
-	return fs.readFileAsync(filePath);
+	var metaFilePath = filePath + META_EXTENSION;
+
+	return [fs.readFileAsync(filePath), fs.readFileAsync(metaFilePath)]
+		.spread(function (file, meta) {
+			meta = meta.toString();
+			meta = meta.split(META_SEPARATOR);
+
+			var result = {};
+			result.content = file;
+			result.name = meta[0];
+			result.mimetype = meta[1];
+
+			return _Promise.resolve(result);
+		});
 };
 
 /**
- * Removes a Buffer from the temp directory. When called in non-development environments,
+ * Removes a file from the temp directory. When called in non-development environments,
  * this method does nothing
  * @param  {String} key		the key by which the content was stored
  * @return {Promise<>}		a resolved promise
  */
-module.exports.removeStream = function (key) {
+module.exports.removeFile = function (key) {
 	if (!config.isDevelopment) {
 		return _Promise.resolve(null);
 	}
 
 	var filePath = STORAGE_DIRECTORY + key;
-	return fs.unlinkAsync(filePath);
+	var metaFilePath = filePath + META_EXTENSION;
+
+	return [fs.unlinkAsync(filePath), fs.unlinkAsync(metaFilePath)]
+		.spread(function (fileResult, metaResult) {
+			return _Promise.resolve(null);
+		});
 };
