@@ -69,7 +69,7 @@ config.uri = {};
 config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT || 8080;
-config.domain = isDevelopment ? ('localhost:' + config.port + '/') : 'hackillinois.org/';
+config.domain = isDevelopment ? ('http:localhost:' + config.port + '/') : 'https://www.hackillinois.org/';
 
 // TODO: Determine exact password reset url
 config.uri.passwordReset = config.domain + 'v1/auth/resetpage?token=';
