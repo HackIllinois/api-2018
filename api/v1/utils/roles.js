@@ -6,10 +6,12 @@ _.forEach(ALL_ROLES, function (role) {
 	_.assign(module.exports, role);
 });
 
+module.exports.NONE = [];
 module.exports.ALL = ALL_ROLES;
 module.exports.SUPERUSER = ALL_ROLES[0];
 module.exports.ORGANIZERS = ['ADMIN', 'STAFF'];
 module.exports.PROFESSIONALS = ['SPONSOR', 'MENTOR'];
+module.exports.NON_PROFESSIONALS = ['ADMIN', 'STAFF', 'VOLUNTEER', 'HACKER'];
 module.exports.HOSTS = ['ADMIN', 'STAFF', 'VOLUNTEER'];
 module.exports.COMMON = ['SPONSOR', 'MENTOR', 'VOLUNTEER', 'HACKER'];
 

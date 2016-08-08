@@ -49,8 +49,8 @@ function _confirmLength(length, maxLength) {
 
 /**
  * Finds an upload by its internal ID
- * @param  {Number} id		the internal ID of the requested upload
- * @return {Upload} 		the requested upload
+ * @param  {Number} id			the internal ID of the requested upload
+ * @return {Promise<Upload>}	the requested upload
  * @throws {NotFoundError}	when the upload does not exist
  */
 module.exports.findUploadById = function (id) {
@@ -59,66 +59,91 @@ module.exports.findUploadById = function (id) {
 		.then(function (result) {
 			if (_.isNull(result)) {
 				var message = "An upload with the given ID cannot be found";
-				var source = "id";
+				var source = 'id';
 				throw new errors.NotFoundError(message, source);
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 
 /**
- * Creates an internal upload representation and provides a signed upload URL
+ * Finds an upload by its key in a given bucket
+ * @param  {String} key		the previously key given to the upload
+ * @param  {String} bucket	the bucket assigned to the upload
+ * @return {Promise<Upload>} the requested upload
+ * @throws {NotFoundError} when the upload does not exist
+ */
+module.exports.findUploadByKey = function (key, bucket) {
+	return Upload
+		.findByKey(key, bucket)
+		.then(function (result) {
+			if (_.isNull(result)) {
+				var message = "An upload with the given key does not exist in the provided bucket";
+				var source = ['key', 'bucket'];
+				throw new errors.NotFoundError(message);
+			}
+
+			return _Promise.resolve(result);
+		});
+};
+
+/**
+ * Creates an internal upload representation
  *
+ * @param  {User} owner				the owner of the upload
+ * @param  {Object} params			parameter object with
+ *                           		{String} bucket			the target upload bucket
+ *                           		{String} key			(optional) the key to use for the upload
+ * @return {Promise<Upload>}		a promise resolving to the new upload
+ *
+ */
+module.exports.createUpload = function (owner, params) {
+	var uploadParams = {};
+	uploadParams.owner_id = owner.get('id');
+	uploadParams.key = params.key || _makeUploadKey(owner);
+	uploadParams.bucket = params.bucket;
+
+	return Upload.forge(uploadParams).save();
+};
+
+/**
+ * Verifies a file is acceptable for upload and provides a
+ * signed, short-term upload URI
+ * @param  {Upload} upload			the internal upload representation associated with this upload
  * @param  {Object} file			parameter object with
+ *                         			{String} content	the MD5 hash of the upload
  *                         			{String} type		the MIME type of the upload
  *                            		{Integer} length	the expected length of the upload
  *                              	{String} name		the name of the upload
- * @param  {User} owner				the owner of the upload
- * @param  {String} bucket			the target upload bucket
  * @param  {Object} params			(optional) parameter object with
  *                           		{Array} allowedTypes	(optional) a list of allowed MIME types
  *                           		{Number} maxLength		(optional) the max length of the upload in bytes
- * @return {Promise<Object>}		a promise resolving to an object with
- *                              	{Upload} upload 	the internal upload record
- *                               	{String} url		the short-expiration signed upload URL
- * @throws {InvalidUploadError}		when the upload fails any imposed validations
- * @throws {ExternalProviderError}	when the client throws an error
+ * @return {Promise<String>} an upload to which the file will be accepted
+ * @throws {InvalidUploadError}	when the upload fails any imposed validations
+ * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
-module.exports.create = function (file, owner, bucket, params) {
+module.exports.receiveUpload = function (upload, file, params) {
 	return new _Promise(function (resolve, reject) {
 		_confirmMimetype(file.type, (params) ? params.allowedTypes : undefined);
 		_confirmLength(file.length, (params) ? params.maxLength : undefined);
 
-		var uploadParams = {};
-		uploadParams.owner_id = owner.get('id');
-		uploadParams.key = _makeUploadKey(owner);
-		uploadParams.bucket = params.bucket;
-		uploadParams.status = storageUtils.statuses.sent;
-
-		return Upload.forge(uploadParams).save();
-	}).then(function (upload) {
-		var result = { upload: upload };
-
 		// TODO make helper methods here
+		var result;
 		if (!client.isEnabled) {
 			if (!config.isDevelopment) {
 				// something went wrong and we made it into production without
 				// an enabled client
-				return upload
-					.destroy()
-					.then(function () {
-						throw new Errors.ApiError();
-					});
+				throw new Errors.ApiError();
 			}
 
-			result.url = config.domain + DEVELOPMENT_UPLOAD_URI + upload.get('id');
+			result = config.domain + DEVELOPMENT_UPLOAD_URI + upload.get('id');
 			return _Promise.resolve(result);
 		} else {
 			// TODO add aws support
 			logger.error("AWS support not implemented!");
 
-			result.url = '';
+			result = '';
 			return _Promise.resolve(result);
 		}
 	});
@@ -130,7 +155,7 @@ module.exports.create = function (file, owner, bucket, params) {
  * @return {Promise<String>}
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.get = function (upload) {
+module.exports.getUpload = function (upload) {
 	return new _Promise(function (resolve, reject) {
 		// TODO add aws support and remove wrapping promise
 		return files.getFile(upload.get('key'));
@@ -145,7 +170,7 @@ module.exports.get = function (upload) {
  * @return {Promise<>}				an empty promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.remove = function (upload, transaction) {
+module.exports.removeUpload = function (upload, transaction) {
 	return files
 		.removeStream(upload.get('key'))
 		.then(function () {
@@ -163,7 +188,7 @@ module.exports.remove = function (upload, transaction) {
  * @return {Promise<>}				an empty promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.removeAll = function (uploads) {
+module.exports.removeAllUploads = function (uploads) {
 	return Upload.transaction(function (t) {
 		var removed = [];
 		uploads.forEach(function (upload) {

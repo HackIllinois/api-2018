@@ -3,6 +3,5 @@ module.exports = {
 	errors: require('./errors.js'),
 	permission: require('./permission.js'),
 	request: require('./request.js'),
-	response: require('./response.js'),
-	synchronize: require('./synchronize.js')
+	response: require('./response.js')
 };

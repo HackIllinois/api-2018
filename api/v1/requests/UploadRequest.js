@@ -1,7 +1,8 @@
 var Request = require('./Request');
 
-var required = ['type', 'length', 'name'];
+var required = ['content', 'type', 'length', 'name'];
 var validations = {
+	'content': ['string', 'exactLength:32'],
 	'type': ['string', 'between:1:255'],
 	'length': ['naturalNonZero'],
 	'name': ['string']

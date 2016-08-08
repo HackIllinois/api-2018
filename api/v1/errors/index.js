@@ -6,7 +6,6 @@ module.exports = {
 	InvalidUploadError: require('./InvalidUploadError.js'),
 	MissingParameterError: require('./MissingParameterError.js'),
 	NotFoundError: require('./NotFoundError.js'),
-	RateLimitError: require('./RateLimitError.js'),
 	UnauthorizedError: require('./UnauthorizedError.js'),
 	UnprocessableRequestError: require('./UnprocessableRequestError.js')
 };
