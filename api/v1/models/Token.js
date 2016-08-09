@@ -22,13 +22,4 @@ Token.findByValue = function(value) {
 	return this.collection().query({ where: { value: value }}).fetchOne();
 };
 
-/**
- * Obtains the user model this token refers to
- * @return {Promise} resolving to the associated User model
- */
-Token.prototype.getUser = function () {
-	var id = this.get('userId');
-	return User.findById(id);
-};
-
 module.exports = Token;

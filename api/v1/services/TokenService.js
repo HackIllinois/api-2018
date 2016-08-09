@@ -23,17 +23,13 @@ module.exports.findTokenByValue = function(value, scope) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			// Provided logging for the DEFAULT case in case the developer did not intend to use it
-			var defaultExpiration = function() {
-				const warning = 'The scope currently accessed has the DEFAULT scope, '
-				    + 'you may have forgotten to create a new scope in config.js';
-				logger.warn(warning);
-				return config.token.expiration['DEFAULT'];
-			};
-
 			// Check expiration
-			let expiration = config.token.expiration[scope.toUpperCase()]
-						 || defaultExpiration();
+			let expiration = config.token.expiration[scope.toUpperCase()];
+
+			if (expiration == undefined) {
+				throw new TypeError('Could not find matching scope.');
+			}
+
 			var tokenExpire = Date.parse(result.get('created')) + expiration;
 			if (tokenExpire < Date.now())
 			{
