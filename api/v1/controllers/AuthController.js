@@ -108,14 +108,8 @@ function passwordReset(req, res, next) {
 	TokenService
 		.findTokenByValue(req.body.token, 'AUTH')
 		.then(function (token) {
-			return Promise.resolve((function () {
-				var user = token.user();
-				token.destroy();
-				return user;
-			})());
-		})
-		.then(function (user) {
-			return UserService.resetPassword(user, req.body.password);
+			token.destroy();
+			return UserService.resetPassword(token.related('user'), req.body.password);
 		})
 		.then(function (user) {
 			return AuthService.issueForUser(user);

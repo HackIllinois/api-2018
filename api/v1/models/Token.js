@@ -19,7 +19,7 @@ var Token = Model.extend({
  * @return {Promise} resolving to the associated Token Model
  */
 Token.findByValue = function(value) {
-	return this.collection().query({ where: { value: value }}).fetchOne();
+	return this.collection().query({ where: { value: value }}).fetchOne({ withRelated: ['user'] } );
 };
 
 module.exports = Token;
