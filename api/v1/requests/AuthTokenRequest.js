@@ -1,16 +1,16 @@
 var Request = require('./Request');
 
-var required = ['email', 'password'];
-var validations = {
+var bodyRequired = ['email', 'password'];
+var bodyValidations = {
 	'email': ['email'],
 	'password': ['string', 'minLength:8']
 };
 
-function AuthTokenRequest(parameters) {
-	Request.call(this, parameters);
+function AuthTokenRequest(headers, body) {
+	Request.call(this, headers, body);
 
-	this.required = required;
-	this.validations = validations;
+	this.bodyRequired = bodyRequired;
+	this.bodyValidations = bodyValidations;
 }
 
 AuthTokenRequest.prototype = Object.create(Request.prototype);

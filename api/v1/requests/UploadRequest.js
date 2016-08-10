@@ -1,18 +1,11 @@
 var Request = require('./Request');
 
-var required = ['content', 'type', 'length', 'name'];
-var validations = {
-	'content': ['string', 'exactLength:32'],
-	'type': ['string', 'between:1:255'],
-	'length': ['naturalNonZero'],
-	'name': ['string']
-};
+var headersRequired = ['x-content-name'];
 
-function UploadRequest(parameters) {
-	Request.call(this, parameters);
+function UploadRequest(headers, body) {
+	Request.call(this, headers, body);
 
-	this.required = required;
-	this.validations = validations;
+	this.headersRequired = headersRequired;
 }
 
 UploadRequest.prototype = Object.create(Request.prototype);

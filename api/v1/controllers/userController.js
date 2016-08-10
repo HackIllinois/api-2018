@@ -1,3 +1,5 @@
+var bodyParser = require('body-parser');
+
 var errors = require('../errors');
 var services = require('../services');
 
@@ -73,9 +75,16 @@ function getUser (req, res, next) {
 		});
 }
 
+router.use(bodyParser.json());
+router.use(middleware.auth);
+router.use(middleware.request);
+
 router.post('', createHackerUser);
 router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
+
+router.use(middleware.response);
+router.use(middleware.errors);
 
 module.exports.createHackerUser = createHackerUser;
 module.exports.createAccreditedUser = createAccreditedUser;

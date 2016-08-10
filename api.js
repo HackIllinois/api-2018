@@ -1,4 +1,3 @@
-var bodyParser = require('body-parser');
 var express = require('express');
 var fs = require('fs');
 
@@ -9,8 +8,6 @@ var logger = require('./api/logging');
 var api = require('./api/');
 
 var instance = express();
-instance.use(bodyParser.json());
-instance.use(bodyParser.urlencoded({ extended: false }));
 instance.disable('x-powered-by');
 
 instance.use('/v1', api.v1);

@@ -68,6 +68,7 @@ config.storage = {};
 config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT || 8080;
+config.profile = 'hackillinois-api';
 config.domain = isDevelopment ? ('http://localhost:' + config.port) : 'https://hackillinois.org';
 
 config.superuser.email = superuserEmail;
@@ -91,7 +92,7 @@ config.mail.sinkhole = '.sink.sparkpostmail.com';
 config.mail.whitelistedDomains = ['@hackillinois.org'];
 config.mail.whitelistedLists = ['test'];
 
-config.storage.maxLength = 2 * 1000000; // in bytes
+config.storage.maxLength = '2mb';
 config.storage.bucketExtension = (isDevelopment) ? '-development' : '-2017';
 
 logger.info("prepared environment for %s", environment);

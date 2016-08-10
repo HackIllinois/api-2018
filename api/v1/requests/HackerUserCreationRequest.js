@@ -1,7 +1,7 @@
 var Request = require('./Request');
 
-var required = ['email', 'password', 'confirmedPassword'];
-var validations = {
+var bodyRequired = ['email', 'password', 'confirmedPassword'];
+var bodyValidations = {
 	'email': ['email'],
 	'password': ['string', 'minLength:8'],
 	'confirmedPassword': [{ rule: 'matchesField:password',
@@ -9,11 +9,11 @@ var validations = {
 };
 
 // usable whenever a request is made to create a Hacker
-function HackerUserCreationRequest(parameters) {
-	Request.call(this, parameters);
+function HackerUserCreationRequest(headers, body) {
+	Request.call(this, headers, body);
 
-	this.required = required;
-	this.validations = validations;
+	this.bodyRequired = bodyRequired;
+	this.bodyValidations = bodyValidations;
 }
 
 HackerUserCreationRequest.prototype = Object.create(Request.prototype);

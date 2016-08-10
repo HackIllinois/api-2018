@@ -2,49 +2,56 @@
 
 var config = require('../../config');
 var files = require('../../files');
+var logger = require('../../logging');
 var errors = require('../errors');
-var logger = require('../logging');
 var storageUtils = require('../utils/storage');
 var Upload = require('../models/Upload');
 
-var client = require('aws-sdk');
+var bytes = require('bytes');
+var uuid = require('node-uuid');
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
+var client = require('aws-sdk');
 client.config.credentials = new client.SharedIniFileCredentials({ profile: config.profile });
-client.isEnabled = !!client.config.accessKeyId;
+client.isEnabled = !!client.config.credentials.accessKeyId;
+
+var remote = new client.S3();
 
 const INVALID_LENGTH_MESSAGE = "The upload was larger than the maximum allowed length";
 const INVALID_CONTENT_TYPE = "The upload did not match any of the allowed types";
-const NOT_READY = "The requested content has not yet been persisted or failed to be persisted";
-const FAILURE_TEMPLATE = "upload failed for file with key %s in %s: \n%j";
+
 const UPLOAD_KEY_SEPARATOR = '/';
+const SIGNATURE_EXPIRATION = 10; // seconds
 
-const DEVELOPMENT_UPLOAD_URI = '/api/v1/upload/dev?id=';
+const CLIENT_NAME = "AWS_S3";
 
-function _makeUploadKey(owner) {
-	return owner.get('id') + UPLOAD_KEY_SEPARATOR + time.unix();
+function _handleDisabledUpload (upload, file) {
+	if (!config.isDevelopment) {
+		// something went wrong and we made it into production without
+		// an enabled client, so do not expose the instance's file system
+		throw new errors.ApiError();
+	}
+
+	// TODO persist using files.writeFile
 }
 
-function _confirmMimetype(type, allowedTypes) {
-	if (!!allowedTypes && !_.isEmpty(allowedTypes)) {
-		if (!_.includes(allowedTypes, type)) {
-			var message = INVALID_CONTENT_TYPE + " (" + allowedTypes.join(', ') + ")";
-			throw new errors.InvalidUploadError(message);
-		}
-	}
-}
+function _handleUpload (upload, file) {
+	var params = {};
+	params.Body = file.content;
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+	params.ContentDisposition = "attachment; filename=" + file.name;
+	params.ContentLength = file.content.length;
+	params.ContentType = file.type;
 
-function _confirmLength(length, maxLength) {
-	var message;
-	if (!maxLength && content.length > config.storage.maxLength) {
-		message = INVALID_LENGTH_MESSAGE + " (" + config.storage.maxLength + " bytes)";
-		throw new errors.InvalidUploadError(message);
-	}
-	else if (content.length > maxLength) {
-		message = INVALID_LENGTH_MESSAGE + " (" + maxLength + " bytes)";
-		throw new errors.InvalidUploadError(message);
-	}
+	return remote.putObject(params).promise()
+		.catch(function (error) {
+			var message = "the storage client received an error";
+			message += " (" + error.message + ")";
+
+			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		});
 }
 
 /**
@@ -94,58 +101,45 @@ module.exports.findUploadByKey = function (key, bucket) {
  * @param  {User} owner				the owner of the upload
  * @param  {Object} params			parameter object with
  *                           		{String} bucket			the target upload bucket
- *                           		{String} key			(optional) the key to use for the upload
+ *                           		{String} key			(optional) the 36-character key to use for the upload
  * @return {Promise<Upload>}		a promise resolving to the new upload
  *
  */
 module.exports.createUpload = function (owner, params) {
 	var uploadParams = {};
-	uploadParams.owner_id = owner.get('id');
-	uploadParams.key = params.key || _makeUploadKey(owner);
+	uploadParams.ownerId = owner.get('id');
+	uploadParams.key = params.key || uuid.v4();
 	uploadParams.bucket = params.bucket;
 
 	return Upload.forge(uploadParams).save();
 };
 
 /**
- * Verifies a file is acceptable for upload and provides a
- * signed, short-term upload URI
+ * Provides a signed, short-term upload URI
  * @param  {Upload} upload			the internal upload representation associated with this upload
  * @param  {Object} file			parameter object with
- *                         			{String} content	the MD5 hash of the upload
+ *                         			{String} content	the Buffer containing the file
  *                         			{String} type		the MIME type of the upload
- *                            		{Integer} length	the expected length of the upload
  *                              	{String} name		the name of the upload
- * @param  {Object} params			(optional) parameter object with
+ * @param  {Object} params			(optional) specifies validation should be performed with any of the following
  *                           		{Array} allowedTypes	(optional) a list of allowed MIME types
  *                           		{Number} maxLength		(optional) the max length of the upload in bytes
  * @return {Promise<String>} an upload to which the file will be accepted
  * @throws {InvalidUploadError}	when the upload fails any imposed validations
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
-module.exports.receiveUpload = function (upload, file, params) {
+module.exports.persistUpload = function (upload, file, params) {
 	return new _Promise(function (resolve, reject) {
-		_confirmMimetype(file.type, (params) ? params.allowedTypes : undefined);
-		_confirmLength(file.length, (params) ? params.maxLength : undefined);
-
-		// TODO make helper methods here
-		var result;
-		if (!client.isEnabled) {
-			if (!config.isDevelopment) {
-				// something went wrong and we made it into production without
-				// an enabled client
-				throw new Errors.ApiError();
-			}
-
-			result = config.domain + DEVELOPMENT_UPLOAD_URI + upload.get('id');
-			return _Promise.resolve(result);
-		} else {
-			// TODO add aws support
-			logger.error("AWS support not implemented!");
-
-			result = '';
-			return _Promise.resolve(result);
+		if (params) {
+			return module.exports.verifyUpload(file, params);
 		}
+		return resolve(true);
+	})
+	.then (function () {
+		if (!client.isEnabled) {
+			return _handleDisabledUpload(upload, file);
+		}
+		return _handleUpload(upload, file);
 	});
 };
 

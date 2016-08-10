@@ -1,4 +1,7 @@
+var bodyParser = require('body-parser');
 var Promise = require('bluebird');
+
+var middleware = require('../middleware');
 
 var errors = require('../errors');
 var AuthService = require('../services/AuthService');
@@ -70,8 +73,15 @@ function refreshToken (req, res, next) {
 		});
 }
 
+router.use(bodyParser.json());
+router.use(middleware.auth);
+router.use(middleware.request);
+
 router.post('', createToken);
 router.get('/refresh', refreshToken);
+
+router.use(middleware.response);
+router.use(middleware.errors);
 
 module.exports.createToken = createToken;
 module.exports.router = router;

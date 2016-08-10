@@ -16,9 +16,11 @@ module.exports = function(allowed, isOwner) {
 
 		if (isOwner) {
 			// the endpoint defined an ownership method
-			if ('function' === typeof isOwner.then) {
+			var result = isOwner(req);
+
+			if ('function' === typeof result.then) {
 				// the ownership method is async, so resolve its promise
-				isOwner(req).then(function (truth) {
+				result.then(function (truth) {
 					if (!truth) {
 						next(new errors.UnauthorizedError());
 					} else {
@@ -28,7 +30,7 @@ module.exports = function(allowed, isOwner) {
 				.catch(function (error) {
 					next(error);
 				});
-			} else if (!isOwner(req)) {
+			} else if (!result) {
 				// the ownership method is synchronous (but failed)
 				return next(new errors.UnauthorizedError());
 			} else {

@@ -1,8 +1,7 @@
 /* jshint esversion: 6 */
 
-// NOTE: this is an example controller that will be used to handle resume
-// uploads (it is currently a WIP)
-
+var ExpressRouter = require('express').Router;
+var bodyParser = require('body-parser');
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
@@ -12,48 +11,40 @@ var services = require('../services');
 var utils = require('../utils');
 
 var Upload = require('../models/Upload');
+var User = require('../models/User');
 
-// TODO move all constant definitions to service
-const UPLOAD_EXPIRATION = 10; // in seconds
+const UPLOAD_ALREADY_PRESENT = "An upload has already been associated with this user";
 
-const RESUME_KEY_SEPARATOR = '/';
-const RESUME_KEY_IDENTIFIER = 'RESUME';
+const RESUME_UPLOAD_LIMIT = '2mb';
+const RESUME_UPLOAD_TYPE = 'application/pdf';
 const RESUME_BUCKET = utils.storage.buckets.resumes;
-const RESUME_MAX_LENGTH = 2 * 1000 * 1000; // bytes
-const RESUME_FILE_TYPES = [utils.storage.types.pdf];
 
-var router = require('express').Router();
+// in order to protect ourselves, we create a router for every type of upload
+// that we need to handle. this allows us to place a limit on the incoming buffer
+var router = ExpressRouter();
+var resumeRouter = ExpressRouter();
 
 function isOwner (req) {
-	return services.StorageService
-		.findById(req.params.id)
+	return services.StorageService.findUploadById(req.params.id)
 		.then(function (upload) {
 			req.upload = upload;
-			return _Promise.resolve(upload.get('owner_id') == req.params.id);
+			return _Promise.resolve(upload.get('ownerId') === parseInt(req.auth.sub));
 		});
 }
 
-function _makeResumeKey (user) {
-	return user.get('id') + RESUME_KEY_SEPARATOR + RESUME_KEY_IDENTIFIER;
+function _makeFileParams (req, type) {
+	return { content: req.body, type: type, name: req.header('x-content-name') };
 }
 
-function _getResumeUploadUri (upload, fileParams) {
-	var uploadParams = { allowedTypes: RESUME_FILE_TYPES, maxLength: RESUME_MAX_LENGTH };
-	return services.StorageService.receive(upload, fileParams, uploadParams);
-}
+function createResumeUpload (req, res, next) {
+	var upload;
+	var uploadOwner = User.forge({ id: parseInt(req.auth.sub) }); // NOTE: this will soon be present on the actual auth object
+	var uploadParams = { bucket: RESUME_BUCKET };
 
-function createUpload(req, res, next) {
-	// TODO refactor into service
-	var newUpload;
-	var uploadOwner = User.forge({ id: req.auth.id });
-	var uploadParams = { bucket: RESUME_BUCKET, key: _makeResumeKey(uploadOwner) };
-
-	Upload
-		.findByKey(uploadParams.key, uploadParams.bucket)
-		.then(function (result) {
-			if (!_.isNull(result)) {
-				var message = "A resume has already been associated with this user";
-				next(new InvalidUploadError(message));
+	Upload.findByOwner(uploadOwner, uploadParams.bucket)
+		.then(function (results) {
+			if (!_.isEmpty(results)) {
+				return next(new errors.InvalidUploadError(UPLOAD_ALREADY_PRESENT));
 			}
 
 			return null;
@@ -61,14 +52,14 @@ function createUpload(req, res, next) {
 		.then(function () {
 			return services.StorageService.createUpload(uploadOwner, uploadParams);
 		})
-		.then(function (upload) {
-			newUpload = upload;
-			return _getResumeUploadUri(upload, req.body);
+		.then(function (newUpload) {
+			upload = newUpload;
+
+			var fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
+			return services.StorageService.persistUpload(upload, fileParams);
 		})
-		.then(function (uploadUri) {
-			res.body = newUpload.toJSON();
-			res.body.transfer = uploadUri;
-			res.body.retrieve = null;
+		.then (function () {
+			res.body = upload.toJSON();
 
 			next();
 			return null;
@@ -78,26 +69,14 @@ function createUpload(req, res, next) {
 		});
 }
 
-function updateUpload(req, res, next) {
-	// TODO refactor into service
-	var updatedUpload;
-	var uploadOwner = User.forge({ id: req.auth.id });
-	var uploadParams = { bucket: RESUME_BUCKET, key: _makeResumeKey(uploadOwner) };
-
-	StorageService
-		.findById(req.params.id)
+function replaceResumeUpload (req, res, next) {
+	return req.upload.save()
 		.then(function (upload) {
-			// update the timestamp
-			upload.save();
+			var fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
+			return services.StorageService.persistUpload(upload, fileParams);
 		})
-		.then(function (upload) {
-			updatedUpload = upload;
-			return _getResumeUploadUri(upload, req.body);
-		})
-		.then(function (uploadUri) {
-			res.body = updatedUpload.toJSON();
-			res.body.transfer = uploadUri;
-			res.body.retrieve = null;
+		.then(function () {
+			res.body = req.upload.toJSON();
 
 			next();
 			return null;
@@ -107,33 +86,29 @@ function updateUpload(req, res, next) {
 		});
 }
 
-function getUpload(req, res, next) {
-	var existingUpload;
-
-	StorageService
-		.findById(req.params.id)
-		.then(function (upload) {
-			existingUpload = upload;
-			return StorageService.getUpload(upload);
-		})
-		.then(function (retrievalUri) {
-			res.body = existingUpload.toJSON();
-			res.body.transfer = null;
-			res.body.retrieve = retrievalUri;
-
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-		});
+function getResumeUpload (req, res, next) {
+	// TODO
+	next();
 }
 
-router.post('/', middleware.permission(utils.roles.NON_PROFESSIONALS), createUpload);
-router.put('/:id', middleware.permission(utils.roles.NONE, isOwner), updateUpload);
-router.get('/:id', middleware.permission(utils.roles.ORGANIZERS, isOwner), getUpload);
+// since we are using individual sub-routers, we cannot use the request middleware
+// until after we have attached the individual body parsers (otherwise req.body will be undefined)
+router.use(middleware.auth);
 
-module.exports.createUpload = createUpload;
-module.exports.updateUpload = updateUpload;
-module.exports.getUpload = getUpload;
+// add sub-routers to main router (sub-routes will be set-up below)
+router.use('/resume', resumeRouter);
+
+// add the general error-handling and response middleware that all routers use
+router.use(middleware.response);
+router.use(middleware.errors);
+
+// set up individual sub-routers, starting with the body parser and then moving on
+// to request-handling middleware (see above for reasoning)
+resumeRouter.use(bodyParser.raw({ limit: RESUME_UPLOAD_LIMIT, type: RESUME_UPLOAD_TYPE }));
+resumeRouter.use(middleware.request);
+
+resumeRouter.post('/', middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+resumeRouter.put('/:id', middleware.permission(utils.roles.NONE, isOwner), replaceResumeUpload);
+resumeRouter.get('/:id', middleware.permission(utils.roles.ORGANIZERS, isOwner), getResumeUpload);
+
 module.exports.router = router;

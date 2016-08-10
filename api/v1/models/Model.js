@@ -7,31 +7,36 @@ var _ = require('lodash');
 var database = require('../../database');
 var bookshelf = database.instance();
 
-var Model = bookshelf.Model.extend({
-	// the default model has no validations, but more can be
-	// added as desired
-	validations: {}
-});
-
 /**
  * Produces datastore transaction
  * @param  {Function} callback	method to start transaction
  * @return {Promise} 			the result of the callback
  */
-Model.transaction = function (callback) {
+function _transaction (callback) {
 	return bookshelf.transaction(callback);
-};
+}
 
 /**
  * Fetches a model by its ID
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
-Model.findById = function (id) {
-	var queryWhere = {};
-	queryWhere[this.idAttribute] = id;
-	return this.collection().query({ where: queryWhere }).fetchOne();
-};
+function _findById (id) {
+	var _model = new this();
+
+	var queryParams = {};
+	queryParams[_model.idAttribute] = id;
+	return _model.query({ where: queryParams }).fetch();
+}
+
+var Model = bookshelf.Model.extend({
+	// the default model has no validations, but more can be
+	// added as desired
+	validations: {}
+}, {
+	transaction: _transaction,
+	findById: _findById
+});
 
 /**
  * Initializes the model by setting up all event handlers
