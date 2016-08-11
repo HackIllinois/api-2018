@@ -14,7 +14,7 @@ var Upload = Model.extend({
 Upload.findByOwner = function (owner, bucket) {
 	var queryParams = { where : {} };
 
-	queryParams.where.ownerId = owner.get('id');
+	queryParams.where.owner_id = owner.get('id');
 	if (bucket) { queryParams.where.bucket = bucket; }
 
 	return Upload.collection().query(queryParams).fetch();

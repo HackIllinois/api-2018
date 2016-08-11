@@ -12,6 +12,7 @@ var logger = require('./logging');
 var time = require('./v1/utils/time');
 
 // NOTE all paths are relative to the root of the project directory
+const DIRECTORY_SEPARATOR = '/';
 const TEMP_DIRECTORY = './temp/';
 const MAIL_DIRECTORY = TEMP_DIRECTORY + 'mail/';
 const STORAGE_DIRECTORY = TEMP_DIRECTORY + 'storage/';
@@ -58,7 +59,11 @@ module.exports.writeMail = function (recipients, template, substitutions) {
  * Writes a file to the temp directory. When called in non-development environments,
  * this method does nothing
  * @param {Buffer} content		the content to write
- * @param {Object} params		an object containing a `key`, `name`, and `mimetype`
+ * @param {Object} params		a parameter object with
+ *                         		{String} key	the key under which to store the file
+ *                         		{String} bucket	the bucket in which to store the file
+ *                         		{String} name	the name of the file
+ *                         		{String} type	the MIME type of the file
  * @return {Promise<>}			a resolved promise
  */
 module.exports.writeFile = function (content, params) {
@@ -66,14 +71,16 @@ module.exports.writeFile = function (content, params) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + params.key;
+	var filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
 	var metaFilePath = filePath + META_EXTENSION;
 
-	var metaContent = [params.name, params.mimetype].join(META_SEPARATOR);
+	var metaContent = [params.name, params.type].join(META_SEPARATOR);
 
-	mkdirp.sync(STORAGE_DIRECTORY);
-	return [fs.writeFileAsync(filePath, content), fs.writeFileAsync(metaFilePath, Buffer.from(metaContent))]
-		.spread(function (fileResult, metaResult) {
+	mkdirp.sync(STORAGE_DIRECTORY + params.bucket);
+	return _Promise.join(
+		fs.writeFileAsync(filePath, content),
+		fs.writeFileAsync(metaFilePath, new Buffer(metaContent)))
+		.then(function (fileResult, metaResult) {
 			return _Promise.resolve(null);
 		});
 };
@@ -82,26 +89,29 @@ module.exports.writeFile = function (content, params) {
  * Retrieves a file from the temp directory. When called in non-development environments,
  * this method does nothing
  * @param  {String} key			the key by which the content was stored
- * @return {Promise<Object>}	a promise resolving to an object containing the `content` Buffer
- *                             	as well as `name`, `mimetype`, and `encoding`
+ * @param  {String} bucket		the bucket in which the key was stored
+ * @return {Promise<Object>}	the stored file with
+ *                              {}`
  */
-module.exports.getFile = function (key) {
+module.exports.getFile = function (key, bucket) {
 	if (!config.isDevelopment) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + key;
+	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
 	var metaFilePath = filePath + META_EXTENSION;
 
-	return [fs.readFileAsync(filePath), fs.readFileAsync(metaFilePath)]
-		.spread(function (file, meta) {
+	return _Promise.join(
+		fs.readFileAsync(filePath),
+		fs.readFileAsync(metaFilePath))
+		.then(function (file, meta) {
 			meta = meta.toString();
 			meta = meta.split(META_SEPARATOR);
 
 			var result = {};
 			result.content = file;
-			result.name = meta[0];
-			result.mimetype = meta[1];
+			result.name = (meta.length) ? meta[0] : undefined;
+			result.mimetype = (meta.length) ? meta[1] : undefined;
 
 			return _Promise.resolve(result);
 		});

@@ -4,10 +4,10 @@ var v1 = express.Router();
 // set up CORS to allow for usage from different origins
 // we may remove this in the future
 v1.all('*', function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Content-Length, X-Content-Name');
-  next();
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type, Content-Length, X-Content-Name');
+	next();
 });
 
 

@@ -18,12 +18,6 @@ client.isEnabled = !!client.config.credentials.accessKeyId;
 
 var remote = new client.S3();
 
-const INVALID_LENGTH_MESSAGE = "The upload was larger than the maximum allowed length";
-const INVALID_CONTENT_TYPE = "The upload did not match any of the allowed types";
-
-const UPLOAD_KEY_SEPARATOR = '/';
-const SIGNATURE_EXPIRATION = 10; // seconds
-
 const CLIENT_NAME = "AWS_S3";
 
 function _handleDisabledUpload (upload, file) {
@@ -33,7 +27,13 @@ function _handleDisabledUpload (upload, file) {
 		throw new errors.ApiError();
 	}
 
-	// TODO persist using files.writeFile
+	var params = {};
+	params.bucket = upload.get('bucket');
+	params.key = upload.get('key');
+	params.name = file.name;
+	params.type = file.type;
+
+	return files.writeFile(file.content, params);
 }
 
 function _handleUpload (upload, file) {
@@ -125,7 +125,6 @@ module.exports.createUpload = function (owner, params) {
  *                           		{Array} allowedTypes	(optional) a list of allowed MIME types
  *                           		{Number} maxLength		(optional) the max length of the upload in bytes
  * @return {Promise<String>} an upload to which the file will be accepted
- * @throws {InvalidUploadError}	when the upload fails any imposed validations
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
 module.exports.persistUpload = function (upload, file, params) {
