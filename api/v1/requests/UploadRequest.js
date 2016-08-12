@@ -1,6 +1,6 @@
 var Request = require('./Request');
 
-var headersRequired = ['Content-Length', 'Content-Type', 'X-Content-Name'];
+var headersRequired = ['Content-Length', 'Content-Type'];
 
 function UploadRequest(headers, body) {
 	Request.call(this, headers, body);

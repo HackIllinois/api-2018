@@ -30,7 +30,6 @@ function _handleDisabledUpload (upload, file) {
 	var params = {};
 	params.bucket = upload.get('bucket');
 	params.key = upload.get('key');
-	params.name = file.name;
 	params.type = file.type;
 
 	return files.writeFile(file.content, params);
@@ -41,13 +40,44 @@ function _handleUpload (upload, file) {
 	params.Body = file.content;
 	params.Bucket = upload.get('bucket');
 	params.Key = upload.get('key');
-	params.ContentDisposition = "attachment; filename=" + file.name;
 	params.ContentLength = file.content.length;
 	params.ContentType = file.type;
 
 	return remote.putObject(params).promise()
 		.catch(function (error) {
-			var message = "the storage client received an error";
+			var message = "the storage client received an error on upload";
+			message += " (" + error.message + ")";
+
+			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		});
+}
+
+function _handleDisabledRetrieval (upload) {
+	return files.getFile(upload.get('key'), upload.get('bucket'))
+		.then(function (file) {
+			var result = {};
+			result.content = file.content;
+			result.type = file.type;
+
+			return _Promise.resolve(result);
+		});
+}
+
+function _handleRetrieval (upload) {
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+
+	return remote.getObject(params).promise()
+		.then(function (data) {
+			var result = {};
+			result.content = data.Body;
+			result.type = data.ContentType;
+
+			return result;
+		})
+		.catch(function (error) {
+			var message = "the storage client received an error on retrieval";
 			message += " (" + error.message + ")";
 
 			throw new errors.ExternalProviderError(message, CLIENT_NAME);
@@ -120,39 +150,29 @@ module.exports.createUpload = function (owner, params) {
  * @param  {Object} file			parameter object with
  *                         			{String} content	the Buffer containing the file
  *                         			{String} type		the MIME type of the upload
- *                              	{String} name		the name of the upload
- * @param  {Object} params			(optional) specifies validation should be performed with any of the following
- *                           		{Array} allowedTypes	(optional) a list of allowed MIME types
- *                           		{Number} maxLength		(optional) the max length of the upload in bytes
  * @return {Promise<String>} an upload to which the file will be accepted
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
-module.exports.persistUpload = function (upload, file, params) {
-	return new _Promise(function (resolve, reject) {
-		if (params) {
-			return module.exports.verifyUpload(file, params);
-		}
-		return resolve(true);
-	})
-	.then (function () {
-		if (!client.isEnabled) {
-			return _handleDisabledUpload(upload, file);
-		}
-		return _handleUpload(upload, file);
-	});
+module.exports.persistUpload = function (upload, file) {
+	if (!client.isEnabled) {
+		return _handleDisabledUpload(upload, file);
+	}
+	return _handleUpload(upload, file);
 };
 
 /**
- * Provides a signed URL for retrieving a an upload
+ * Retrieves an upload from remote storage
  * @param  {Upload} upload			an internal upload representation
- * @return {Promise<String>}
+ * @return {Promise<Object>}		an object with
+ *                               	{Buffer} content 		the content retrieved
+ *                               	{String} type			the MIME type of the content
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.getUpload = function (upload) {
-	return new _Promise(function (resolve, reject) {
-		// TODO add aws support and remove wrapping promise
-		return files.getFile(upload.get('key'));
-	});
+	if (!client.isEnabled) {
+		return _handleDisabledRetrieval(upload);
+	}
+	return _handleRetrieval(upload);
 };
 
 /**

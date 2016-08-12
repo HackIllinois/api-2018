@@ -27,7 +27,7 @@ function isOwner (req) {
 }
 
 function _makeFileParams (req, type) {
-	return { content: req.body, type: req.header('content-type'), name: req.header('x-content-name') };
+	return { content: req.body, type: req.header('content-type') };
 }
 
 function createResumeUpload (req, res, next) {
@@ -80,9 +80,19 @@ function replaceResumeUpload (req, res, next) {
 		});
 }
 
-function getResumeUpload (req, res, next) {
-	// TODO
-	next();
+function getUpload (req, res, next) {
+	return services.StorageService.getUpload(req.upload)
+		.then(function (result) {
+			res.set('Content-Length', result.content.length);
+			res.set('Content-Type', result.type);
+
+			res.send(result.content);
+
+			next();
+			return null;
+		}).catch(function (error) {
+			next(error);
+		});
 }
 
 // set up individual sub-routers to restrict upload size and type
@@ -93,7 +103,7 @@ resumeRouter.use(middleware.request);
 
 resumeRouter.post('/', middleware.upload, middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
 resumeRouter.put('/:id', middleware.upload, middleware.permission(utils.roles.NONE, isOwner), replaceResumeUpload);
-resumeRouter.get('/:id', middleware.permission(utils.roles.ORGANIZERS, isOwner), getResumeUpload);
+resumeRouter.get('/:id', middleware.permission(utils.roles.ORGANIZERS, isOwner), getUpload);
 
 // set up the primary router with just the auth middleware since the sub-routers
 // will handle the request middleware

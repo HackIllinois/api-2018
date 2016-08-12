@@ -62,7 +62,6 @@ module.exports.writeMail = function (recipients, template, substitutions) {
  * @param {Object} params		a parameter object with
  *                         		{String} key	the key under which to store the file
  *                         		{String} bucket	the bucket in which to store the file
- *                         		{String} name	the name of the file
  *                         		{String} type	the MIME type of the file
  * @return {Promise<>}			a resolved promise
  */
@@ -74,13 +73,15 @@ module.exports.writeFile = function (content, params) {
 	var filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
 	var metaFilePath = filePath + META_EXTENSION;
 
-	var metaContent = [params.name, params.type].join(META_SEPARATOR);
+	// we only store the type for now, but adding to this array
+	// would allow us to store more
+	var metaContent = [params.type].join(META_SEPARATOR);
 
 	mkdirp.sync(STORAGE_DIRECTORY + params.bucket);
 	return _Promise.join(
 		fs.writeFileAsync(filePath, content),
-		fs.writeFileAsync(metaFilePath, new Buffer(metaContent)))
-		.then(function (fileResult, metaResult) {
+		fs.writeFileAsync(metaFilePath, new Buffer(metaContent)),
+		function (fileResult, metaResult) {
 			return _Promise.resolve(null);
 		});
 };
@@ -91,7 +92,8 @@ module.exports.writeFile = function (content, params) {
  * @param  {String} key			the key by which the content was stored
  * @param  {String} bucket		the bucket in which the key was stored
  * @return {Promise<Object>}	the stored file with
- *                              {}`
+ *                              {Buffer} content the file content
+ *                              {type} type the MIME type of the original file
  */
 module.exports.getFile = function (key, bucket) {
 	if (!config.isDevelopment) {
@@ -103,15 +105,14 @@ module.exports.getFile = function (key, bucket) {
 
 	return _Promise.join(
 		fs.readFileAsync(filePath),
-		fs.readFileAsync(metaFilePath))
-		.then(function (file, meta) {
+		fs.readFileAsync(metaFilePath),
+		function (file, meta) {
 			meta = meta.toString();
 			meta = meta.split(META_SEPARATOR);
 
 			var result = {};
 			result.content = file;
-			result.name = (meta.length) ? meta[0] : undefined;
-			result.mimetype = (meta.length) ? meta[1] : undefined;
+			result.type = meta[0];
 
 			return _Promise.resolve(result);
 		});
@@ -131,8 +132,10 @@ module.exports.removeFile = function (key) {
 	var filePath = STORAGE_DIRECTORY + key;
 	var metaFilePath = filePath + META_EXTENSION;
 
-	return [fs.unlinkAsync(filePath), fs.unlinkAsync(metaFilePath)]
-		.spread(function (fileResult, metaResult) {
+	return _Promise.join(
+		fs.unlinkAsync(filePath),
+		fs.unlinkAsync(metaFilePath),
+		function (fileResult, metaResult) {
 			return _Promise.resolve(null);
 		});
 };
