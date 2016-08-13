@@ -1,5 +1,10 @@
 /* jshint esversion: 6 */
 
+// NOTE this controller is mostly example code that demonstrates how to use
+// the storage service to permit the uploading of resumes to the API (1 per user).
+// it is expected that this code will be refactored into the registration service
+// after being merged
+
 var bodyParser = require('body-parser');
 var ExpressRouter = require('express').Router;
 var _Promise = require('bluebird');
@@ -32,7 +37,10 @@ function _makeFileParams (req, type) {
 
 function createResumeUpload (req, res, next) {
 	var upload;
-	var uploadOwner = User.forge({ id: parseInt(req.auth.sub) }); // NOTE: this will soon be present on the actual auth object
+
+	// NOTE: the user object will soon be present on the actual auth object instead
+	// see issue #10
+	var uploadOwner = User.forge({ id: parseInt(req.auth.sub) });
 	var uploadParams = { bucket: RESUME_BUCKET };
 
 	Upload.findByOwner(uploadOwner, uploadParams.bucket)

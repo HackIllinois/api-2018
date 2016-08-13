@@ -129,7 +129,7 @@ module.exports.removeFile = function (key) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + key;
+	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
 	var metaFilePath = filePath + META_EXTENSION;
 
 	return _Promise.join(

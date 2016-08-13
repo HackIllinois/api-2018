@@ -2,12 +2,9 @@
 
 var config = require('../../config');
 var files = require('../../files');
-var logger = require('../../logging');
 var errors = require('../errors');
-var storageUtils = require('../utils/storage');
 var Upload = require('../models/Upload');
 
-var bytes = require('bytes');
 var uuid = require('node-uuid');
 var _Promise = require('bluebird');
 var _ = require('lodash');
@@ -81,6 +78,31 @@ function _handleRetrieval (upload) {
 			message += " (" + error.message + ")";
 
 			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		});
+}
+
+function _handleDisabledRemoval (upload) {
+	return files
+		.removeFile(upload.get('key'))
+		.then(function () {
+			return upload.destroy();
+		});
+}
+
+function _handleRemoval (upload) {
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+
+	return remote.deleteObject(params).promise()
+		.catch(function (error) {
+			var message = "the storage client received an error on removal";
+			message += " (" + error.message + ")";
+
+			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		})
+		.then(function () {
+			return upload.destory();
 		});
 }
 
@@ -183,31 +205,9 @@ module.exports.getUpload = function (upload) {
  * @return {Promise<>}				an empty promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.removeUpload = function (upload, transaction) {
-	return files
-		.removeStream(upload.get('key'))
-		.then(function () {
-			if (transaction) {
-				return upload.destroy({ transacting: transaction });
-			}
-			return upload.destroy();
-		});
-};
-
-/**
- * Removes all requested files from storage
- *
- * @param  {Array<Upload>} uploads 	the uploads to delete
- * @return {Promise<>}				an empty promise indicating success
- * @throws {ExternalProviderError}	when the client throws an error
- */
-module.exports.removeAllUploads = function (uploads) {
-	return Upload.transaction(function (t) {
-		var removed = [];
-		uploads.forEach(function (upload) {
-			removed.push(module.exports.remove(upload, t));
-		});
-
-		return _Promise.all(removed);
-	});
+module.exports.removeUpload = function (upload) {
+	if (!client.isEnabled) {
+		return _handleDisabledRemoval(upload);
+	}
+	return _handleRemoval(upload);
 };
