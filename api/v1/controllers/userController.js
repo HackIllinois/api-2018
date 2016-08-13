@@ -2,11 +2,9 @@ var errors = require('../errors');
 var services = require('../services');
 var config = require('../../config');
 
-var utils = require('../utils');
-var scopes = utils.scopes;
-var mail = utils.mail;
-
 var middleware = require('../middleware');
+var scopes = require('../utils/scopes');
+var mail = require('../utils/mail');
 var roles = require('../utils/roles');
 
 var router = require('express').Router();

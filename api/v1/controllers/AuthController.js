@@ -3,11 +3,8 @@ var Promise = require('bluebird');
 var config = require('../../config');
 var errors = require('../errors');
 var utils = require('../utils');
-var scopes = utils.scopes;
-var mail = utils.mail;
 
 var AuthService = require('../services/AuthService');
-var MailService = require('../services/MailService');
 var TokenService = require('../services/TokenService');
 var UserService = require('../services/UserService');
 
