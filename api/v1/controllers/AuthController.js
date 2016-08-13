@@ -79,31 +79,6 @@ function refreshToken (req, res, next) {
 		});
 }
 
-function requestPasswordReset (req, res, next) {
-	var userEmail = req.query.email;
-
-	UserService
-		.findUserByEmail(userEmail)
-		.then(function (user){
-			return TokenService.generateToken(user, scopes.AUTH);
-		})
-		.then(function (tokenVal){
-			//TODO: Determine exact url route for reset page
-			tokenURL = config.uri.passwordReset + tokenVal;
-			var substitutions = {'resetURL': tokenURL};
-			return MailService.send(userEmail, mail.templates.passwordReset, substitutions);
-		})
-		.then(function(){
-			res.body = {};
-			next();
-			return null;
-		})
-		.catch(function (error){
-			next(error);
-			return null;
-		});
-}
-
 function passwordReset(req, res, next) {
 	TokenService
 		.findTokenByValue(req.body.token, 'AUTH')
@@ -129,7 +104,6 @@ function passwordReset(req, res, next) {
 
 router.post('', createToken);
 router.get('/refresh', refreshToken);
-router.get('/reset', requestPasswordReset);
 router.post('/reset', passwordReset);
 
 module.exports.createToken = createToken;

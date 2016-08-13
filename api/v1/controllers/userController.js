@@ -1,5 +1,10 @@
 var errors = require('../errors');
 var services = require('../services');
+var config = require('../../config');
+
+var utils = require('../utils');
+var scopes = utils.scopes;
+var mail = utils.mail;
 
 var middleware = require('../middleware');
 var roles = require('../utils/roles');
@@ -73,7 +78,33 @@ function getUser (req, res, next) {
 		});
 }
 
+function requestPasswordReset (req, res, next) {
+	var userEmail = req.body.email;
+
+	services.UserService
+		.findUserByEmail(userEmail)
+		.then(function (user){
+			return services.TokenService.generateToken(user, scopes.AUTH);
+		})
+		.then(function (tokenVal){
+			//TODO: Determine exact url route for reset page
+			tokenURL = config.uri.passwordReset + tokenVal;
+			var substitutions = {'resetURL': tokenURL};
+			return services.MailService.send(userEmail, mail.templates.passwordReset, substitutions);
+		})
+		.then(function(){
+			res.body = {};
+			next();
+			return null;
+		})
+		.catch(function (error){
+			next(error);
+			return null;
+		});
+}
+
 router.post('', createHackerUser);
+router.post('/reset', requestPasswordReset);
 router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
