@@ -5,6 +5,7 @@ module.exports = {
 	InvalidParameterError: require('./InvalidParameterError.js'),
 	MissingParameterError: require('./MissingParameterError.js'),
 	NotFoundError: require('./NotFoundError.js'),
+	TokenExpirationError: require('./TokenExpirationError.js'),
 	UnauthorizedError: require('./UnauthorizedError.js'),
 	UnprocessableRequestError: require('./UnprocessableRequestError.js')
 };

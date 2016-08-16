@@ -8,8 +8,15 @@ endpoints['/user'] = {
 endpoints['/user/accredited'] = {
 	POST: requests.AccreditedUserCreationRequest
 };
+endpoints['/user/reset'] = {
+	POST: requests.ResetPasswordRequest
+};
+
 endpoints['/auth'] = {
 	POST: requests.AuthTokenRequest
+};
+endpoints['/auth/reset'] = {
+	POST: requests.TokenRequest
 };
 
 module.exports = endpoints;
