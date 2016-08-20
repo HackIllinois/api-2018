@@ -14,14 +14,18 @@ module.exports = function(allowed, isOwner) {
 			return next(new errors.UnauthorizedError());
 		}
 
-		if (isOwner) {
+    else if (_.includes(allowed, req.auth.role)) {
+      next();
+    }
+
+    else if (isOwner) {
 			// the endpoint defined an ownership method
 			var result = isOwner(req);
 
 			if ('function' === typeof result.then) {
 				// the ownership method is async, so resolve its promise
 				result.then(function (truth) {
-					if (!truth && !_.includes(allowed, req.auth.role)) {
+					if (!truth) {
 						next(new errors.UnauthorizedError());
 					} else {
 						next();
@@ -30,7 +34,7 @@ module.exports = function(allowed, isOwner) {
 				.catch(function (error) {
 					next(error);
 				});
-			} else if (!result && !_.includes(allowed, req.auth.role)) {
+			} else if (!result) {
 				// the ownership method is synchronous (but failed)
 				return next(new errors.UnauthorizedError());
 			} else {
@@ -38,13 +42,9 @@ module.exports = function(allowed, isOwner) {
 				next();
 			}
 		}
-		else if (!_.includes(allowed, req.auth.role)) {
-			// the endpoint did not define an ownership method, and the
-			// requester did not have the role necessary to continue
-			return next(new errors.UnauthorizedError());
-		} else {
-			// the requester is authorized
-			next();
-		}
+
+    else {
+      return next(new errors.UnauthorizedError());
+    }
 	};
 };

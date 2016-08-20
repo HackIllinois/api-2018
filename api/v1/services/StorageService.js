@@ -2,12 +2,9 @@
 
 var config = require('../../config');
 var files = require('../../files');
-var logger = require('../../logging');
 var errors = require('../errors');
-var storageUtils = require('../utils/storage');
 var Upload = require('../models/Upload');
 
-var bytes = require('bytes');
 var uuid = require('node-uuid');
 var _Promise = require('bluebird');
 var _ = require('lodash');
@@ -18,12 +15,6 @@ client.isEnabled = !!client.config.credentials.accessKeyId;
 
 var remote = new client.S3();
 
-const INVALID_LENGTH_MESSAGE = "The upload was larger than the maximum allowed length";
-const INVALID_CONTENT_TYPE = "The upload did not match any of the allowed types";
-
-const UPLOAD_KEY_SEPARATOR = '/';
-const SIGNATURE_EXPIRATION = 10; // seconds
-
 const CLIENT_NAME = "AWS_S3";
 
 function _handleDisabledUpload (upload, file) {
@@ -33,7 +24,12 @@ function _handleDisabledUpload (upload, file) {
 		throw new errors.ApiError();
 	}
 
-	// TODO persist using files.writeFile
+	var params = {};
+	params.bucket = upload.get('bucket');
+	params.key = upload.get('key');
+	params.type = file.type;
+
+	return files.writeFile(file.content, params);
 }
 
 function _handleUpload (upload, file) {
@@ -41,16 +37,72 @@ function _handleUpload (upload, file) {
 	params.Body = file.content;
 	params.Bucket = upload.get('bucket');
 	params.Key = upload.get('key');
-	params.ContentDisposition = "attachment; filename=" + file.name;
 	params.ContentLength = file.content.length;
 	params.ContentType = file.type;
 
 	return remote.putObject(params).promise()
 		.catch(function (error) {
-			var message = "the storage client received an error";
+			var message = "the storage client received an error on upload";
 			message += " (" + error.message + ")";
 
 			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		});
+}
+
+function _handleDisabledRetrieval (upload) {
+	return files.getFile(upload.get('key'), upload.get('bucket'))
+		.then(function (file) {
+			var result = {};
+			result.content = file.content;
+			result.type = file.type;
+
+			return _Promise.resolve(result);
+		});
+}
+
+function _handleRetrieval (upload) {
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+
+	return remote.getObject(params).promise()
+		.then(function (data) {
+			var result = {};
+			result.content = data.Body;
+			result.type = data.ContentType;
+
+			return result;
+		})
+		.catch(function (error) {
+			var message = "the storage client received an error on retrieval";
+			message += " (" + error.message + ")";
+
+			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		});
+}
+
+function _handleDisabledRemoval (upload) {
+	return files
+		.removeFile(upload.get('key'))
+		.then(function () {
+			return upload.destroy();
+		});
+}
+
+function _handleRemoval (upload) {
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+
+	return remote.deleteObject(params).promise()
+		.catch(function (error) {
+			var message = "the storage client received an error on removal";
+			message += " (" + error.message + ")";
+
+			throw new errors.ExternalProviderError(message, CLIENT_NAME);
+		})
+		.then(function () {
+			return upload.destory();
 		});
 }
 
@@ -120,40 +172,29 @@ module.exports.createUpload = function (owner, params) {
  * @param  {Object} file			parameter object with
  *                         			{String} content	the Buffer containing the file
  *                         			{String} type		the MIME type of the upload
- *                              	{String} name		the name of the upload
- * @param  {Object} params			(optional) specifies validation should be performed with any of the following
- *                           		{Array} allowedTypes	(optional) a list of allowed MIME types
- *                           		{Number} maxLength		(optional) the max length of the upload in bytes
  * @return {Promise<String>} an upload to which the file will be accepted
- * @throws {InvalidUploadError}	when the upload fails any imposed validations
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
-module.exports.persistUpload = function (upload, file, params) {
-	return new _Promise(function (resolve, reject) {
-		if (params) {
-			return module.exports.verifyUpload(file, params);
-		}
-		return resolve(true);
-	})
-	.then (function () {
-		if (!client.isEnabled) {
-			return _handleDisabledUpload(upload, file);
-		}
-		return _handleUpload(upload, file);
-	});
+module.exports.persistUpload = function (upload, file) {
+	if (!client.isEnabled) {
+		return _handleDisabledUpload(upload, file);
+	}
+	return _handleUpload(upload, file);
 };
 
 /**
- * Provides a signed URL for retrieving a an upload
+ * Retrieves an upload from remote storage
  * @param  {Upload} upload			an internal upload representation
- * @return {Promise<String>}
+ * @return {Promise<Object>}		an object with
+ *                               	{Buffer} content 		the content retrieved
+ *                               	{String} type			the MIME type of the content
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.getUpload = function (upload) {
-	return new _Promise(function (resolve, reject) {
-		// TODO add aws support and remove wrapping promise
-		return files.getFile(upload.get('key'));
-	});
+	if (!client.isEnabled) {
+		return _handleDisabledRetrieval(upload);
+	}
+	return _handleRetrieval(upload);
 };
 
 /**
@@ -164,31 +205,9 @@ module.exports.getUpload = function (upload) {
  * @return {Promise<>}				an empty promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.removeUpload = function (upload, transaction) {
-	return files
-		.removeStream(upload.get('key'))
-		.then(function () {
-			if (transaction) {
-				return upload.destroy({ transacting: transaction });
-			}
-			return upload.destroy();
-		});
-};
-
-/**
- * Removes all requested files from storage
- *
- * @param  {Array<Upload>} uploads 	the uploads to delete
- * @return {Promise<>}				an empty promise indicating success
- * @throws {ExternalProviderError}	when the client throws an error
- */
-module.exports.removeAllUploads = function (uploads) {
-	return Upload.transaction(function (t) {
-		var removed = [];
-		uploads.forEach(function (upload) {
-			removed.push(module.exports.remove(upload, t));
-		});
-
-		return _Promise.all(removed);
-	});
+module.exports.removeUpload = function (upload) {
+	if (!client.isEnabled) {
+		return _handleDisabledRemoval(upload);
+	}
+	return _handleRemoval(upload);
 };

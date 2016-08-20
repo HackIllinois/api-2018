@@ -1,4 +1,5 @@
 var checkit = require('checkit');
+var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var errors = require('../errors');
@@ -24,6 +25,10 @@ function Request(headers, body) {
 }
 
 Request.prototype.constructor = Request;
+
+Request.prototype._isRaw = function () {
+	return (this._body instanceof Buffer || this._body instanceof String);
+};
 
 /**
  * Provides read-only access to this request's body
@@ -59,10 +64,7 @@ Request.prototype.audit = function () {
 		throw new errors.UnprocessableRequestError(errorDetail, null);
 	}
 
-	if (!(this._body instanceof Buffer) && !(this._body instanceof String)) {
-		// we can only run validations on certain types of request bodies from
-		// the body parser ('raw' and 'text' will not work here)
-
+	if (!this._isRaw()) {
 		_.forEach(this.bodyRequired, _.bind(function(requiredParameter) {
 			if (!_.has(this._body, requiredParameter))
 				missingParameters.push(requiredParameter);
@@ -81,6 +83,11 @@ Request.prototype.audit = function () {
  * allowed and set the marshalled flag
  */
 Request.prototype.marshal = function () {
+	if (this._isRaw()) {
+		this._marshalled = true;
+		return;
+	}
+
 	this._body = _.pick(this._body, _.merge(this.bodyRequired, this.bodyAllowed));
 	this._marshalled = true;
 };
@@ -88,7 +95,7 @@ Request.prototype.marshal = function () {
 /**
  * Validates the request body by auditing, marshalling it, and finally
  * running request-specific validations
- * @return {Promise} resolving to the result of running Checkit's validations
+ * @return {Promise<>} when the validation is complete
  */
 Request.prototype.validate = function () {
 	if (!this._audited)
@@ -97,7 +104,11 @@ Request.prototype.validate = function () {
 		this.marshal();
 
 	return checkit(this.headersValidations).run(this._headers)
+		.bind(this)
 		.then(function () {
+			if (this._isRaw()) {
+				return _Promise.resolve(true);
+			}
 			return checkit(this.bodyValidations).run(this._body);
 		});
 };
