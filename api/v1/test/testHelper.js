@@ -6,5 +6,5 @@ module.exports = {
     var body = res.body.data;
     body.id.should.not.be.null;
     body.email.should.not.be.null;
-  }
+  },
 };

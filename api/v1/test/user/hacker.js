@@ -6,13 +6,13 @@ var UserService = require('../../services/UserService');
 var User = require('../../models/User');
 var testHelper = require('../testHelper');
 
-var should = chai.should();
 chai.use(chaiHttp);
 
 describe('hacker functionality', function() {
   var key;
 
   before(function(done) {
+    // create a hacker and grab an authentication token to use
     var req = {
       'email': 'test@example.com',
       'password': 'password123',
@@ -42,7 +42,7 @@ describe('hacker functionality', function() {
   });
 
   describe('POST /user/accredited', function() {
-    it('should not be able to create roled users', function(done) {
+    it('should not be able to create staff/admin users', function(done) {
       var req = {
         "email": "staff@example.com",
         "role": "STAFF"
