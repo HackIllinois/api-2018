@@ -7,6 +7,7 @@ var User = require('../../models/User');
 var testHelper = require('../testHelper');
 
 chai.use(chaiHttp);
+var should = chai.should();
 
 describe('staffed user functionality', function() {
   var key;
@@ -30,14 +31,11 @@ describe('staffed user functionality', function() {
   });
 
   after(function(done) {
-    console.log("why")
     UserService.findUserByEmail("test@example.com")
                .then(function(result) {
-                 console.log("hello");
                  new User({id: result.attributes.id})
                    .destroy()
                    .then(function(model) {
-                     console.log("fuck");
                      done();
                    });
                })
@@ -57,7 +55,6 @@ describe('staffed user functionality', function() {
           .end(function(err, res) {
             testHelper.userAssertHelper(res)
             res.body.data.role.should.equal('STAFF');
-            console.log("did this");
             done();
           });
     });

@@ -7,6 +7,7 @@ var User = require('../../models/User');
 var testHelper = require('../testHelper');
 
 chai.use(chaiHttp);
+var should = chai.should();
 
 describe('hacker functionality', function() {
   var key;
