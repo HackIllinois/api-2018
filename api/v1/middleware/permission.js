@@ -14,7 +14,11 @@ module.exports = function(allowed, isOwner) {
 			return next(new errors.UnauthorizedError());
 		}
 
-		if (isOwner) {
+    else if (_.includes(allowed, req.auth.role)) {
+      next();
+    }
+
+    else if (isOwner) {
 			// the endpoint defined an ownership method
 			var result = isOwner(req);
 
@@ -38,13 +42,9 @@ module.exports = function(allowed, isOwner) {
 				next();
 			}
 		}
-		else if (!_.includes(allowed, req.auth.role)) {
-			// the endpoint did not define an ownership method, and the
-			// requester did not have the role necessary to continue
-			return next(new errors.UnauthorizedError());
-		} else {
-			// the requester is authorized
-			next();
-		}
+
+    else {
+      return next(new errors.UnauthorizedError());
+    }
 	};
 };
