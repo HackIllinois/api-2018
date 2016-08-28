@@ -8,7 +8,7 @@ const PRODUCTION_IDENTIFIER = 'production';
 var environment = process.env.NODE_ENV;
 var secret = process.env.HACKILLINOIS_SECRET;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
-var superuserPassword = process.env.HACKKILLINOIS_SUPERUSER_PASSWORD;
+var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
@@ -58,17 +58,19 @@ if (!superuserPassword) {
 }
 
 var config = {};
-config.superuser = {};
 config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
 config.mail = {};
 config.storage = {};
+config.superuser = {};
+config.token = { expiration: {} };
 
 config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT || 8080;
 config.profile = 'hackillinois-api';
+
 config.domain = isDevelopment ? ('http://localhost:' + config.port) : 'https://hackillinois.org';
 
 config.superuser.email = superuserEmail;
@@ -77,6 +79,14 @@ config.superuser.password = superuserPassword;
 config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
+
+// 7 days in milliseconds
+const MILLISECONDS_PER_HOUR = 3600000;
+const HOURS_PER_DAY = 24;
+const DAYS_PER_WEEK = 7;
+config.token.expiration.AUTH = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration.OTHER = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration.DEFAULT = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
 
 config.database.primary.host = process.env.RDS_HOSTNAME || process.env.LOCAL_MYSQL_HOST || '127.0.0.1';
 config.database.primary.port = process.env.RDS_PORT || process.env.LOCAL_MYSQL_PORT || 3306;

@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 
 var User = require('../models/User');
+var Token = require('../models/Token');
 var errors = require('../errors');
 var utils = require('../utils');
 
@@ -104,5 +105,19 @@ module.exports.verifyPassword = function (user, password) {
 			}
 
 			return Promise.resolve(true);
+		});
+};
+
+/**
+ * Resets the user's password and saves it.
+ * @param  {User} user a User model
+ * @param  {String} password the password to change to
+ * @return {Promise} resolving to the new User model
+ */
+module.exports.resetPassword = function (user, password) {
+	return user
+		.setPassword(password)
+		.then(function (updated) {
+			return updated.save();
 		});
 };

@@ -3,5 +3,6 @@ module.exports = {
 	MailService: require('./MailService'),
 	PermissionService: require('./PermissionService'),
 	StorageService: require('./StorageService'),
-	UserService: require('./UserService')
+	UserService: require('./UserService'),
+	TokenService: require('./TokenService')
 };

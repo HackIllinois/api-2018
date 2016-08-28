@@ -8,6 +8,7 @@ const SHA_OUTPUT_TYPE = "HEX";
 
 const PASSWORD_RADIX = 31;
 const PASSWORD_LENGTH = 33;
+const TOKEN_LENGTH = 33;
 
 /**
  * Provides a weak hash of the provided text
@@ -26,5 +27,14 @@ module.exports.hashWeak = function (text) {
  * @return {String} a significantly-long, pseudo-random string
  */
 module.exports.generatePassword = function () {
-	return Math.random().toString(PASSWORD_RADIX).substring(0, PASSWORD_LENGTH);
+	return createRandomString(PASSWORD_LENGTH);
 };
+
+// TODO: Determine the length of the token
+module.exports.generateResetToken = function (){
+	return createRandomString(TOKEN_LENGTH);
+};
+
+function createRandomString(length){
+	return Math.random().toString(PASSWORD_RADIX).substring(0, length);
+}

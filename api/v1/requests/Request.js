@@ -4,17 +4,19 @@ var _ = require('lodash');
 
 var errors = require('../errors');
 
-var headersValidations = { };
+var headerValidations = { };
 var bodyValidations = { };
-var headersRequired = [];
+
+var headerRequired = [];
 var bodyRequired = [];
+
 var bodyAllowed = [];
 
 // base request class
 function Request(headers, body) {
-	this.headersValidations = headersValidations;
+	this.headerValidations = headerValidations;
 	this.bodyValidations = bodyValidations;
-	this.headersRequired = headersRequired;
+	this.headerRequired = headerRequired;
 	this.bodyRequired = bodyRequired;
 	this.bodyAllowed = bodyAllowed;
 
@@ -49,7 +51,7 @@ Request.prototype.audit = function () {
 	var missingHeaders = [];
 	var missingParameters = [];
 
-	_.forEach(this.headersRequired, _.bind(function (requiredHeader) {
+	_.forEach(this.headerRequired, _.bind(function (requiredHeader) {
 		if (!_.has(this._headers, requiredHeader.toLowerCase())) {
 			missingHeaders.push(requiredHeader);
 		}
@@ -59,7 +61,7 @@ Request.prototype.audit = function () {
 		throw new errors.MissingHeaderError(null, missingHeaders);
 	}
 
-	if (!this._body) {
+	if (_.isUndefined(this._body) || _.isNull(this._body)) {
 		var errorDetail = 'The request body could not be parsed';
 		throw new errors.UnprocessableRequestError(errorDetail, null);
 	}
@@ -103,7 +105,7 @@ Request.prototype.validate = function () {
 	if (!this.marshalled)
 		this.marshal();
 
-	return checkit(this.headersValidations).run(this._headers)
+	return checkit(this.headerValidations).run(this._headers)
 		.bind(this)
 		.then(function () {
 			if (this._isRaw()) {

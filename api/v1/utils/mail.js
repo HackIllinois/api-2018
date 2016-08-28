@@ -3,6 +3,7 @@ module.exports.lists = {};
 
 // mapping internal template identifiers to client template identifiers
 module.exports.templates.test = 'test';
+module.exports.templates.passwordReset = 'password_reset';
 
 // mapping internal list identifiers to internal-client representation
 module.exports.lists.test = { name: 'test', id: 'test' };

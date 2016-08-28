@@ -19,7 +19,7 @@ module.exports = function(req, res, next) {
 	// and then handle any validation errors before continuing
 	var request = new MethodRequest(req.headers, req.body);
 	request.validate()
-		.then(function () {
+		.then(function (validated) {
 			req.body = request.body();
 
 			next();

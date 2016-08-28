@@ -1,11 +1,14 @@
 var Promise = require('bluebird');
+var Checkit = require('checkit');
 
 var jwt = require('jsonwebtoken');
 var _ = require('lodash');
 
+var utils = require('../utils');
 var config = require('../../config');
 var errors = require('../errors');
 var logger = require('../../logging');
+var Token = require('../models/Token');
 
 var JWT_SECRET = config.auth.secret;
 var JWT_CONFIG = {

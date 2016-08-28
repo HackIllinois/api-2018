@@ -1,11 +1,16 @@
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
 
-var middleware = require('../middleware');
-
+var config = require('../../config');
 var errors = require('../errors');
+var middleware = require('../middleware');
+var utils = require('../utils');
+
 var AuthService = require('../services/AuthService');
+var TokenService = require('../services/TokenService');
 var UserService = require('../services/UserService');
+
+var logger = require('../../logging');
 
 var router = require('express').Router();
 
@@ -73,12 +78,35 @@ function refreshToken (req, res, next) {
 		});
 }
 
+function passwordReset(req, res, next) {
+	TokenService
+		.findTokenByValue(req.body.token, utils.scopes.AUTH)
+		.then(function (token) {
+			token.destroy();
+			return UserService.resetPassword(token.related('user'), req.body.password);
+		})
+		.then(function (user) {
+			return AuthService.issueForUser(user);
+		})
+		.then(function (auth) {
+			res.body = {};
+			res.body.auth = auth;
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
 router.post('', createToken);
 router.get('/refresh', refreshToken);
+router.post('/reset', passwordReset);
 
 router.use(middleware.response);
 router.use(middleware.errors);

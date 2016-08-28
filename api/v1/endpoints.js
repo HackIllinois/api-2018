@@ -8,6 +8,12 @@ endpoints['/v1/user'] = {
 endpoints['/v1/user/accredited'] = {
 	POST: requests.AccreditedUserCreationRequest
 };
+endpoints['/v1/user/reset'] = {
+	POST: requests.ResetTokenRequest
+};
+endpoints['/v1/auth/reset'] = {
+	POST: requests.ResetPasswordRequest
+};
 endpoints['/v1/auth'] = {
 	POST: requests.AuthTokenRequest
 };
