@@ -30,7 +30,7 @@ module.exports.findTokenByValue = function(value, scope) {
 				throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
 			}
 
-			var expiration = config.token.expiration[scope.toUpperCase()];
+			var expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
 			var tokenExpiration = Date.parse(result.get('created')) + expiration;
 			if (tokenExpiration < Date.now())
 			{

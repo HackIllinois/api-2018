@@ -1,5 +1,8 @@
 /* jshint esversion: 6 */
 
+// NOTE: all duration are expressed using notation understood by the
+// `ms` NPM module. These durations must be converted before they are used.
+
 var logger = require('./logging');
 
 const DEVELOPMENT_IDENTIFIER = 'development';
@@ -80,13 +83,8 @@ config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
 
-// 7 days in milliseconds
-const MILLISECONDS_PER_HOUR = 3600000;
-const HOURS_PER_DAY = 24;
-const DAYS_PER_WEEK = 7;
-config.token.expiration.AUTH = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
-config.token.expiration.OTHER = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
-config.token.expiration.DEFAULT = DAYS_PER_WEEK * HOURS_PER_DAY * MILLISECONDS_PER_HOUR;
+config.token.expiration.DEFAULT = '7d';
+config.token.expiration.AUTH = config.token.expiration.DEFAULT;
 
 config.database.primary.host = process.env.RDS_HOSTNAME || process.env.LOCAL_MYSQL_HOST || '127.0.0.1';
 config.database.primary.port = process.env.RDS_PORT || process.env.LOCAL_MYSQL_PORT || 3306;
@@ -95,14 +93,13 @@ config.database.primary.password = process.env.RDS_PASSWORD || process.env.LOCAL
 config.database.primary.name = process.env.RDS_DB_NAME || 'hackillinois-2017';
 config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
-config.database.primary.pool.idleTimeout = 5 * 1000; // in millseconds
+config.database.primary.pool.idleTimeout = '5s';
 
 config.mail.key = mailApiKey;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
 config.mail.whitelistedDomains = ['@hackillinois.org'];
 config.mail.whitelistedLists = ['test'];
 
-config.storage.maxLength = '2mb';
 config.storage.bucketExtension = (isDevelopment) ? '-development' : '-2017';
 
 logger.info("prepared environment for %s", environment);
