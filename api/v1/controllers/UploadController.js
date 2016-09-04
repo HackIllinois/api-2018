@@ -23,12 +23,21 @@ const RESUME_UPLOAD_LIMIT = '2mb';
 const RESUME_UPLOAD_TYPE = 'application/pdf';
 const RESUME_BUCKET = utils.storage.buckets.resumes;
 
-function isOwner (req) {
+function _findUpload(req, res, next) {
 	return services.StorageService.findUploadById(req.params.id)
 		.then(function (upload) {
 			req.upload = upload;
-			return _Promise.resolve(upload.get('ownerId') === parseInt(req.auth.sub));
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
 		});
+}
+
+function _isOwner (req) {
+	return req.upload.get('ownerId') === parseInt(req.auth.sub);
 }
 
 function _makeFileParams (req, type) {
@@ -110,8 +119,8 @@ resumeRouter.use(bodyParser.raw({ limit: RESUME_UPLOAD_LIMIT, type: RESUME_UPLOA
 resumeRouter.use(middleware.request);
 
 resumeRouter.post('/', middleware.upload, middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
-resumeRouter.put('/:id', middleware.upload, middleware.permission(utils.roles.NONE, isOwner), replaceResumeUpload);
-resumeRouter.get('/:id', middleware.permission(utils.roles.ORGANIZERS, isOwner), getUpload);
+resumeRouter.put('/:id', middleware.upload, _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
+resumeRouter.get('/:id', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
 
 // set up the primary router with just the auth middleware since the sub-routers
 // will handle the request middleware
