@@ -57,8 +57,17 @@ will exit with an unsuccessful error code if it finds that this variable is miss
 To save time, you might add this variable to your PATH, or to a `bash_profile` as
 an export.
 
-Contributing developers will need to set the `HACKILLINOIS_MAIL_KEY` properly to
-ensure that the mail service functions as expected.
+Developers contributing to a feature that involves email transmissions
+will need to set the `HACKILLINOIS_MAIL_KEY` to a valid SparkPost API key.
+
+Developers contributing to a feature that involves any AWS
+products will also need to set up an
+[AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
+with the profile `hackillinois-api`.
+
+Note that this API is targeted for hosting via AWS, so any AWS-specific settings
+(e.g. those in IAM roles) are used by this API before settings in any environment
+variables or other credentials files.
 
 ## Installation
 

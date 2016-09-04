@@ -1,8 +1,13 @@
+/* jshint esversion: 6 */
+
 var Token = require('../models/Token');
 var config = require('../../config');
 var logger = require('../../logging');
 var errors = require('../errors');
 var utils = require('../utils');
+
+const TOKEN_NOT_FOUND_ERROR = "The supplied token does not exist";
+const TOKEN_SCOPE_INVALID_ERROR = "An invalid or non-existent scope was supplied";
 
 /**
  * Finds a token given the Token value
@@ -14,29 +19,24 @@ var utils = require('../utils');
  * @throws {TypeError} when the scope was not found
  */
 module.exports.findTokenByValue = function(value, scope) {
+	if (!(scope in config.token.expiration)) {
+		throw new TypeError(TOKEN_SCOPE_INVALID_ERROR);
+	}
+
 	return Token
 		.findByValue(value)
 		.then(function(result) {
 			if (!result) {
-				const message = "Could not find the provided token.";
-				const source = "token";
-				throw new errors.NotFoundError(message, source);
+				throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
 			}
 
-			// Check expiration
-			let expiration = config.token.expiration[scope.toUpperCase()];
-
-			if (expiration == undefined) {
-				throw new TypeError('Could not find matching scope.');
-			}
-
-			var tokenExpire = Date.parse(result.get('created')) + expiration;
-			if (tokenExpire < Date.now())
+			var expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
+			var tokenExpiration = Date.parse(result.get('created')) + expiration;
+			if (tokenExpiration < Date.now())
 			{
 				// Invalid token (expired)
 				result.destroy();
-				const message = 'Requested token has expired.';
-				return Promise.reject(new errors.TokenExpirationError(message));
+				return Promise.reject(new errors.TokenExpirationError());
 			}
 
 			return Promise.resolve(result);
@@ -53,17 +53,15 @@ module.exports.findTokenByValue = function(value, scope) {
  */
 module.exports.generateToken = function(user, scope){
 	var tokenVal = utils.crypto.generateResetToken();
-	var user_id = user.get('id');
+	var userId = user.get('id');
 
 	return Token
-		.where({user_id: user_id, type: scope}).fetchAll()
+		.where({user_id: userId, type: scope}).fetchAll()
 		.then(function(tokens) {
 			return tokens.invokeThen('destroy')
 				.then(function() {
-					var token = Token.forge({type: scope, value: tokenVal, 'user_id': user_id});
+					var token = Token.forge({type: scope, value: tokenVal, user_id: userId});
 					return token.save().then(function () { return tokenVal; });
 				});
 		});
 };
-
-

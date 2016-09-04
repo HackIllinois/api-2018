@@ -1,15 +1,16 @@
 var Request = require('./Request');
 
-var required = ['email'];
-var validations = {
-	'email': ['string']
+var bodyRequired = ['token', 'password'];
+var bodyValidations = {
+	'token': ['string'],
+	'password': ['string', 'minLength:8']
 };
 
-function ResetPasswordRequest(parameters) {
-	Request.call(this, parameters);
+function ResetPasswordRequest(headers, body) {
+	Request.call(this, headers, body);
 
-	this.required = required;
-	this.validations = validations;
+	this.bodyRequired = bodyRequired;
+	this.bodyValidations = bodyValidations;
 }
 
 ResetPasswordRequest.prototype = Object.create(Request.prototype);

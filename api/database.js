@@ -1,5 +1,6 @@
 var Bookshelf = require('bookshelf');
 var Knex = require('knex');
+var milliseconds = require('ms');
 
 var logger = require('./logging');
 var config = require('./config');
@@ -16,7 +17,7 @@ var KNEX_CONFIG = {
 	pool: {
 		min: config.database.primary.pool.min,
 		max: config.database.primary.pool.max,
-		idleTimeout: config.database.primary.pool.idleTimeout
+		idleTimeout: milliseconds(config.database.primary.pool.idleTimeout)
 	}
 };
 

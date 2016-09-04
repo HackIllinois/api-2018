@@ -1,3 +1,5 @@
+var bodyParser = require('body-parser');
+
 var errors = require('../errors');
 var services = require('../services');
 var config = require('../../config');
@@ -85,9 +87,7 @@ function requestPasswordReset (req, res, next) {
 			return services.TokenService.generateToken(user, scopes.AUTH);
 		})
 		.then(function (tokenVal){
-			//TODO: Determine exact url route for reset page
-			tokenURL = config.uri.passwordReset + tokenVal;
-			var substitutions = {'resetURL': tokenURL};
+			var substitutions = { token: tokenVal, isDevelopment: config.isDevelopment };
 			return services.MailService.send(userEmail, mail.templates.passwordReset, substitutions);
 		})
 		.then(function(){
@@ -101,10 +101,17 @@ function requestPasswordReset (req, res, next) {
 		});
 }
 
+router.use(bodyParser.json());
+router.use(middleware.auth);
+router.use(middleware.request);
+
 router.post('', createHackerUser);
 router.post('/reset', requestPasswordReset);
 router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
+
+router.use(middleware.response);
+router.use(middleware.errors);
 
 module.exports.createHackerUser = createHackerUser;
 module.exports.createAccreditedUser = createAccreditedUser;

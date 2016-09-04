@@ -3,8 +3,7 @@ var ApiError = require('./ApiError');
 var ERROR_TYPE = 'TokenExpirationError';
 var ERROR_TITLE = 'Token Expired';
 
-var DEFAULT_MESSAGE = "The requested resource cannot be accessed with the " +
-	"current token. Please request a new token.";
+var DEFAULT_MESSAGE = "The provided token has expired";
 var STATUS_CODE = 401;
 
 function TokenExpirationError(message, source) {
