@@ -1,5 +1,5 @@
 var Checkit = require('checkit');
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var User = require('../models/User');
@@ -43,7 +43,7 @@ module.exports.createUser = function (email, password, role) {
 			return user.save();
 		})
 		.then(function (user) {
-			return Promise.resolve(user);
+			return _Promise.resolve(user);
 		});
 };
 
@@ -63,7 +63,7 @@ module.exports.findUserById = function (id) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 
@@ -83,7 +83,7 @@ module.exports.findUserByEmail = function (email) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 
@@ -104,7 +104,7 @@ module.exports.verifyPassword = function (user, password) {
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return Promise.resolve(true);
+			return _Promise.resolve(true);
 		});
 };
 

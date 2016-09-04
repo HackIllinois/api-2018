@@ -1,4 +1,4 @@
-var promise = require('bluebird');
+var _Promise = require('bluebird');
 
 var Model = require('./Model');
 var User = require('./User');
@@ -31,7 +31,7 @@ MailingList.prototype.addUser = function (user) {
 				.fetch({ transacting: t })
 				.then(function (result) {
 					if (result) {
-						return promise.resolve(result);
+						return _Promise.resolve(result);
 					}
 					return mailingListUser.save(null, { transacting: t });
 				});

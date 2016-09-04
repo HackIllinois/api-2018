@@ -1,5 +1,5 @@
 var bodyParser = require('body-parser');
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 
 var config = require('../../config');
 var errors = require('../errors');

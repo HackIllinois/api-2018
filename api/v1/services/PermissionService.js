@@ -1,4 +1,4 @@
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 
 var errors = require('../errors');
 var roles = require('../utils/roles');
@@ -14,15 +14,15 @@ var roles = require('../utils/roles');
 module.exports.canCreateUser = function (creatorRole, userRole) {
 	if (creatorRole === roles.SUPERUSER) {
 		// the superuser can create anyone
-		return Promise.resolve(true);
+		return _Promise.resolve(true);
 	}
 	if (roles.isIn(roles.COMMON, userRole) &&
 			roles.isIn(roles.ORGANIZERS, creatorRole)) {
 		// the organizers must be able to create any of the
 		// common roles
-		return Promise.resolve(true);
+		return _Promise.resolve(true);
 	}
 
 	var message = "The requested user cannot be created with the provided credentials";
-	return Promise.reject(new errors.UnauthorizedError(message));
+	return _Promise.reject(new errors.UnauthorizedError(message));
 };
