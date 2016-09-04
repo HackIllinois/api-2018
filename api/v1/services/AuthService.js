@@ -1,4 +1,4 @@
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 var Checkit = require('checkit');
 
 var jwt = require('jsonwebtoken');
@@ -44,11 +44,11 @@ module.exports.issueForUser = function (user) {
 		role: user.get("role")
 	};
 
-	return Promise
+	return _Promise
 		.try(function () {
 			// the JWT library behind _issue may thrown any number
 			// of errors, which we do not want to propogate yet
-			return Promise.resolve(_issue(payload, subject));
+			return _Promise.resolve(_issue(payload, subject));
 		});
 };
 
@@ -59,9 +59,9 @@ module.exports.issueForUser = function (user) {
  * promise resolving to an UnprocessableRequestError
  */
 module.exports.verify = function(token) {
-	return Promise
+	return _Promise
 		.try(function () {
-			return Promise.resolve(jwt.verify(token, JWT_SECRET));
+			return _Promise.resolve(jwt.verify(token, JWT_SECRET));
 		})
 		.catch(jwt.JsonWebTokenError, function (error) {
 			var message = error.message;

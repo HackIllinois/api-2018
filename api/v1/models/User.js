@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
-var Promise = require('bluebird');
-var bcrypt = Promise.promisifyAll(require('bcrypt'));
+var _Promise = require('bluebird');
+var bcrypt = _Promise.promisifyAll(require('bcrypt'));
 var _ = require('lodash');
 
 var crypto = require('../utils/crypto');
@@ -42,7 +42,7 @@ User.prototype.setPassword = function (password) {
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
 		.then(function (p) {
-			return Promise.resolve(this.set({ password: p }));
+			return _Promise.resolve(this.set({ password: p }));
 		});
 };
 
@@ -54,7 +54,7 @@ User.prototype.setPassword = function (password) {
  */
 User.prototype.hasPassword = function (password) {
 	password = crypto.hashWeak(password);
-	return Promise
+	return _Promise
 		.bind(this)
 		.then(function() {
 			return bcrypt.compareAsync(password, this.get('password'));
