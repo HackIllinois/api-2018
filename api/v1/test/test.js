@@ -1,1 +1,2 @@
 require('./user');
+require('./auth');

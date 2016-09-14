@@ -120,3 +120,12 @@ Any issues found in a feature branch (i.e. not in `master` or `staging`)
 should be communicated to the active developer(s) directly, unless there is an open
 pull-request for that feature branch. In the latter case, just leave a comment on
 the pull-request detailing the issue preventing a merge.
+
+## Testing
+
+Please set the proper enviornment variables before testing. You can run the tests locally with
+
+``` shell
+npm test
+```
+
