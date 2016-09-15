@@ -96,9 +96,9 @@ Note that if you're looking to contribute to this codebase, you should read the
 [database README](/database/README.md) as well. It contains important information that all
 contributors should be familiar with.
 
-## Starting Up
+## Usage
 
-A local API instance can be created on port 8080 via the following, executed from
+By default, a local API instance can be created on port 8080 via execution from
 the root of the project directory:
 
 ```
@@ -106,6 +106,18 @@ node api.js
 ```
 
 Use `Control-C` to kill the server. Note that `node` must be on your path.
+
+
+If you would like to see the available commands, run
+``` shell
+node api.js -h
+```
+
+We currently support
+| Argument Parameter | Description |
+|--------------------|-------------|
+| -h | Show help |
+| -t | Run tests |
 
 ## Documentation
 
@@ -125,12 +137,14 @@ the pull-request detailing the issue preventing a merge.
 
 Please set the proper enviornment variables before testing. You can run the tests locally with
 
+If you have `mocha` installed globally, you can run our test suite with
 ``` shell
 npm test
 ```
 
-or
+otherwise, you can use the following command to run the tests using `mocha` from the prerequisites
 
 ``` shell
 node api.js -t
 ```
+

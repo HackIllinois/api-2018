@@ -27,7 +27,6 @@ module.exports = {
                                         .then(function (tok) {
 						if (tok == null) return;
                                                 tok.destroy();
-						tok.save();
                                         })
                                         .then(function () {
                                                 return userModel.destroy();

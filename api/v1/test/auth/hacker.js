@@ -2,14 +2,14 @@ var chai = require('chai');
 var chaiHttp = require('chai-http');
 
 var api = require('../../../../api');
+var consts = require('../testConsts');
+var testHelper = require('../testHelper');
+var Token = require('../../models/Token');
 var UserService = require('../../services/UserService');
 var User = require('../../models/User');
-var testHelper = require('../testHelper');
 
 chai.use(chaiHttp);
 var should = chai.should();
-
-var consts = require('../testConsts');
 
 
 /*
@@ -23,6 +23,7 @@ var consts = require('../testConsts');
 
 describe('/v1/auth hacker functionality', function() {
         var key;
+        var uid;
 
         before(function(done) {
                 console.log('before');
@@ -40,7 +41,11 @@ describe('/v1/auth hacker functionality', function() {
                                 res.should.have.status(200);
                                 res.body.data.auth.should.not.be.null;
                                 key = res.body.data.auth;
-                                done();
+                                UserService.findUserByEmail(consts.DUMMY_USER.email)
+                                        .then(function(model) {
+                                                uid = model.attributes.id;
+                                                done();
+                                        });
                         });
         });
 
@@ -51,33 +56,17 @@ describe('/v1/auth hacker functionality', function() {
                         });
         });
 
-        describe('POST /auth/reset', function() {
+
+        describe('POST v1/auth/reset', function() {
                 if (process.env.NODE_ENV != 'development')
                 {
-                        console.log('Cannot run the password reset test outside of development enviornment.');
+			console.log('Cannot run the password reset test outside of development enviornment.');
                 }
                 else
                 {
-                        it('We should NOT be able to request a token with a bad email address', function(done) {
+                        before(function (done) {
                                 var req = {
-                                        'email': consts.BAD_DUMMY_USER.email,
-                                        'password': 'blahblahdoesntmatter'
-                                };
-
-                                chai.request(api)
-                                        .post('/v1/user/reset')
-                                        .send(req)
-                                        .end(function(err, res) {
-                                                res.should.not.have.status(200);
-                                                res.body.error.type.should.equal('NotFoundError');
-                                                done();
-                                        });
-                        });
-
-                        it('We should be able to request a token with a good email address', function(done) {
-                                var req = {
-                                        'email': consts.DUMMY_USER.email,
-                                        'password': consts.DUMMY_USER.password
+                                        'email': consts.DUMMY_USER.email
                                 };
 
                                 chai.request(api)
@@ -88,24 +77,37 @@ describe('/v1/auth hacker functionality', function() {
                                                 done();
                                         });
                         });
-                }
-        });
-
-        describe('POST /auth/reset', function() {
-                if (process.env.NODE_ENV != 'development')
-                {
-                        console.log('Cannot run the password reset test outside of development enviornment.');
-                }
-                else
-                {
-			// TODO: Read mail file by most recent file
-			// TODO: Implement tests
-                        it('We should NOT reset our password with a bad token', function(done) {
-				done(); // remove me when working
+                        // TODO: Read mail file by most recent file?
+                        // TODO: Implement tests
+                        it('Should NOT be able to reset our password with a bad token', function(done) {
+                                var req = {
+                                        'token': '0xDEADBEEF',
+                                        'password': 'deadbeefpassword'
+                                };
+                                chai.request(api)
+                                        .post('/v1/auth/reset')
+                                        .end(function(err, res) {
+                                                res.should.not.have.status(200);
+                                                done();
+                                        });
                         });
 
-                        it('We should be able to reset our password with a good token', function(done) {
-				done(); // remove me when working
+                        it('Should be able to reset our password with a good token', function(done) {
+                                Token.collection().query({where: {user_id: uid}}).fetchOne()
+                                        .then(function(token) {
+                                                var resetReq = {
+                                                        'token': token.attributes.value,
+                                                        'password': 'ANewPassword'
+                                                };
+
+                                                chai.request(api)
+                                                        .post('/v1/auth/reset')
+							.send(resetReq)
+                                                        .end(function(err, res) {
+                                                                res.should.have.status(200);
+                                                                done();
+                                                        });
+                                        });
                         });
                 }
         });
