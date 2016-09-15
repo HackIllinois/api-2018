@@ -10,25 +10,26 @@ var roles = require('../utils/roles');
 const SALT_ROUNDS = 12;
 
 var Model = require('./Model');
+
 var User = Model.extend({
-	tableName: 'users',
-	idAttribute: 'id',
-	hasTimestamps: ['created', 'updated'],
-	validations: {
-		email: ['required', 'email'],
-		password: ['required', 'string', 'minLength:8'],
-		role: ['required', 'string', roles.verifyRole]
-	}
+        tableName: 'users',
+        idAttribute: 'id',
+        hasTimestamps: ['created', 'updated'],
+        validations: {
+                email: ['required', 'email'],
+                password: ['required', 'string', 'minLength:8'],
+                role: ['required', 'string', roles.verifyRole]
+        }
 });
 
 /**
  * Finds a user by its email address
- * @param  {String} 			email the email address
+ * @param  {String}                     email the email address
  * @return {Promise<User>}      the found user, or null
  */
 User.findByEmail = function (email) {
-	email = email.toLowerCase();
-	return this.collection().query({ where: { email: email } }).fetchOne();
+        email = email.toLowerCase();
+        return this.collection().query({ where: { email: email } }).fetchOne();
 };
 
 /**
@@ -37,13 +38,13 @@ User.findByEmail = function (email) {
  * @return {Promise} a Promise resolving to the updated User model
  */
 User.prototype.setPassword = function (password) {
-	password = crypto.hashWeak(password);
-	return bcrypt
-		.hashAsync(password, SALT_ROUNDS)
-		.bind(this)
-		.then(function (p) {
-			return Promise.resolve(this.set({ password: p }));
-		});
+        password = crypto.hashWeak(password);
+        return bcrypt
+                .hashAsync(password, SALT_ROUNDS)
+                .bind(this)
+                .then(function (p) {
+                        return Promise.resolve(this.set({ password: p }));
+                });
 };
 
 /**
@@ -53,12 +54,12 @@ User.prototype.setPassword = function (password) {
  * of the provided password
  */
 User.prototype.hasPassword = function (password) {
-	password = crypto.hashWeak(password);
-	return Promise
-		.bind(this)
-		.then(function() {
-			return bcrypt.compareAsync(password, this.get('password'));
-		});
+        password = crypto.hashWeak(password);
+        return Promise
+                .bind(this)
+                .then(function() {
+                        return bcrypt.compareAsync(password, this.get('password'));
+                });
 };
 
 /**
@@ -66,7 +67,16 @@ User.prototype.hasPassword = function (password) {
  * @return {Object} the serialized form of this User
  */
 User.prototype.toJSON = function () {
-	return _.omit(this.attributes, ['password']);
+        return _.omit(this.attributes, ['password']);
+};
+
+
+/**
+ * Given a user model, purges the user from the database.
+ * For complete removals, use this function instead of User.destroy()
+ */
+User.prototype.removeAll = function () {
+	
 };
 
 module.exports = User;

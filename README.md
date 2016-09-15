@@ -129,3 +129,8 @@ Please set the proper enviornment variables before testing. You can run the test
 npm test
 ```
 
+or
+
+``` shell
+node api.js -t
+```
