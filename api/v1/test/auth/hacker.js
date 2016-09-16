@@ -1,8 +1,8 @@
+var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 
 var api = require('../../../../api');
-var consts = require('../testConsts');
 var testHelper = require('../testHelper');
 var Token = require('../../models/Token');
 var UserService = require('../../services/UserService');
@@ -11,27 +11,19 @@ var User = require('../../models/User');
 chai.use(chaiHttp);
 var should = chai.should();
 
-
-/*
-  endpoints['/v1/auth/reset'] = {
-  POST: requests.ResetPasswordRequest
-  };
-  endpoints['/v1/auth'] = {
-  POST: requests.AuthTokenRequest
-  };
-*/
+const UNIQUE_PREFIX = 'v1-auth-staff-';
+const USER1 = testHelper.userGenerate(UNIQUE_PREFIX);
 
 describe('/v1/auth hacker functionality', function() {
         var key;
         var uid;
 
         before(function(done) {
-                console.log('before');
                 // We need to create a hacker in order to run our auth tests.
                 var req = {
-                        'email': consts.DUMMY_USER.email,
-                        'password': consts.DUMMY_USER.password,
-                        'confirmedPassword': consts.DUMMY_USER.password
+                        'email': USER1.email,
+                        'password': USER1.password,
+                        'confirmedPassword': USER1.password
                 };
 
                 chai.request(api)
@@ -41,7 +33,7 @@ describe('/v1/auth hacker functionality', function() {
                                 res.should.have.status(200);
                                 res.body.data.auth.should.not.be.null;
                                 key = res.body.data.auth;
-                                UserService.findUserByEmail(consts.DUMMY_USER.email)
+                                UserService.findUserByEmail(USER1.email)
                                         .then(function(model) {
                                                 uid = model.attributes.id;
                                                 done();
@@ -50,23 +42,55 @@ describe('/v1/auth hacker functionality', function() {
         });
 
         after(function(done) {
-                testHelper.userDelete(consts.DUMMY_USER.email)
+                testHelper.userDelete(USER1.email)
                         .then(function () {
                                 done();
                         });
         });
 
+        describe('POST /v1/auth', function () {
+                it('Users should be able to obtain auth token', function(done) {
+                        var req = {
+                                'email': USER1.email,
+                                'password': USER1.password
+                        };
 
-        describe('POST v1/auth/reset', function() {
+                        chai.request(api)
+                                .post('/v1/auth')
+                                .send(req)
+                                .end(function (err, res) {
+                                        res.should.have.status(200);
+                                        res.body.data.auth.should.not.be.null;
+					key = res.body.data.auth;
+					done();
+                                });
+                });
+        });
+
+	describe('POST /v1/auth/refresh', function () {
+		it('Users should be able to refresh their token using auth', function (done) {
+			chai.request(api)
+				.post('/v1/auth/refresh')
+				.set('Authorization', key)
+				.end(function(err, res) {
+					res.should.have.status(200);
+					assert.notEqual(key, res.body.data.auth);
+					key = res.body.data.auth;
+					done();
+				});
+		});
+	});
+
+        describe('POST /v1/auth/reset', function() {
                 if (process.env.NODE_ENV != 'development')
                 {
-			console.log('Cannot run the password reset test outside of development enviornment.');
+                        console.log('Cannot run the password reset test outside of development enviornment.');
                 }
                 else
                 {
                         before(function (done) {
                                 var req = {
-                                        'email': consts.DUMMY_USER.email
+                                        'email': USER1.email
                                 };
 
                                 chai.request(api)
@@ -102,7 +126,7 @@ describe('/v1/auth hacker functionality', function() {
 
                                                 chai.request(api)
                                                         .post('/v1/auth/reset')
-							.send(resetReq)
+                                                        .send(resetReq)
                                                         .end(function(err, res) {
                                                                 res.should.have.status(200);
                                                                 done();

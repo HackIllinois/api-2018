@@ -5,10 +5,15 @@ var api = require('../../../../api');
 var UserService = require('../../services/UserService');
 var User = require('../../models/User');
 var testHelper = require('../testHelper');
-var consts = require('../testConsts');
 
 chai.use(chaiHttp);
 var should = chai.should();
+
+const UNIQUE_PREFIX = 'v1-user-';
+const USER1 = testHelper.userGenerate(UNIQUE_PREFIX);
+const USER2 = testHelper.userGenerate(UNIQUE_PREFIX);
+const USER3 = testHelper.userGenerate(UNIQUE_PREFIX);
+const USER4 = testHelper.userGenerate(UNIQUE_PREFIX);
 
 describe('/v1/user hacker functionality', function() {
         var key;
@@ -16,9 +21,9 @@ describe('/v1/user hacker functionality', function() {
         before(function(done) {
                 // create a hacker and grab an authentication token to use
                 var req = {
-                        'email': consts.DUMMY_USER.email,
-                        'password': consts.DUMMY_USER.password,
-                        'confirmedPassword': consts.DUMMY_USER.password
+                        'email': USER1.email,
+                        'password': USER1.password,
+                        'confirmedPassword': USER1.password
                 };
 
                 chai.request(api)
@@ -33,7 +38,7 @@ describe('/v1/user hacker functionality', function() {
         });
 
         after(function(done) {
-                testHelper.userDelete(consts.DUMMY_USER.email)
+                testHelper.userDelete(USER1.email)
 			.then(function () {
 				done();
 			});
@@ -42,7 +47,7 @@ describe('/v1/user hacker functionality', function() {
         describe('POST /user/accredited', function() {
                 it('should not be able to create staff/admin users', function(done) {
                         var req = {
-                                "email": consts.UNIQUE_DUMMY_USER.email,
+                                "email": USER2.email,
                                 "role": "STAFF"
                         };
 
@@ -62,9 +67,9 @@ describe('/v1/user hacker functionality', function() {
                 var other_id;
                 before(function (done) {
                         var req = {
-                                'email': consts.DUMMY_USER_TWO.email,
-                                'password': consts.DUMMY_USER_TWO.password,
-                                'confirmedPassword': consts.DUMMY_USER_TWO.password
+                                'email': USER3.email,
+                                'password': USER3.password,
+                                'confirmedPassword': USER3.password
                         };
 
                         chai.request(api)
@@ -72,7 +77,7 @@ describe('/v1/user hacker functionality', function() {
                                 .send(req)
                                 .end(function(err, res) {
                                         res.should.have.status(200);
-                                        UserService.findUserByEmail(consts.DUMMY_USER_TWO.email)
+                                        UserService.findUserByEmail(USER3.email)
                                                 .then(function(model) {
                                                         other_id = model.attributes.id;
                                                         done();
@@ -81,14 +86,14 @@ describe('/v1/user hacker functionality', function() {
                 });
 
                 after(function (done) {
-                        testHelper.userDelete(consts.DUMMY_USER_TWO.email)
+                        testHelper.userDelete(USER3.email)
                                 .then(function () {
                                         done();
                                 });
                 });
 
                 it('Should be able to access own user id', function(done) {
-                        UserService.findUserByEmail(consts.DUMMY_USER.email)
+                        UserService.findUserByEmail(USER1.email)
                                 .then(function(user) {
                                         chai.request(api)
                                                 .get('/v1/user/' + user.attributes.id)
@@ -132,7 +137,7 @@ describe('/v1/user hacker functionality', function() {
                 {
                         it('We should NOT be able to request a token with a bad email address', function(done) {
                                 var req = {
-                                        'email': consts.BAD_DUMMY_USER.email
+                                        'email': USER4.email
                                 };
 
                                 chai.request(api)
@@ -147,7 +152,7 @@ describe('/v1/user hacker functionality', function() {
 
                         it('We should be able to request a token with a good email address', function(done) {
                                 var req = {
-                                        'email': consts.DUMMY_USER.email
+                                        'email': USER1.email
                                 };
 
                                 chai.request(api)
