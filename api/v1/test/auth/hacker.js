@@ -101,8 +101,7 @@ describe('/v1/auth hacker functionality', function() {
                                                 done();
                                         });
                         });
-                        // TODO: Read mail file by most recent file?
-                        // TODO: Implement tests
+
                         it('Should NOT be able to reset our password with a bad token', function(done) {
                                 var req = {
                                         'token': '0xDEADBEEF',

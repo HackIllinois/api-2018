@@ -30,33 +30,39 @@ module.exports = {
                                         .query({ where: { user_id: user_id }})
                                         .fetchOne({ withRelated: ['user'] })
                                         .then(function (tok) {
-                                                if (tok == null) return;
-                                                tok.destroy().then(function () {
-							return userModel.destroy();
-						});
+                                                if (tok == null)
+                                                {
+                                                        userModel.destroy();
+                                                }
+                                                else
+                                                {
+                                                        tok.destroy().then(function () {
+                                                                return userModel.destroy();
+                                                        });
+                                                }
                                         });
                         });
         },
 
         userGenerate: function(prefix) {
 
-		var user = {
-			'email': '',
-			'password': ''
-		};
+                var user = {
+                        'email': '',
+                        'password': ''
+                };
 
                 user.email = randString(RANDOM_USER_LEN) + '@'
-			+ randString(RANDOM_DOMAIN_LEN) + '.' + randString(RANDOM_SUFFIX_LEN);
+                        + randString(RANDOM_DOMAIN_LEN) + '.' + randString(RANDOM_SUFFIX_LEN);
 
-		user.password = randString(RANDOM_PWD_LEN);
+                user.password = randString(RANDOM_PWD_LEN);
 
-		if (prefix)
-		{
-			user.email = prefix + user.email;
-			user.password = prefix + user.password;
-		}
+                if (prefix)
+                {
+                        user.email = prefix + user.email;
+                        user.password = prefix + user.password;
+                }
 
-		return user;
+                return user;
         }
 };
 

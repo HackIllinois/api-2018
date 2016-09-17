@@ -42,7 +42,11 @@ module.exports = instance;
 
 if(args.test)
 {
-        var mocha = new Mocha();
+        var mocha = new Mocha({
+		bail: true,
+		fullTrace: true
+	});
+
         mocha.addFile('api/v1/test/test.js');
         mocha.run()
                 .on('end', function() {
