@@ -114,10 +114,12 @@ node api.js -h
 ```
 
 We currently support
+
 | Argument Parameter | Description |
-|--------------------|-------------|
-| -h | Show help |
-| -t | Run tests |
+| ------------------ | ----------- |
+| -h                 | Show help   |
+| -t                 | Run tests   |
+
 
 ## Documentation
 
@@ -136,13 +138,6 @@ the pull-request detailing the issue preventing a merge.
 ## Testing
 
 Please set the proper enviornment variables before testing. You can run the tests locally with
-
-If you have `mocha` installed globally, you can run our test suite with
-``` shell
-npm test
-```
-
-otherwise, you can use the following command to run the tests using `mocha` from the prerequisites
 
 ``` shell
 node api.js -t
