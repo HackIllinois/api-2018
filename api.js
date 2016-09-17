@@ -1,3 +1,4 @@
+var Bookshelf = require('Bookshelf');
 var express = require('express');
 var fs = require('fs');
 var Mocha = require('mocha');
@@ -52,4 +53,8 @@ if(args.test)
                 .on('end', function() {
                         process.exit(0);
                 });
+}
+else
+{
+	Bookshelf.events.off('superUserInitialized');
 }
