@@ -18,7 +18,7 @@ var utils = require('../utils');
  */
 module.exports.createUser = function (email, password, role) {
 	email = email.toLowerCase();
-	storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
+	var storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
 	var user = User.forge({ email: email, password: storedPassword });
 
 	return user
@@ -41,7 +41,7 @@ module.exports.createUser = function (email, password, role) {
 				// TODO: send user an email requiring a password reset when
 				// the password is automatically generated
 			}
-
+			
 			return _Promise.resolve(result);
 		});
 };

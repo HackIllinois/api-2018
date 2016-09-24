@@ -1,4 +1,5 @@
 var AuthService = require('../services/AuthService');
+var User = require('../models/User');
 var config = require('../../config');
 var errors = require('../errors');
 
@@ -13,7 +14,11 @@ module.exports = function (req, res, next) {
 
 	return AuthService.verify(auth)
 		.then(function (decoded) {
-			req.auth = decoded;
+			req.auth = true;
+			return User.findById(decoded.sub);
+		})
+		.then(function (user) {
+			req.user = user;
 
 			next();
 			return null;

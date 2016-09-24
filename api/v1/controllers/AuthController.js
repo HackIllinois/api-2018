@@ -64,7 +64,7 @@ function refreshToken (req, res, next) {
 
 	// the requester's token must be valid and present, so we can re-issue
 	// without requiring a password
-	_issueByEmail(req.auth.email)
+	_issueByEmail(req.user.email)
 		.then(function (auth) {
 			res.body = {};
 			res.body.auth = auth;

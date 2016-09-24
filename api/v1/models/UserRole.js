@@ -51,7 +51,7 @@ UserRole.setActive = function (userRole, active) {
 };
 
 UserRole.prototype.serialize = function () {
-	return _.omit(this.attributes, 'userId');
+	return _.omit(this.attributes, ['id', 'userId']);
 };
 
 module.exports = UserRole;

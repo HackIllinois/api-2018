@@ -4,8 +4,6 @@ var _Promise = require('bluebird');
 var bcrypt = _Promise.promisifyAll(require('bcrypt'));
 var _ = require('lodash');
 
-var crypto = require('../utils/crypto');
-
 const SALT_ROUNDS = 12;
 
 var Model = require('./Model');
@@ -16,7 +14,7 @@ var User = Model.extend({
 	hasTimestamps: ['created', 'updated'],
 	validations: {
 		email: ['required', 'email'],
-		password: ['required', 'string', 'minLength:8']
+		password: ['required', 'string']
 	},
 	roles: function () {
 		return this.hasMany(UserRole);
@@ -67,18 +65,17 @@ User.create = function (email, password, role) {
 					return userRole.save(null, { transacting: t });
 				})
 				.then(function (result) {
-					return user.fetch({ withRelated: ['roles'], transacting: t });
+					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles'], transacting: t });
 				});
 		});
 };
 
 /**
  * Securely sets a user's password without persisting any changes
- * @param {String} password a secure password of arbitrarily-long length
+ * @param {String} password a secure password of up to fifty characters
  * @return {Promise<User>} a Promise resolving to the updated User model
  */
 User.prototype.setPassword = function (password) {
-	password = crypto.hashWeak(password);
 	return bcrypt
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
@@ -141,7 +138,6 @@ User.prototype.hasRoles = function (roles, activeOnly) {
  * of the provided password
  */
 User.prototype.hasPassword = function (password) {
-	password = crypto.hashWeak(password);
 	return _Promise
 		.bind(this)
 		.then(function() {

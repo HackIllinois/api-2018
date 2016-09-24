@@ -18,12 +18,12 @@ var router = require('express').Router();
  * @return {Boolean} whether or not the requester is requesting itself
  */
 function isRequester(req) {
-	return parseInt(req.auth.sub) == req.params.id;
+	return req.user.get('id') == req.params.id;
 }
 
-function createHackerUser (req, res, next) {
+function createAttendee (req, res, next) {
 	services.UserService
-		.createUser(req.body.email, req.body.password, 'HACKER')
+		.createUser(req.body.email, req.body.password, roles.ATTENDEE)
 		.then(function (user) {
 			return services.AuthService.issueForUser(user);
 		})
@@ -41,10 +41,8 @@ function createHackerUser (req, res, next) {
 }
 
 function createAccreditedUser (req, res, next) {
-	var requesterRole = req.auth.role;
-
 	services.PermissionService
-		.canCreateUser(requesterRole, req.body.role)
+		.canCreateUser(req.user, req.body.role)
 		.then(function (verified) {
 			return services.UserService
 				.createUser(req.body.email, req.body.password, req.body.role);
@@ -105,14 +103,14 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
-router.post('', createHackerUser);
-router.post('/reset', requestPasswordReset);
+router.post('/attendee', createAttendee);
 router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
+router.post('/reset', requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
 router.use(middleware.response);
 router.use(middleware.errors);
 
-module.exports.createHackerUser = createHackerUser;
+module.exports.createAttendee = createAttendee;
 module.exports.createAccreditedUser = createAccreditedUser;
 module.exports.router = router;

@@ -14,11 +14,11 @@ module.exports = function(allowed, isOwner) {
 			return next(new errors.UnauthorizedError());
 		}
 
-    else if (_.includes(allowed, req.auth.role)) {
-      next();
-    }
+	else if (req.user.hasRoles(allowed)) {
+	  next();
+	}
 
-    else if (isOwner) {
+	else if (isOwner) {
 			// the endpoint defined an ownership method
 			var result = isOwner(req);
 
@@ -43,8 +43,8 @@ module.exports = function(allowed, isOwner) {
 			}
 		}
 
-    else {
-      return next(new errors.UnauthorizedError());
-    }
+	else {
+	  return next(new errors.UnauthorizedError());
+	}
 	};
 };
