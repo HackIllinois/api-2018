@@ -10,6 +10,7 @@ var roles = require('../utils/roles');
 const SALT_ROUNDS = 12;
 
 var Model = require('./Model');
+var UserRole = require('./UserRole');
 var User = Model.extend({
 	tableName: 'users',
 	idAttribute: 'id',
@@ -18,8 +19,22 @@ var User = Model.extend({
 		email: ['required', 'email'],
 		password: ['required', 'string', 'minLength:8'],
 		role: ['required', 'string', roles.verifyRole]
+	},
+	roles: function () {
+		return this.hasMany(UserRole);
 	}
 });
+
+
+
+/**
+ * Finds a user by its ID, joining in its related roles
+ * @param  {Number|String} id	the ID of the model with the appropriate type
+ * @return {Promise<Model>}		a Promise resolving to the resulting model or null
+ */
+User.findById = function (id) {
+	return User.where({ id: id }).fetch({ withRelated: ['roles'] });
+};
 
 /**
  * Finds a user by its email address
@@ -28,7 +43,7 @@ var User = Model.extend({
  */
 User.findByEmail = function (email) {
 	email = email.toLowerCase();
-	return this.collection().query({ where: { email: email } }).fetchOne();
+	return User.where({ email: email }).fetch({ withRelated: ['roles']});
 };
 
 /**
@@ -44,6 +59,42 @@ User.prototype.setPassword = function (password) {
 		.then(function (p) {
 			return _Promise.resolve(this.set({ password: p }));
 		});
+};
+
+/**
+ * Determines whether or not this user has the specified role
+ * @param  {String}	role the string representation of a role from utils.roles
+ * @param  {Boolean} activeOnly whether or not the role must be active (default true)
+ * @return {Boolean}	  whether or not the user has the role
+ * @throws TypeError	  when the user is missing its related roles key
+ */
+User.prototype.hasRole = function (role, activeOnly) {
+	if (_.isUndefined(this.related('roles'))) {
+		throw new TypeError("The related roles were not fetched with this User");
+	}
+
+	var roleMatch = { role: role };
+	if (_.isUndefined(activeOnly) || activeOnly) {
+		role.active = 1;
+	}
+
+	return _.some(this.related('roles').toJSON(), roleMatch);
+};
+
+/**
+ * The plural form of User#hasRole. Checks if the user has any of the provided roles.
+ * @param  {Array}	roles an array of string representations of a role from utils.roles
+ * @param  {Boolean} activeOnly whether or not the role must be active (default true)
+ * @return {Boolean}	  whether or not the user has any of the specified roles
+ * @throws TypeError	  when the user is missing its related roles key
+ */
+User.prototype.hasRoles = function (roles, activeOnly) {
+	var found = false;
+	_.forEach(roles, _.bind(function (role) {
+		found = found || this.hasRole(role, activeOnly);
+	}, this));
+
+	return found;
 };
 
 /**
