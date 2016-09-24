@@ -5,7 +5,6 @@ var bcrypt = _Promise.promisifyAll(require('bcrypt'));
 var _ = require('lodash');
 
 var crypto = require('../utils/crypto');
-var roles = require('../utils/roles');
 
 const SALT_ROUNDS = 12;
 
@@ -17,15 +16,12 @@ var User = Model.extend({
 	hasTimestamps: ['created', 'updated'],
 	validations: {
 		email: ['required', 'email'],
-		password: ['required', 'string', 'minLength:8'],
-		role: ['required', 'string', roles.verifyRole]
+		password: ['required', 'string', 'minLength:8']
 	},
 	roles: function () {
 		return this.hasMany(UserRole);
 	}
 });
-
-
 
 /**
  * Finds a user by its ID, joining in its related roles
@@ -47,9 +43,39 @@ User.findByEmail = function (email) {
 };
 
 /**
+ * Creates a new user with the specified parameters and role. The role will be
+ * set to active if user creation succeeds. Validation is performed on-save only
+ * @param  {String} email    the user's email
+ * @param  {String} password the user's raw password
+ * @param  {String}	role the string representation of a role from utils.roles
+ * @return {Promise<User>}	 the User object with the related roles joined-in
+ */
+User.create = function (email, password, role) {
+	var user = User.forge({ email: email });
+	var userRole = UserRole.forge({ role: role, active: true });
+
+	return User
+		.transaction(function (t) {
+			return user.setPassword(password)
+				.then(function (result) {
+					return result.save(null, { transacting: t });
+				})
+				.then(function (result) {
+					user = result;
+
+					userRole.set({ userId: user.get('id') });
+					return userRole.save(null, { transacting: t });
+				})
+				.then(function (result) {
+					return user.fetch({ withRelated: ['roles'], transacting: t });
+				});
+		});
+};
+
+/**
  * Securely sets a user's password without persisting any changes
  * @param {String} password a secure password of arbitrarily-long length
- * @return {Promise} a Promise resolving to the updated User model
+ * @return {Promise<User>} a Promise resolving to the updated User model
  */
 User.prototype.setPassword = function (password) {
 	password = crypto.hashWeak(password);
@@ -62,11 +88,22 @@ User.prototype.setPassword = function (password) {
 };
 
 /**
+ * Retrieves a role from the roles field.
+ * @param  {String}	role the string representation of a role from utils.roles
+ * @return {UserRole}	 the desired role, or undefined
+ */
+User.prototype.getRole = function (role) {
+	return _.find(this.related('roles').models, function (role) {
+		return role.role === role;
+	});
+};
+
+/**
  * Determines whether or not this user has the specified role
  * @param  {String}	role the string representation of a role from utils.roles
  * @param  {Boolean} activeOnly whether or not the role must be active (default true)
  * @return {Boolean}	  whether or not the user has the role
- * @throws TypeError	  when the user is missing its related roles key
+ * @throws {TypeError}	  when the user is missing its related roles key
  */
 User.prototype.hasRole = function (role, activeOnly) {
 	if (_.isUndefined(this.related('roles'))) {
@@ -116,8 +153,13 @@ User.prototype.hasPassword = function (password) {
  * Serializes this User
  * @return {Object} the serialized form of this User
  */
-User.prototype.toJSON = function () {
-	return _.omit(this.attributes, ['password']);
+User.prototype.serialize = function () {
+	var serialized = _.omit(this.attributes, ['password']);
+
+	var roles = this.related('roles');
+	serialized.roles = (_.isUndefined(roles)) ? null : roles.serialize();
+
+	return serialized;
 };
 
 module.exports = User;
