@@ -3,7 +3,7 @@ var Request = require('./Request');
 var bodyRequired = ['token', 'password'];
 var bodyValidations = {
 	'token': ['string'],
-	'password': ['string', 'minLength:8', 'maxLength: 50']
+	'password': ['string', 'minLength:8', 'maxLength:50']
 };
 
 function ResetPasswordRequest(headers, body) {
