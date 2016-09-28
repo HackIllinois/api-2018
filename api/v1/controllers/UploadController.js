@@ -37,7 +37,7 @@ function _findUpload(req, res, next) {
 }
 
 function _isOwner (req) {
-	return req.upload.get('ownerId') === parseInt(req.user.get('id'));
+	return req.upload.get('ownerId') === req.user.get('id');
 }
 
 function _makeFileParams (req, type) {
