@@ -1,9 +1,9 @@
 var _ = require('lodash');
 
-var ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'HACKER'];
+var ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
 
 _.forEach(ALL_ROLES, function (role) {
-	_.assign(module.exports, role);
+	module.exports[role] = role;
 });
 
 module.exports.NONE = [];
@@ -11,9 +11,9 @@ module.exports.ALL = ALL_ROLES;
 module.exports.SUPERUSER = ALL_ROLES[0];
 module.exports.ORGANIZERS = ['ADMIN', 'STAFF'];
 module.exports.PROFESSIONALS = ['SPONSOR', 'MENTOR'];
-module.exports.NON_PROFESSIONALS = ['ADMIN', 'STAFF', 'VOLUNTEER', 'HACKER'];
+module.exports.NON_PROFESSIONALS = ['ADMIN', 'STAFF', 'VOLUNTEER', 'ATTENDEE'];
 module.exports.HOSTS = ['ADMIN', 'STAFF', 'VOLUNTEER'];
-module.exports.COMMON = ['SPONSOR', 'MENTOR', 'VOLUNTEER', 'HACKER'];
+module.exports.COMMON = ['SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
 
 /**
  * Determines whether or not a given role is in a certain role group

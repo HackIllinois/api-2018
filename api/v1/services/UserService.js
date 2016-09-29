@@ -18,11 +18,8 @@ var utils = require('../utils');
  */
 module.exports.createUser = function (email, password, role) {
 	email = email.toLowerCase();
-	password = (password) ? password : utils.crypto.generatePassword();
-	var user = User.forge({ email: email, password: password, role: role });
-
-	// TODO: send user an email requiring a password reset when
-	// the password is automatically generated
+	var storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
+	var user = User.forge({ email: email, password: storedPassword });
 
 	return user
 		.validate()
@@ -37,13 +34,15 @@ module.exports.createUser = function (email, password, role) {
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return user.setPassword(password);
+			return User.create(email, storedPassword, role);
 		})
-		.then(function () {
-			return user.save();
-		})
-		.then(function (user) {
-			return _Promise.resolve(user);
+		.then(function (result) {
+			if (_.isUndefined(password) || _.isNull(password)) {
+				// TODO: send user an email requiring a password reset when
+				// the password is automatically generated
+			}
+			
+			return _Promise.resolve(result);
 		});
 };
 

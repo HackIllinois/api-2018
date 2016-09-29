@@ -38,10 +38,10 @@ function _issue(payload, subject) {
  * @return {Promise} resolving to the auth token
  */
 module.exports.issueForUser = function (user) {
-	var subject = user.get("id").toString();
+	var subject = user.get('id').toString();
 	var payload = {
-		email: user.get("email"),
-		role: user.get("role")
+		email: user.get('email'),
+		roles: user.related('roles').toJSON()
 	};
 
 	return _Promise

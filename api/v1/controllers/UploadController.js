@@ -37,7 +37,7 @@ function _findUpload(req, res, next) {
 }
 
 function _isOwner (req) {
-	return req.upload.get('ownerId') === parseInt(req.auth.sub);
+	return req.upload.get('ownerId') === req.user.get('id');
 }
 
 function _makeFileParams (req, type) {
@@ -47,9 +47,7 @@ function _makeFileParams (req, type) {
 function createResumeUpload (req, res, next) {
 	var upload;
 
-	// NOTE: the user object will soon be present on the actual auth object instead
-	// see issue #10
-	var uploadOwner = User.forge({ id: parseInt(req.auth.sub) });
+	var uploadOwner = req.user;
 	var uploadParams = { bucket: RESUME_BUCKET };
 
 	Upload.findByOwner(uploadOwner, uploadParams.bucket)

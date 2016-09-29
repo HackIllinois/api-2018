@@ -7,7 +7,6 @@ var bodyValidations = {
 	'role': ['string', roles.verifyRole]
 };
 
-// usable whenever a request is made to create a non-hacker user
 function AccreditedUserCreationRequest(headers, body) {
 	Request.call(this, headers, body);
 
