@@ -14,7 +14,10 @@ module.exports = function (req, res, next) {
 
 	return AuthService.verify(auth)
 		.then(function (decoded) {
+			// specifies that request supplied a valid auth token
+			// (but not necessarily that the associated user data has been retrieved)
 			req.auth = true;
+			
 			return User.findById(decoded.sub);
 		})
 		.then(function (user) {
