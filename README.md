@@ -54,6 +54,10 @@ The following environment variables can be used to configure the API for your sy
 
 You should set `NODE_ENV` to `development`, as this variable is required. The API
 will exit with an unsuccessful error code if it finds that this variable is missing.
+Typically this is done via a line like so:
+```
+NODE_ENV=development node api.js
+```
 To save time, you might add this variable to your PATH, or to a `bash_profile` as
 an export.
 
@@ -69,6 +73,7 @@ Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
+There is a provided ENV_CONFIG template and an associated startup script ```startup.sh``` to hold environment variables outside your .profile. Rename the file to ```ENV_CONFIG``` and add your keys and parameters. By running ```./startup.sh```  those variables will be loaded into the environment and the api will start running.
 ## Installation
 
 #### Dependencies
@@ -103,6 +108,10 @@ the root of the project directory:
 
 ```
 node api.js
+```
+If you are using an ```ENV_CONFIG``` file then from the root directory use:
+```
+./startup.sh
 ```
 
 Use `Control-C` to kill the server. Note that `node` must be on your path.
