@@ -86,6 +86,12 @@ Note that your current directory must be the root of the project.
 To begin, you will need the [FlywayDB command line tool](http://flywaydb.org/documentation/commandline/).
 Further, you'll need to create a schema called `hackillinois-2017` on your local MySQL instance.
 
+This can be done via the following steps:
+```
+$ mysql -u[USERNAME]
+mysql> CREATE DATABASE hackillinois-2017
+mysql> USE hackillinois-2017
+```
 Once you have both of these tasks completed, run `./database/flyway.sh migrate`
 from the root of the project directory. This will run all migration scripts available to-date.
 If you see any errors, such as an inability to access the database, make sure you have
