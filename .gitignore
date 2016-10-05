@@ -13,3 +13,5 @@ node_modules
 temp
 
 ENV_CONFIG
+DEV_ENV_CONFIG
+PROD_ENV_CONFIG

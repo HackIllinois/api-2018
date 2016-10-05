@@ -39,18 +39,24 @@ from your favorite package manager.
 
 The following environment variables can be used to configure the API for your system:
 
-| Variable | Possible Values | Purpose |
-| -------- | --------------- | ------- |
-| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
-| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
-| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| LOCAL_MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') |
-| LOCAL_MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') |
-| LOCAL_MYSQL_HOST | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
-| LOCAL_MYSQL_PORT | Any valid port number | Overrides default MySQL port (3306) |
+| Variable | Possible Values | Purpose | Used in Config |
+| -------- | --------------- | ------- | -------------- |
+| NODE_ENV | 'production' or 'development' | Determines how environment should be configured | Both |
+| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) | Both |
+| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) | Both |
+| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') | Both |
+| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') | Both |
+| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key | Both |
+| LOCAL_MYSQL_NAME | Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | Development |
+| LOCAL_MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') | Development |
+| LOCAL_MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') | Development |
+| LOCAL_MYSQL_HOST | Any valid URI | Overrides default MySQL host ('127.0.0.1') | Development |
+| LOCAL_MYSQL_PORT | Any valid port number | Overrides default MySQL port (3306) | Development |
+| RDS_DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | Production |
+| RDS_USERNAME | Any string | Overrides default MySQL username ('root') | Production |
+| RDS_PASSWORD | Any string | Overrides default MySQL password ('') | Production |
+| RDS_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') | Production |
+| RDS_PORT | Any valid port number | Overrides default MySQL port (3306) | Production |
 
 You should set `NODE_ENV` to `development`, as this variable is required. The API
 will exit with an unsuccessful error code if it finds that this variable is missing.
@@ -73,7 +79,7 @@ Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
-There is a provided ENV_CONFIG template and an associated startup script ```startup.sh``` to hold environment variables outside your .profile. Rename the file to ```ENV_CONFIG``` and add your keys and parameters. By running ```./startup.sh```  those variables will be loaded into the environment and the api will start running.
+There is a provided file ```ENV_CONFIG.template``` in the config directory to hold environment variables outside your .profile. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
 ## Installation
 
 #### Dependencies
@@ -109,9 +115,16 @@ the root of the project directory:
 ```
 node api.js
 ```
-If you are using an ```ENV_CONFIG``` file then from the root directory use:
+If you are using ```ENV_CONFIG``` files then run:
+
+
+For the developer configurations (```DEV_ENV_CONFIG```)
 ```
-./startup.sh
+npm run dev
+```
+For the production configurations (```PROD_ENV_CONFIG```)
+```
+npm run prod
 ```
 
 Use `Control-C` to kill the server. Note that `node` must be on your path.
