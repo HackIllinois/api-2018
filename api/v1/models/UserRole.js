@@ -11,6 +11,20 @@ var UserRole = Model.extend({
 		role: ['required', 'string', roles.verifyRole]
 	}
 });
+/**
+ * Saves a forged user role using the passed transaction
+ */
+function _addRole (userRole, active, t) {
+	return userRole
+		.fetch({ transacting: t })
+		.then(function (result) {
+			if (result) {
+				return _Promise.resolve(result);
+			}
+			userRole.set({ active: (_.isUndefined(active) || active) });
+			return userRole.save(null, { transacting: t });
+		});
+}
 
 /**
  * Adds a role to the specified user. If the role already exists, it is returned
@@ -18,22 +32,17 @@ var UserRole = Model.extend({
  * @param {User} user		the target user
  * @param {String} role		the string representation of the role from utils.roles
  * @param {Boolean} active	whether or not the role should be activated (defaults to true)
+ * @param {Transaction} t	pending transaction (optional)
  * @returns {Promise<UserRole>} the result of the addititon
  */
-UserRole.addRole = function (user, role, active) {
+UserRole.addRole = function (user, role, active, t) {
 	var userRole = UserRole.forge({ user_id: user.id, role: role });
-	return UserRole
-		.transaction(function (t) {
-			return userRole
-				.fetch({ transacting: t })
-				.then(function (result) {
-					if (result) {
-						return _Promise.resolve(result);
-					}
-					userRole.set({ active: (_.isUndefined(active) || active) });
-					return userRole.save(null, { transacting: t });
-				});
-		});
+	if (t) {
+		return _addRole(userRole, active, t);
+	}
+	return UserRole.transaction(function(t){
+		return _addRole(userRole, active, t);
+	});
 };
 
 /**

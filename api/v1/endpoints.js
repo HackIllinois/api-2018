@@ -2,7 +2,7 @@ var requests = require('./requests');
 
 var endpoints = {};
 
-endpoints['/v1/user/attendee'] = {
+endpoints['/v1/user/'] = {
 	POST: requests.BasicAuthRequest
 };
 endpoints['/v1/user/accredited'] = {
@@ -10,6 +10,9 @@ endpoints['/v1/user/accredited'] = {
 };
 endpoints['/v1/user/reset'] = {
 	POST: requests.ResetTokenRequest
+};
+endpoints['/v1/registration/mentor'] = {
+	POST: requests.BasicAuthRequest
 };
 endpoints['/v1/auth/reset'] = {
 	POST: requests.ResetPasswordRequest

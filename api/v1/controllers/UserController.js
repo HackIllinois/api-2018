@@ -21,9 +21,9 @@ function isRequester(req) {
 	return req.user.get('id') == req.params.id;
 }
 
-function createAttendee (req, res, next) {
+function createUser (req, res, next) {
 	services.UserService
-		.createUser(req.body.email, req.body.password, roles.ATTENDEE)
+		.createUser(req.body.email, req.body.password)
 		.then(function (user) {
 			return services.AuthService.issueForUser(user);
 		})
@@ -103,7 +103,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
-router.post('/attendee', createAttendee);
+router.post('/', createUser);
 router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
