@@ -89,8 +89,8 @@ Further, you'll need to create a schema called `hackillinois-2017` on your local
 This can be done via the following steps:
 ```
 $ mysql -u[USERNAME]
-mysql> CREATE DATABASE hackillinois-2017
-mysql> USE hackillinois-2017
+mysql> CREATE DATABASE `hackillinois-2017`
+mysql> USE `hackillinois-2017`
 ```
 Once you have both of these tasks completed, run `./database/flyway.sh migrate`
 from the root of the project directory. This will run all migration scripts available to-date.
