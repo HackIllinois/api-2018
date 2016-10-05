@@ -79,7 +79,7 @@ Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
-There is a provided file ```ENV_CONFIG.template``` in the config directory to hold environment variables outside your .profile. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
+There are a provided files ```DEV_ENV_CONFIG.template``` and ```PROD_ENV_CONFIG.template``` in the config directory to show how to hold environment variables outside your .profile for use in this application. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
 ## Installation
 
 #### Dependencies
