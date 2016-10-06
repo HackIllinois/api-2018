@@ -39,24 +39,19 @@ from your favorite package manager.
 
 The following environment variables can be used to configure the API for your system:
 
-| Variable | Possible Values | Purpose | Used in Config |
-| -------- | --------------- | ------- | -------------- |
-| NODE_ENV | 'production' or 'development' | Determines how environment should be configured | Both |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) | Both |
-| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) | Both |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') | Both |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') | Both |
-| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key | Both |
-| LOCAL_MYSQL_NAME | Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | Development |
-| LOCAL_MYSQL_USERNAME | Any string | Overrides default MySQL username ('root') | Development |
-| LOCAL_MYSQL_PASSWORD | Any string | Overrides default MySQL password ('') | Development |
-| LOCAL_MYSQL_HOST | Any valid URI | Overrides default MySQL host ('127.0.0.1') | Development |
-| LOCAL_MYSQL_PORT | Any valid port number | Overrides default MySQL port (3306) | Development |
-| RDS_DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | Production |
-| RDS_USERNAME | Any string | Overrides default MySQL username ('root') | Production |
-| RDS_PASSWORD | Any string | Overrides default MySQL password ('') | Production |
-| RDS_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') | Production |
-| RDS_PORT | Any valid port number | Overrides default MySQL port (3306) | Production |
+| Variable | Possible Values | Purpose |
+| -------- | --------------- | ------- |
+| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
+| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
+| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
+| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
+| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
+| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
+| DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | 
+| DB_USERNAME | Any string | Overrides default MySQL username ('root') |
+| DB_PASSWORD | Any string | Overrides default MySQL password ('') |
+| DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
+| DB_PORT | Any valid port number | Overrides default MySQL port (3306) |
 
 You should set `NODE_ENV` to `development`, as this variable is required. The API
 will exit with an unsuccessful error code if it finds that this variable is missing.

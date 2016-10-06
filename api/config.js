@@ -86,11 +86,11 @@ config.auth.expiration = '7d';
 config.token.expiration.DEFAULT = '7d';
 config.token.expiration.AUTH = config.token.expiration.DEFAULT;
 
-config.database.primary.host = process.env.RDS_HOSTNAME || process.env.LOCAL_MYSQL_HOST || '127.0.0.1';
-config.database.primary.port = process.env.RDS_PORT || process.env.LOCAL_MYSQL_PORT || 3306;
-config.database.primary.user = process.env.RDS_USERNAME || process.env.LOCAL_MYSQL_USER || 'root';
-config.database.primary.password = process.env.RDS_PASSWORD || process.env.LOCAL_MYSQL_PASSWORD || '';
-config.database.primary.name = process.env.RDS_DB_NAME || process.env.LOCAL_MYSQL_NAME || 'hackillinois-2017';
+config.database.primary.host = process.env.DB_HOSTNAME || '127.0.0.1';
+config.database.primary.port = process.env.DB_PORT || 3306;
+config.database.primary.user = process.env.DB_USERNAME || 'root';
+config.database.primary.password = process.env.DB_PASSWORD || '';
+config.database.primary.name = process.env.DB_NAME || 'hackillinois-2017';
 config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = '5s';
