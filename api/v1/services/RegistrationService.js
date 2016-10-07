@@ -81,8 +81,11 @@ module.exports.findMentorByUserId = function (user_id) {
       var source = "userId";
       throw new errors.NotFoundError(message, source);
     }
-
-    return _Promise.resolve(result);
+    var mentorAndIdeas = {
+      'mentor': result,
+      'ideas':  result.related('ideas')
+    };
+    return _Promise.resolve(mentorAndIdeas);
   });
 };
 
@@ -101,8 +104,11 @@ module.exports.findMentorById = function (id) {
       var source = "id";
       throw new errors.NotFoundError(message, source);
     }
-
-    return _Promise.resolve(result);
+    var mentorAndIdeas = {
+      'mentor': result,
+      'ideas':  result.related('ideas')
+    };
+    return _Promise.resolve(mentorAndIdeas);
   });
 };
 
@@ -117,9 +123,7 @@ module.exports.updateMentorbyUser = function (mentorObject, user) {
   var userId = user.get('id');
   var mentorAttributes = mentorObject['mentor'];
   var mentorIdeas = mentorObject['ideas'];
-  if (!user.hasRoles(utils.roles.ORGANIZERS, false)) {
-    delete mentorAttributes['status'];
-  }
+  delete mentorAttributes['status'];
   return Mentor
   .findByUserId(user.get('id'))
   .then(function (result) {

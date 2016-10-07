@@ -16,7 +16,7 @@ router.use(middleware.request);
 function createMentor(req, res, next) {
   services.RegistrationService.createMentor(req.body, req.user)
   .then(function (mentor) {
-    res.body = mentor.toJSON(); //TODO: change this to reflect what's returned
+    res.body = mentor.toJSON();
 
     next();
     return null;

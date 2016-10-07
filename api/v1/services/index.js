@@ -4,5 +4,6 @@ module.exports = {
 	PermissionService: require('./PermissionService'),
 	StorageService: require('./StorageService'),
 	UserService: require('./UserService'),
-	TokenService: require('./TokenService')
+	TokenService: require('./TokenService'),
+	RegistrationService: require('./TokenService')
 };
