@@ -1,3 +1,5 @@
+//This Controller is used for testing purposes
+
 var bodyParser = require('body-parser');
 
 var errors = require('../errors');
@@ -93,6 +95,57 @@ function getList (req, res, next) {
 		});
 }
 
+function getHash (req, res, next) {
+	var key = req.query.key;
+
+	services.RedisCacheService.getHash(key)
+		.then(function (object){
+			res.body = {}
+			res.body.values = object;
+			next();
+			return null;
+		})
+		.catch(function(error){
+			next(error);
+			return null;
+		});
+}
+
+function updateHash (req, res, next) {
+	var key = req.body.key;
+	var field = req.body.field;
+	var newVal = req.body.newVal;
+
+	services.RedisCacheService.updateHash(key, field, newVal)
+		.then(function(status){
+			res.body = {};
+			res.body.status = status;
+			next();
+			return null;
+		})
+		.catch(function(error){
+			next(error);
+			return null;
+		});
+}
+
+function getHashField (req, res, next) {
+	var key = req.query.key;
+	var field = req.query.field;
+
+	services.RedisCacheService.getHashField(key, field)
+		.then(function(reply){
+			res.body = {};
+			res.body.value = reply;
+			next();
+			return null;
+		})
+		.catch(function(error){
+			next(error);
+			return null;
+		}); 
+}
+
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
@@ -100,9 +153,12 @@ router.use(middleware.request);
 
 router.post('/saveString', saveString);
 router.post('/saveHash', saveHash);
+router.post('/updateHash', updateHash);
 router.post('/saveList', saveList);
 router.get('/getString', getString);
 router.get('/getList', getList);
+router.get('/getHash', getHash);
+router.get('/getHashField', getHashField);
 
 router.use(middleware.response);
 router.use(middleware.errors);
