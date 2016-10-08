@@ -1,28 +1,27 @@
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 
 var errors = require('../errors');
 var roles = require('../utils/roles');
 
 /**
- * Determines whether the provided creator role can create a user
+ * Determines whether the provided creator can create a user
  * with the provided user role
- * @param  {String} creatorRole the role of the creating user
+ * @param  {User} creator 		the intended creator with related role information
  * @param  {String} userRole    the role of the desired user
- * @return {Promise}            resolving whether or not creation should be allowed
+ * @return {Promise<Boolean>}   resolving whether or not creation should be allowed
  * @throws {UnauthorizedError}  when the provided role is not authorized (rejected promise)
  */
-module.exports.canCreateUser = function (creatorRole, userRole) {
-	if (creatorRole === roles.SUPERUSER) {
+module.exports.canCreateUser = function (creator, userRole) {
+	if (creator.hasRole(roles.SUPERUSER)) {
 		// the superuser can create anyone
-		return Promise.resolve(true);
+		return _Promise.resolve(true);
 	}
-	if (roles.isIn(roles.COMMON, userRole) &&
-			roles.isIn(roles.ORGANIZERS, creatorRole)) {
+	if (roles.isIn(roles.COMMON, userRole) && creator.hasRoles(roles.ORGANIZERS)) {
 		// the organizers must be able to create any of the
 		// common roles
-		return Promise.resolve(true);
+		return _Promise.resolve(true);
 	}
 
 	var message = "The requested user cannot be created with the provided credentials";
-	return Promise.reject(new errors.UnauthorizedError(message));
+	return _Promise.reject(new errors.UnauthorizedError(message));
 };

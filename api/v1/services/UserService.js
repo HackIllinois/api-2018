@@ -1,5 +1,5 @@
 var Checkit = require('checkit');
-var Promise = require('bluebird');
+var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var User = require('../models/User');
@@ -18,11 +18,8 @@ var utils = require('../utils');
  */
 module.exports.createUser = function (email, password, role) {
 	email = email.toLowerCase();
-	password = (password) ? password : utils.crypto.generatePassword();
-	var user = User.forge({ email: email, password: password, role: role });
-
-	// TODO: send user an email requiring a password reset when
-	// the password is automatically generated
+	var storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
+	var user = User.forge({ email: email, password: storedPassword });
 
 	return user
 		.validate()
@@ -37,13 +34,15 @@ module.exports.createUser = function (email, password, role) {
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return user.setPassword(password);
+			return User.create(email, storedPassword, role);
 		})
-		.then(function () {
-			return user.save();
-		})
-		.then(function (user) {
-			return Promise.resolve(user);
+		.then(function (result) {
+			if (_.isUndefined(password) || _.isNull(password)) {
+				// TODO: send user an email requiring a password reset when
+				// the password is automatically generated
+			}
+			
+			return _Promise.resolve(result);
 		});
 };
 
@@ -63,7 +62,7 @@ module.exports.findUserById = function (id) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 
@@ -83,7 +82,7 @@ module.exports.findUserByEmail = function (email) {
 				throw new errors.NotFoundError(message, source);
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 
@@ -104,7 +103,7 @@ module.exports.verifyPassword = function (user, password) {
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return Promise.resolve(true);
+			return _Promise.resolve(true);
 		});
 };
 

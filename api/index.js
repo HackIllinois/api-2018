@@ -11,20 +11,14 @@ logger.info("starting superuser setup check in the background");
 var User = require('./v1/models/User');
 var utils = require('./v1/utils/');
 
-User.query().where('Email', config.superuser.email).select('id')
-        .then(function (results) {
-                if (!results.length) {
-                        var superuser = User.forge({ email: config.superuser.email, role: utils.roles.SUPERUSER});
-                        return superuser.setPassword(config.superuser.password);
-                } 
 
-                return null;
-        })
-        .then(function (user) {
-                if (user) {
-                        return user.save();
-                }
-                return null;
-        });
+User.findByEmail(config.superuser.email)
+	.then(function (result) {
+		if (!result) {
+			return User.create(config.superuser.email, config.superuser.password, utils.roles.SUPERUSER);
+		}
+
+		return null;
+	});
 
 module.exports = { v1: v1 };

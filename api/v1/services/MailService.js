@@ -5,7 +5,7 @@
 // NOTE: the sink is active during development! use whitelisted domains to avoid
 // wasting messages on emails that lack a whitelisted domain (and other frustrations)
 
-var promise = require('bluebird');
+var _Promise = require('bluebird');
 var SparkPost = require('sparkpost');
 var _ = require('lodash');
 
@@ -17,8 +17,8 @@ var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
 
 var client = new SparkPost(config.mail.key || 'NONE');
-var transmissionsAsync = promise.promisifyAll(client.transmissions);
-var recipientsAsync = promise.promisifyAll(client.recipientLists);
+var transmissionsAsync = _Promise.promisifyAll(client.transmissions);
+var recipientsAsync = _Promise.promisifyAll(client.recipientLists);
 client.isEnabled = !!config.mail.key;
 
 const CLIENT_NAME = 'SparkPost';
@@ -113,7 +113,7 @@ function send(recipients, template, substitutions) {
 
 	if (_.isEmpty(transmission.recipients)) {
 		handleOperationUnsuccessful(template, recipients, substitutions, RECIPIENTS_NOT_WHITELISTED_REASON);
-		return promise.resolve(true);
+		return _Promise.resolve(true);
 	}
 
 	return transmissionsAsync
@@ -136,7 +136,7 @@ function send(recipients, template, substitutions) {
 function sendToList(list, template, substitutions) {
 	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
 		handleOperationUnsuccessful(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
-		return promise.resolve(true);
+		return _Promise.resolve(true);
 	}
 
 	var recipientList = {
@@ -210,7 +210,7 @@ function removeFromList(user, list) {
 
 function sendDisabled(recipients, template, substitutions) {
 	handleOperationUnsuccessful(template, recipients, substitutions, CLIENT_DISABLED_REASON);
-	return promise.resolve(true);
+	return _Promise.resolve(true);
 }
 
 module.exports.clientName = CLIENT_NAME;

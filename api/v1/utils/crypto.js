@@ -1,14 +1,11 @@
 /* jshint esversion: 6 */
 
 var Sha = require('jssha');
+var uuid = require('node-uuid');
 
 const SHA_TYPE = "SHA-256";
 const SHA_INPUT_TYPE = "TEXT";
 const SHA_OUTPUT_TYPE = "HEX";
-
-const PASSWORD_RADIX = 31;
-const PASSWORD_LENGTH = 33;
-const TOKEN_LENGTH = 33;
 
 /**
  * Provides a weak hash of the provided text
@@ -22,19 +19,10 @@ module.exports.hashWeak = function (text) {
 	return sha256.getHash(SHA_OUTPUT_TYPE);
 };
 
-/**
- * Generates a pseudo-random string
- * @return {String} a significantly-long, pseudo-random string
- */
 module.exports.generatePassword = function () {
-	return createRandomString(PASSWORD_LENGTH);
+	return uuid.v4();
 };
 
-// TODO: Determine the length of the token
 module.exports.generateResetToken = function (){
-	return createRandomString(TOKEN_LENGTH);
+	return uuid.v4();
 };
-
-function createRandomString(length){
-	return Math.random().toString(PASSWORD_RADIX).substring(0, length);
-}
