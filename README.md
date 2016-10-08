@@ -37,44 +37,39 @@ from your favorite package manager.
 
 ## Configuration
 
-The following environment variables can be used to configure the API for your system:
+The API is configured using configuration files placed in the `config` directory. The
+naming convention is `{ENV}.config`, where `{ENV}` is the target environment (like `dev` or `prod`).
 
-| Variable | Possible Values | Purpose |
-| -------- | --------------- | ------- |
-| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
-| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
-| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | 
-| DB_USERNAME | Any string | Overrides default MySQL username ('root') |
-| DB_PASSWORD | Any string | Overrides default MySQL password ('') |
-| DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
-| DB_PORT | Any valid port number | Overrides default MySQL port (3306) |
+We have provided templates in the directory already with all available configuration options.
+These templates are named `{ENV}.config.template`. You should copy these templates into
+files named `{ENV}.config` and fill them with sensible values; these values can be raw
+values or existing environment variables. Note that changes to the templates are
+commited to the project codebase, but changes to any `*.config` files are ignored.
 
-You should set `NODE_ENV` to `development`, as this variable is required. The API
-will exit with an unsuccessful error code if it finds that this variable is missing.
-Typically this is done via a line like so:
-```
-NODE_ENV=development node api.js
-```
-Developers contributing to a feature that involves email transmissions
+Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
+can be made available with configuration options for those systems under the profile
+`hackillinois-api`. We do not handle AWS configuration options in our configuration files.
+
+#### Considerations
+
+Not all configuration options must be set during development (although all options should
+be set in production). When certain keys are left empty, the API determines whether
+or not it can use a local alternative or a default value at startup. Here are some
+considerations that will help you determine which keys to set as you develop:
+
+* Anyone contributing to a feature that involves email transmissions
 will need to set the `HACKILLINOIS_MAIL_KEY` to a valid SparkPost API key.
-
-Developers contributing to a feature that involves any AWS
-products will also need to set up an
-[AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
-with the profile `hackillinois-api`.
+* Anyone contributing to a feature that involves any AWS products will need to set
+up an AWS shared credentials file (see above)
 
 Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
-There are a provided files ```DEV_ENV_CONFIG.template``` and ```PROD_ENV_CONFIG.template``` in the config directory to show how to hold environment variables for use in this application. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
 ## Installation
 
 #### Dependencies
+
 A typical `package.json` is present in the root of the project directory. You can
 use it to install all of the dependencies at once by running the following:
 
@@ -101,25 +96,21 @@ contributors should be familiar with.
 
 ## Starting Up
 
-A local API instance can be created on port 8080 via the following, executed from
-the root of the project directory:
+A local API instance can be created on port 8080 via the following commands,
+executed from the root of the project directory.
 
-```
-node api.js
-```
-If you are using ```ENV_CONFIG``` files then run:
-
-
-For the developer configurations (```DEV_ENV_CONFIG```)
+To run the API for development:
 ```
 npm run dev
 ```
-For the production configurations (```PROD_ENV_CONFIG```)
+
+To run the API in production:
 ```
 npm run prod
 ```
 
-Use `Control-C` to kill the server. Note that `node` must be on your path.
+Use `Control-C` to kill the server. Note that `node` must be on your path and that
+the configuration for the target environment must be present in the `config` directory.
 
 ## Documentation
 
