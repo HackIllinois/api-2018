@@ -2,6 +2,7 @@ var express = require('express');
 
 var config = require('./api/config');
 var database = require('./api/database');
+var redisdb = require('./api/redisdb');
 var logger = require('./api/logging');
 
 // the dirname is local to every module, so we expose the app root's cwd
