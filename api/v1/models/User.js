@@ -37,10 +37,6 @@ User.findById = function (id) {
  * @return {Promise<User>}      the found user, or null
  */
 User.findByEmail = function (email) {
-<<<<<<< HEAD
-        email = email.toLowerCase();
-        return this.collection().query({ where: { email: email } }).fetchOne();
-=======
 	email = email.toLowerCase();
 	return User.where({ email: email }).fetch({ withRelated: ['roles']});
 };
@@ -73,7 +69,6 @@ User.create = function (email, password, role) {
 					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles'], transacting: t });
 				});
 		});
->>>>>>> fddeeedb1fe4f6f171ccb7ba7b40b590b98e0c3b
 };
 
 /**
@@ -82,22 +77,12 @@ User.create = function (email, password, role) {
  * @return {Promise<User>} a Promise resolving to the updated User model
  */
 User.prototype.setPassword = function (password) {
-<<<<<<< HEAD
-        password = crypto.hashWeak(password);
-        return bcrypt
-                .hashAsync(password, SALT_ROUNDS)
-                .bind(this)
-                .then(function (p) {
-                        return Promise.resolve(this.set({ password: p }));
-                });
-=======
 	return bcrypt
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
 		.then(function (p) {
 			return _Promise.resolve(this.set({ password: p }));
 		});
->>>>>>> fddeeedb1fe4f6f171ccb7ba7b40b590b98e0c3b
 };
 
 /**
@@ -154,39 +139,17 @@ User.prototype.hasRoles = function (roles, activeOnly) {
  * of the provided password
  */
 User.prototype.hasPassword = function (password) {
-<<<<<<< HEAD
-        password = crypto.hashWeak(password);
-        return Promise
-                .bind(this)
-                .then(function() {
-                        return bcrypt.compareAsync(password, this.get('password'));
-                });
-=======
 	return _Promise
 		.bind(this)
 		.then(function() {
 			return bcrypt.compareAsync(password, this.get('password'));
 		});
->>>>>>> fddeeedb1fe4f6f171ccb7ba7b40b590b98e0c3b
 };
 
 /**
  * Serializes this User
  * @return {Object} the serialized form of this User
  */
-<<<<<<< HEAD
-User.prototype.toJSON = function () {
-        return _.omit(this.attributes, ['password']);
-};
-
-
-/**
- * Given a user model, purges the user from the database.
- * For complete removals, use this function instead of User.destroy()
- */
-User.prototype.removeAll = function () {
-	
-=======
 User.prototype.serialize = function () {
 	var serialized = _.omit(this.attributes, ['password']);
 
@@ -194,7 +157,6 @@ User.prototype.serialize = function () {
 	serialized.roles = (_.isUndefined(roles)) ? null : roles.serialize();
 
 	return serialized;
->>>>>>> fddeeedb1fe4f6f171ccb7ba7b40b590b98e0c3b
 };
 
 module.exports = User;
