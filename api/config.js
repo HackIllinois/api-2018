@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-// NOTE: all duration are expressed using notation understood by the
+// NOTE: all durations are expressed using notation understood by the
 // `ms` NPM module. These durations must be converted before they are used.
 
 var logger = require('./logging');
@@ -25,12 +25,18 @@ if (!isProduction && !isDevelopment) {
 }
 
 if (!secret) {
-	if (isProduction) {
-		logger.error("set ENV variable HACKILLINOIS_SECRET to a secure, random string");
-		process.exit(1);
-	}
+	logger.error("set ENV variable HACKILLINOIS_SECRET to a secure, random string");
+	process.exit(1);
+}
 
-	secret = 'NONE';
+if (!superuserEmail) {
+	logger.error("set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email");
+	process.exit(1);
+}
+
+if (!superuserPassword) {
+	logger.error("set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
+	process.exit(1);
 }
 
 if (!mailApiKey) {
@@ -40,24 +46,6 @@ if (!mailApiKey) {
 	}
 
 	mailApiKey = undefined;
-}
-
-if (!superuserEmail) {
-	if (isProduction) {
-		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email");
-		process.exit(1);
-	}
-
-	superuserEmail = 'admin@example.com';
-}
-
-if (!superuserPassword) {
-	if (isProduction) {
-		logger.error("set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
-		process.exit(1);
-	}
-
-	superuserPassword = 'ABCD1234!';
 }
 
 var config = {};
@@ -73,8 +61,6 @@ config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT || 8080;
 config.profile = 'hackillinois-api';
-
-config.domain = isDevelopment ? ('http://localhost:' + config.port) : 'https://hackillinois.org';
 
 config.superuser.email = superuserEmail;
 config.superuser.password = superuserPassword;
