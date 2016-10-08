@@ -105,3 +105,18 @@ module.exports.getHashField = function (key, field) {
 			return reply;
 		});
 }
+
+module.exports.expireKey = function (key, duration) {
+	return client.existsAsync(key)
+		.then(function(reply){
+			if(reply != 1){
+				throw new errors.RedisError();
+			}
+		})
+		.then(function(){
+			return client.expireAsync(key, duration);
+		})
+		.then(function(reply){
+			return reply;
+		});
+}

@@ -146,6 +146,23 @@ function getHashField (req, res, next) {
 		}); 
 }
 
+function expireKey (req, res, next) {
+	var key = req.body.key;
+	var duration = req.body.duration;
+
+	services.RedisCacheService.expireKey(key, duration)
+		.then(function(reply){
+			res.body = {};
+			res.body.status = reply;
+			next();
+			return null;
+		})
+		.catch(function(error){
+			next(error);
+			return null;
+		}); 
+}
+
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
@@ -155,6 +172,7 @@ router.post('/saveString', saveString);
 router.post('/saveHash', saveHash);
 router.post('/updateHash', updateHash);
 router.post('/saveList', saveList);
+router.post('/expireKey', expireKey);
 router.get('/getString', getString);
 router.get('/getList', getList);
 router.get('/getHash', getHash);
