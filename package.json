@@ -25,7 +25,7 @@
     "winston": "^2.2.0"
  },
   "scripts": {
-    "dev" : "./resources/scripts/startup.sh DEV",
-    "prod" : "./resources/scripts/startup.sh PROD"
+    "dev" : "./resources/scripts/startup.sh dev",
+    "prod" : "./resources/scripts/startup.sh prod"
   }
 }

@@ -12,6 +12,5 @@ node_modules
 .DS_Store
 temp
 
-ENV_CONFIG
-DEV_ENV_CONFIG
-PROD_ENV_CONFIG
+dev.config
+prod.config

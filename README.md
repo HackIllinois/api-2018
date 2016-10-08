@@ -47,7 +47,7 @@ The following environment variables can be used to configure the API for your sy
 | HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
 | HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
 | HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) | 
+| DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) |
 | DB_USERNAME | Any string | Overrides default MySQL username ('root') |
 | DB_PASSWORD | Any string | Overrides default MySQL password ('') |
 | DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
@@ -71,7 +71,7 @@ Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
-There are a provided files ```DEV_ENV_CONFIG.template``` and ```PROD_ENV_CONFIG.template``` in the config directory to show how to hold environment variables for use in this application. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
+There are a provided files ```dev.config.template``` and ```prod.config.template``` in the config directory to show how to hold environment variables for use in this application. A by creating ```dev.config``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```prod.config``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
 ## Installation
 
 #### Dependencies
@@ -110,11 +110,11 @@ node api.js
 If you are using ```ENV_CONFIG``` files then run:
 
 
-For the developer configurations (```DEV_ENV_CONFIG```)
+For the developer configurations (```dev.config```)
 ```
 npm run dev
 ```
-For the production configurations (```PROD_ENV_CONFIG```)
+For the production configurations (```prod.config```)
 ```
 npm run prod
 ```
