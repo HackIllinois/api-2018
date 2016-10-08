@@ -59,9 +59,6 @@ Typically this is done via a line like so:
 ```
 NODE_ENV=development node api.js
 ```
-To save time, you might add this variable to your PATH, or to a `bash_profile` as
-an export.
-
 Developers contributing to a feature that involves email transmissions
 will need to set the `HACKILLINOIS_MAIL_KEY` to a valid SparkPost API key.
 
@@ -74,7 +71,7 @@ Note that this API is targeted for hosting via AWS, so any AWS-specific settings
 (e.g. those in IAM roles) are used by this API before settings in any environment
 variables or other credentials files.
 
-There are a provided files ```DEV_ENV_CONFIG.template``` and ```PROD_ENV_CONFIG.template``` in the config directory to show how to hold environment variables outside your .profile for use in this application. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
+There are a provided files ```DEV_ENV_CONFIG.template``` and ```PROD_ENV_CONFIG.template``` in the config directory to show how to hold environment variables for use in this application. A by creating ```DEV_ENV_CONFIG``` file in the config directory you can set the environment variables to be loaded for development when you run ```npm run dev```. Similarly  a ```PROD_ENV_CONFIG``` file in the config directory  will configure for the application for production (e.g AWS) when you run ```npm run prod```.
 ## Installation
 
 #### Dependencies
