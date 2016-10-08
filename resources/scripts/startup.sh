@@ -6,7 +6,7 @@ if [ -f config/$1.config ]; then
     while read line; do
         [[ "$line" =~ ^#.*$ ]] && continue
         [ -z "$line" ] && continue
-        export "$line";
+        eval export "$line";
     done < config/$1.config
 else
     if [[ $1 == *"dev"* ]]; then
