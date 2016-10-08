@@ -30,7 +30,7 @@ module.exports.updateHash = function (key, field, newVal) {
 	return client.existsAsync(key)
 		.then(function(reply){
 			if(reply != 1){
-				throw new errors.ApiError();
+				throw new errors.RedisError();
 			}
 			return null;
 		})
@@ -46,7 +46,7 @@ module.exports.getString = function (key) {
 	return client.existsAsync(key)
 		.then(function(reply){
 			if(reply != 1){
-				throw new errors.ApiError();
+				throw new errors.RedisError();
 			}
 			return null;
 		})
@@ -62,7 +62,7 @@ module.exports.getList = function (key, startIndex, endIndex) {
 	return client.existsAsync(key)
 		.then(function(reply){
 			if(reply != 1){
-				throw new errors.ApiError();
+				throw new errors.RedisError();
 			}
 			return null;
 		})
@@ -78,7 +78,7 @@ module.exports.getHash = function (key) {
 	return client.existsAsync(key)
 		.then(function(reply){
 			if(reply != 1){
-				throw new errors.ApiError();
+				throw new errors.RedisError();
 			}
 			return null;
 		})
@@ -94,7 +94,7 @@ module.exports.getHashField = function (key, field) {
 	return client.hexistsAsync(key, field)
 		.then(function(reply){
 			if(reply != 1){
-				throw new errors.ApiError();
+				throw new errors.RedisError();
 			}
 			return null;
 		})
