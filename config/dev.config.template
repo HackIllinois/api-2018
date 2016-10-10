@@ -1,5 +1,5 @@
 ###############################################################################
-#                               PROD_ENV_CONFIG
+#                               DEV_ENV_CONFIG
 ###############################################################################
 #ENV AND PORTS
 NODE_ENV=development
@@ -7,13 +7,13 @@ HACKILLINOIS_PORT=8080
 
 #API KEYS AND PASSWORDS
 HACKILLINOIS_SECRET=VERY_SPECIAL_KEY
-HACKILLINOIS_SUPERUSER_EMAIL=superuser@example.com
-HACKILLINOIS_SUPERUSER_PASSWORD=SECRET_PASSWORD
+HACKILLINOIS_SUPERUSER_EMAIL=admin@example.com
+HACKILLINOIS_SUPERUSER_PASSWORD=ABCD1234!
 HACKILLINOIS_MAIL_KEY=ANOTHER_SPECIAL_KEY
 
 #DATABASE
 DB_NAME=hackillinois-2017
-DB_HOSTNAME=localhost
+DB_HOSTNAME=127.0.0.1
 DB_PORT=3306
 DB_USERNAME=root
-DB_PASSWORD=SECRET_PASSWORD
+DB_PASSWORD=

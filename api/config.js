@@ -16,6 +16,13 @@ var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
+var envShortName;
+if (isProduction) {
+    envShortName = "prod";
+} else {
+    envShortName = "dev";
+}
+
 if (!isProduction && !isDevelopment) {
 	logger.error("an environment was not provided");
 	logger.error("set NODE_ENV to '%s' or '%s'",
@@ -25,23 +32,23 @@ if (!isProduction && !isDevelopment) {
 }
 
 if (!secret) {
-	logger.error("set ENV variable HACKILLINOIS_SECRET to a secure, random string");
+	logger.error(`set ENV variable HACKILLINOIS_SECRET to a secure, random string in config/${envShortName}.config`);
 	process.exit(1);
 }
 
-if (!superuserEmail) {
-	logger.error("set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email");
+if ((isProduction && superuserEmail === 'admin@example.com') || !superuserEmail) {
+	logger.error(`set ENV variable HACKILLINOIS_SUPERUSER_EMAIL to the desired admin email in config/${envShortName}.config`);
 	process.exit(1);
 }
 
-if (!superuserPassword) {
-	logger.error("set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string");
+if ((isProduction && superuserPassword === 'ABCD1234!') || !superuserPassword) {
+	logger.error(`set ENV variable HACKILLINOIS_SUPERUSER_PASSWORD to a secure, random string in config/${envShortName}.config`);
 	process.exit(1);
 }
 
 if (!mailApiKey) {
 	if (isProduction) {
-		logger.error("set ENV variable HACKILLINOIS_MAIL_KEY to the mailing provider's API key");
+		logger.error(`set ENV variable HACKILLINOIS_MAIL_KEY to the mailing provider's API key in config/${envShortName}.config`);
 		process.exit(1);
 	}
 
