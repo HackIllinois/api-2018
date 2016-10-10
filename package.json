@@ -31,6 +31,8 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "chai-http": "^3.0.0"
+    "chai-http": "^3.0.0",
+    "jsmockito": "1.0.5",
+    "jshamcrest": "0.7.0"
   }
 }
