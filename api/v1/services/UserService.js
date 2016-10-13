@@ -81,7 +81,6 @@ module.exports.findUserByEmail = function (email) {
 				var source = "email";
 				throw new errors.NotFoundError(message, source);
 			}
-			console.log(_Promise.resolve(result));
 			return _Promise.resolve(result);
 		});
 };

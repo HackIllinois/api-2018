@@ -1,6 +1,5 @@
 var config = require('./config');
 var logger = require('./logging');
-
 var v1 = require('./v1');
 
 logger.info("starting superuser setup check in the background");
@@ -10,7 +9,6 @@ logger.info("starting superuser setup check in the background");
 // using version-specific functionality
 var User = require('./v1/models/User');
 var utils = require('./v1/utils/');
-
 
 User.findByEmail(config.superuser.email)
 	.then(function (result) {

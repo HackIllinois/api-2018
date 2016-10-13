@@ -99,12 +99,11 @@ function passwordReset(req, res, next) {
 			return null;
 		});
 }
-
 router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
-router.post('', createToken);
+router.post('/', createToken);
 router.get('/refresh', refreshToken);
 router.post('/reset', passwordReset);
 
