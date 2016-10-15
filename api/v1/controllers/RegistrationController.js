@@ -92,6 +92,4 @@ router.put('/mentor/:id', middleware.permission(roles.ORGANIZERS), updateMentorB
 router.use(middleware.response);
 router.use(middleware.errors);
 
-module.exports.createAttendee = createAttendee;
-module.exports.createAccreditedUser = createAccreditedUser;
 module.exports.router = router;

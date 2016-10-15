@@ -3,5 +3,7 @@ module.exports = {
 	MailingListUser: require('./MailingListUser'),
 	User: require('./User'),
 	UserRole: require('./UserRole'),
-	Token: require('./Token')
+	Token: require('./Token'),
+	Mentor: require('./Mentor'),
+	MentorProjectIdea: require('./MentorProjectIdea')
 };

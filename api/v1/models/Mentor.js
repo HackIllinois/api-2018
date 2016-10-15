@@ -9,9 +9,10 @@ var Mentor = Model.extend({
 		last_name:  ['required', 'string', 'maxLength:255'],
 		shirt_size: ['required', 'string', registration.verifyTshirtSize],
 		github:     ['string', 'maxLength:50'],
+		location:    ['required', 'string', 'maxLength:255'],
 		summary:    ['required', 'string', 'maxLength:255'],
 		occupation: ['required', 'string', 'maxLength:255'],
-		status:     ['required', 'string', registration.verifyStatus]
+		user_id:    ['required', 'integer']
 	},
 	ideas: function () {
 		return this.hasMany(MentorProjectIdea);

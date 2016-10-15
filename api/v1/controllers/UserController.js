@@ -111,6 +111,6 @@ router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser
 router.use(middleware.response);
 router.use(middleware.errors);
 
-module.exports.createAttendee = createAttendee;
+module.exports.createUser = createUser;
 module.exports.createAccreditedUser = createAccreditedUser;
 module.exports.router = router;

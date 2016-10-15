@@ -3,5 +3,6 @@ module.exports = {
 	BasicAuthRequest: require('./BasicAuthRequest'),
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
-	UploadRequest: require('./UploadRequest')
+	UploadRequest: require('./UploadRequest'),
+	MentorRegistrationRequest: require('./MentorRegistrationRequest')
 };

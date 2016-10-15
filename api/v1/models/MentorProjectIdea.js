@@ -5,7 +5,8 @@ var MentorProjectIdea = Model.extend({
 	validations: {
     link:           ['required', 'url', 'maxLength:255'],
     contributions:  ['required', 'string', 'maxLength:255'],
-    ideas:          ['required', 'string', 'maxLength:255']
+    ideas:          ['required', 'string', 'maxLength:255'],
+		mentor_id:    ['required', 'integer']
 	}
 });
 

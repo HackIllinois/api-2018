@@ -18,7 +18,7 @@ module.exports.createMentor = function (mentorObject, user) {
   var userId = user.get('id');
   var mentorAttributes = mentorObject['mentor'];
   var mentorIdeas = mentorObject['ideas'];
-  mentorAttributes['userId'] = userId;
+  mentorAttributes['user_id'] = userId;
   if (!user.hasRoles(utils.roles.ORGANIZERS, false)) {
     delete mentorAttributes['status'];
   }
@@ -53,7 +53,7 @@ module.exports.createMentor = function (mentorObject, user) {
               mentorAndIdeas['ideas'].push(idea);
               return idea;
             });
-          });
+          })
         )
         .then(function (result) {
           return mentorAndIdeas;
@@ -135,13 +135,13 @@ module.exports.updateMentorbyUser = function (mentorObject, user) {
     return _Promise.all(
       _.map(result.related('ideas'), function(idea) {
         return idea.destroy();
-      });
+      })
     )
     .then(function(){
       return result;
     });
   })
-  .then(mentor) {
+  .then(function (mentor) {
     mentor.set(mentorAttributes);
     return mentor
     .validate()
@@ -164,7 +164,7 @@ module.exports.updateMentorbyUser = function (mentorObject, user) {
                 mentorAndIdeas['ideas'].push(idea);
                 return idea;
               });
-            });
+            })
           )
           .then(function (result) {
             return mentorAndIdeas;
@@ -199,13 +199,13 @@ module.exports.updateMentorbyId = function (mentorObject, id) {
     return _Promise.all(
       _.map(result.related('ideas'), function(idea) {
         return idea.destroy();
-      });
+      })
     )
     .then(function(){
       return result;
     });
   })
-  .then(mentor) {
+  .then(function (mentor) {
     mentor.set(mentorAttributes);
     return mentor
     .validate()
@@ -228,7 +228,7 @@ module.exports.updateMentorbyId = function (mentorObject, id) {
                 mentorAndIdeas['ideas'].push(idea);
                 return idea;
               });
-            });
+            })
           )
           .then(function (result) {
             return mentorAndIdeas;
