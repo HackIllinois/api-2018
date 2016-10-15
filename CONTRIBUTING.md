@@ -86,7 +86,7 @@ All changes must be reviewed before being merged into the codebase, and some
 additional changes may be requested before the pull request is accepted. In order
 to make this process as easy as possible, be sure to do the following:
 
-* **Select your merge target** to be `staging` or lower, never `master`
+* **Select your merge target** to be `staging` or a branch that has been branched off of `staging`
 * **Provide a general summary** of the changes you've made in 1-3 sentences
 * **Provide specific summaries in check-list format** (skip any that do not apply)
 	* The application/testing changes should come first
@@ -122,6 +122,7 @@ In general, these rules should be followed:
 ### Commit Styleguide
 
 * Provide meaningful, complete commits
+* Keep commit history tidy by squashing commits when appropriate (before pushing)
 * Use the past tense ("added new feature" not "add new feature")
 * Keep messages entirely lowercase and as concise as possible
 * Do not end messages with a period
