@@ -46,17 +46,18 @@ files named `{ENV}.config` and fill them with sensible values; these values can 
 values or existing environment variables. Note that changes to the templates are
 commited to the project codebase, but changes to any `*.config` files are ignored.
 
-A list of configuration options is provided below:
+A list of configuration keys is provided below:
 
-| Variable | Possible Values | Purpose |
-| -------- | --------------- | ------- |
+| Key | Possible Values | Purpose |
+| --- | --------------- | ------- |
 | NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
+| PROFILE | Any string | Presents an externally-meaningful identifier |
 | HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
 | HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
 | HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
 | HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
 | HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any vaild SQL DB name | Overrides default MySQL DB name (hackillinois-2017) |
+| DB_NAME |  Any valid MySQL schema name | Overrides default name (hackillinois) |
 | DB_USERNAME | Any string | Overrides default MySQL username ('root') |
 | DB_PASSWORD | Any string | Overrides default MySQL password ('') |
 | DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
@@ -64,7 +65,8 @@ A list of configuration options is provided below:
 
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
-`hackillinois-api`. We do not handle AWS configuration options in our configuration files.
+identified by the `PROFILE` configuration key. We do not handle AWS-specific configuration
+options in our configuration files.
 
 #### Considerations
 
@@ -98,9 +100,10 @@ Note that your current directory must be the root of the project.
 #### Database
 
 To begin, you will need the [FlywayDB command line tool](http://flywaydb.org/documentation/commandline/).
-Further, you'll need to create a schema called `hackillinois-2017` on your local MySQL instance.
+Further, you'll need to create a new schema for the API on your local MySQL instance.
+Make sure that all configuration keys related to the database have the correct values!
 
-Once you have both of these tasks completed, run `./database/flyway.sh migrate`
+Once you have both of these tasks completed, run `npm run dev-migrations`
 from the root of the project directory. This will run all migration scripts available to-date.
 If you see any errors, such as an inability to access the database, make sure you have
 set up the schema correctly and that you have set any necessary MySQL environment
