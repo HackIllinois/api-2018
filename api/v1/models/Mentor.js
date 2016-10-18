@@ -5,14 +5,14 @@ var Mentor = Model.extend({
 	tableName: 'mentors',
 	idAttribute: 'id',
 	validations: {
-		first_name: ['required', 'string', 'maxLength:255'],
-		last_name:  ['required', 'string', 'maxLength:255'],
-		shirt_size: ['required', 'string', registration.verifyTshirtSize],
+		firstName: ['required', 'string', 'maxLength:255'],
+		lastName:  ['required', 'string', 'maxLength:255'],
+		shirtSize: ['required', 'string', registration.verifyTshirtSize],
 		github:     ['string', 'maxLength:50'],
 		location:    ['required', 'string', 'maxLength:255'],
 		summary:    ['required', 'string', 'maxLength:255'],
 		occupation: ['required', 'string', 'maxLength:255'],
-		user_id:    ['required', 'integer']
+		userId:    ['required', 'integer']
 	},
 	ideas: function () {
 		return this.hasMany(MentorProjectIdea);

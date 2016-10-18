@@ -7,5 +7,5 @@ module.exports = {
 	storage: require('./storage.js'),
 	time: require('./time.js'),
 	registration: require('./registration.js'),
-	validator: require('./validator.js')
+	validators: require('./validators.js')
 };
