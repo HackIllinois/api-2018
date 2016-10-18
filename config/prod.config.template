@@ -1,0 +1,20 @@
+###############################################################################
+#                               PROD_ENV_CONFIG
+###############################################################################
+#ENV AND PORTS
+NODE_ENV=production
+PROFILE=hackillinois-api
+HACKILLINOIS_PORT=8080
+
+#API KEYS AND PASSWORDS
+HACKILLINOIS_SECRET=
+HACKILLINOIS_SUPERUSER_EMAIL=
+HACKILLINOIS_SUPERUSER_PASSWORD=
+HACKILLINOIS_MAIL_KEY=
+
+#DATABASE
+DB_NAME=$PROD_DB_NAME
+DB_HOSTNAME=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
