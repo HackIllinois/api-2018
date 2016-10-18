@@ -1,6 +1,7 @@
 # HackIllinois API (2017)
 
-The back-end services supporting HackIllinois 2017 are stored here.
+The back-end services supporting HackIllinois 2017 are stored here. Looking to
+contribute? See the [contribution guidelines](/CONTRIBUTING.md).
 
 ## Setup
 
