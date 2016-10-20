@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "NODE_ENV=test mocha 'test/test.js' --timeout 10000"
+    "test": "NODE_ENV=test mocha 'test/test.js' --timeout 10000",
+    "dev" : "./resources/scripts/startup.sh dev",
+    "prod" : "./resources/scripts/startup.sh prod",
+    "dev-migrations": "source resources/scripts/env.sh dev && ./database/flyway.sh migrate",
+    "prod-migrations": "source resources/scripts/env.sh prod && ./database/flyway.sh migrate"
   },
   "dependencies": {
     "argparse": "^1.0.7",
