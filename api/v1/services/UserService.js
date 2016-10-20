@@ -17,14 +17,15 @@ var utils = require('../utils');
  * @throws InvalidParameterError when a user exists with the specified email
  */
 module.exports.createUser = function (email, password, role) {
+
 	email = email.toLowerCase();
 	var storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
 	var user = User.forge({ email: email, password: storedPassword });
-
 	return user
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
+			//console.log(email);
 			return User.findByEmail(email);
 		})
 		.then(function (result) {

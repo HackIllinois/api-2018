@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "mocha 'api/v1/test/test.js' --timeout 10000"
+    "test": "NODE_ENV=test mocha 'test/test.js' --timeout 10000"
   },
   "dependencies": {
     "argparse": "^1.0.7",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "jsmockito": "1.0.5",
-    "jshamcrest": "0.7.0"
+    "mock-knex": "^0.3.7",
+    "sinon": "^1.17.6"
   }
 }
