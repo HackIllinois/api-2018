@@ -10,18 +10,13 @@ const PRODUCTION_IDENTIFIER = 'production';
 const TEST_ENVIRONMENT = 'test';
 
 var environment = process.env.NODE_ENV;
-<<<<<<< HEAD
-var secret = process.env.HACKILLINOIS_SECRET;
-var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
-var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
-var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY;
-var isTest = environment === TEST_ENVIRONMENT;
-=======
+
 var secret = process.env.HACKILLINOIS_SECRET || undefined;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL || undefined;
 var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD || undefined;
 var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY || undefined;
->>>>>>> 0a3a7cbe5cea7c3d1d2803fb017066b42cf6b30f
+var isTest = environment === TEST_ENVIRONMENT;
+
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
