@@ -1,4 +1,6 @@
-var Checkit = require('checkit');
+/* jshint esversion: 6 */
+
+var CheckitError = require('checkit').Error;
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
@@ -9,235 +11,123 @@ var errors = require('../errors');
 var utils = require('../utils');
 
 /**
-* Registers a mentor and their project ideas for the given user
-* @param  {Object} mentorObject a JSON object holding the mentor registration
-* @param  {Object} user the user for which a mentor will be registered
-* @return {Promise} resolving to an object in the same format as mentorObject, holding the saved models
-* @throws InvalidParameterError when a mentor exists for the specified user
-*/
-module.exports.createMentor = function (mentorObject, user) {
-	var userId = user.get('id');
-	var mentorAttributes = mentorObject.mentor;
-	var mentorIdeas = mentorObject.ideas;
+ * Persists a mentor and its ideas
+ * @param  {Mentor} mentor	a mentor object to be created/updated
+ * @param  {Array} ideas 	an array of raw mentor attributes
+ * @param  {Transaction} t	a pending transaction
+ * @return {Promise<Mentor>} the mentor with related ideas
+ */
+function _saveMentorAndIdeas(mentor, ideas, t) {
+	return mentor
+		.save(null, { transacting: t })
+		.then(function (mentor) {
+			return _Promise.map(ideas, function (idea) {
+				return mentor.related('ideas').create(idea, { transacting: t });
+			}).return(mentor);
+		});
+}
 
-	mentorAttributes.userId = userId;
+/**
+* Registers a mentor and their project ideas for the given user
+* @param  {Object} user the user for which a mentor will be registered
+* @param  {Object} attributes a JSON object holding the mentor attributes
+* @return {Promise<Mentor>} the mentor with related ideas
+* @throws {InvalidParameterError} when a mentor exists for the specified user
+*/
+var createMentor = function (user, attributes) {
+	var mentorAttributes = attributes.mentor;
+	var mentorIdeas = attributes.ideas;
+
+	mentorAttributes.userId = user.get('id');
 	var mentor = Mentor.forge(mentorAttributes);
 
 	return mentor
 		.validate()
-		.catch(Checkit.Error, utils.errors.handleValidationError)
+		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (validated) {
 			if (user.hasRole(utils.roles.MENTOR, false)) {
-				  var message = "The given user has already registered as a mentor";
+				var message = "The given user has already registered as a mentor";
 				var source = "userId";
 				throw new errors.InvalidParameterError(message, source);
 			}
 
 			return Mentor.transaction(function (t) {
-				return UserRole.addRole(user, utils.roles.MENTOR, false, t)
+				return UserRole
+					.addRole(user, utils.roles.MENTOR, false, t)
 					.then(function (result) {
-						return mentor.save(null, { transacting: t });
-					})
-					.then(function (result) {
-						var mentorAndIdeas = {
-							'mentor': result,
-							'ideas':  []
-						};
-
-						var mentorId = result.get('id');
-						return _Promise.all(_.map(mentorIdeas, function(ideaAttributes) {
-							ideaAttributes.mentorId = mentorId;
-							var projectIdea = MentorProjectIdea.forge(ideaAttributes);
-
-							return projectIdea.save(null, { transacting: t })
-								.then(function(idea) {
-									mentorAndIdeas.ideas.push(idea);
-									return idea;
-								});
-							}))
-							.then(function (result) {
-								return mentorAndIdeas;
-							});
-						});
+						return _saveMentorAndIdeas(mentor, mentorIdeas);
 					});
-				})
-				.then(function (result) {
-					return _Promise.resolve(result);
 				});
-			};
+			});
+};
 
 /**
-* Finds a mentor by querying for the userId
-* @param  {Number} id the User ID to query
-* @return {Promise} resolving to the associated Mentor model
+* Finds a mentor by querying on a user's ID
+* @param  {User} user		the user expected to be associated with a mentor
+* @return {Promise<Mentor>}	resolving to the associated Mentor model
 * @throws {NotFoundError} when the requested mentor cannot be found
 */
-module.exports.findMentorByUserId = function (userId) {
+var findMentorByUser = function (user) {
 	return Mentor
-		.findByUserId(user_id)
-		.then(function (result) {
+		.findByUserId(user.get('id'))
+		.tap(function (result) {
 			if (_.isNull(result)) {
 				var message = "A mentor with the given user ID cannot be found";
 				var source = "userId";
 				throw new errors.NotFoundError(message, source);
 			}
-
-			var mentorAndIdeas = {
-				'mentor': result,
-				'ideas':  result.related('ideas')
-			};
-			return _Promise.resolve(mentorAndIdeas);
 		});
 };
 
 /**
 * Finds a mentor by querying for the given ID
 * @param  {Number} id the ID to query
-* @return {Promise} resolving to the associated Mentor model
+* @return {Promise<Mentor>} resolving to the associated Mentor model
 * @throws {NotFoundError} when the requested mentor cannot be found
 */
-module.exports.findMentorById = function (id) {
+var findMentorById = function (id) {
 	return Mentor
-	.findById(id)
-	.then(function (result) {
-		if (_.isNull(result)) {
-			var message = "A mentor with the given ID cannot be found";
-			var source = "id";
-			throw new errors.NotFoundError(message, source);
-		}
-
-		var mentorAndIdeas = {
-			'mentor': result,
-			'ideas':  result.related('ideas')
-		};
-		return _Promise.resolve(mentorAndIdeas);
-  });
+		.findById(id)
+		.tap(function (result) {
+			if (_.isNull(result)) {
+				var message = "A mentor with the given ID cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
+		});
 };
 
 /**
 * Updates a mentor and their project ideas by relational user
-* @param  {Object} mentorObject a JSON object holding the mentor registration
-* @param  {Object} user the relational user of the mentor to be updated
-* @return {Promise} resolving to an object in the same format as mentorObject, holding the saved models
-* @throws InvalidParameterError when a mentor doesn't exist for the specified user
+* @param  {Mentor} mentor the mentor to be updated
+* @param  {Object} attributes a JSON object holding the mentor registration attributes
+* @return {Promise} resolving to an object in the same format as attributes, holding the saved models
+* @throws {InvalidParameterError} when a mentor doesn't exist for the specified user
 */
-module.exports.updateMentorbyUser = function (mentorObject, user) {
-	var userId = user.get('id');
-	var mentorAttributes = mentorObject.mentor;
-	var mentorIdeas = mentorObject.ideas;
+var updateMentor = function (mentor, attributes) {
+	var mentorAttributes = attributes.mentor;
+	var mentorIdeas = attributes.ideas;
 
-	return Mentor
-		.findByUserId(user.get('id'))
-		.then(function (result) {
-			if (_.isNull(result)) {
-				var message = "A mentor with the given user ID cannot be found";
-				var source = "userId";
-				throw new errors.NotFoundError(message, source);
-			}
-
-			return _Promise.all(_.map(result.related('ideas'), function(idea) {
-				return idea.destroy();
-			}))
-			.then(function(){
-				return result;
-			});
-		})
-		.then(function (mentor) {
-			mentor.set(mentorAttributes);
-			return mentor
-		.validate()
-		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function (validated) {
-			return Mentor.transaction( function(t) {
-				return mentor.save(null, { transacting: t })
-					.then(function(result) {
-						var mentorAndIdeas = {
-							'mentor': result,
-							'ideas':  []
-						};
-						var mentorId = result.get('id');
-						return _Promise.all(_.map(mentorIdeas, function(ideaAttributes) {
-							ideaAttributes.mentorId = mentorId;
-
-							var projectIdea = MentorProjectIdea.forge(ideaAttributes);
-							return projectIdea.save(null, { transacting: t })
-								.then(function(idea) {
-									mentorAndIdeas.ideas.push(idea);
-									return idea;
-								});
-							}))
-							.then(function (result) {
-								return mentorAndIdeas;
-							});
-						});
-					});
-				});
-			})
-			.then(function (result) {
-				return _Promise.resolve(result);
-			});
-		};
-
-/**
-* Updates a mentor and their project ideas by id
-* @param  {Object} mentorObject a JSON object holding the mentor registration
-* @param  {Object} id the id of the mentor to be updated
-* @return {Promise} resolving to an object in the same format as mentorObject, holding the saved models
-* @throws InvalidParameterError when a mentor doesn't exist with the specified id
-*/
-module.exports.updateMentorbyId = function (mentorObject, id) {
-  var mentorAttributes = mentorObject.mentor;
-  var mentorIdeas = mentorObject.ideas;
-  return Mentor
-  .findById(id)
-  .then(function (result) {
-	if (_.isNull(result)) {
-	  var message = "A mentor with the given ID cannot be found";
-	  var source = "id";
-	  throw new errors.NotFoundError(message, source);
-	}
-	return _Promise.all(
-	  _.map(result.related('ideas'), function(idea) {
-		return idea.destroy();
-	  })
-	)
-	.then(function(){
-	  return result;
-	});
-  })
-  .then(function (mentor) {
 	mentor.set(mentorAttributes);
+	mentor.related('ideas').reset();
+
 	return mentor
-	.validate()
-	.catch(Checkit.Error, utils.errors.handleValidationError)
-	.then(function (validated) {
-	  return Mentor.transaction( function(t) {
-		return mentor.save(null, { transacting: t })
-		.then( function(result) {
-		  var mentorAndIdeas = {
-			'mentor': result,
-			'ideas':  []
-		  };
-		  var mentorId = result.get('id');
-		  return _Promise.all(
-			_.map(mentorIdeas, function(ideaAttributes) {
-			  ideaAttributes.mentorId = mentorId;
-			  var projectIdea = MentorProjectIdea.forge(ideaAttributes);
-			  return projectIdea.save(null, { transacting: t })
-			  .then( function(idea) {
-				mentorAndIdeas.ideas.push(idea);
-				return idea;
-			  });
-			})
-		  )
-		  .then(function (result) {
-			return mentorAndIdeas;
-		  });
+		.validate()
+		.catch(CheckitError, utils.errors.handleValidationError)
+		.then(function (validated) {
+			return Mentor.transaction(function (t) {
+				return mentor.related('ideas')
+					.invokeThen('destroy', { transacting: t })
+					.then(function () {
+						return _saveMentorAndIdeas(mentor, mentorIdeas);
+					});
+			});
 		});
-	  });
-	});
-  })
-  .then(function (result) {
-	return _Promise.resolve(result);
-  });
+};
+
+module.exports = {
+	createMentor: createMentor,
+	findMentorByUser: findMentorByUser,
+	findMentorById: findMentorById,
+	updateMentor: updateMentor
 };

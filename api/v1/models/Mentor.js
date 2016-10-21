@@ -1,6 +1,8 @@
+var _ = require('lodash');
 var registration = require('../utils/registration');
 
 var Model = require('./Model');
+var MentorProjectIdea = require('./MentorProjectIdea');
 var Mentor = Model.extend({
 	tableName: 'mentors',
 	idAttribute: 'id',

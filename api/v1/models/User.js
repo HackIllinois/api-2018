@@ -158,12 +158,7 @@ User.prototype.hasPassword = function (password) {
  * @return {Object} the serialized form of this User
  */
 User.prototype.serialize = function () {
-	var serialized = _.omit(this.attributes, ['password']);
-
-	var roles = this.related('roles');
-	serialized.roles = (_.isUndefined(roles)) ? null : roles.serialize();
-
-	return serialized;
+	return _.omit(this.attributes, ['password']);
 };
 
 module.exports = User;

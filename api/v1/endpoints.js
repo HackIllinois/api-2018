@@ -12,11 +12,11 @@ endpoints['/v1/user/reset'] = {
 	POST: requests.ResetTokenRequest
 };
 endpoints['/v1/registration/mentor'] = {
-	POST: requests.MentorCreationRequest,
-	PUT:	requests.MentorUpdateRequest
+	POST: requests.MentorRequest,
+	PUT: requests.MentorRequest
 };
 endpoints['/v1/registration/mentor/:id'] = {
-	PUT:	requests.MentorUpdateRequest
+	PUT: requests.MentorRequest
 };
 endpoints['/v1/auth/reset'] = {
 	POST: requests.ResetPasswordRequest

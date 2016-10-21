@@ -1,10 +1,7 @@
 var bodyParser = require('body-parser');
 
-var errors = require('../errors');
 var services = require('../services');
-var config = require('../../config');
 var middleware = require('../middleware');
-
 var roles = require('../utils/roles');
 
 var router = require('express').Router();
@@ -16,7 +13,7 @@ function _isAuthenticated (req) {
 function createMentor(req, res, next) {
 	delete req.body.status;
 
-	services.RegistrationService.createMentor(req.body, req.user)
+	services.RegistrationService.createMentor(req.user, req.body)
 		.then(function (mentor) {
 			res.body = mentor.toJSON();
 
@@ -30,17 +27,18 @@ function createMentor(req, res, next) {
 }
 
 function fetchMentorByUser(req, res, next) {
-  services.RegistrationService.findMentorByUserId(req.user.get('id'))
-  .then(function(mentor){
-	res.body = mentor.toJSON();
+	services.RegistrationService
+		.findMentorByUser(req.user)
+		.then(function(mentor){
+			res.body = mentor.toJSON();
 
-	next();
-	return null;
-  })
-  .catch(function (error) {
-	next(error);
-	return null;
-  });
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
 }
 
 function fetchMentorById(req, res, next) {
@@ -58,11 +56,15 @@ function fetchMentorById(req, res, next) {
 }
 
 function updateMentorByUser(req, res, next) {
-	if (!req.user.hasRoles(utils.roles.ORGANIZERS)) {
+	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}
 
-	services.RegistrationService.updateMentorByUser(req.body, req.user)
+	services.RegistrationService
+		.findMentorByUser(req.user)
+		.then(function (mentor) {
+			return services.RegistrationService.updateMentor(mentor, req.body);
+		})
 		.then(function(mentor){
 			res.body = mentor.toJSON();
 
@@ -76,12 +78,16 @@ function updateMentorByUser(req, res, next) {
 }
 
 function updateMentorById(req, res, next) {
-	if (!req.user.hasRoles(utils.roles.ORGANIZERS)) {
+	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}
 
-	services.RegistrationService.updateMentorById(req.body, req.params.id)
-		.then(function(mentor){
+	services.RegistrationService
+		.findMentorById(req.params.id)
+		.then (function (mentor) {
+			return services.RegistrationService.updateMentor(mentor, req.body);
+		})
+		.then(function (mentor) {
 			res.body = mentor.toJSON();
 
 			next();

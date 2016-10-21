@@ -1,8 +1,7 @@
 module.exports = {
 	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
 	BasicAuthRequest: require('./BasicAuthRequest'),
-	MentorCreationRequest: require('./MentorCreationRequest'),
-	MentorUpdateRequest: require('./MentorUpdateRequest'),
+	MentorRequest: require('./MentorRequest'),
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
 	UploadRequest: require('./UploadRequest')
