@@ -5,6 +5,37 @@ var _Promise = require('bluebird');
 var sinon = require('sinon');
 
 var UserService;
+var User = require('../api/v1/models/User.js');
+
+///////////////////////////////////////////////////////////////////////////
+//     local stubbing of user model, doesn't require mockery             //
+///////////////////////////////////////////////////////////////////////////
+var findByEmail = function(email) {
+    if (email == 'valid@example.com') {
+        var tUser = User.forge({email: email, password: 'password1'});
+        tUser.attributes.id = 1;
+        return _Promise.resolve(tUser);
+    } else {
+        return _Promise.resolve(null);
+    }
+};
+var findById = function (id) {
+    if (id == 1) {
+        var tUser = User.forge({email: 'valid@example.com', password: 'password1'});
+        tUser.attributes.id = 1;
+        return _Promise.resolve(tUser);
+    } else {
+        return _Promise.resolve(null);
+    }
+};
+var create = function (email, password, role) {
+    var tUser = User.forge({email: email, password: 'password1', role: role});
+    return tUser;
+};
+sinon.stub(User,'findByEmail',findByEmail);
+sinon.stub(User,'findById',findById);
+sinon.stub(User,'create',create);
+////////////////////////////////////////////////////////////////////////////////////
 
 describe('Unit Tests',function(){
 

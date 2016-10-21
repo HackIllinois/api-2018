@@ -30,4 +30,5 @@ var MockedUser = {
         return User.forge(user);
     }
 };
-mockery.registerMock('../models/User', MockedUser);
+// MUST ENABLE FOR MOCKERY - (necessary for global use of the mocked user)
+//mockery.registerMock('../models/User', MockedUser);

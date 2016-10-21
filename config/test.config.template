@@ -2,7 +2,7 @@
 #                               TEST_ENV_CONFIG
 ###############################################################################
 #ENV AND PORTS
-NODE_ENV=TEST
+NODE_ENV=test
 PROFILE=hackillinois-api
 HACKILLINOIS_PORT=8080
 
