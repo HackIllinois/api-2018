@@ -4,14 +4,14 @@ var mockery = require('mockery');
 var _Promise = require('bluebird');
 var sinon = require('sinon');
 
-var mockedUser = require('./mocked/User.js');
-
 var UserService;
-var User;
 
 describe('Unit Tests',function(){
 
     before(function(done) {
+
+        require('./mocked/index');
+
         mockery.enable({
             warnOnUnregistered: false
         });
@@ -23,14 +23,8 @@ describe('Unit Tests',function(){
 
     describe('Check User Services',function(){
 
-        before(function(done){
-            User = '../models/User';
-            mockery.registerMock(User, mockedUser);
-            done();
-        });
-
         describe('Test UserService.findUserByEmail',function(){
-            it('checks for valid email',function(done){
+            it('checks with valid email',function(done){
                 UserService.findUserByEmail('valid@email.com')
                     .then(function(result){
                         //console.log(result.attributes);
@@ -39,7 +33,7 @@ describe('Unit Tests',function(){
                         done();
                     });
             });
-            it('checks for invalid email',function(done){
+            it('checks with invalid email',function(done){
                 UserService.findUserByEmail('invalid@email.com')
                     .then(function(result){
                         throw new errors.ExistsError('Bad null search','email');
@@ -52,7 +46,7 @@ describe('Unit Tests',function(){
         });
 
         describe('Test User.Service.createUser',function(){
-            it('checks for user creating with valid email',function(done){
+            it('checks for user creation with valid email',function(done){
                 UserService.createUser('create@email.com','password1','ATTENDEE')
                     .then(function(result){
                         assert.equal(result.attributes.email,'create@email.com','Should return user object with passed email');
@@ -71,9 +65,25 @@ describe('Unit Tests',function(){
             });
         });
 
-        after(function(done){
-            mockery.deregisterMock(User);
-            done();
+        describe('Test User.Service.findUserById',function(){
+            it('checks for finding user with valid id',function(done){
+                UserService.findUserById(1)
+                    .then(function(result){
+                        assert.equal(result.attributes.email,'valid@email.com','User\'s email should be the input')
+                        assert.equal(result.attributes.id, 1, 'User\'s id should be 1');
+                        done();
+                    });
+            });
+            it('checks for find failure with invalid id',function(done){
+                UserService.findUserById(2)
+                    .then(function(result){
+                        throw new errors.ExistsError('Bad null search','email');
+                    })
+                    .catch(function(e){
+                        assert.equal(e.type,'NotFoundError','Should throw error if user doesn\'t exists');
+                        done();
+                    });
+            });
         });
 
     });
