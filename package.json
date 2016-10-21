@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "test": "NODE_ENV=test mocha 'test/test.js' --timeout 10000",
-    "dev" : "./resources/scripts/startup.sh dev",
-    "prod" : "./resources/scripts/startup.sh prod",
+    "dev": "./resources/scripts/startup.sh dev",
+    "prod": "./resources/scripts/startup.sh prod",
     "dev-migrations": "source resources/scripts/env.sh dev && ./database/flyway.sh migrate",
     "prod-migrations": "source resources/scripts/env.sh prod && ./database/flyway.sh migrate"
   },
@@ -36,7 +36,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "mock-knex": "^0.3.7",
-    "sinon": "^1.17.6"
+    "mockery": "^2.0.0"
   }
 }
