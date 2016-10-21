@@ -41,6 +41,10 @@ User.findByEmail = function (email) {
 	return User.where({ email: email }).fetch({ withRelated: ['roles']});
 };
 
+User.myf = function() {
+    console.log('production!');
+};
+
 /**
  * Creates a new user with the specified parameters and role. The role will be
  * set to active if user creation succeeds. Validation is performed on-save only
