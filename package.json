@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "HACKILLINOIS_SECRET=ASFDSDF HACKILLINOIS_SUPERUSER_EMAIL=admin@example.com HACKILLINOIS_SUPERUSER_PASSWORD=ABCD1234! NODE_ENV=test mocha 'test/test.js' --timeout 10000",
+    "test": "source resources/scripts/env.sh test && mocha 'test/test.js' -b —full-trace",
     "dev": "./resources/scripts/startup.sh dev",
     "prod": "./resources/scripts/startup.sh prod",
     "dev-migrations": "source resources/scripts/env.sh dev && ./database/flyway.sh migrate",
@@ -36,6 +36,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "mockery": "^2.0.0"
+    "mockery": "^2.0.0",
+    "sinon": "^1.17.6"
   }
 }

@@ -6,7 +6,7 @@ var MockedUser = {
 
     findById : function (id) {
         if (id == 1) {
-            var tUser = User.forge({email: 'valid@email.com', password: 'password1'});
+            var tUser = User.forge({email: 'valid@example.com', password: 'password1'});
             tUser.attributes.id = 1;
             return _Promise.resolve(tUser);
         } else {
@@ -14,7 +14,7 @@ var MockedUser = {
         }
     },
     findByEmail : function(email) {
-        if (email == 'valid@email.com') {
+        if (email == 'valid@example.com') {
             var tUser = User.forge({email: email, password: 'password1'});
             tUser.attributes.id = 1;
             return _Promise.resolve(tUser);

@@ -23,7 +23,6 @@ var KNEX_CONFIG = {
 
 function DatabaseManager() {
 	this._knex = Knex(KNEX_CONFIG);
-	this._knex = (config.isTest) ? require('mock-knex').mock(this._knex) : this._knex;
 
 	this._bookshelf = Bookshelf(this._knex);
 }
