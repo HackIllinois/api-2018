@@ -25,7 +25,6 @@ module.exports.createUser = function (email, password, role) {
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
-			//console.log(email);
 			return User.findByEmail(email);
 		})
 		.then(function (result) {
@@ -34,7 +33,6 @@ module.exports.createUser = function (email, password, role) {
 				var source = "email";
 				throw new errors.InvalidParameterError(message, source);
 			}
-
 			return User.create(email, storedPassword, role);
 		})
 		.then(function (result) {

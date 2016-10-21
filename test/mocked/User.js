@@ -4,11 +4,17 @@ var _Promise = require('bluebird');
 
 User.findById = function(){
 
-}
+};
 User.findByEmail = function(email){
-    var tUser = new User(); tUser.attributes.id = 1;
-    return _Promise.resolve(tUser);
-}
-User.create = function(){
-
-}
+    if (email=='valid@email.com') {
+        var tUser = User.forge({email: email,password: 'password1'});
+        tUser.attributes.id = 1;
+        return _Promise.resolve(tUser);
+    }else{
+        return _Promise.resolve(null);
+    }
+};
+User.create = function(email,password,role){
+    var tUser = User.forge({email: email,password: 'password1',role:role});
+    return tUser;
+};
