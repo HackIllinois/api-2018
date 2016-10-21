@@ -111,10 +111,6 @@ var MockedUser = {
     create: function(email, password, role) {
         var model = MockedUserModel(email, password, role);
         return model;
-    },
-
-    myf: function() {
-	console.log('hello!');
     }
 };
 
