@@ -108,21 +108,51 @@ var updateMentor = function (mentor, attributes) {
 	var mentorAttributes = attributes.mentor;
 	var mentorIdeas = attributes.ideas;
 
+	// TODO clean this up!!
 	mentor.set(mentorAttributes);
-	mentor.related('ideas').reset();
 
 	return mentor
 		.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (validated) {
+			var newIdeas = [];
+			var updatedIdeas = [];
+			var updatedIdeaIds = [];
+
+			_.forEach(mentorIdeas, function (idea) {
+				if (!_.has(idea, 'id')) {
+					newIdeas.push(idea);
+				} else if (_.isUndefined(mentor.related('ideas').get(idea.id))) {
+					const MESSAGE = "A MentorProjectIdea with the given ID does not exist";
+					const SOURCE = "idea.id";
+					throw new errors.NotFoundError(MESSAGE, SOURCE);
+				} else {
+					updatedIdeas.push(mentor.related('ideas').get(idea.id).set(idea));
+					updatedIdeaIds.push(idea.id);
+				}
+			});
+
+			return _Promise.all([newIdeas, updatedIdeas, updatedIdeaIds]);
+		})
+		.spread(function (newIdeas, updatedIdeas, updatedIdeaIds){
 			return Mentor.transaction(function (t) {
 				return mentor.related('ideas')
-					.invokeThen('destroy', { transacting: t })
+					.query().transacting(t)
+					.whereNotIn('id', updatedIdeaIds)
+					.delete()
+					.catch(Mentor.NoRowsDeletedError, function () { return null; })
 					.then(function () {
-						return _saveMentorAndIdeas(mentor, mentorIdeas);
+						mentor.related('ideas').reset();
+						return _Promise.map(updatedIdeas, function (idea) {
+							mentor.related('ideas').add(idea);
+							return idea.save(null, { transacting: t, require: false });
+						});
+					})
+					.then(function () {
+						return _saveMentorAndIdeas(mentor, newIdeas, t);
 					});
+				});
 			});
-		});
 };
 
 module.exports = {
