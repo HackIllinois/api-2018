@@ -28,6 +28,65 @@ function _saveMentorAndIdeas(mentor, ideas, t) {
 }
 
 /**
+ * Determines which ideas are new and which are
+ * existing ones that need to be updated
+ * @param  {Mentor} mentor		the Mentor with whom the ideas are associated
+ * @param  {Array} mentorIdeas	the list of MentorProjectIdea objects/attributes
+ * @return {Array}				containing the new ideas, updated ideas, and ids of updated ideas
+ */
+function _extractMentorIdeas(mentor, mentorIdeas) {
+	var newIdeas = [];
+	var updatedIdeas = [];
+	var updatedIdeaIds = [];
+
+	_.forEach(mentorIdeas, function (idea) {
+		var MESSAGE, SOURCE;
+		if (!_.has(idea, 'id')) {
+			newIdeas.push(idea);
+		} else if (_.isUndefined(mentor.related('ideas').get(idea.id))) {
+			MESSAGE = "A MentorProjectIdea with the given ID does not exist";
+			SOURCE = "idea.id";
+			throw new errors.NotFoundError(MESSAGE, SOURCE);
+		} else if (mentor.related('ideas').get(idea.id).get('mentorId') !== mentor.get('id')){
+			MESSAGE = "A MentorProjectIdea that does not belong to this mentor cannot be updated here";
+			throw new errors.UnauthorizedError(MESSAGE);
+		} else {
+			// TODO remove this once Request validator can marshal recursively
+			idea.mentorId = mentor.get('id');
+
+			updatedIdeas.push(mentor.related('ideas').get(idea.id).set(idea));
+			updatedIdeaIds.push(idea.id);
+		}
+	});
+
+	return _Promise.all([newIdeas, updatedIdeas, updatedIdeaIds]);
+}
+
+/**
+ * Removes unwanted ideas and updates desired ideas
+ * @param  {Mentor} mentor			the Mentor with whom the ideas are associated
+ * @param  {Array} updatedIdeas		a list of related MentorProjectIdeas with new attributes
+ * @param  {Array} updatedIdeaIds	a list of the ids contained in the updatedIdeas
+ * @param  {Transaction} t			a pending transaction
+ * @return {Promise<>}				a promise indicating all changes have been added to the transaction
+ */
+function _adjustMentorIdeas(mentor, updatedIdeas, updatedIdeaIds, t) {
+	return mentor.related('ideas')
+		.query().transacting(t)
+		.whereNotIn('id', updatedIdeaIds)
+		.delete()
+		.catch(Mentor.NoRowsDeletedError, function () { return null; })
+		.then(function () {
+			mentor.related('ideas').reset();
+
+			return _Promise.map(updatedIdeas, function (idea) {
+				mentor.related('ideas').add(idea);
+				return idea.save(null, { transacting: t, require: false });
+			});
+		});
+}
+
+/**
 * Registers a mentor and their project ideas for the given user
 * @param  {Object} user the user for which a mentor will be registered
 * @param  {Object} attributes a JSON object holding the mentor attributes
@@ -108,46 +167,17 @@ var updateMentor = function (mentor, attributes) {
 	var mentorAttributes = attributes.mentor;
 	var mentorIdeas = attributes.ideas;
 
-	// TODO clean this up!!
 	mentor.set(mentorAttributes);
 
 	return mentor
 		.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function (validated) {
-			var newIdeas = [];
-			var updatedIdeas = [];
-			var updatedIdeaIds = [];
-
-			_.forEach(mentorIdeas, function (idea) {
-				if (!_.has(idea, 'id')) {
-					newIdeas.push(idea);
-				} else if (_.isUndefined(mentor.related('ideas').get(idea.id))) {
-					const MESSAGE = "A MentorProjectIdea with the given ID does not exist";
-					const SOURCE = "idea.id";
-					throw new errors.NotFoundError(MESSAGE, SOURCE);
-				} else {
-					updatedIdeas.push(mentor.related('ideas').get(idea.id).set(idea));
-					updatedIdeaIds.push(idea.id);
-				}
-			});
-
-			return _Promise.all([newIdeas, updatedIdeas, updatedIdeaIds]);
+		.then(function (){
+			return _extractMentorIdeas(mentor, mentorIdeas);
 		})
 		.spread(function (newIdeas, updatedIdeas, updatedIdeaIds){
 			return Mentor.transaction(function (t) {
-				return mentor.related('ideas')
-					.query().transacting(t)
-					.whereNotIn('id', updatedIdeaIds)
-					.delete()
-					.catch(Mentor.NoRowsDeletedError, function () { return null; })
-					.then(function () {
-						mentor.related('ideas').reset();
-						return _Promise.map(updatedIdeas, function (idea) {
-							mentor.related('ideas').add(idea);
-							return idea.save(null, { transacting: t, require: false });
-						});
-					})
+				return _adjustMentorIdeas(mentor, updatedIdeas, updatedIdeaIds, t)
 					.then(function () {
 						return _saveMentorAndIdeas(mentor, newIdeas, t);
 					});
