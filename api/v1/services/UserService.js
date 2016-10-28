@@ -85,7 +85,7 @@ module.exports.findUserByEmail = function (email) {
 };
 
 /**
- * Verifies that the provided password matches that of the user's password
+ * Verifies that the provided password matches the user's password
  * @param  {User} user a User model
  * @param  {String} password the value to verify
  * @return {Promise} resolving to the validity of the provided password
