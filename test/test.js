@@ -1,2 +1,5 @@
+var chai = require('chai');
+chai.use(require('chai-as-promised'));
 
-require('./serviceTests/UserService.js');
+// TODO unit tests go here
+require('./user.js');
