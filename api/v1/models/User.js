@@ -85,6 +85,7 @@ User.prototype.setPassword = function (password) {
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
 		.then(function (p) {
+			console.log(p);
 			return _Promise.resolve(this.set({ password: p }));
 		});
 };
