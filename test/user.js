@@ -24,10 +24,13 @@ describe('UserService',function(){
 
 				_createUser = sinon.stub(User, 'create');
 				_findByEmail = sinon.stub(User, 'findByEmail');
+				_findById = sinon.stub(User, 'findById');
 
 				_createUser.withArgs(sinon.match.string, sinon.match.string, sinon.match.string).returns(_Promise.resolve(testUser));
 				_findByEmail.withArgs('existing@example.com').returns(_Promise.resolve(testUser));
 				_findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
+				_findById.withArgs(1).returns(_Promise.resolve(testUser));
+				_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 
 				done();
 			});
@@ -82,27 +85,20 @@ describe('UserService',function(){
 		});
 	});
 
-	//
-	// describe('findUserById',function(){
-	//     it('finds existing user',function(done){
-	//         UserService.findUserById(1)
-	//             .then(function(result){
-	//                 assert.equal(result.attributes.email,'valid@example.com',"User's email should be the input")
-	//                 assert.equal(result.attributes.id, 1, "User's id should be 1");
-	//                 done();
-	//             });
-	//     });
-	//     it('searches for non-existent user',function(done){
-	//         UserService.findUserById(2)
-	//             .then(function(result){
-	//                 throw new errors.ExistsError('Bad null search','email');
-	//             })
-	//             .catch(function(e){
-	//                 assert.equal(e.type,'NotFoundError',"Should throw error if user doesn't exists");
-	//                 done();
-	//             });
-	//     });
-	// });
+	describe('findUserById',function(){
+		it('finds existing user',function(done){
+			var user = UserService.findUserById(1);
+			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should 1, the searched for ID");
+			expect(user).to.eventually.have.deep.property("attributes.email",
+				'new@example.com',"email should new@example.com");
+			done();
+		});
+		it('throws exception after searching for non-existent user',function(done){
+			var user = UserService.findUserById(2);
+			expect(user).to.eventually.be.rejectedWith(errors.NotFoundError);
+			done();
+		});
+	});
 	//
 	// describe('verifyPassword',function(){
 	//     it('verifies correct password',function(done){
