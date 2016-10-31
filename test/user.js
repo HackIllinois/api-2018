@@ -11,7 +11,6 @@ var User = require('../api/v1/models/User.js');
 var assert = chai.assert;
 var expect = chai.expect;
 
-// TODO move these to separate file
 describe('UserService',function(){
 	describe('createUser', function () {
 		var _createUser;
@@ -24,13 +23,10 @@ describe('UserService',function(){
 
 				_createUser = sinon.stub(User, 'create');
 				_findByEmail = sinon.stub(User, 'findByEmail');
-				_findById = sinon.stub(User, 'findById');
 
 				_createUser.withArgs(sinon.match.string, sinon.match.string, sinon.match.string).returns(_Promise.resolve(testUser));
 				_findByEmail.withArgs('existing@example.com').returns(_Promise.resolve(testUser));
 				_findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
-				_findById.withArgs(1).returns(_Promise.resolve(testUser));
-				_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 
 				done();
 			});
@@ -86,43 +82,79 @@ describe('UserService',function(){
 	});
 
 	describe('findUserById',function(){
+		var _findById;
+		before(function(done){
+			var testUser = User.forge({ id: 1, email: 'new@example.com' });
+			testUser.setPassword('password123');
+
+				_findById = sinon.stub(User, 'findById');
+
+				_findById.withArgs(1).returns(_Promise.resolve(testUser));
+				_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+
+				done();
+		});
 		it('finds existing user',function(done){
 			var user = UserService.findUserById(1);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should 1, the searched for ID");
-			expect(user).to.eventually.have.deep.property("attributes.email",
-				'new@example.com',"email should new@example.com");
-			done();
+			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should 1, the searched for ID").then(function(){
+				expect(user).to.eventually.have.deep.property("attributes.email",
+						'new@example.com',"email should new@example.com").notify(done);
+			})
 		});
 		it('throws exception after searching for non-existent user',function(done){
 			var user = UserService.findUserById(2);
-			expect(user).to.eventually.be.rejectedWith(errors.NotFoundError);
+			expect(user).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+		});
+		after(function(done){
+			_findById.restore();
 			done();
 		});
 	});
-	//
-	// describe('verifyPassword',function(){
-	//     it('verifies correct password',function(done){
-	//         var email = 'password@example.com';
-	//         var password = 'password1';
-	//         var tUser = User.forge({email: email, password: password});
-	//         UserService.verifyPassword(tUser, password)
-	//             .then(function(result){
-	//                 assert.equal(result, true, "Password should match");
-	//                 done();
-	//             });
-	//     });
-	//     it('verifies correct response for incorrect password',function(done){
-	//         var email = 'password@example.com';
-	//         var password = 'password1';
-	//         var tUser = User.forge({email: email, password: password});
-	//         UserService.verifyPassword(tUser, 'wrongPassword')
-	//             .then(function(result){
-	//                 throw new errors.ExistsError('Password should not match','email');
-	//             })
-	//             .catch(function(e){
-	//                 assert.equal(e.type, 'InvalidParameterError', "Incorrect password should throw error");
-	//                 done();
-	//             });
-	//     });
-	// });
+
+	describe('verifyPassword',function(){ 
+		var testUser; 
+		before(function(done){
+			testUser = User.forge({ id: 1, email: 'new@example.com' });
+			testUser.setPassword('password123')
+				.then(function(updatedUser){
+					testUser = updatedUser;
+					done();
+				});
+		});  
+		it('tries a correct password',function(done){ 
+			var user = UserService.verifyPassword(testUser,"password123"); 
+			expect(user).to.eventually.equal(true).and.notify(done); 
+		}); 
+		it('tries an incorrect password',function(done){ 
+			var user = UserService.verifyPassword(testUser,"wrongPassword"); 
+			expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done)
+		}); 
+	});
+
+	describe('resetPassword',function(){
+		var testUser;
+		var _save;
+		before(function(done){
+			testUser = User.forge({ id: 1, email: 'new@example.com' });
+			testUser.setPassword('password123')
+				.then(function(updatedUser){
+					testUser = updatedUser;
+
+					_save = sinon.stub(User.prototype,'save');
+					_save.withArgs().returns(this);
+
+					done();
+				});
+		});
+		it('resets password',function(done){
+			var user = UserService.resetPassword(testUser,'password456').then(function(updatedUser){
+				return UserService.verifyPassword(updatedUser,"password456");
+			});
+			expect(user).to.eventually.equal(true).and.notify(done);
+		});
+		after(function(done){
+			_save.restore();
+			done();
+		});
+	})
 });

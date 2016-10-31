@@ -34,7 +34,6 @@ module.exports.findTokenByValue = function(value, scope) {
 			var tokenExpiration = Date.parse(result.get('created')) + expiration;
 			if (tokenExpiration < Date.now())
 			{
-				// Invalid token (expired)
 				result.destroy();
 				return Promise.reject(new errors.TokenExpirationError());
 			}
@@ -54,6 +53,8 @@ module.exports.findTokenByValue = function(value, scope) {
 module.exports.generateToken = function(user, scope){
 	var tokenVal = utils.crypto.generateResetToken();
 	var userId = user.get('id');
+
+	//Token.where({user_id: userId, type: scope}).fetchAll().then(function(data){console.log(data)});
 
 	return Token
 		.where({user_id: userId, type: scope}).fetchAll()
