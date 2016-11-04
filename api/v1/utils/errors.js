@@ -6,8 +6,16 @@ var InvalidParameterError = require('../errors/InvalidParameterError');
  * @throws {InvalidParameterError} the re-thrown error
  */
 module.exports.handleValidationError = function (error) {
-	var errorSource = error.keys()[0];
-	var errorDetail = error.errors[errorSource].message;
+	var errorKey = error.keys()[0];
+	var specificError = error.errors[errorKey];
+
+	var errorDetail = specificError.message;
+	var errorSource;
+	while (specificError.key) {
+		// find the most-complete error source in the error stack
+		errorSource = specificError.key;
+		specificError = (specificError.errors) ? specificError.errors[0] : undefined;
+	}
 
 	throw new InvalidParameterError(errorDetail, errorSource);
 };
