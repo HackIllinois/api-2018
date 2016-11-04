@@ -6,6 +6,7 @@ var mentorValidations = {
 	firstName: ['required', 'string', 'maxLength:255'],
 	lastName:  ['required', 'string', 'maxLength:255'],
 	shirtSize: ['required', 'string', registration.verifyTshirtSize],
+	status: ['string', registration.verifyStatus],
 	github:     ['required', 'string', 'maxLength:50'],
 	location:    ['required', 'string', 'maxLength:255'],
 	summary:    ['required', 'string', 'maxLength:255'],

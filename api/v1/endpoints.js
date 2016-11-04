@@ -2,7 +2,7 @@ var requests = require('./requests');
 
 var endpoints = {};
 
-endpoints['/v1/user/'] = {
+endpoints['/v1/user'] = {
 	POST: requests.BasicAuthRequest
 };
 endpoints['/v1/user/accredited'] = {
