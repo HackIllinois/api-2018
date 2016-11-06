@@ -4,6 +4,7 @@ var router = require('express').Router();
 
 var errors = require('../errors');
 var config = require('../../config');
+var roles = require('../utils/roles');
 
 var ProjectService = require('../services/ProjectService');
 
@@ -16,8 +17,13 @@ function createProject (req, res, next) {
 	attributes.repo = req.body.repo;
 	attributes.isPublished = req.body.isPublished;
 
+	console.log(attributes);
+
 	ProjectService
-		.createProject(attributes)
+		.canCreateProject(req.user)
+		.then(function (isAuthed) {
+			return ProjectService.createProject(attributes);
+		})
 		.then(function (newProject) {
 			res.body = newProject.toJSON();
 
@@ -34,7 +40,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
-router.post('/', createProject);
+router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 
 router.use(middleware.response);
 router.use(middleware.errors);

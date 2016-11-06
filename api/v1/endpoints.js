@@ -30,5 +30,8 @@ endpoints['/v1/upload/resume'] = {
 endpoints['/v1/upload/resume/:id'] = {
 	PUT: requests.UploadRequest
 };
+endpoints['/v1/project'] = {
+	POST: requests.ProjectCreationRequest
+};
 
 module.exports = endpoints;
