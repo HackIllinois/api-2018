@@ -7,8 +7,8 @@ var Project = Model.extend({
 		name: ['required', 'string', 'maxLength:100'],
 		description: ['required', 'string', 'maxLength:200'],
 		repo: ['string', 'maxLength:255'],
-		is_published: ['required', 'boolean']
+		is_published: ['boolean']
 	}
 });
 
-module.exports Project;
+module.exports = Project;
