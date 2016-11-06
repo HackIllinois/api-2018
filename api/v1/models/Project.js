@@ -11,4 +11,13 @@ var Project = Model.extend({
 	}
 });
 
+Project.findByName = function (name) {
+	name = name.toLowerCase();
+	return Project.where({ name:name }).fetch();
+}
+
+Project.findById = function (id) {
+	return Project.where({ id:id }).fetch();
+}
+
 module.exports = Project;

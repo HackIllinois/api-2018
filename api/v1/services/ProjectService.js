@@ -26,15 +26,42 @@ module.exports.createProject = function (attributes) {
 		attributes.isPublished = 0; //false
 	}
 
+	attributes.name = attributes.name.toLowerCase();
+
 	var project = Project.forge(attributes);
 	return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
+			return Project.findByName(attributes.name);
+		})
+		.then(function (result){
+			if (!_.isNull(result)) {
+				var message = "A project with the given name already exists";
+				var source = "name";
+				throw new errors.InvalidParameterError(message, source);
+			}
+
 			return project
 				.save()
 				.then(function (project) {
 					return project;
 				});
+		})
+}
+
+module.exports.findProjectById = function (id) {
+	return Project
+		.findById(id)
+		.then(function (result){
+			if(_.isNull(result)){
+				var message = "A project with the given ID cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
+
+			return _Promise.resolve(result);
 		});
 }
+
+
