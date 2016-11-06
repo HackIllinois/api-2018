@@ -1,7 +1,7 @@
 var roles = require('../utils/roles');
 var Request = require('./Request');
 
-var bodyRequired = ['name', 'description'];
+var bodyRequired = ['name', 'description', 'repo', 'is_published'];
 var bodyValidations = {
 	'name': ['string', 'required'],
 	'description': ['string', 'required'],

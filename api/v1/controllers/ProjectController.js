@@ -15,9 +15,7 @@ function createProject (req, res, next) {
 	attributes.name = req.body.name;
 	attributes.description = req.body.description;
 	attributes.repo = req.body.repo;
-	attributes.isPublished = req.body.isPublished;
-
-	console.log(attributes);
+	attributes.is_published = req.body.is_published;
 
 	ProjectService
 		.canCreateProject(req.user)
@@ -40,7 +38,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
-router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
+router.post('/', middleware.permission(roles.ALL), createProject);
 
 router.use(middleware.response);
 router.use(middleware.errors);
