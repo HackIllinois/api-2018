@@ -53,7 +53,7 @@ module.exports.createProject = function (attributes) {
 module.exports.findProjectById = function (id) {
 	return Project
 		.findById(id)
-		.then(function (result){
+		.then(function (result) {
 			if(_.isNull(result)){
 				var message = "A project with the given ID cannot be found";
 				var source = "id";
@@ -64,4 +64,7 @@ module.exports.findProjectById = function (id) {
 		});
 }
 
+module.exports.updateProject = function (project, key, value) {
+	return project.set(key, value).save();
+}
 

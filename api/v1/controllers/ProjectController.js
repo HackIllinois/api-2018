@@ -41,7 +41,28 @@ function getProject (req, res, next) {
 		.findProjectById(id)
 		.then(function (project) {
 			res.body = project.toJSON();
-			res.body.test = "test";
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
+function updateProject (req, res, next) {
+	var id = req.params.id;
+	var key = req.body.key;
+	var value = req.body.value;
+
+	ProjectService
+		.findProjectById(id)
+		.then(function (project) {
+			return ProjectService.updateProject(project, key, value);
+		})
+		.then(function (project) {
+			res.body = project.toJSON();
 
 			next();
 			return null;
@@ -58,6 +79,7 @@ router.use(middleware.request);
 
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
+router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
 
 router.use(middleware.response);
 router.use(middleware.errors);
