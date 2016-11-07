@@ -10,6 +10,8 @@ var Token = require('../api/v1/models/Token.js');
 var User = require('../api/v1/models/User.js');
 var _ = require('lodash');
 
+var shelf = require('bookshelf');
+
 
 var assert = chai.assert;
 var expect = chai.expect;
