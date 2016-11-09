@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 
+var client = require('../../aws');
 var config = require('../../config');
 var files = require('../../files');
 var errors = require('../errors');
@@ -8,10 +9,6 @@ var Upload = require('../models/Upload');
 var uuid = require('node-uuid');
 var _Promise = require('bluebird');
 var _ = require('lodash');
-
-var client = require('aws-sdk');
-client.config.credentials = new client.SharedIniFileCredentials({ profile: config.profile });
-client.isEnabled = !!client.config.credentials.accessKeyId;
 
 var remote = new client.S3();
 

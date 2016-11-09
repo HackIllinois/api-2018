@@ -1,26 +1,36 @@
-var fs = require("fs");
-var logger = require("winston");
-var path = require("path");
+var winston = require("winston");
+var WinstonCloudwatch = require("winston-cloudwatch");
 
-var DEFAULT_BANNER = "HACKILLINOIS API (2017)";
-var BANNER_LOCATION = "../resources/banner.txt";
+var config = require('./config');
+var client = require('./aws');
+var files = require('./files');
 
-// sets up logger to work with cli
-// we will need to set up a more robust system in the future
-logger.cli();
+var TEMP_INSTANCE_ID = 'instanceid';
 
-console.log();
-try {
-	var bannerPath = path.join(__dirname, BANNER_LOCATION);
-	var banner = fs.readFileSync(bannerPath, { encoding: 'utf8' });
-	console.log(banner);
-} catch (e) {
-	if (e.code === 'ENOENT') {
-		console.log(DEFAULT_BANNER);
-	} else {
-		throw e;
-	}
+var transports = [];
+if (client.isEnabled && config.isProduction) {
+	var cloudwatchTransport = new WinstonCloudwatch({
+		logGroupName: config.logs.groupName,
+		logStreamName: function() {
+			// keeps streams separated by instance and date
+			// TODO add instance to string once metadata is available
+
+			var date = new Date().toISOString().split('T')[0];
+			return date + '-' + TEMP_INSTANCE_ID;
+		},
+		awsRegion: 'us-east-1', // TODO switch this to the client.config.region
+		json: true
+	});
+
+	// add other transports as needed
+	transports.push(cloudwatchTransport);
+} else {
+	var fileTransport = new winston.transports.File({
+		filename: files.initializeLogfile()
+	});
+
+	// add other transports as needed
+	transports.push(fileTransport);
 }
-console.log();
 
-module.exports = logger;
+module.exports = new winston.Logger({ transports: transports });

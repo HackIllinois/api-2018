@@ -49,10 +49,12 @@ config.auth = {};
 config.database = {};
 config.database.primary = { pool: {} };
 config.mail = {};
+config.logs = {};
 config.storage = {};
 config.superuser = {};
 config.token = { expiration: {} };
 
+config.isProduction = isProduction;
 config.isDevelopment = isDevelopment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT;
@@ -81,6 +83,8 @@ config.mail.key = mailApiKey;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
 config.mail.whitelistedDomains = ['@hackillinois.org'];
 config.mail.whitelistedLists = ['test'];
+
+config.logs.groupName = (isDevelopment) ? 'api' : 'api-dev';
 
 config.storage.bucketExtension = (isDevelopment) ? '-development' : '-2017';
 
