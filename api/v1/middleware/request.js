@@ -3,8 +3,11 @@ var CheckitError = require('checkit').Error;
 var endpoints = require('../endpoints');
 var errors = require('../errors');
 var errorUtils = require('../utils/errors');
+var logUtils = require('../utils/logs');
 
 module.exports = function(req, res, next) {
+	logUtils.logRequest(req);
+	
 	// we need to find whether or not this endpoint's method has a validating
 	// request object mapped to it
 	var pathRequests = endpoints[req.originalUrl.replace(/\/+$/, "")];
