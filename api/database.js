@@ -31,7 +31,7 @@ function DatabaseManager() {
 DatabaseManager.prototype.constructor = DatabaseManager;
 
 DatabaseManager.prototype.instantiate = function() {
-	return _Promise.resolve(this._bookshelf);
+	return _Promise.resolve(this.instance());
 }
 
 DatabaseManager.prototype.instance = function() {

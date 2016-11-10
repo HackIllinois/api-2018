@@ -28,7 +28,8 @@ function _initRedis () {
 }
 
 function CacheManager () {
-	_initRedis().then(function(config) {
+	_initRedis().bind(this)
+		.then(function(config) {
 		_Promise.promisifyAll(redis.RedisClient.prototype);
 		_Promise.promisifyAll(redis.Multi.prototype);
 		this._cache = redis.createClient(config);
@@ -37,9 +38,13 @@ function CacheManager () {
 
 CacheManager.prototype.constructor = CacheManager;
 
-CacheManager.prototype.instance = function () {
+CacheManager.prototype.instance = function() {
+	return this._cache;
+}
+
+CacheManager.prototype.instantiate = function (){
+	var cache = this._cache;
 	return new Promise(function(resolve, reject) {
-		var cache = this._cache;
 		cache.on("ready", function() {
 			resolve(cache);
 		});

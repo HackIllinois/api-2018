@@ -1,16 +1,5 @@
-var _Promise = require('bluebird');
-
-var config = require('../../config');
-var files = require('../../files');
 var errors = require('../errors');
-var Upload = require('../models/Upload');
-var cache = require('../../cache');
-
-
-var client = cache.instance().then(function(client) {
-	return client;
-});
-
+var client = require('../../cache').instance();
 
 module.exports.storeHash = function (key, keyValuePairs) {
 	return client.hmsetAsync(key, keyValuePairs).then(function(reply){
