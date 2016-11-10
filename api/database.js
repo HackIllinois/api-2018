@@ -1,5 +1,7 @@
 var Bookshelf = require('bookshelf');
 var Knex = require('knex');
+var _Promise = require('bluebird');
+var events = require('events');
 var milliseconds = require('ms');
 
 var logger = require('./logging');
@@ -28,9 +30,14 @@ function DatabaseManager() {
 
 DatabaseManager.prototype.constructor = DatabaseManager;
 
-DatabaseManager.prototype.instance = function () {
+DatabaseManager.prototype.instantiate = function() {
+	return _Promise.resolve(this._bookshelf);
+}
+
+DatabaseManager.prototype.instance = function() {
 	return this._bookshelf;
-};
+}
+
 DatabaseManager.prototype.connection = function () {
 	return this._knex;
 };

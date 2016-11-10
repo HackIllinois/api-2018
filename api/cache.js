@@ -8,9 +8,6 @@ client.config.credentials = new client.SharedIniFileCredentials({ profile: confi
 client.isEnabled = !!client.config.credentials.accessKeyId;
 var _remote = new client.ElastiCache();
 
-_Promise.promisifyAll(redis.RedisClient.prototype);
-_Promise.promisifyAll(redis.Multi.prototype);
-
 function _initRedis () {
 	_REDIS_CONFIG = {};
 	if(!client.isEnabled) {
@@ -27,18 +24,29 @@ function _initRedis () {
 		})
 		.catch(function (err) {
 			logger.error(err);
-		})
+		});
 }
 
 function CacheManager () {
-	this._CONFIG = _initRedis();
-	this._cache = redis.createClient(this._CONFIG);
+	_initRedis().then(function(config) {
+		_Promise.promisifyAll(redis.RedisClient.prototype);
+		_Promise.promisifyAll(redis.Multi.prototype);
+		this._cache = redis.createClient(config);
+	});
 }
 
 CacheManager.prototype.constructor = CacheManager;
 
 CacheManager.prototype.instance = function () {
-	return this._cache;
+	return new Promise(function(resolve, reject) {
+		var cache = this._cache;
+		cache.on("ready", function() {
+			resolve(cache);
+		});
+		cache.on("error", function(err) {
+			reject(err);
+		});
+	});
 };
 
 logger.info("connecting to redis");

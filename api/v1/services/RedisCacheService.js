@@ -4,8 +4,12 @@ var config = require('../../config');
 var files = require('../../files');
 var errors = require('../errors');
 var Upload = require('../models/Upload');
+var cache = require('../../cache');
 
-var client = require('../../redis');
+
+var client = cache.instance().then(function(client) {
+	return client;
+});
 
 
 module.exports.storeHash = function (key, keyValuePairs) {
