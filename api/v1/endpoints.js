@@ -18,6 +18,13 @@ endpoints['/v1/registration/mentor'] = {
 endpoints['/v1/registration/mentor/:id'] = {
 	PUT: requests.MentorRequest
 };
+endpoints['/v1/registration/attendee'] = {
+	POST: requests.AttendeeRequest,
+	PUT: requests.AttendeeRequest
+};
+endpoints['/v1/registration/attendee/:id'] = {
+	PUT: requests.AttendeeRequest
+};
 endpoints['/v1/auth/reset'] = {
 	POST: requests.ResetPasswordRequest
 };
