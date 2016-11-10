@@ -5,6 +5,7 @@ var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var Mentor = require('../models/Mentor');
+var Attendee = require('../models/Attendee');
 var MentorProjectIdea = require('../models/MentorProjectIdea');
 var UserRole = require('../models/UserRole');
 var errors = require('../errors');
@@ -185,9 +186,119 @@ var updateMentor = function (mentor, attributes) {
 			});
 };
 
+
+/**
+ * Persists an attendee and its related objects
+ * @param  {Mentor} attendee	an attendee object to be created/updated
+ * @param  {Object} relatedAttributes 	an object mapping related keys to arrays of raw attributes
+ * @param  {Transaction} t	a pending transaction
+ * @return {Promise<Mentor>} the attendee with related
+ */
+function _saveAttendeeAndRelated(attendee, relatedAttributes, t) {
+	return attendee
+		.save(null, { transacting: t })
+		.then(function (attendee) {
+			var relatedPromises = [];
+			_.mapValues(relatedAttributes, function(valArray, key){
+				var promise = _Promise.map(valArray, function (val) {
+						return attendee.related(key).create(val, { transacting: t });
+				});
+				relatedPromises.push(promise);
+			})
+			return _Promise.all(relatedPromises)
+			.return(attendee);
+		});
+}
+
+/**
+* Registers an attendee for the given user
+* @param  {Object} user the user for which an attendee will be registered
+* @param  {Object} attributes a JSON object holding the attendee attributes
+* @return {Promise<Attendee>} the attendee with their related properties
+* @throws {InvalidParameterError} when an attendee exists for the specified user
+*/
+var createAttendee = function (user, attributes) {
+	var attendeeAttributes = attributes.attendee;
+	delete attributes.attendee;
+
+	attendeeAttributes.userId = user.get('id');
+	var attendee = Attendee.forge(attendeeAttributes);
+
+	return attendee
+		.validate()
+		.catch(CheckitError, utils.errors.handleValidationError)
+		.then(function (validated) {
+			if (user.hasRole(utils.roles.ATTENDEE, false)) {
+				var message = "The given user has already registered as an attendee";
+				var source = "userId";
+				throw new errors.InvalidParameterError(message, source);
+			}
+
+			return Attendee.transaction(function (t) {
+				return UserRole
+					.addRole(user, utils.roles.ATTENDEE, false, t)
+					.then(function (result) {
+						return _saveAttendeeAndRelated(attendee, attributes, t);
+					});
+				});
+			});
+};
+
+/**
+* Finds an attendee by querying on a user's ID
+* @param  {User} user		the user expected to be associated with an attendee
+* @return {Promise<Attendee>}	resolving to the associated Attendee model
+* @throws {NotFoundError} when the requested attendee cannot be found
+*/
+var findAttendeeByUser = function (user) {
+	return Attendee
+		.findByUserId(user.get('id'))
+		.tap(function (result) {
+			if (_.isNull(result)) {
+				var message = "A attendee with the given user ID cannot be found";
+				var source = "userId";
+				throw new errors.NotFoundError(message, source);
+			}
+		});
+};
+
+/**
+* Finds an attendee by querying for the given ID
+* @param  {Number} id the ID to query
+* @return {Promise<Attendee>} resolving to the associated Attendee model
+* @throws {NotFoundError} when the requested attendee cannot be found
+*/
+var findAttendeeById = function (id) {
+	return Attendee
+		.findById(id)
+		.tap(function (result) {
+			if (_.isNull(result)) {
+				var message = "A attendee with the given ID cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
+		});
+};
+
+/**
+* Updates an attendee and their relational tables by relational user
+* @param  {Attendee} attendee the attendee to be updated
+* @param  {Object} attributes a JSON object holding the attendee registration attributes
+* @return {Promise} resolving to an object in the same format as attributes, holding the saved models
+* @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
+*/
+var updateAttendee = function (attendee, attributes) {
+
+};
+
 module.exports = {
 	createMentor: createMentor,
 	findMentorByUser: findMentorByUser,
 	findMentorById: findMentorById,
-	updateMentor: updateMentor
+	updateMentor: updateMentor,
+
+	createAttendee: createAttendee,
+	findAttendeeByUser: findAttendeeByUser,
+	findAttendeeById: findAttendeeById,
+	updateAttendee: updateAttendee
 };

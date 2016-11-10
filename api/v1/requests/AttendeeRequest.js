@@ -28,26 +28,28 @@ var projectValidations = {
     isSuggestion: ['required', 'boolean']
 };
 var projectInterestValidations = {
-    type:       ['required', 'string', registration.verifyType],
+    type:       ['required', 'string', registration.verifyProjectInterestType],
     projectId:  ['required', 'integer'],
-    attendeeProjectId: ['required', 'integer']
+    attendeeProjectId: ['integer']
 };
 var requestedCollaboratorValidations = {
     collaborator: ['required', 'string', 'maxLength:255']
 };
 var bodyRequired = ['attendee', 'interests'];
+var bodyAllowed = ['attendee', 'interests', 'projects', 'extras', 'collaborators'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject', validators.nested(attendeeValidations, 'attendee')],
-	'interests': ['required', 'array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(projectInterestValidations, 'interests'))],
-	'projects': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(projectValidations, 'projects'))],
-	'extras': ['array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(extraInfoValidations, 'extras'))],
-	'collaborators': ['array', 'minLength:1', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))]
+	'interests': ['required', 'array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(projectInterestValidations, 'interests'), 'interests')],
+	'projects': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
+	'extras': ['array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
+	'collaborators': ['array', 'minLength:1', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
 };
 
 function AttendeeRequest(headers, body) {
 	Request.call(this, headers, body);
 
 	this.bodyRequired = bodyRequired;
+	this.bodyAllowed = bodyAllowed;
 	this.bodyValidations = bodyValidations;
 }
 

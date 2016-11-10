@@ -8,9 +8,9 @@ var AttendeeProjectInterest = Model.extend({
 	idAttribute: 'id',
 	validations: {
         attendeeId: ['required', 'integer'],
-        type:       ['required', 'string', registration.verifyType],
+        type:       ['required', 'string', registration.verifyProjectInterestType],
         projectId:  ['required', 'integer'],
-        attendeeProjectId: ['required', 'integer']
+        attendeeProjectId: ['integer']
 	}
 });
 

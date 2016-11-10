@@ -32,8 +32,8 @@ module.exports.verifyTshirtSize = function (size) {
  * @throws TypeError when the diet is invalid
  */
 module.exports.verifyDiet = function(diet){
-	if (!_.includes(DIETS, size)) {
-		throw new TypeError(size + " is not a valid diet");
+	if (!_.includes(DIETS, diet)) {
+		throw new TypeError(diet + " is not a valid diet");
 	}
 
 	return true;
@@ -48,7 +48,7 @@ module.exports.verifyDiet = function(diet){
  */
 module.exports.verifyTransportation = function(transportation){
 	if (!_.includes(TRANSPORTATION_OPTIONS, transportation)) {
-		throw new TypeError(size + " is not a valid transportation option");
+		throw new TypeError(transportation + " is not a valid transportation option");
 	}
 
 	return true;
@@ -79,6 +79,21 @@ module.exports.verifyGender = function(gender){
 module.exports.verifyProfessionalInterest = function(professionalInterest){
 	if (!_.includes(PROFESSIONAL_INTERESTS, professionalInterest)) {
 		throw new TypeError(professionalInterest + " is not a valid professional interest option");
+	}
+
+	return true;
+}
+
+/**
+ * Ensures that the provided project interest type is in the list
+ * of valid project interest type options
+ * @param  {String} projectInterestType the option to check
+ * @return {Boolean} true when the project interest type option is valid
+ * @throws TypeError when the project interest type option is invalid
+ */
+module.exports.verifyProjectInterestType = function(projectInterestType){
+	if (!_.includes(PROJECT_INTEREST_TYPES, projectInterestType)) {
+		throw new TypeError(projectInterestType + " is not a valid project interest type");
 	}
 
 	return true;

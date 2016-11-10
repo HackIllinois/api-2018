@@ -2,6 +2,10 @@ var _ = require('lodash');
 var registration = require('../utils/registration');
 
 var Model = require('./Model');
+var AttendeeProjectInterest = require('./AttendeeProjectInterest');
+var AttendeeProject = require('./AttendeeProject');
+var AttendeeExtraInfo = require('./AttendeeExtraInfo');
+var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 var Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
@@ -21,6 +25,18 @@ var Attendee = Model.extend({
         github:    ['required', 'string', 'maxLength:50'],
         interests: ['required', 'string', 'maxLength:255'],
         status:    ['string', registration.verifyStatus]
+	},
+	interests: function () {
+		return this.hasMany(AttendeeProjectInterest);
+	},
+	projects: function () {
+		return this.hasMany(AttendeeProject);
+	},
+	extras: function () {
+		return this.hasMany(AttendeeExtraInfo);
+	},
+	collaborators: function () {
+		return this.hasMany(AttendeeRequestedCollaborator);
 	}
 });
 
@@ -31,7 +47,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch();
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['interests', 'projects', 'extras', 'collaborators']});
 };
 
 /**
@@ -40,7 +56,7 @@ Attendee.findByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch();
+	return Attendee.where({ id: id }).fetch({withRelated: ['interests', 'projects', 'extras', 'collaborators']});
 };
 
 module.exports = Attendee;
