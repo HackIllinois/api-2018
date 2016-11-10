@@ -18,6 +18,7 @@ module.exports.canCreateProject = function (creator) {
 	return _Promise.reject(new errors.UnauthorizedError(message));
 }
 
+//TODO: make the name handling better
 module.exports.createProject = function (attributes) {
 	if(typeof attributes.repo === 'undefined'){
 		attributes.description = '';
@@ -67,4 +68,37 @@ module.exports.findProjectById = function (id) {
 module.exports.updateProject = function (project, key, value) {
 	return project.set(key, value).save();
 }
+
+
+module.exports.deleteProjectMentor = function (project, mentor) {
+	return ProjectMentor
+		.where({ project_id: project.id, mentor_id: mentor.id }).fetch()
+		.then(function(oldProjectMentor) {
+			return oldProjectMentor.destroy();
+		});
+}
+
+
+module.exports.addProjectMentor = function (project, mentor) {
+	var projectMentor = ProjectMentor.forge({ project_id: project.id, mentor_id: mentor.id });
+
+	return ProjectMentor
+		.findByProjectId(project.id)
+		.then(function (result) {
+			if (!_.isNull(result)) {
+				deleteProjectMentor(project, mentor);
+			}
+
+			return projectMentor
+				.save()
+				.then(function (projectMentor) {
+					return projectMentor;
+				});
+		});
+}
+
+
+
+
+
 

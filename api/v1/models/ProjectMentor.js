@@ -1,3 +1,6 @@
+var _Promise = require('bluebird');
+var _ = require('lodash');
+
 var Model = require('./Model');
 var Project = require('./Project');
 var Mentor = require('./Mentor');

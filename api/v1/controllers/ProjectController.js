@@ -51,6 +51,8 @@ function getProject (req, res, next) {
 		});
 }
 
+
+// TODO: Make this better
 function updateProject (req, res, next) {
 	var id = req.params.id;
 	var key = req.body.key;
