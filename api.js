@@ -13,7 +13,7 @@ database.instantiate()
 	.then(function () {
 		return cache.instantiate();
 	})
-	.then(function (client) {
+	.then(function () {
 		var api = require('./api/');
 		instance.use('/v1', api.v1);
 
