@@ -101,7 +101,7 @@ function _handleClientError(error) {
  * @param  {String|Array} recipients	a list of the recipients
  * @param  {String} template			the template identifier to use
  * @param  {Object} substitutions		a mapping of keys to their substitution values (optional)
- * @return {Promise<>}					an empty promise
+ * @return {Promise<>}					an empty _Promise
  * @throws {ExternalProviderError} 		when the mail client returns an error
  */
 function send(recipients, template, substitutions) {
@@ -130,7 +130,7 @@ function send(recipients, template, substitutions) {
  * @param  {Object} list          	the (internal-client) list representation (see mail.js)
  * @param  {String} template      	the template identifier to use
  * @param  {Object} substitutions 	a mapping of keys to their substitution values (optional)
- * @return {Promise<>}				an empty promise
+ * @return {Promise<>}				an empty _Promise
  * @throws {ExternalProviderError}	when the mail client returns an error
  */
 function sendToList(list, template, substitutions) {
@@ -184,7 +184,7 @@ function sendToList(list, template, substitutions) {
  * is already on the desired list
  * @param {User} user						the user to add to the list
  * @param {Object} list						the internal list representation to receive this user
- * @returns {Promise<MailingListUser>}		an promise with the save result
+ * @returns {Promise<MailingListUser>}		an _Promise with the save result
  */
 function addToList(user, list) {
 	return MailingList
@@ -198,7 +198,7 @@ function addToList(user, list) {
  * Removes a user from a mailing list
  * @param  {User} user					the user to remove from the list
  * @param  {Object} list				the internal list representation that the user is currently on
- * @return {Promise<MailingListUser>}	a promise with the deleted result
+ * @return {Promise<MailingListUser>}	a _Promise with the deleted result
  */
 function removeFromList(user, list) {
 	return MailingList

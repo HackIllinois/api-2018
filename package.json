@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "aws-sdk": "^2.5.0",
+    "aws-sdk": "^2.6.12",
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.1",
     "body-parser": "^1.15.1",
@@ -24,5 +24,11 @@
     "redis": "^2.6.2",
     "sparkpost": "^1.3.5",
     "winston": "^2.2.0"
+  },
+  "scripts": {
+    "dev": "./resources/scripts/startup.sh dev",
+    "prod": "./resources/scripts/startup.sh prod",
+    "dev-migrations": "source resources/scripts/env.sh dev && ./database/flyway.sh migrate",
+    "prod-migrations": "source resources/scripts/env.sh prod && ./database/flyway.sh migrate"
   }
 }

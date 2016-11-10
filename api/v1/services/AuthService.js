@@ -56,7 +56,7 @@ module.exports.issueForUser = function (user) {
  * Verifies the parameterized token's signature and expiration
  * @param  {String} token an auth token
  * @return {Promise} resolving to the validity of the token, or a rejected
- * promise resolving to an UnprocessableRequestError
+ * _Promise resolving to an UnprocessableRequestError
  */
 module.exports.verify = function(token) {
 	return _Promise

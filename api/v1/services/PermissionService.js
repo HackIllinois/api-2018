@@ -9,7 +9,7 @@ var roles = require('../utils/roles');
  * @param  {User} creator 		the intended creator with related role information
  * @param  {String} userRole    the role of the desired user
  * @return {Promise<Boolean>}   resolving whether or not creation should be allowed
- * @throws {UnauthorizedError}  when the provided role is not authorized (rejected promise)
+ * @throws {UnauthorizedError}  when the provided role is not authorized (rejected _Promise)
  */
 module.exports.canCreateUser = function (creator, userRole) {
 	if (creator.hasRole(roles.SUPERUSER)) {

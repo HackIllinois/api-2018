@@ -26,7 +26,7 @@ const META_SEPARATOR = '^|';
  * @param  {Array|String} 	recipients    the intended recipients
  * @param  {String} 		template      the intended template
  * @param  {Object} 		substitutions the intended substitutions (if any)
- * @return {Promise<>}		a resolved promise
+ * @return {Promise<>}		a resolved _Promise
  */
 module.exports.writeMail = function (recipients, template, substitutions) {
 	if (!config.isDevelopment) {
@@ -63,7 +63,7 @@ module.exports.writeMail = function (recipients, template, substitutions) {
  *                         		{String} key	the key under which to store the file
  *                         		{String} bucket	the bucket in which to store the file
  *                         		{String} type	the MIME type of the file
- * @return {Promise<>}			a resolved promise
+ * @return {Promise<>}			a resolved _Promise
  */
 module.exports.writeFile = function (content, params) {
 	if (!config.isDevelopment) {
@@ -122,7 +122,7 @@ module.exports.getFile = function (key, bucket) {
  * Removes a file from the temp directory. When called in non-development environments,
  * this method does nothing
  * @param  {String} key		the key by which the content was stored
- * @return {Promise<>}		a resolved promise
+ * @return {Promise<>}		a resolved _Promise
  */
 module.exports.removeFile = function (key) {
 	if (!config.isDevelopment) {

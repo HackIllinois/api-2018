@@ -5,7 +5,7 @@ var files = require('../../files');
 var errors = require('../errors');
 var Upload = require('../models/Upload');
 
-var client = require('../../redisdb');
+var client = require('../../redis');
 
 
 module.exports.storeHash = function (key, keyValuePairs) {

@@ -154,7 +154,7 @@ module.exports.findUploadByKey = function (key, bucket) {
  * @param  {Object} params			parameter object with
  *                           		{String} bucket			the target upload bucket
  *                           		{String} key			(optional) the 36-character key to use for the upload
- * @return {Promise<Upload>}		a promise resolving to the new upload
+ * @return {Promise<Upload>}		a _Promise resolving to the new upload
  *
  */
 module.exports.createUpload = function (owner, params) {
@@ -183,7 +183,7 @@ module.exports.persistUpload = function (upload, file) {
 };
 
 /**
- * Retrieves an upload from remote storage
+ * Retrieves an upload from _remote storage
  * @param  {Upload} upload			an internal upload representation
  * @return {Promise<Object>}		an object with
  *                               	{Buffer} content 		the content retrieved
@@ -202,7 +202,7 @@ module.exports.getUpload = function (upload) {
  *
  * @param {Upload} upload 			an internal upload representation
  * @param {Transaction} transaction	(optional) a pending database transaction
- * @return {Promise<>}				an empty promise indicating success
+ * @return {Promise<>}				an empty _Promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.removeUpload = function (upload) {

@@ -20,7 +20,7 @@ var router = require('express').Router();
  * user's password
  * @param  {String} email    a user's email address
  * @param  {String} password the associated user's password (optional)
- * @return {Promise} a promise resolving to an auth token
+ * @return {Promise} a _Promise resolving to an auth token
  * @throws {NotFoundError} when there is no user associated with the email
  * @throws {InvalidParameterError} when the provided password is incorrect
  */
