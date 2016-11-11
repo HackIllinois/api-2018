@@ -17,7 +17,8 @@ database.instantiate()
 		return cache.instantiate();
 	})
 	.then(function () {
-		//api is initialized here which assures that all modules have access to an initialized datastore and cache instance
+		//api is initialized here which assures that all modules have access
+		//to an initialized datastore and cache instance
 		var api = require('./api/');
 		instance.use('/v1', api.v1);
 

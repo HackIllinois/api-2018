@@ -13,7 +13,7 @@ function RedisError(message, source) {
 	this.message = (message) ? message : DEFAULT_MESSAGE;
 }
 
-RedisError.prototype = Object.create(UnprocessableRequestError.prototype);
+RedisError.prototype = Object.create(ApiError.prototype);
 RedisError.prototype.constructor = RedisError;
 
 module.exports = RedisError;

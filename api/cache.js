@@ -11,7 +11,7 @@ client.config.credentials = new client.SharedIniFileCredentials({ profile: confi
 client.isEnabled = !!client.config.credentials.accessKeyId;
 var _remote = new client.ElastiCache();
 
-function _buildConfiguration () {
+function _buildConfiguration() {
 	_REDIS_CONFIG = {};
 	if(!client.isEnabled) {
 		_REDIS_CONFIG.host = config.redis.host;
@@ -30,6 +30,21 @@ function _buildConfiguration () {
 		});
 }
 
+function _instantiate(cache) {
+	if(cache.connected) {
+		return _Promise.resolve(cache);
+	}
+
+	return new Promise(function(resolve, reject) {
+		cache.on("ready", function() {
+			resolve(cache);
+		});
+		cache.on("error", function(err) {
+			reject(err);
+		});
+	});
+}
+
 function CacheManager () {
 	this._cache = undefined;
 }
@@ -45,26 +60,13 @@ CacheManager.prototype.instance = function() {
 
 CacheManager.prototype.instantiate = function (){
 	if(!this._cache) {
-		_buildConfiguration().bind(this)
+		return _buildConfiguration().bind(this)
 			.then(function(config) {
 				this._cache = redis.createClient(config);
+				return _instantiate(this._cache);
 			});
 	}
-
-	var cache = this._cache;
-
-	if(cache.connected) {
-		return _Promise.resolve(cache);
-	}
-
-	return new Promise(function(resolve, reject) {
-		cache.on("ready", function() {
-			resolve(cache);
-		});
-		cache.on("error", function(err) {
-			reject(err);
-		});
-	});
+	return _instantiate(this._cache);
 };
 
 logger.info("connecting to redis");
