@@ -4,11 +4,14 @@ var _Promise = require('bluebird');
 var redis = require('redis');
 var client = require('aws-sdk');
 
+_Promise.promisifyAll(redis.RedisClient.prototype);
+_Promise.promisifyAll(redis.Multi.prototype);
+
 client.config.credentials = new client.SharedIniFileCredentials({ profile: config.profile });
 client.isEnabled = !!client.config.credentials.accessKeyId;
 var _remote = new client.ElastiCache();
 
-function _initRedis () {
+function _buildConfiguration () {
 	_REDIS_CONFIG = {};
 	if(!client.isEnabled) {
 		_REDIS_CONFIG.host = config.redis.host;
@@ -28,22 +31,32 @@ function _initRedis () {
 }
 
 function CacheManager () {
-	_initRedis().bind(this)
-		.then(function(config) {
-		_Promise.promisifyAll(redis.RedisClient.prototype);
-		_Promise.promisifyAll(redis.Multi.prototype);
-		this._cache = redis.createClient(config);
-	});
+	this._cache = undefined;
 }
 
 CacheManager.prototype.constructor = CacheManager;
 
 CacheManager.prototype.instance = function() {
+	if(!this._cache) {
+		throw new TypeError('cache module is not initialized');
+	}
 	return this._cache;
 }
 
 CacheManager.prototype.instantiate = function (){
+	if(!this._cache) {
+		_buildConfiguration().bind(this)
+			.then(function(config) {
+				this._cache = redis.createClient(config);
+			});
+	}
+
 	var cache = this._cache;
+
+	if(cache.connected) {
+		return _Promise.resolve(cache);
+	}
+
 	return new Promise(function(resolve, reject) {
 		cache.on("ready", function() {
 			resolve(cache);

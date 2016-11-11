@@ -80,8 +80,6 @@ config.database.primary.pool.idleTimeout = '5s';
 
 config.redis.host = process.env.REDIS_HOST;
 config.redis.port = process.env.REDIS_PORT;
-config.redis.path = process.env.REDIS_PATH;
-config.redis.url = process.env.REDIS_URL;
 
 config.mail.key = mailApiKey;
 config.mail.sinkhole = '.sink.sparkpostmail.com';

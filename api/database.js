@@ -1,7 +1,6 @@
 var Bookshelf = require('bookshelf');
 var Knex = require('knex');
 var _Promise = require('bluebird');
-var events = require('events');
 var milliseconds = require('ms');
 
 var logger = require('./logging');

@@ -23,7 +23,7 @@ module.exports = function(allowed, isOwner) {
 				var result = isOwner(req);
 
 				if ('function' === typeof result.then) {
-					// the ownership method is async, so resolve its _Promise
+					// the ownership method is async, so resolve its promise
 					result.then(function (truth) {
 						if (!truth) {
 							next(new errors.UnauthorizedError());
