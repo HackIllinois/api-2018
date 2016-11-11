@@ -211,6 +211,72 @@ function _saveAttendeeAndRelated(attendee, relatedAttributes, t) {
 }
 
 /**
+ * Determines which relational objects are new and which are existing ones that need to be updated
+ * @param  {Attendee} attendee		the Attendee with whom the relational objects are associated
+ * @param  {Object} relatedAttributes	an object mapping related keys to arrays of raw objects
+ * @return {Object}		mapping to a set of arrays of new objects, updated objects, and ids of updated objects
+ */
+function _extractAttendeeRelatedObjects(attendee, relatedAttributes) {
+	var newAndUpdatedMap = _.mapValues(relatedAttributes, function(valArray, key) {
+		var ret = {};
+		ret.new = [];
+		ret.updated = [];
+		ret.updatedIds = [];
+		_.forEach(valArray, function (val) {
+			var MESSAGE, SOURCE;
+			if (!_.has(val, 'id')) {
+				ret.new.push(val);
+			} else if (_.isUndefined(attendee.related(key).get(val.id))) {
+				MESSAGE = "A related " + key + " object with the given ID does not exist";
+				SOURCE = key.slice(0, -2) + ".id";
+				throw new errors.NotFoundError(MESSAGE, SOURCE);
+			} else if (attendee.related(key).get(val.id).get('attendeeId') !== attendee.get('id')){
+				MESSAGE = "A " + key + " object that does not belong to this attendee cannot be updated here";
+				throw new errors.UnauthorizedError(MESSAGE);
+			} else {
+				// TODO remove this once Request validator can marshal recursively
+				val.attendeeId = attendee.get('id');
+
+				ret.updated.push(attendee.related(key).get(val.id).set(val));
+				ret.updatedIds.push(val.id);
+			}
+		});
+		return ret;
+	});
+	return _Promise.props(newAndUpdatedMap);
+}
+
+/**
+ * Removes unwanted objects and updates desired objects
+ * @param  {Attendee} attendee			the Attendee with whom the ideas are associated
+ * @param  {Array} updatedIdeas		a list of related AttendeeProjectIdeas with new attributes
+ * @param  {Array} updatedIdeaIds	a list of the ids contained in the updatedIdeas
+ * @param  {Transaction} t			a pending transaction
+ * @return {Promise<>}				a promise indicating all changes have been added to the transaction
+ */
+function _adjustAttendeeRelatedObjects(attendee, newAndUpdatedMap, t) {
+	var relatedPromises = [];
+	_.mapValues(newAndUpdatedMap, function(newAndUpdatedObject, key){
+		var promise = attendee.related(key)
+			.query().transacting(t)
+			.whereNotIn('id', newAndUpdatedObject.updatedIds)
+			.delete()
+			.catch(Attendee.NoRowsDeletedError, function () { return null; })
+			.then(function () {
+				attendee.related(key).reset();
+
+				return _Promise.map(newAndUpdatedObject.updated, function (updated) {
+					attendee.related(key).add(updated);
+					return updated.save(null, { transacting: t, require: false });
+				});
+			});
+		relatedPromises.push(promise);
+	});
+	return _Promise.all(relatedPromises)
+	.return(attendee);
+}
+
+/**
 * Registers an attendee for the given user
 * @param  {Object} user the user for which an attendee will be registered
 * @param  {Object} attributes a JSON object holding the attendee attributes
@@ -288,7 +354,25 @@ var findAttendeeById = function (id) {
 * @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
 */
 var updateAttendee = function (attendee, attributes) {
+	var attendeeAttributes = attributes.attendee;
+	delete attributes.attendee;
 
+	attendee.set(attendeeAttributes);
+
+	return attendee
+		.validate()
+		.catch(CheckitError, utils.errors.handleValidationError)
+		.then(function (){
+			return _extractAttendeeRelatedObjects(attendee, attributes);
+		})
+		.then(function (newAndUpdatedMap) {
+			return Attendee.transaction(function (t) {
+				return _adjustAttendeeRelatedObjects(attendee, newAndUpdatedMap, t)
+					.then(function () {
+						return _saveAttendeeAndRelated(attendee, attributes, t);
+					});
+				});
+			});
 };
 
 module.exports = {
