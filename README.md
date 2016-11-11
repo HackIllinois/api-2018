@@ -66,7 +66,6 @@ A list of configuration keys is provided below:
 | REDIS_HOST | IP address | Overrides default redis host ('127.0.0.1') |
 | REDIS_PORT | Any valid port number | Overrides default redis port (6379) |
 
-
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
 identified by the `PROFILE` configuration key. We do not handle AWS-specific configuration
