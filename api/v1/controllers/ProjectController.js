@@ -75,6 +75,42 @@ function updateProject (req, res, next) {
 		});
 }
 
+function addProjectMentor (req, res, next) {
+	var project_id = req.body.project_id;
+	var mentor_id = req.body.mentor_id;
+
+	ProjectService
+		.addProjectMentor(project_id, mentor_id)
+		.then(function (projectMentor) {
+			res.body = projectMentor.toJSON();
+
+			next();
+			return null;
+		})
+		.catch( function (error) {
+			next(error);
+			return null;
+		});
+}
+
+function deleteProjectMentor (req, res, next) {
+	var project_id = req.body.project_id;
+	var mentor_id = req.body.mentor_id;
+
+	ProjectService
+		.deleteProjectMentor(project_id, mentor_id)
+		.then(function () {
+			res.body = {}
+
+			next();
+			return null;
+		})
+		.catch( function (error) {
+			next(error);
+			return null;
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
@@ -82,6 +118,8 @@ router.use(middleware.request);
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
 router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
+router.post('/mentor', addProjectMentor);
+router.delete('/mentor', deleteProjectMentor);
 
 router.use(middleware.response);
 router.use(middleware.errors);

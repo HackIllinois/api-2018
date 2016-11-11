@@ -2,8 +2,10 @@ var Checkit = require('checkit');
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
+var Mentor = require('../models/Mentor');
 var Project = require('../models/Project');
 var ProjectMentor = require('../models/ProjectMentor');
+
 var errors = require('../errors');
 var utils = require('../utils');
 var roles = require('../utils/roles');
@@ -70,23 +72,63 @@ module.exports.updateProject = function (project, key, value) {
 }
 
 
-module.exports.deleteProjectMentor = function (project, mentor) {
+_isProjectMentorValid = function (project_id, mentor_id) {
+	return Project
+		.findById(project_id)
+		.then(function (result) {
+			if(!_.isNull(result)) {
+				return _Promise.resolve(true);
+			}else{
+				return _Promise.resolve(false);
+			}
+		})
+		.then(function (isValidSoFar) {
+			if(isValidSoFar){
+				return Mentor
+					.findById(mentor_id)
+					.then(function (res) {
+						if(!_.isNull(res)) {
+							return _Promise.resolve(true);
+						}
+					})
+			}
+			return _Promise.resolve(false);
+		});
+}
+
+_deleteProjectMentor = function (project_id) {
 	return ProjectMentor
-		.where({ project_id: project.id, mentor_id: mentor.id }).fetch()
+		.where({ project_id: project_id }).fetch()
 		.then(function(oldProjectMentor) {
 			return oldProjectMentor.destroy();
 		});
 }
 
 
-module.exports.addProjectMentor = function (project, mentor) {
-	var projectMentor = ProjectMentor.forge({ project_id: project.id, mentor_id: mentor.id });
+module.exports.addProjectMentor = function (project_id, mentor_id) {
+	var projectMentor = ProjectMentor.forge({ project_id: project_id, mentor_id: mentor_id });
 
-	return ProjectMentor
-		.findByProjectId(project.id)
+	return _isProjectMentorValid(project_id, mentor_id)
+		.then(function (isValid) {
+			if(!isValid){
+				var message = "A project or mentor with the given IDs cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
+
+			return null;
+		})
+		.then(function () {
+			return ProjectMentor.findByProjectId(project_id);
+		})
 		.then(function (result) {
 			if (!_.isNull(result)) {
-				deleteProjectMentor(project, mentor);
+				if(result.attributes.mentorId != mentor_id){
+					_deleteProjectMentor(project_id);
+				}else{
+					//There already exists the project mentor
+					return _Promise.resolve(result);
+				}
 			}
 
 			return projectMentor
@@ -98,7 +140,20 @@ module.exports.addProjectMentor = function (project, mentor) {
 }
 
 
+module.exports.deleteProjectMentor = function (project_id, mentor_id) {
+	return _isProjectMentorValid(project_id, mentor_id)
+		.then(function (isValid) {
+			if(!isValid){
+				var message = "A project or mentor with the given IDs cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
 
-
+			return null;
+		})
+		.then(function () {
+			return _deleteProjectMentor(project_id, mentor_id);
+		});
+}
 
 

@@ -15,3 +15,9 @@ var ProjectMentor = Model.extend({
 		return this.belongsTo(Mentor, 'mentor_id');
 	}
 });
+
+ProjectMentor.findByProjectId = function (project_id) {
+	return ProjectMentor.where({ project_id: project_id }).fetch();
+}
+
+module.exports = ProjectMentor;
