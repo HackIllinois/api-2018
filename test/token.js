@@ -71,5 +71,39 @@ describe('TokenService',function(){
         });
     });
 
-    // TODO finish unit test for generateToken
+    describe('generateToken',function(){ 
+        var testUser; 
+        var testToken; 
+        before(function(done){
+
+            var _mockedTokens = {
+                invokeThen : function(){
+                    return _Promise.resolve(null);
+                }
+            }
+            var _mockedWhere = {
+                fetchAll : function(){
+                    return _Promise.resolve(_mockedTokens);
+                }
+            };
+
+            testUser = User.forge({ id: 1, email: 'new@example.com' }); 
+            testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});  
+
+            _where = sinon.stub(Token,'where'); 
+            _where.returns(_mockedWhere);
+
+            _save = sinon.stub(Token.prototype,'save'); 
+            _save.returns(_Promise.resolve(null));  
+            done(); 
+        }); 
+        it('generates a new token',function(done){ 
+            var token = TokenService.generateToken(testUser,'7d'); 
+            expect(token).to.eventually.be.a('string')
+                .then(function(data){
+                    expect(data.length).to.equal(36);
+                    done();
+                });
+        }); 
+    });
 });
