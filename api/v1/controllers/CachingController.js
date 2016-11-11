@@ -9,12 +9,11 @@ var config = require('../../config');
 var middleware = require('../middleware');
 var router = require('express').Router();
 
-
 function saveString (req, res, next) {
 	var key = req.body.key;
 	var value = req.body.value;
 
-	services.RedisCacheService.storeString(key, value)
+	services.CacheService.storeString(key, value)
 		.then(function (status){
 			res.body = {};
 			res.body.status = status;
@@ -31,7 +30,7 @@ function saveHash (req, res, next) {
 	var key = req.body.key;
 	var keyVals = req.body.keyVals;
 
-	services.RedisCacheService.storeHash(key, keyVals)
+	services.CacheService.storeHash(key, keyVals)
 		.then(function (status){
 			res.body = {};
 			res.body.status = status;
@@ -48,7 +47,7 @@ function saveList (req, res, next) {
 	var key = req.body.key;
 	var vals = req.body.vals;
 
-	services.RedisCacheService.storeList(key, vals)
+	services.CacheService.storeList(key, vals)
 		.then(function (status){
 			res.body = {};
 			res.body.status = status;
@@ -64,7 +63,7 @@ function saveList (req, res, next) {
 function getString (req, res, next) {
 	var key = req.query.key;
 
-	services.RedisCacheService.getString(key)
+	services.CacheService.getString(key)
 		.then(function (string){
 			res.body = {}
 			res.body.value = string;
@@ -82,7 +81,7 @@ function getList (req, res, next) {
 	var start = req.query.start;
 	var end = req.query.end;
 
-	services.RedisCacheService.getList(key, start, end)
+	services.CacheService.getList(key, start, end)
 		.then(function (list){
 			res.body = {}
 			res.body.values = list;
@@ -98,7 +97,7 @@ function getList (req, res, next) {
 function getHash (req, res, next) {
 	var key = req.query.key;
 
-	services.RedisCacheService.getHash(key)
+	services.CacheService.getHash(key)
 		.then(function (object){
 			res.body = {}
 			res.body.values = object;
@@ -116,7 +115,7 @@ function updateHash (req, res, next) {
 	var field = req.body.field;
 	var newVal = req.body.newVal;
 
-	services.RedisCacheService.updateHash(key, field, newVal)
+	services.CacheService.updateHash(key, field, newVal)
 		.then(function(status){
 			res.body = {};
 			res.body.status = status;
@@ -133,7 +132,7 @@ function getHashField (req, res, next) {
 	var key = req.query.key;
 	var field = req.query.field;
 
-	services.RedisCacheService.getHashField(key, field)
+	services.CacheService.getHashField(key, field)
 		.then(function(reply){
 			res.body = {};
 			res.body.value = reply;
@@ -143,14 +142,14 @@ function getHashField (req, res, next) {
 		.catch(function(error){
 			next(error);
 			return null;
-		}); 
+		});
 }
 
 function expireKey (req, res, next) {
 	var key = req.body.key;
 	var duration = req.body.duration;
 
-	services.RedisCacheService.expireKey(key, duration)
+	services.CacheService.expireKey(key, duration)
 		.then(function(reply){
 			res.body = {};
 			res.body.status = reply;
@@ -160,7 +159,7 @@ function expireKey (req, res, next) {
 		.catch(function(error){
 			next(error);
 			return null;
-		}); 
+		});
 }
 
 
