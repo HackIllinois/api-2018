@@ -100,6 +100,11 @@ _deleteProjectMentor = function (project_id) {
 	return ProjectMentor
 		.where({ project_id: project_id }).fetch()
 		.then(function(oldProjectMentor) {
+			if(_.isNull(oldProjectMentor)) {
+				var message = "A project with the given ID cannot be found";
+				var source = "id";
+				throw new errors.NotFoundError(message, source);
+			}
 			return oldProjectMentor.destroy();
 		});
 }
