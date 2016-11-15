@@ -1,5 +1,3 @@
-var logUtils = require('../utils/logs');
-
 module.exports = function (req, res, next) {
 	if (!res.headersSent) {
 		// we only have things to do if middleware further upstream
@@ -12,6 +10,5 @@ module.exports = function (req, res, next) {
 		res.json(response);
 	}
 
-	logUtils.logResponse(req, res);
 	next();
 };

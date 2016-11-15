@@ -33,4 +33,8 @@ if (client.isEnabled && config.isProduction) {
 	transports.push(fileTransport);
 }
 
-module.exports = new winston.Logger({ transports: transports });
+
+var logger = new winston.Logger({ transports: transports });
+logger.info("prepared environment for %s", config.environment);
+
+module.exports = logger;

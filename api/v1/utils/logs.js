@@ -5,8 +5,6 @@ var logger = require('../../logging');
 
 var REQUEST_BLACKLIST = ['password'];
 
-// TODO perhaps we should also filter out 'auth' keys, as they hold the user's auth
-// token.
 function _filterBody (body, blacklist) {
 	for (var key in body) {
 		var value = body[key];
@@ -23,7 +21,7 @@ function _makeRequestMetadata (req) {
 }
 
 module.exports.logRequest = function (req) {
-	logger.info("recieved request", _makeRequestMetadata(req));
+	logger.info("received request", _makeRequestMetadata(req));
 };
 
 module.exports.logResponse = function (req, res) {

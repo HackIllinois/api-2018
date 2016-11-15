@@ -3,8 +3,6 @@
 // NOTE: all durations are expressed using notation understood by the
 // `ms` NPM module. These durations must be converted before they are used.
 
-var logger = require('./logging');
-
 const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
 
@@ -16,32 +14,27 @@ var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY || undefined;
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
+var exit = false;
 if (!isProduction && !isDevelopment) {
-	logger.error("an environment was not provided");
-	logger.error("set NODE_ENV to '%s' or '%s'",
-		DEVELOPMENT_IDENTIFIER, PRODUCTION_IDENTIFIER);
-
-	process.exit(1);
+	exit = true;
+	console.error("error: set NODE_ENV to '%s' or '%s'", DEVELOPMENT_IDENTIFIER, PRODUCTION_IDENTIFIER);
+} if (!superuserEmail) {
+	exit = true;
+	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
+} if (!superuserPassword) {
+	exit = true;
+	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
+} if (!secret) {
+	exit = true;
+	console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
+} if (isProduction && !mailApiKey) {
+	exit = true;
+	console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
 }
 
-if (!superuserEmail) {
-	logger.error("set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
-	process.exit(1);
-}
-
-if (!superuserPassword) {
-	logger.error("set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
-	process.exit(1);
-}
-
-if (!secret) {
-	logger.error("set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
-	process.exit(1);
-}
-
-if (isProduction && !mailApiKey) {
-	logger.error("set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
-	process.exit(1);
+if (exit) {
+	console.error("error: environment incomplete. shutting down...");
+	process.exit();
 }
 
 var config = {};
@@ -56,6 +49,7 @@ config.token = { expiration: {} };
 
 config.isProduction = isProduction;
 config.isDevelopment = isDevelopment;
+config.environment = environment;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT;
 config.profile = process.env.PROFILE;
@@ -87,7 +81,5 @@ config.mail.whitelistedLists = ['test'];
 config.logs.groupName = (isDevelopment) ? 'api' : 'api-dev';
 
 config.storage.bucketExtension = (isDevelopment) ? '-development' : '-2017';
-
-logger.info("prepared environment for %s", environment);
 
 module.exports = config;

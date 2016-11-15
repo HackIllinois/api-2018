@@ -21,11 +21,11 @@ code to this repository.
 
 #### Node.js Version
 
-Our application is deployed with Node.js v4.4.3. It is recommended that you install
-this version exactly, although using a different release version (v4.4.x) will
+Our application is deployed with Node.js v4.6.2. It is recommended that you install
+this version, although using a different release version (v4.6.x) will
 probably work too.
 
-The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v4.4.3/) or from your favorite package manager.
+The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v4.6.2/).
 
 #### MySQL Version
 
@@ -119,20 +119,27 @@ contributors should be familiar with.
 ## Starting Up
 
 A local API instance can be created on port 8080 via the following commands,
-executed from the root of the project directory.
+executed from the root of the project directory. Note that in development, you must
+to install the process manager `nodemon` globally via `[sudo] npm install -g nodemon`.
 
 To run the API for development:
 ```
 npm run dev
 ```
 
-To run the API in production:
-```
-npm run prod
-```
+Note that `node` must and `nodemon` must be on your path and that the configuration
+for the target environment must be present in the `config` directory. The server will
+restart automatically when changes are made. To stop the API, simply type `Control-C`.
 
-Use `Control-C` to kill the server. Note that `node` must be on your path and that
-the configuration for the target environment must be present in the `config` directory.
+For production, we build a Docker image and deploy this to a container ecosystem. You can
+find the Dockerfile in the project root directory.
+
+## Logging
+
+The API access logs are available in `/temp/logs/api.log` during development, but
+are periodically pushed to AWS CloudWatch during in production (and are not accessible
+until they are pushed). Note that these logs are optimized for searchability, not
+readability.
 
 ## Documentation
 

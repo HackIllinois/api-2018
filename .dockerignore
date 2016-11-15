@@ -1,0 +1,14 @@
+.gitignore
+.dockerignore
+.nodemonignore
+*.md
+Dockerfile
+env.list
+!README.md
+
+config/*
+!config/prod.config
+
+node_modules
+database
+temp
