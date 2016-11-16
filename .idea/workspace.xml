@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="743687bf-6129-4184-a7e6-40d2d655c728" name="Default" comment="Merge branch 'staging' of https://github.com/Hackillinois/api-2017 into feature/caching&#10;&#10;# Conflicts:&#10;#&#9;.gitignore&#10;#&#9;package.json&#10;">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/api/v1/controllers/HealthController.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/v1/controllers/index.js" afterPath="$PROJECT_DIR$/api/v1/controllers/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/v1/index.js" afterPath="$PROJECT_DIR$/api/v1/index.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/v1/controllers/HealthController.js" afterPath="$PROJECT_DIR$/api/v1/controllers/HealthController.js" />
     </list>
     <ignored path="api-2017.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,8 +26,18 @@
       <file leaf-file-name="HealthController.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/api/v1/controllers/HealthController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
+            <state relative-caret-position="108">
+              <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RegistrationController.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/v1/controllers/RegistrationController.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1541">
+              <caret line="105" column="33" selection-start-line="105" selection-start-column="23" selection-end-line="105" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -689,7 +697,7 @@
       <workItem from="1478733928079" duration="8753000" />
       <workItem from="1478744457208" duration="21589000" />
       <workItem from="1479153740194" duration="1035000" />
-      <workItem from="1479282413311" duration="1934000" />
+      <workItem from="1479282413311" duration="2390000" />
     </task>
     <task id="LOCAL-00001" summary="Added redis cache">
       <created>1478737311856</created>
@@ -702,7 +710,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="55179000" />
+    <option name="totallyTimeSpent" value="55635000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1855" height="926" extended-state="6" />
@@ -963,13 +971,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/api/v1/controllers/AuthController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="22" column="24" selection-start-line="22" selection-start-column="24" selection-end-line="22" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/api/v1/requests/AccreditedUserCreationRequest.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1077,14 +1078,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/api/v1/controllers/UploadController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1105">
-          <caret line="35" column="11" selection-start-line="35" selection-start-column="11" selection-end-line="35" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/api/v1/middleware/response.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1109,9 +1102,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/api/v1/controllers/UploadController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="623">
+          <caret line="128" column="3" selection-start-line="128" selection-start-column="3" selection-end-line="128" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/v1/controllers/AuthController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="821">
+          <caret line="64" column="18" selection-start-line="64" selection-start-column="18" selection-end-line="64" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/api/v1/controllers/RegistrationController.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1181">
+        <state relative-caret-position="1541">
           <caret line="105" column="33" selection-start-line="105" selection-start-column="23" selection-end-line="105" selection-end-column="33" />
           <folding />
         </state>
@@ -1119,8 +1128,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/api/v1/controllers/HealthController.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
+        <state relative-caret-position="108">
+          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
           <folding />
         </state>
       </provider>
