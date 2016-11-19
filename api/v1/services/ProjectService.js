@@ -5,11 +5,12 @@ var _ = require('lodash');
 var Mentor = require('../models/Mentor');
 var Project = require('../models/Project');
 var ProjectMentor = require('../models/ProjectMentor');
-,
+
 var errors = require('../errors');
 var utils = require('../utils');
 var roles = require('../utils/roles');
 
+const projectKeys = ["name", "description", "repo", "isPublished"];
 
 /**
  * Checks to see if a requestor valid permissions to create a new project
@@ -41,14 +42,14 @@ module.exports.createProject = function (attributes) {
 		attributes.isPublished = 0; //false
 	}
 
-	attributes.name = attributes.name.toLowerCase();
+	validationName = attributes.name.toLowerCase();
 
 	var project = Project.forge(attributes);
 	return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
-			return Project.findByName(attributes.name);
+			return Project.findByName(validationName);
 		})
 		.then(function (result){
 			if (!_.isNull(result)) {
@@ -64,7 +65,6 @@ module.exports.createProject = function (attributes) {
 				});
 		})
 }
-
 
 /**
  * Returns a project with the specified project id
@@ -92,9 +92,21 @@ module.exports.findProjectById = function (id) {
  * @param  {String} Key is the name of the attribute
  * @param  {String} Value is the new value of the attribute
  * @return {Promise} resolving to the updated project
+ * @throws InvalidParameterError when the key is not valid
  */
 module.exports.updateProject = function (project, key, value) {
-	return project.set(key, value).save();
+	if(projectKeys.indexOf(key.toLowerCase()) == -1){
+		var message = "The given key is invalid";
+		var source = "key";
+		throw new errors.InvalidParameterError(message, source);
+	}
+	return project
+		.set(key, value)
+		.validate()
+		.catch(Checkit.Error, utils.errors.handleValidationError)
+		.then(function (validated) {
+			return project.save();
+		});
 }
 
 
