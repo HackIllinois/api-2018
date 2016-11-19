@@ -118,8 +118,8 @@ router.use(middleware.request);
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
 router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
-router.post('/mentor', addProjectMentor);
-router.delete('/mentor', deleteProjectMentor);
+router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
+router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 
 router.use(middleware.response);
 router.use(middleware.errors);
