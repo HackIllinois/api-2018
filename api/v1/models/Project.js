@@ -5,8 +5,8 @@ var Project = Model.extend({
 	idAttribute: 'id',
 	validations: {
 		name: ['required', 'string', 'maxLength:100'],
-		description: ['required', 'string', 'maxLength:200'],
-		repo: ['string', 'maxLength:255'],
+		description: ['required', 'string', 'maxLength:255'],
+		repo: ['required', 'string', 'maxLength:255'],
 		is_published: ['boolean']
 	}
 });

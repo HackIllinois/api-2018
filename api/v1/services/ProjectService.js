@@ -12,21 +12,6 @@ var roles = require('../utils/roles');
 
 const projectKeys = ["name", "description", "repo", "isPublished"];
 
-/**
- * Checks to see if a requestor valid permissions to create a new project
- * @param  {User} user creating the new project
- * @return {Promise} resolving to true if the user is an organizer
- * @throws InvalidParameterError when a user does not have correct permissions
- */
-module.exports.canCreateProject = function (creator) {
-	if(creator.hasRole(roles.SUPERUSER) || creator.hasRole(roles.ORGANIZERS)){
-		return _Promise.resolve(true);
-	}
-
-	var message = "A project cannot be created with the provided credentials";
-	return _Promise.reject(new errors.UnauthorizedError(message));
-}
-
 
 /**
  * Creates a project with the specificed attributes
@@ -35,21 +20,16 @@ module.exports.canCreateProject = function (creator) {
  * @throws InvalidParameterError when a project exists with the specified name
  */
 module.exports.createProject = function (attributes) {
-	if(typeof attributes.repo === 'undefined'){
-		attributes.description = '';
+	if(_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)){
+		attributes.isPublished = false;
 	}
-	if(typeof attributes.isPublished === 'undefined'){
-		attributes.isPublished = 0; //false
-	}
-
-	validationName = attributes.name.toLowerCase();
 
 	var project = Project.forge(attributes);
 	return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
-			return Project.findByName(validationName);
+			return Project.findByName(attributes.name);
 		})
 		.then(function (result){
 			if (!_.isNull(result)) {
@@ -120,21 +100,18 @@ _isProjectMentorValid = function (project_id, mentor_id) {
 	return Project
 		.findById(project_id)
 		.then(function (result) {
-			if(!_.isNull(result)) {
-				return _Promise.resolve(true);
-			}else{
-				return _Promise.resolve(false);
+			if(_.isNull(result)) {
+				var message = "The project id is invalid";
+				var source = "project_id";
+				throw new errors.InvalidParameterError(message, source);
 			}
+			return Mentor.findById(mentor_id);
 		})
-		.then(function (isValidSoFar) {
-			if(isValidSoFar){
-				return Mentor
-					.findById(mentor_id)
-					.then(function (res) {
-						if(!_.isNull(res)) {
-							return _Promise.resolve(true);
-						}
-					});
+		.then(function (mentor) {
+			if(_.isNull(mentor)) {
+				var message = "The mentor id is invalid";
+				var source = "mentor_id";
+				throw new errors.InvalidParameterError(message, source);
 			}
 			return _Promise.resolve(false);
 		});
@@ -173,12 +150,6 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
 
 	return _isProjectMentorValid(project_id, mentor_id)
 		.then(function (isValid) {
-			if(!isValid){
-				var message = "A project or mentor with the given IDs cannot be found";
-				var source = "project_id/mentor_id";
-				throw new errors.NotFoundError(message, source);
-			}
-
 			return ProjectMentor.findByProjectAndMentorId(project_id, mentor_id);
 		})
 		.then(function (result) {
@@ -192,7 +163,7 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
 				.then(function (projectMentor) {
 					return projectMentor;
 				});
-		});
+		})
 }
 
 /**

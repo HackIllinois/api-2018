@@ -7,17 +7,13 @@ var config = require('../../config');
 var roles = require('../utils/roles');
 
 var ProjectService = require('../services/ProjectService');
-
+var PermissionService = require('../services/PermissionService');
 
 
 function createProject (req, res, next) {
-	attributes = {};
-	attributes.name = req.body.name;
-	attributes.description = req.body.description;
-	attributes.repo = req.body.repo;
-	attributes.is_published = req.body.is_published;
+	attributes = req.body;
 
-	ProjectService
+	PermissionService
 		.canCreateProject(req.user)
 		.then(function (isAuthed) {
 			return ProjectService.createProject(attributes);
@@ -51,8 +47,6 @@ function getProject (req, res, next) {
 		});
 }
 
-
-// TODO: Make this better
 function updateProject (req, res, next) {
 	var id = req.params.id;
 	var key = req.body.key;
