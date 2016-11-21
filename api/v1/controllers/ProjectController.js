@@ -49,13 +49,12 @@ function getProject (req, res, next) {
 
 function updateProject (req, res, next) {
 	var id = req.params.id;
-	var key = req.body.key;
-	var value = req.body.value;
+	var attributes = req.body;
 
 	ProjectService
 		.findProjectById(id)
 		.then(function (project) {
-			return ProjectService.updateProject(project, key, value);
+			return ProjectService.updateProject(project, attributes);
 		})
 		.then(function (project) {
 			res.body = project.toJSON();

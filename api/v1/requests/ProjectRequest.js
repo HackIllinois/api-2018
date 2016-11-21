@@ -5,18 +5,19 @@ var bodyRequired = ['name', 'description', 'repo', 'is_published'];
 var bodyValidations = {
 	'name': ['string', 'required'],
 	'description': ['string', 'required'],
-	'repo': ['string', 'maxLength:255'],
+	'repo': ['required', 'string', 'maxLength:255'],
 	'is_published': ['boolean']
 };
 
-function ProjectCreationRequest(headers, body) {
+function ProjectRequest(headers, body) {
+	console.log("USING THIS NOW");
 	Request.call(this, headers, body);
 
 	this.bodyRequired = bodyRequired;
 	this.bodyValidations = bodyValidations;
 }
 
-ProjectCreationRequest.prototype = Object.create(Request.prototype);
-ProjectCreationRequest.prototype.constructor = ProjectCreationRequest;
+ProjectRequest.prototype = Object.create(Request.prototype);
+ProjectRequest.prototype.constructor = ProjectRequest;
 
-module.exports = ProjectCreationRequest;
+module.exports = ProjectRequest;

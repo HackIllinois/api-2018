@@ -10,8 +10,6 @@ var errors = require('../errors');
 var utils = require('../utils');
 var roles = require('../utils/roles');
 
-const projectKeys = ["name", "description", "repo", "isPublished"];
-
 
 /**
  * Creates a project with the specificed attributes
@@ -20,8 +18,8 @@ const projectKeys = ["name", "description", "repo", "isPublished"];
  * @throws InvalidParameterError when a project exists with the specified name
  */
 module.exports.createProject = function (attributes) {
-	if(_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)){
-		attributes.isPublished = false;
+	if(_.isNull(attributes.is_published) || _.isUndefined(attributes.is_published)){
+		attributes.is_published = false;
 	}
 
 	var project = Project.forge(attributes);
@@ -69,19 +67,14 @@ module.exports.findProjectById = function (id) {
 /**
  * Update a key value pair in a project
  * @param  {Project} Project that will be updated
- * @param  {String} Key is the name of the attribute
- * @param  {String} Value is the new value of the attribute
+ * @param  {Object} JSON representing new project mentor key value pairs
  * @return {Promise} resolving to the updated project
  * @throws InvalidParameterError when the key is not valid
  */
-module.exports.updateProject = function (project, key, value) {
-	if(projectKeys.indexOf(key.toLowerCase()) == -1){
-		var message = "The given key is invalid";
-		var source = "key";
-		throw new errors.InvalidParameterError(message, source);
-	}
+module.exports.updateProject = function (project, attributes) {
+	project.set(attributes);
+
 	return project
-		.set(key, value)
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
@@ -158,12 +151,8 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
 				return _Promise.resolve(result);
 			}
 
-			return projectMentor
-				.save()
-				.then(function (projectMentor) {
-					return projectMentor;
-				});
-		})
+			return projectMentor.save()
+		});
 }
 
 /**
