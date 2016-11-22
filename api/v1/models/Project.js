@@ -7,7 +7,7 @@ var Project = Model.extend({
 		name: ['required', 'string', 'maxLength:100'],
 		description: ['required', 'string', 'maxLength:255'],
 		repo: ['required', 'string', 'maxLength:255'],
-		is_published: ['boolean']
+		isPublished: ['boolean']
 	}
 });
 

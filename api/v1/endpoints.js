@@ -25,16 +25,12 @@ endpoints['/v1/auth'] = {
 	POST: requests.BasicAuthRequest
 };
 endpoints['/v1/upload/resume'] = {
-	POST: requests.UploadRequest
-};
-endpoints['/v1/upload/resume/:id'] = {
+	POST: requests.UploadRequest,
 	PUT: requests.UploadRequest
 };
-endpoints['/v1/project/:id'] = {
-	PUT: requests.ProjectRequest
-};
 endpoints['/v1/project'] = {
-	POST: requests.ProjectRequest
+	POST: requests.ProjectRequest,
+	PUT: requests.ProjectRequest
 };
 
 module.exports = endpoints;

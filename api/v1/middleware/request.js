@@ -7,7 +7,7 @@ var errorUtils = require('../utils/errors');
 module.exports = function(req, res, next) {
 	// we need to find whether or not this endpoint's method has a validating
 	// request object mapped to it
-	var pathRequests = endpoints[req.originalUrl.replace(/\/+$/, "")];
+	var pathRequests = endpoints[req.baseUrl.replace(/\/+$/, "")];
 	var MethodRequest = (pathRequests) ? pathRequests[req.method] : undefined;
 
 	// not all methods (or endpoints) define such an object

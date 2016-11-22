@@ -13,13 +13,13 @@ var roles = require('../utils/roles');
 
 /**
  * Creates a project with the specificed attributes
- * @param  {Object} Contains name, description, repo, and is_published
+ * @param  {Object} Contains name, description, repo, and isPublished
  * @return {Promise} resolving to the newly-created project
  * @throws InvalidParameterError when a project exists with the specified name
  */
 module.exports.createProject = function (attributes) {
-	if(_.isNull(attributes.is_published) || _.isUndefined(attributes.is_published)){
-		attributes.is_published = false;
+	if(_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)){
+		attributes.isPublished = false;
 	}
 
 	var project = Project.forge(attributes);
