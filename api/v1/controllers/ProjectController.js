@@ -152,7 +152,7 @@ router.use(middleware.request);
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
 router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
-router.get('/all/:page', middleware.permission(roles.ORGANIZERS), getAllProjects);
+router.get('/all/:page', middleware.permission(roles.ALL), getAllProjects);
 router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
 router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 
