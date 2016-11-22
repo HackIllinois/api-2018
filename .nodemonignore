@@ -5,8 +5,8 @@ temp/**
 
 .gitignore
 .nodemonignore
+.env
 .DS_STORE
 package.json
-env.list
 CONTRIBUTING.md
 README.md

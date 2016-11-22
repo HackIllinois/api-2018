@@ -13,4 +13,4 @@ node_modules
 temp
 
 *.config
-env.list
+.env

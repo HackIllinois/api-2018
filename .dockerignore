@@ -1,9 +1,9 @@
 .gitignore
 .dockerignore
 .nodemonignore
+.env
 *.md
 Dockerfile
-env.list
 !README.md
 
 config/*

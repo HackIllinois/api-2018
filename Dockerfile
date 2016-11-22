@@ -16,4 +16,4 @@ RUN  npm install
 COPY . .
 
 # launch the api
-CMD  ["npm", "run", "prod"]
+CMD  ["npm", "run", "dev"]
