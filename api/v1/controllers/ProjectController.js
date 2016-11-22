@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var bodyParser = require('body-parser');
 var middleware = require('../middleware');
 var router = require('express').Router();
@@ -9,6 +10,24 @@ var roles = require('../utils/roles');
 var ProjectService = require('../services/ProjectService');
 var PermissionService = require('../services/PermissionService');
 
+
+function _validGetAllRequest(page, count, published){
+	if(_.isNaN(page)){
+		var message = "Invalid page parameter";
+		var source = "page";
+		throw new errors.InvalidParameterError(message, source);
+	}
+	if(_.isNaN(count)){
+		var message = "Invalid count parameter";
+		var source = "count";
+		throw new errors.InvalidParameterError(message, source);
+	}
+	if(_.isNaN(published) || (published != 0 && published != 1)){
+		var message = "Invalid published parameter";
+		var source = "published";
+		throw new errors.InvalidParameterError(message, source);
+	}
+}
 
 function createProject (req, res, next) {
 	attributes = req.body;
@@ -37,6 +56,28 @@ function getProject (req, res, next) {
 		.findProjectById(id)
 		.then(function (project) {
 			res.body = project.toJSON();
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
+function getAllProjects (req, res, next) {
+	var page = parseInt(req.params.page);
+	var count = parseInt(req.query.count);
+	var published = parseInt(req.query.published);
+
+	_validGetAllRequest(page, count, published);
+	
+	ProjectService
+		.getAllProjects(page, count, published)
+		.then(function (results) {
+			res.body = {};
+			res.body.projects = results;
 
 			next();
 			return null;
@@ -111,6 +152,7 @@ router.use(middleware.request);
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
 router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
+router.get('/all/:page', middleware.permission(roles.ORGANIZERS), getAllProjects);
 router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
 router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 

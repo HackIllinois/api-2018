@@ -24,6 +24,7 @@ var KNEX_CONFIG = {
 function DatabaseManager() {
 	this._knex = Knex(KNEX_CONFIG);
 	this._bookshelf = Bookshelf(this._knex);
+	this._bookshelf.plugin('pagination')
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;

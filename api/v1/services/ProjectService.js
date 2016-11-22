@@ -36,12 +36,8 @@ module.exports.createProject = function (attributes) {
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return project
-				.save()
-				.then(function (project) {
-					return project;
-				});
-		})
+			return project.save()
+		});
 }
 
 /**
@@ -150,7 +146,6 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
 				//The project mentor relationship already exists
 				return _Promise.resolve(result);
 			}
-
 			return projectMentor.save()
 		});
 }
@@ -164,5 +159,30 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
  */
 module.exports.deleteProjectMentor = function (project_id, mentor_id) {
 	return _deleteProjectMentor(project_id, mentor_id);
+}
+
+
+/**
+ * Returns a list of all projects
+ * @param  {Int} Page number
+ * @param  {Int} Number of items on the page
+ * @param  {Int} Boolean in int form representing published/unpublished
+ * @return {Promise} resolving to an array of project objects
+ */
+module.exports.getAllProjects = function (page, count, isPublished) {
+	return Project
+		.query(function (qb){
+			qb.groupBy('projects.id');
+			qb.where('is_published', '=', String(isPublished));
+		})
+		.orderBy('-name')
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var projects = _.map(results.models, 'attributes');
+			return projects;
+		});
 }
 
