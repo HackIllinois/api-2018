@@ -15,7 +15,7 @@ endpoints['/v1/registration/mentor'] = {
 	POST: requests.MentorRequest,
 	PUT: requests.MentorRequest
 };
-endpoints['/v1/registration/mentor/:id'] = {
+endpoints['/v1/registration/mentor/me'] = {
 	PUT: requests.MentorRequest
 };
 endpoints['/v1/auth/reset'] = {
