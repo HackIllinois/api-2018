@@ -5,6 +5,7 @@ var services = require('../services');
 var config = require('../../config');
 
 var middleware = require('../middleware');
+var requests = require('../requests');
 var scopes = require('../utils/scopes');
 var mail = require('../utils/mail');
 var roles = require('../utils/roles');
@@ -101,11 +102,11 @@ function requestPasswordReset (req, res, next) {
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
-router.use(middleware.request);
 
-router.post('/', createUser);
-router.post('/accredited', middleware.permission(roles.ORGANIZERS), createAccreditedUser);
-router.post('/reset', requestPasswordReset);
+router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
+router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
+	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
+router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
 
 router.use(middleware.response);
