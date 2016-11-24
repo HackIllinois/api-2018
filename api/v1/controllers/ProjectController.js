@@ -149,12 +149,12 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 router.use(middleware.request);
 
+router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
+router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
 router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
 router.get('/all/:page', middleware.permission(roles.ALL), getAllProjects);
-router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
-router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 
 router.use(middleware.response);
 router.use(middleware.errors);

@@ -5,13 +5,13 @@ npm-debug.log*
 pids
 *.pid
 *.seed
+dump.rdb
 
 node_modules
 .npm
 
+.idea
 .DS_Store
 temp
 
 *.config
-
-dump.rdb
