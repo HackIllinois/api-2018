@@ -5,6 +5,7 @@ var router = require('express').Router();
 
 var errors = require('../errors');
 var config = require('../../config');
+var requests = require('../requests');
 var roles = require('../utils/roles');
 
 var ProjectService = require('../services/ProjectService');
@@ -147,16 +148,18 @@ function deleteProjectMentor (req, res, next) {
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
-router.use(middleware.request);
 
 router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
 router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
-router.post('/', middleware.permission(roles.ORGANIZERS), createProject);
+router.post('/', middleware.request(requests.ProjectRequest),
+	middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);
-router.put('/:id', middleware.permission(roles.ORGANIZERS), updateProject);
+router.put('/:id', middleware.request(requests.ProjectRequest),
+	middleware.permission(roles.ORGANIZERS), updateProject);
 router.get('/all/:page', middleware.permission(roles.ALL), getAllProjects);
 
 router.use(middleware.response);
 router.use(middleware.errors);
 
 module.exports.router = router;
+
