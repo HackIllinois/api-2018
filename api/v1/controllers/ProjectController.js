@@ -2,6 +2,7 @@ var _ = require('lodash');
 var bodyParser = require('body-parser');
 var middleware = require('../middleware');
 var router = require('express').Router();
+var _Promise = require('bluebird');
 
 var errors = require('../errors');
 var config = require('../../config');
@@ -28,6 +29,7 @@ function _validGetAllRequest(page, count, published){
 		var source = "published";
 		throw new errors.InvalidParameterError(message, source);
 	}
+	return _Promise.resolve(true);
 }
 
 function createProject (req, res, next) {
@@ -68,14 +70,16 @@ function getProject (req, res, next) {
 }
 
 function getAllProjects (req, res, next) {
+	_.defaults(req.params, {'page': 1});
+	_.defaults(req.query, {'count': 10, 'published': 1});
 	var page = parseInt(req.params.page);
 	var count = parseInt(req.query.count);
 	var published = parseInt(req.query.published);
 
-	_validGetAllRequest(page, count, published);
-	
-	ProjectService
-		.getAllProjects(page, count, published)
+	_validGetAllRequest(page, count, published)
+		.then(function () {
+			return ProjectService.getAllProjects(page, count, published);
+		})
 		.then(function (results) {
 			res.body = {};
 			res.body.projects = results;
@@ -149,8 +153,10 @@ function deleteProjectMentor (req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('/mentor', middleware.permission(roles.ORGANIZERS), addProjectMentor);
-router.delete('/mentor', middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
+router.post('/mentor', middleware.request(requests.ProjectMentorRequest),
+	middleware.permission(roles.ORGANIZERS), addProjectMentor);
+router.delete('/mentor', middleware.request(requests.ProjectMentorRequest),
+	middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 router.post('/', middleware.request(requests.ProjectRequest),
 	middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id', middleware.permission(roles.ALL), getProject);

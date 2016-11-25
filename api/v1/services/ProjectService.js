@@ -173,7 +173,7 @@ module.exports.getAllProjects = function (page, count, isPublished) {
 	return Project
 		.query(function (qb){
 			qb.groupBy('projects.id');
-			qb.where('is_published', '=', String(isPublished));
+			qb.where('is_published', '=', isPublished);
 		})
 		.orderBy('-name')
 		.fetchPage({
