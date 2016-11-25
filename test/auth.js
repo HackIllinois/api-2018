@@ -15,7 +15,7 @@ var jwt = require('jsonwebtoken');
 var assert = chai.assert;
 var expect = chai.expect;
 
-describe('UserService',function(){
+describe('AuthService',function(){
 
     describe('issueForUser',function(){
         var testUser;
@@ -38,7 +38,15 @@ describe('UserService',function(){
         });
         it('issues a token for a valid user',function(done){
             var token = AuthService.issueForUser(testUser);
-            expect(token).to.eventually.equal(jwt.sign(subject, JWT_SECRET,parameters)).and.notify(done);
+            token.then(function(data){
+                var decoded = jwt.decode(data, {complete: true})
+
+                expect(decoded.payload.email).to.equal("new@example.com");
+                expect(decoded.payload.roles[0].role).to.equal('ATTENDEE');
+                expect(decoded.payload.sub).to.equal("1");
+
+                done();
+            });
         });
         it('refuses a token for a blank user',function(done){
             try{

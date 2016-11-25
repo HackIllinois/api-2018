@@ -33,15 +33,15 @@ describe('UserService',function(){
 		});
 		it('creates a new user', function (done) {
 			var user = UserService.createUser('new@example.com', 'password123', utils.roles.ATTENDEE);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1);
-			expect(user).to.eventually.have.deep.property("attributes.email", 'new@example.com');
-
-			// TODO restructure this
-			user.tap(function (u) {
-				return expect(u.hasRole(utils.roles.ATTENDEE)).to.equal(true);
-			}).tap(function (u) {
-				return expect(u.hasPassword('password123')).to.eventually.equal(true);
-			}).then(function () { done(); }).catch(done);
+			expect(user).to.eventually.have.deep.property("attributes.id", 1).then(function(){
+				expect(user).to.eventually.have.deep.property("attributes.email", 'new@example.com').then(function(){
+					user.tap(function (u) {
+						return expect(u.hasRole(utils.roles.ATTENDEE)).to.equal(true);
+					}).tap(function (u) {
+						return expect(u.hasPassword('password123')).to.eventually.equal(true);
+					}).then(function () { done(); }).catch(done);
+				});
+			});
 		});
 		it('throws an error for an existing user', function (done) {
 			var user = UserService.createUser('existing@example.com', 'password123', utils.roles.ATTENDEE);
@@ -96,10 +96,10 @@ describe('UserService',function(){
 		});
 		it('finds existing user',function(done){
 			var user = UserService.findUserById(1);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should 1, the searched for ID")
+			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should be 1, the searched for ID")
 				.then(function(){
 					expect(user).to.eventually.have.deep.property("attributes.email",
-						'new@example.com',"email should new@example.com").notify(done);
+						'new@example.com',"email should be new@example.com").notify(done);
 			})
 		});
 		it('throws exception after searching for non-existent user',function(done){

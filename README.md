@@ -132,20 +132,6 @@ npm run prod
 Use `Control-C` to kill the server. Note that `node` must be on your path and that
 the configuration for the target environment must be present in the `config` directory.
 
-
-If you would like to see the available commands, run
-``` shell
-node api.js -h
-```
-
-We currently support
-
-| Argument Parameter | Description |
-| ------------------ | ----------- |
-| -h                 | Show help   |
-| -t                 | Run tests   |
-
-
 ## Documentation
 
 All documentation is available on the [project wiki](https://github.com/HackIllinois/api-2017/wiki).
@@ -162,9 +148,9 @@ the pull-request detailing the issue preventing a merge.
 
 ## Testing
 
-Please set the proper enviornment variables before testing. You can run the tests locally with
+Environment variables should be set in `test.config`. A template is found within the `config` directory.
 
 ``` shell
-node api.js -t
+node run test
 ```
 

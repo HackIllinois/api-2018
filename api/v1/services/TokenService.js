@@ -54,8 +54,6 @@ module.exports.generateToken = function(user, scope){
 	var tokenVal = utils.crypto.generateResetToken();
 	var userId = user.get('id');
 
-	//Token.where({user_id: userId, type: scope}).fetchAll().then(function(data){console.log(data)});
-
 	return Token
 		.where({user_id: userId, type: scope}).fetchAll()
 		.then(function(tokens) {
