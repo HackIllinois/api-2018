@@ -17,17 +17,17 @@ function _validGetAllRequest(page, count, published){
 	if(_.isNaN(page)){
 		var message = "Invalid page parameter";
 		var source = "page";
-		throw new errors.InvalidParameterError(message, source);
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	if(_.isNaN(count)){
 		var message = "Invalid count parameter";
 		var source = "count";
-		throw new errors.InvalidParameterError(message, source);
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	if(_.isNaN(published) || (published != 0 && published != 1)){
 		var message = "Invalid published parameter";
 		var source = "published";
-		throw new errors.InvalidParameterError(message, source);
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	return _Promise.resolve(true);
 }
