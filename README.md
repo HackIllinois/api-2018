@@ -150,9 +150,8 @@ the pull-request detailing the issue preventing a merge.
 
 ## Testing
 
-Environment variables should be set in `test.config`. A template is found within the `config` directory.
+Environment variables should be set in `test.config`. With these values set, run
 
 ``` shell
-node run test
+npm run test
 ```
-
