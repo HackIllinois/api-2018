@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge)
+
 # HackIllinois API (2017)
 
 The back-end services supporting HackIllinois 2017 are stored here. Looking to
