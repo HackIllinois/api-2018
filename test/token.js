@@ -39,13 +39,14 @@ describe('TokenService',function(){
                 });
         });
         it('throws error for invalid scope',function(done){
-            // TODO structure from 'user.js' was not working for catching this error; refactor
-            try {
-                TokenService.findTokenByValue(tokenVal, 'INVALID');
-            }catch(e){
-                expect(e).to.be.instanceof(TypeError);
-                done();
-            }
+            TokenService.findTokenByValue(tokenVal, 'INVALID')
+                .then(function(){
+                    return done("Error was not thrown for INVALID token scope");
+                })
+                .catch(function(err){
+                    expect(err).to.be.instanceof(TypeError);
+                    return done();
+                });
         });
         it('throws error with expired token and calls delete on token',function(done){
             var _get = sinon.stub(Token.prototype,'get');
@@ -55,8 +56,8 @@ describe('TokenService',function(){
             expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
                 .then(function(){
                     expect(_destroy.neverCalledWith()).to.equal(false);
-                    _get.restore;
-                    _destroy.restore;
+                    _get.restore();
+                    _destroy.restore();
                     done();
                 });
         });
