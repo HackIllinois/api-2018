@@ -1,6 +1,5 @@
 var config = require('./config');
 var logger = require('./logging');
-
 var v1 = require('./v1');
 
 logger.info("starting superuser setup check in the background");

@@ -1,5 +1,7 @@
 /* jshint esversion: 6 */
 
+var _Promise = require('bluebird');
+
 var Token = require('../models/Token');
 var config = require('../../config');
 var logger = require('../../logging');
@@ -20,7 +22,7 @@ const TOKEN_SCOPE_INVALID_ERROR = "An invalid or non-existent scope was supplied
  */
 module.exports.findTokenByValue = function(value, scope) {
 	if (!(scope in config.token.expiration)) {
-		throw new TypeError(TOKEN_SCOPE_INVALID_ERROR);
+		return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
 	}
 
 	return Token
@@ -34,12 +36,11 @@ module.exports.findTokenByValue = function(value, scope) {
 			var tokenExpiration = Date.parse(result.get('created')) + expiration;
 			if (tokenExpiration < Date.now())
 			{
-				// Invalid token (expired)
 				result.destroy();
-				return Promise.reject(new errors.TokenExpirationError());
+				throw new errors.TokenExpirationError();
 			}
 
-			return Promise.resolve(result);
+			return _Promise.resolve(result);
 		});
 };
 

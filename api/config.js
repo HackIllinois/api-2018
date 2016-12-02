@@ -7,19 +7,23 @@ var logger = require('./logging');
 
 const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
+const TEST_ENVIRONMENT = 'test';
 
 var environment = process.env.NODE_ENV;
+
 var secret = process.env.HACKILLINOIS_SECRET || undefined;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL || undefined;
 var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD || undefined;
 var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY || undefined;
+var isTest = environment === TEST_ENVIRONMENT;
+
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
 
-if (!isProduction && !isDevelopment) {
+if (!(isProduction || isDevelopment || isTest)) {
 	logger.error("an environment was not provided");
-	logger.error("set NODE_ENV to '%s' or '%s'",
-		DEVELOPMENT_IDENTIFIER, PRODUCTION_IDENTIFIER);
+	logger.error("set NODE_ENV to '%s', '%s', %s",
+		TEST_ENVIRONMENT, DEVELOPMENT_IDENTIFIER, PRODUCTION_IDENTIFIER);
 
 	process.exit(1);
 }
@@ -53,7 +57,9 @@ config.storage = {};
 config.superuser = {};
 config.token = { expiration: {} };
 
+config.isProduction = isProduction;
 config.isDevelopment = isDevelopment;
+config.isTest = isTest;
 config.secret = secret;
 config.port = process.env.HACKILLINOIS_PORT;
 config.profile = process.env.PROFILE;

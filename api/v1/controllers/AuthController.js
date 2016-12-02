@@ -100,7 +100,6 @@ function passwordReset(req, res, next) {
 			return null;
 		});
 }
-
 router.use(bodyParser.json());
 router.use(middleware.auth);
 

@@ -116,7 +116,7 @@ Note that if you're looking to contribute to this codebase, you should read the
 [database README](/database/README.md) as well. It contains important information that all
 contributors should be familiar with.
 
-## Starting Up
+## Usage
 
 A local API instance can be created on port 8080 via the following commands,
 executed from the root of the project directory.
@@ -147,3 +147,12 @@ Any issues found in a feature branch (i.e. not in `master` or `staging`)
 should be communicated to the active developer(s) directly, unless there is an open
 pull-request for that feature branch. In the latter case, just leave a comment on
 the pull-request detailing the issue preventing a merge.
+
+## Testing
+
+Environment variables should be set in `test.config`. A template is found within the `config` directory.
+
+``` shell
+node run test
+```
+
