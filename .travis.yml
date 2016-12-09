@@ -16,6 +16,6 @@ services:
   #- docker
 before_script:
   #Docker setup goes here
-  - cp config/test.config.template config/test/test.config 
+  - cp /home/travis/build/HackIllinois/api-2017/config/test.config.template /home/travis/build/HackIllinois/api-2017/config/test/test.config 
   - npm install
 script: test
