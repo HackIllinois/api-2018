@@ -10,5 +10,4 @@ config/*
 !config/prod.config
 
 node_modules
-database
 temp

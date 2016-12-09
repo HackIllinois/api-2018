@@ -29,7 +29,7 @@
   "scripts": {
 	"dev": "./resources/scripts/dev.sh",
 	"prod": "./resources/scripts/prod.sh",
-	"dev-migrations": "./resources/scripts/env.sh dev && ./database/flyway.sh migrate",
-	"prod-migrations": "./resources/scripts/env.sh prod && ./database/flyway.sh migrate"
+	"dev-migrations": "./database/flyway.sh migrate dev",
+	"prod-migrations": "./database/flyway.sh migrate prod"
   }
 }
