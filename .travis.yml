@@ -1,12 +1,15 @@
 language: node_js
 node_js:
   - "4.6"
-services:
-  - redis-server
-  - mysql
 cache:
   directories:
     - node_modules
+services:
+  - redis-server
+  - mysql
+  #Docker goes here
 before_script:
+  #Docker setup goes here
+  - sudo cp config/test.config.template config/test/test.config 
   - npm install
 script: test
