@@ -5,11 +5,9 @@ cache:
   directories:
     - node_modules
 services:
-  #- redis-server
-  - mysql
   #- docker
 before_script:
   #Docker setup goes here
-  - sudo cp config/test.config.template config/test/test.config 
+  - cp config/test.config.template config/test/test.config 
   - npm install
 script: test
