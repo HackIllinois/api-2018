@@ -5,7 +5,7 @@
 
 const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
-const TEST_ENVIRONMENT = 'test';
+const TEST_IDENTIFIER = 'test';
 
 var environment = process.env.NODE_ENV;
 
@@ -13,15 +13,15 @@ var secret = process.env.HACKILLINOIS_SECRET || undefined;
 var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL || undefined;
 var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD || undefined;
 var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY || undefined;
-var isTest = environment === TEST_ENVIRONMENT;
 
 var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
 var isProduction = environment === PRODUCTION_IDENTIFIER;
+var isTest = environment === TEST_IDENTIFIER;
 
 var exit = false;
-if (!isProduction && !isDevelopment) {
+if (!(isProduction || isDevelopment || isTest)) {
 	exit = true;
-	console.error("error: set NODE_ENV to '%s' or '%s'", DEVELOPMENT_IDENTIFIER, PRODUCTION_IDENTIFIER);
+	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
 } if (!superuserEmail) {
 	exit = true;
 	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");

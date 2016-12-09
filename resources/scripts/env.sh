@@ -14,8 +14,10 @@ else
 		echo -e "${RED}Missing a development configuration (dev.config)\n${NC}"
 	elif [[ $1 == *"prod"* ]]; then
 		echo -e "${RED}Missing a production configuration (prod.config)\n${NC}"
+	elif [[ $1 == *"test"* ]]; then
+		echo -e "${RED}Missing a test configuration (test.config)\n${NC}"
 	else
-		echo -e "${RED}Missing configuration parameter (specify 'prod' or 'dev')\n${NC}"
+		echo -e "${RED}Missing configuration parameter (specify 'prod', 'dev', or 'test')\n${NC}"
 	fi
 	exit 1
 fi

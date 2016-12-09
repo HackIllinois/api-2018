@@ -33,7 +33,7 @@
 	"sinon": "^1.17.2"
   },
   "scripts": {
-	"test": "source resources/scripts/env.sh test && mocha 'test/test.js' -b —full-trace",
+	"test": "./resources/scripts/test.sh",
 	"dev": "./resources/scripts/dev.sh",
 	"prod": "./resources/scripts/prod.sh",
 	"dev-migrations": "./database/flyway.sh migrate dev",
