@@ -38,5 +38,9 @@
     "chai-as-promised": "^6.0.0",
     "chai-http": "^3.0.0",
     "sinon": "^1.17.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HackIllinois/api-2017.git"
   }
 }
