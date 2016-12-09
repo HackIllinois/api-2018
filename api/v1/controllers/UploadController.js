@@ -15,6 +15,7 @@ var services = require('../services');
 var utils = require('../utils');
 
 var Upload = require('../models/Upload');
+var UploadRequest = require('../requests/UploadRequest');
 var User = require('../models/User');
 
 const UPLOAD_ALREADY_PRESENT = "An upload has already been associated with this user";
@@ -114,10 +115,11 @@ function getUpload (req, res, next) {
 // note that the request middleware is added after the body-parser, else there will be no body
 var resumeRouter = ExpressRouter();
 resumeRouter.use(bodyParser.raw({ limit: RESUME_UPLOAD_LIMIT, type: RESUME_UPLOAD_TYPE }));
-resumeRouter.use(middleware.request);
 
-resumeRouter.post('/', middleware.upload, middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
-resumeRouter.put('/:id', middleware.upload, _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
+resumeRouter.post('/', middleware.request(UploadRequest), middleware.upload,
+	middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+resumeRouter.put('/:id', middleware.request(UploadRequest), middleware.upload,
+	_findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
 resumeRouter.get('/:id', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
 
 // set up the primary router with just the auth middleware since the sub-routers

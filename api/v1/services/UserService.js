@@ -17,10 +17,10 @@ var utils = require('../utils');
  * @throws InvalidParameterError when a user exists with the specified email
  */
 module.exports.createUser = function (email, password, role) {
+
 	email = email.toLowerCase();
 	var storedPassword = (storedPassword) ? storedPassword : utils.crypto.generatePassword();
 	var user = User.forge({ email: email, password: storedPassword });
-
 	return user
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
@@ -33,7 +33,6 @@ module.exports.createUser = function (email, password, role) {
 				var source = "email";
 				throw new errors.InvalidParameterError(message, source);
 			}
-
 			return User.create(email, storedPassword, role);
 		})
 		.then(function (result) {
@@ -81,13 +80,12 @@ module.exports.findUserByEmail = function (email) {
 				var source = "email";
 				throw new errors.NotFoundError(message, source);
 			}
-
 			return _Promise.resolve(result);
 		});
 };
 
 /**
- * Verifies that the provided password matches that of the user's password
+ * Verifies that the provided password matches the user's password
  * @param  {User} user a User model
  * @param  {String} password the value to verify
  * @return {Promise} resolving to the validity of the provided password

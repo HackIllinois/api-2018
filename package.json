@@ -26,7 +26,14 @@
 	"winston": "^2.2.0",
 	"winston-cloudwatch": "^1.7.0"
   },
+  "devDependencies": {
+	"chai": "^3.5.0",
+	"chai-as-promised": "^6.0.0",
+	"chai-http": "^3.0.0",
+	"sinon": "^1.17.2"
+  },
   "scripts": {
+	"test": "source resources/scripts/env.sh test && mocha 'test/test.js' -b —full-trace",
 	"dev": "./resources/scripts/dev.sh",
 	"prod": "./resources/scripts/prod.sh",
 	"dev-migrations": "./database/flyway.sh migrate dev",

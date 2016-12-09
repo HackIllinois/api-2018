@@ -1,9 +1,9 @@
+var logger = require('./logging');
+var config = require('./config');
+
 var Bookshelf = require('bookshelf');
 var Knex = require('knex');
 var milliseconds = require('ms');
-
-var logger = require('./logging');
-var config = require('./config');
 
 var KNEX_CONFIG = {
 	client: 'mysql',
@@ -23,7 +23,9 @@ var KNEX_CONFIG = {
 
 function DatabaseManager() {
 	this._knex = Knex(KNEX_CONFIG);
+
 	this._bookshelf = Bookshelf(this._knex);
+	this._bookshelf.plugin('pagination')
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
@@ -35,6 +37,9 @@ DatabaseManager.prototype.connection = function () {
 	return this._knex;
 };
 
-logger.info("connected to database as %s", config.database.primary.user);
+if (!config.isTest) {
+	// do not say this when the datastore is mocked
+	logger.info("connected to database as %s", config.database.primary.user);
+}
 
 module.exports = new DatabaseManager();

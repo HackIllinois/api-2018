@@ -28,12 +28,11 @@ function _issue(payload, subject) {
 	if (arguments.length > 1) {
 		parameters.subject = subject;
 	}
-
 	return jwt.sign(payload, JWT_SECRET, parameters);
 }
 
 /**
- * Issues a token for the parameterized suer
+ * Issues a token for the parameterized user
  * @param  {User} user the User model holding the information to claim
  * @return {Promise} resolving to the auth token
  */
@@ -43,7 +42,6 @@ module.exports.issueForUser = function (user) {
 		email: user.get('email'),
 		roles: user.related('roles').toJSON()
 	};
-
 	return _Promise
 		.try(function () {
 			// the JWT library behind _issue may thrown any number

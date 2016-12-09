@@ -4,6 +4,7 @@ var _Promise = require('bluebird');
 var config = require('../../config');
 var errors = require('../errors');
 var middleware = require('../middleware');
+var requests = require('../requests');
 var utils = require('../utils');
 
 var AuthService = require('../services/AuthService');
@@ -99,14 +100,12 @@ function passwordReset(req, res, next) {
 			return null;
 		});
 }
-
 router.use(bodyParser.json());
 router.use(middleware.auth);
-router.use(middleware.request);
 
-router.post('', createToken);
+router.post('', middleware.request(requests.BasicAuthRequest), createToken);
 router.get('/refresh', refreshToken);
-router.post('/reset', passwordReset);
+router.post('/reset', middleware.request(requests.ResetPasswordRequest), passwordReset);
 
 router.use(middleware.response);
 router.use(middleware.errors);

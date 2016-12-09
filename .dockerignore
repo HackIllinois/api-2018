@@ -10,4 +10,5 @@ config/*
 !config/prod.config
 
 node_modules
+test
 temp

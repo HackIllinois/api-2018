@@ -7,6 +7,7 @@ var _ = require('lodash');
 const SALT_ROUNDS = 12;
 
 var Model = require('./Model');
+
 var UserRole = require('./UserRole');
 var User = Model.extend({
 	tableName: 'users',
@@ -32,7 +33,7 @@ User.findById = function (id) {
 
 /**
  * Finds a user by its email address
- * @param  {String} 			email the email address
+ * @param  {String}                     email the email address
  * @return {Promise<User>}      the found user, or null
  */
 User.findByEmail = function (email) {

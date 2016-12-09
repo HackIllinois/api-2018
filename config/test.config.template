@@ -1,0 +1,13 @@
+###############################################################################
+#                               TEST_ENV_CONFIG
+###############################################################################
+#ENV AND PORTS
+NODE_ENV=test
+PROFILE=hackillinois-api
+HACKILLINOIS_PORT=8080
+
+#API KEYS AND PASSWORDS
+HACKILLINOIS_SECRET=VERY_SPECIAL_KEY
+HACKILLINOIS_SUPERUSER_EMAIL=admin@example.com
+HACKILLINOIS_SUPERUSER_PASSWORD=ABCD1234!
+HACKILLINOIS_MAIL_KEY=
