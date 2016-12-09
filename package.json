@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "source resources/scripts/env.sh test && mocha 'test/test.js' -b —full-trace",
+    "test": ". resources/scripts/env.sh test && mocha 'test/test.js' -b —full-trace",
     "dev": "./resources/scripts/startup.sh dev",
     "prod": "./resources/scripts/startup.sh prod",
     "dev-migrations": "source resources/scripts/env.sh dev && ./database/flyway.sh migrate",
