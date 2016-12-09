@@ -1,3 +1,12 @@
 language: node_js
 node_js:
   - "4.6"
+services:
+  - redis-server
+  - mysql
+cache:
+  directories:
+    - node_modules
+before_script:
+  - npm install
+script: test
