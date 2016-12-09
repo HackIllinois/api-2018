@@ -153,5 +153,5 @@ the pull-request detailing the issue preventing a merge.
 Environment variables should be set in `test.config`. With these values set, run
 
 ``` shell
-npm run test
+npm test
 ```
