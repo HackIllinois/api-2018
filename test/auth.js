@@ -59,6 +59,7 @@ describe('AuthService',function(){
     });
 
     describe('verify',function(){
+        var testUser;
         before(function(done){
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             testUser.related('roles').add({ role: utils.roles.ATTENDEE });

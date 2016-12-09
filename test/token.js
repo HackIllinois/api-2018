@@ -19,6 +19,9 @@ var expect = chai.expect;
 describe('TokenService',function(){
     describe('findTokenByValue',function(){
         var testToken;
+        var _findByValue;
+        var tokenVal;
+
         before(function(done){
             tokenVal = utils.crypto.generateResetToken();
             testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
@@ -74,7 +77,6 @@ describe('TokenService',function(){
 
     describe('generateToken',function(){ 
         var testUser; 
-        var testToken; 
         before(function(done){
 
             var _mockedTokens = {
@@ -89,12 +91,11 @@ describe('TokenService',function(){
             };
 
             testUser = User.forge({ id: 1, email: 'new@example.com' }); 
-            testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});  
 
-            _where = sinon.stub(Token,'where'); 
+            var _where = sinon.stub(Token,'where'); 
             _where.returns(_mockedWhere);
 
-            _save = sinon.stub(Token.prototype,'save'); 
+            var _save = sinon.stub(Token.prototype,'save'); 
             _save.returns(_Promise.resolve(null));  
             done(); 
         }); 
