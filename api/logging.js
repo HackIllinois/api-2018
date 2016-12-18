@@ -2,23 +2,14 @@ var winston = require("winston");
 var WinstonCloudwatch = require("winston-cloudwatch");
 
 var config = require('./config');
-var client = require('./aws');
 var files = require('./files');
 
-var TEMP_INSTANCE_ID = 'instanceid';
-
 var transports = [];
-if (client.isEnabled && config.isProduction) {
+if (config.isProduction && config.aws.enabled) {
 	var cloudwatchTransport = new WinstonCloudwatch({
 		logGroupName: config.logs.groupName,
-		logStreamName: function() {
-			// keeps streams separated by instance and date
-			// TODO add instance to string once metadata is available
-
-			var date = new Date().toISOString().split('T')[0];
-			return date + '-' + TEMP_INSTANCE_ID;
-		},
-		awsRegion: 'us-east-1', // TODO switch this to the client.config.region
+		logStreamName: config.logs.streamPrefix + '/' + config.logs.groupName + '/' + config.id,
+		awsRegion: config.aws.defaults.region,
 		json: true
 	});
 

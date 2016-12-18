@@ -47,45 +47,36 @@ We have provided templates in the directory already with all available configura
 These templates are named `{ENV}.config.template`. You should copy these templates into
 files named `{ENV}.config` and fill them with sensible values; these values can be raw
 values or existing environment variables. Note that changes to the templates are
-commited to the project codebase, but changes to any `*.config` files are ignored.
+committed to the project codebase, but changes to any `*.config` files are ignored.
 
 A list of configuration keys is provided below:
 
 | Key | Possible Values | Purpose |
 | --- | --------------- | ------- |
-| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
-| PROFILE | Any string | Presents an externally-meaningful identifier |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
-| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
+| NODE_ENV | 'production', 'development', 'testing' | Determines how environment should be configured |
+| AWS | 0 or 1 | Whether or not to use AWS |
+| HACKILLINOIS_ID | Any string | Sets the identifier used to represent this instance |
+| HACKILLINOIS_SECRET | Any string | Sets the master secret |
+| HACKILLINOIS_PORT | Any valid port number | Sets the port |
+| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Sets the default superuser email |
+| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Sets the default superuser password |
 | HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any valid MySQL schema name | Overrides default name (hackillinois) |
-| DB_USERNAME | Any string | Overrides default MySQL username ('root') |
-| DB_PASSWORD | Any string | Overrides default MySQL password ('') |
-| DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
-| DB_PORT | Any valid port number | Overrides default MySQL port (3306) |
+| DB_NAME |  Any valid MySQL schema name | Sets database name |
+| DB_USERNAME | Any string | Sets MySQL username |
+| DB_PASSWORD | Any string | Sets MySQL password |
+| DB_HOSTNAME | Any valid URI | Sets MySQL host |
+| DB_PORT | Any valid port number | Sets MySQL port |
 
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
-identified by the `PROFILE` configuration key. We do not handle AWS-specific configuration
-options in our configuration files.
+identified by `hackillinois-api`. Be sure to set the `AWS` configuration key to `1` and
+add the key `AWS_PROFILE` to your configuration with your corresponding profile name.
 
 #### Considerations
 
-Not all configuration options must be set during development (although all options should
+Not all configuration options must be set during development (but all options _should_
 be set in production). When certain keys are left empty, the API determines whether
-or not it can use a local alternative or a default value at startup. Here are some
-considerations that will help you determine which keys to set as you develop:
-
-* Anyone contributing to a feature that involves email transmissions
-will need to set the `HACKILLINOIS_MAIL_KEY` to a valid SparkPost API key.
-* Anyone contributing to a feature that involves any AWS products will need to set
-up an AWS shared credentials file (see above)
-
-Note that this API is targeted for hosting via AWS, so any AWS-specific settings
-(e.g. those in IAM roles) are used by this API before settings in any environment
-variables or other credentials files.
+or not it can use a local alternative or a default value at startup.
 
 ## Installation
 

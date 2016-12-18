@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-var client = require('../../aws');
+var client = require('aws-sdk');
 var config = require('../../config');
 var files = require('../../files');
 var errors = require('../errors');
@@ -10,6 +10,7 @@ var uuid = require('node-uuid');
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
+client.config.update(config.aws.defaults);
 var remote = new client.S3();
 
 const CLIENT_NAME = "AWS_S3";
@@ -173,7 +174,7 @@ module.exports.createUpload = function (owner, params) {
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
 module.exports.persistUpload = function (upload, file) {
-	if (!client.isEnabled) {
+	if (!config.aws.enabled) {
 		return _handleDisabledUpload(upload, file);
 	}
 	return _handleUpload(upload, file);
@@ -188,7 +189,7 @@ module.exports.persistUpload = function (upload, file) {
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.getUpload = function (upload) {
-	if (!client.isEnabled) {
+	if (!config.aws.enabled) {
 		return _handleDisabledRetrieval(upload);
 	}
 	return _handleRetrieval(upload);
@@ -203,7 +204,7 @@ module.exports.getUpload = function (upload) {
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.removeUpload = function (upload) {
-	if (!client.isEnabled) {
+	if (!config.aws.enabled) {
 		return _handleDisabledRemoval(upload);
 	}
 	return _handleRemoval(upload);

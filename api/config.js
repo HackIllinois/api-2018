@@ -7,41 +7,9 @@ const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
 const TEST_IDENTIFIER = 'test';
 
-var environment = process.env.NODE_ENV;
-
-var secret = process.env.HACKILLINOIS_SECRET || undefined;
-var superuserEmail = process.env.HACKILLINOIS_SUPERUSER_EMAIL || undefined;
-var superuserPassword = process.env.HACKILLINOIS_SUPERUSER_PASSWORD || undefined;
-var mailApiKey = process.env.HACKILLINOIS_MAIL_KEY || undefined;
-
-var isDevelopment = environment === DEVELOPMENT_IDENTIFIER;
-var isProduction = environment === PRODUCTION_IDENTIFIER;
-var isTest = environment === TEST_IDENTIFIER;
-
-var exit = false;
-if (!(isProduction || isDevelopment || isTest)) {
-	exit = true;
-	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
-} if (!superuserEmail) {
-	exit = true;
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
-} if (!superuserPassword) {
-	exit = true;
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
-} if (!secret) {
-	exit = true;
-	console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
-} if (isProduction && !mailApiKey) {
-	exit = true;
-	console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
-}
-if (exit) {
-	console.error("error: environment incomplete. shutting down...");
-	process.exit();
-}
-
 var config = {};
-config.auth = {};
+config.auth = { };
+config.aws = { defaults: {} };
 config.database = {};
 config.database.primary = { pool: {} };
 config.mail = {};
@@ -50,20 +18,26 @@ config.storage = {};
 config.superuser = {};
 config.token = { expiration: {} };
 
-config.isProduction = isProduction;
-config.isDevelopment = isDevelopment;
-config.isTest = isTest;
-config.environment = environment;
-config.secret = secret;
+config.environment = process.env.NODE_ENV;
+config.isProduction = (config.environment === PRODUCTION_IDENTIFIER);
+config.isDevelopment = (config.environment === DEVELOPMENT_IDENTIFIER);
+config.isTest = (config.environment === TEST_IDENTIFIER);
+config.id = process.env.HACKILLINOIS_ID;
+config.secret = process.env.HACKILLINOIS_SECRET;
 config.port = process.env.HACKILLINOIS_PORT;
-config.profile = process.env.PROFILE;
 
-config.superuser.email = superuserEmail;
-config.superuser.password = superuserPassword;
+config.superuser.email = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
+config.superuser.password = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 
 config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
+
+var sharedAWSCreds = new (require('aws-sdk').SharedIniFileCredentials)();
+config.aws.enabled = (process.env.AWS && !!parseInt(process.env.AWS));
+config.aws.defaults.credentials = (!!sharedAWSCreds.accessKeyId) ? sharedAWSCreds : undefined;
+config.aws.defaults.region = 'us-east-1';
+config.aws.defaults.sslEnabled = true;
 
 config.token.expiration.DEFAULT = '7d';
 config.token.expiration.AUTH = config.token.expiration.DEFAULT;
@@ -77,13 +51,33 @@ config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = '5s';
 
-config.mail.key = mailApiKey;
+config.mail.key = process.env.HACKILLINOIS_MAIL_KEY;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
 config.mail.whitelistedDomains = ['@hackillinois.org'];
 config.mail.whitelistedLists = ['test'];
 
-config.logs.groupName = (isDevelopment) ? 'api' : 'api-dev';
+config.logs.streamPrefix = 'instances';
+config.logs.groupName = (!config.isProduction) ? 'api-dev' : 'api';
 
-config.storage.bucketExtension = (isDevelopment) ? '-development' : '-2017';
+config.storage.bucketExtension = (!config.isProduction) ? '-development' : '-2017';
+
+var exit = true;
+if (!(config.isProduction || config.isDevelopment || config.isTest)) {
+	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
+} else if (!config.superuser.email) {
+	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
+} else if (!config.superuser.password) {
+	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
+} else if (!config.secret) {
+	console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
+} else if (config.isProduction && !config.mail.key) {
+	console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
+} else {
+	exit = false;
+}
+if (exit) {
+	console.error("fatal: environment incomplete. shutting down...");
+	process.exit();
+}
 
 module.exports = config;
