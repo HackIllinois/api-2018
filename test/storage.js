@@ -11,6 +11,15 @@ var User = require('../api/v1/models/User.js');
 
 var assert = chai.assert;
 var expect = chai.expect;
+var tracker = require('mock-knex').getTracker();
+
+function _patchInsertUpdate () {
+	// adds a query handler to the mock database connection so that
+	// it returns a result (i.e. on save for these tests)
+	tracker.on('query', function (query) {
+		query.response([]);
+	});
+}
 
 describe('StorageService',function(){
 
@@ -25,11 +34,17 @@ describe('StorageService',function(){
 			_save = sinon.spy(Upload.prototype, 'save');
 			done();
 		});
+		beforeEach(function (done) {
+			tracker.install();
+			done();
+		});
+
 		it('creates a new upload with generated key', function (done) {
 			var params = {};
-			var upload;
 			params.bucket = "target_bucket";
-			upload = StorageService.createUpload(testUser, params);
+
+			_patchInsertUpdate();
+			var upload = StorageService.createUpload(testUser, params);
 
 			// define the expected parameters
 			params.ownerId = 1;
@@ -45,11 +60,12 @@ describe('StorageService',function(){
 		});
 		it('creates a new upload with defined key', function (done) {
 			var params = {};
-			var upload;
 			params.bucket = "target_bucket";
 			params.key = "key";
 			params.ownerId = 1;
-			upload = StorageService.createUpload(testUser, params);
+
+			_patchInsertUpdate();
+			var upload = StorageService.createUpload(testUser, params);
 
 			upload.then(function () {
 				assert(_forge.withArgs(params).called, "forge not called with right parameters");
@@ -58,6 +74,11 @@ describe('StorageService',function(){
 			}).catch(function (e) {
 				return done(e);
 			});
+		});
+
+		afterEach(function (done) {
+			tracker.uninstall();
+			done();
 		});
 		after(function(done) {
 			_forge.restore();
