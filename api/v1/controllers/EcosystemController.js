@@ -9,23 +9,14 @@ var config = require('../../config');
 var requests = require('../requests');
 var roles = require('../utils/roles');
 
-var Ecosystem = require('../models/Ecosystem');
+var EcosystemService = require('../services/EcosystemService');
 
 
 function createEcosystem (req, res, next) {
 	var name = req.body.name;
-	var ecosystem = Ecosystem.forge({name: name.toLowerCase()});
 
-	Ecosystem.findByName(name)
-		.then(function (result) {
-			if (!_.isNull(result)) {
-				var message = "An ecosystem with the given name already exists";
-				var source = "name";
-				throw new errors.InvalidParameterError(message, source);
-			}
-
-			return ecosystem.save();
-		})
+	EcosystemService
+		.createEcosystem(name)
 		.then(function (newEcosystem) {
 			res.body = {};
 			res.body.ecosystem = newEcosystem.attributes.name;
@@ -40,7 +31,8 @@ function createEcosystem (req, res, next) {
 }
 
 function getAllEcosystems (req, res, next) {
-	Ecosystem.fetchAll()
+	EcosystemService
+		.getAllEcosystems()
 		.then(function (results) {
 			res.body = results.toJSON();
 
@@ -56,16 +48,8 @@ function getAllEcosystems (req, res, next) {
 function deleteEcosystem (req, res, next) {
 	var name = req.body.name;
 
-	Ecosystem.findByName(name)
-		.then(function (result) {
-			if (_.isNull(result)) {
-				var message = "An ecosystem with the given name does not exist";
-				var source = "name";
-				throw new errors.InvalidParameterError(message, source);
-			}
-
-			return result.destroy();
-		})
+	EcosystemService
+		.deleteEcosystem(name)
 		.then(function () {
 			res.body = {}
 
