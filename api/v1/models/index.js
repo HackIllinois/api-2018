@@ -1,4 +1,5 @@
 module.exports = {
+	Ecosystem: require('./Ecosystem'),
 	MailingList: require('./MailingList'),
 	MailingListUser: require('./MailingListUser'),
 	User: require('./User'),

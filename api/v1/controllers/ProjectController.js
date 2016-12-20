@@ -33,7 +33,7 @@ function _validGetAllRequest(page, count, published){
 }
 
 function createProject (req, res, next) {
-	attributes = req.body;
+	var attributes = req.body;
 
 	PermissionService
 		.canCreateProject(req.user)
