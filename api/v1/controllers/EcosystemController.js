@@ -67,7 +67,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.get('/all', middleware.permission(roles.ORGANIZERS), getAllEcosystems);
-router.post('/', middleware.permission(roles.ORGANIZERS), createEcosystem);
+router.post('/', middleware.request(requests.EcosystemCreationRequest), middleware.permission(roles.ORGANIZERS), createEcosystem);
 router.delete('/', middleware.permission(roles.ORGANIZERS), deleteEcosystem);
 
 router.use(middleware.response);
