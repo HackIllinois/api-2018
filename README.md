@@ -1,4 +1,5 @@
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge) 
+[![Build Status](https://travis-ci.org/HackIllinois/api-2017.svg?branch=staging)](https://travis-ci.org/HackIllinois/api-2017)
 
 # HackIllinois API (2017)
 
@@ -157,5 +158,5 @@ the pull-request detailing the issue preventing a merge.
 Environment variables should be set in `test.config`. With these values set, run
 
 ``` shell
-npm run test
+npm test
 ```
