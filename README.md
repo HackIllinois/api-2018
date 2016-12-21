@@ -127,10 +127,16 @@ find the Dockerfile in the project root directory.
 
 ## Logging
 
-The API access logs are available in `/temp/logs/api.log` during development, but
-are periodically pushed to AWS CloudWatch during in production (and are not accessible
-until they are pushed). Note that these logs are optimized for searchability, not
-readability.
+The API access logs are available in `/temp/logs/api.log` as well as on the console
+during development. In production, the logs are periodically pushed to AWS CloudWatch
+(and are not accessible until they are pushed). Note that the logs (excluding those on
+the console) are optimized for searchability, not readability.
+
+You can clean up the file logs during development by running
+
+```
+npm run clean-logs
+```
 
 ## Documentation
 

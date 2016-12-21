@@ -19,9 +19,14 @@ if (config.isProduction && config.aws.enabled) {
 	var fileTransport = new winston.transports.File({
 		filename: files.initializeLogfile()
 	});
+	var consoleTransport = new winston.transports.Console({
+		colorize: true,
+		prettyPrint: true
+	});
 
 	// add other transports as needed
 	transports.push(fileTransport);
+	transports.push(consoleTransport);
 }
 
 
