@@ -1,26 +1,36 @@
-var fs = require("fs");
-var logger = require("winston");
-var path = require("path");
+var winston = require("winston");
+var WinstonCloudwatch = require("winston-cloudwatch");
 
-var DEFAULT_BANNER = "HACKILLINOIS API (2017)";
-var BANNER_LOCATION = "../resources/banner.txt";
+var config = require('./config');
+var files = require('./files');
 
-// sets up logger to work with cli
-// we will need to set up a more robust system in the future
-logger.cli();
+var transports = [];
+if (config.isProduction && config.aws.enabled) {
+	var cloudwatchTransport = new WinstonCloudwatch({
+		logGroupName: config.logs.groupName,
+		logStreamName: config.logs.streamPrefix + '/' + config.logs.groupName + '/' + config.id,
+		awsRegion: config.aws.defaults.region,
+		json: true
+	});
 
-console.log();
-try {
-	var bannerPath = path.join(__dirname, BANNER_LOCATION);
-	var banner = fs.readFileSync(bannerPath, { encoding: 'utf8' });
-	console.log(banner);
-} catch (e) {
-	if (e.code === 'ENOENT') {
-		console.log(DEFAULT_BANNER);
-	} else {
-		throw e;
-	}
+	// add other transports as needed
+	transports.push(cloudwatchTransport);
+} else {
+	var fileTransport = new winston.transports.File({
+		filename: files.initializeLogfile()
+	});
+	var consoleTransport = new winston.transports.Console({
+		colorize: true,
+		prettyPrint: true
+	});
+
+	// add other transports as needed
+	transports.push(fileTransport);
+	transports.push(consoleTransport);
 }
-console.log();
+
+
+var logger = new winston.Logger({ transports: transports });
+logger.info("prepared environment for %s", config.environment);
 
 module.exports = logger;

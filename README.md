@@ -21,11 +21,11 @@ code to this repository.
 
 #### Node.js Version
 
-Our application is deployed with Node.js v4.4.3. It is recommended that you install
-this version exactly, although using a different release version (v4.4.x) will
+Our application is deployed with Node.js v4.6.2. It is recommended that you install
+this version, although using a different release version (v4.6.x) will
 probably work too.
 
-The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v4.4.3/) or from your favorite package manager.
+The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v4.6.2/).
 
 #### MySQL Version
 
@@ -47,45 +47,36 @@ We have provided templates in the directory already with all available configura
 These templates are named `{ENV}.config.template`. You should copy these templates into
 files named `{ENV}.config` and fill them with sensible values; these values can be raw
 values or existing environment variables. Note that changes to the templates are
-commited to the project codebase, but changes to any `*.config` files are ignored.
+committed to the project codebase, but changes to any `*.config` files are ignored.
 
 A list of configuration keys is provided below:
 
 | Key | Possible Values | Purpose |
 | --- | --------------- | ------- |
-| NODE_ENV | 'production' or 'development' | Determines how environment should be configured |
-| PROFILE | Any string | Presents an externally-meaningful identifier |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret (required on production) |
-| HACKILLINOIS_PORT | Any valid port number | Overrides default port (8080) |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Overrides the default superuser email ('admin@example.com') |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Overrides the default superuser password ('ABCD1234!') |
+| NODE_ENV | 'production', 'development', 'testing' | Determines how environment should be configured |
+| AWS | 0 or 1 | Whether or not to use AWS |
+| HACKILLINOIS_ID | Any string | Sets the identifier used to represent this instance |
+| HACKILLINOIS_SECRET | Any string | Sets the master secret |
+| HACKILLINOIS_PORT | Any valid port number | Sets the port |
+| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Sets the default superuser email |
+| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Sets the default superuser password |
 | HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any valid MySQL schema name | Overrides default name (hackillinois) |
-| DB_USERNAME | Any string | Overrides default MySQL username ('root') |
-| DB_PASSWORD | Any string | Overrides default MySQL password ('') |
-| DB_HOSTNAME | Any valid URI | Overrides default MySQL host ('127.0.0.1') |
-| DB_PORT | Any valid port number | Overrides default MySQL port (3306) |
+| DB_NAME |  Any valid MySQL schema name | Sets database name |
+| DB_USERNAME | Any string | Sets MySQL username |
+| DB_PASSWORD | Any string | Sets MySQL password |
+| DB_HOSTNAME | Any valid URI | Sets MySQL host |
+| DB_PORT | Any valid port number | Sets MySQL port |
 
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
-identified by the `PROFILE` configuration key. We do not handle AWS-specific configuration
-options in our configuration files.
+identified by `hackillinois-api`. Be sure to set the `AWS` configuration key to `1` and
+add the key `AWS_PROFILE` to your configuration with your corresponding profile name.
 
 #### Considerations
 
-Not all configuration options must be set during development (although all options should
+Not all configuration options must be set during development (but all options _should_
 be set in production). When certain keys are left empty, the API determines whether
-or not it can use a local alternative or a default value at startup. Here are some
-considerations that will help you determine which keys to set as you develop:
-
-* Anyone contributing to a feature that involves email transmissions
-will need to set the `HACKILLINOIS_MAIL_KEY` to a valid SparkPost API key.
-* Anyone contributing to a feature that involves any AWS products will need to set
-up an AWS shared credentials file (see above)
-
-Note that this API is targeted for hosting via AWS, so any AWS-specific settings
-(e.g. those in IAM roles) are used by this API before settings in any environment
-variables or other credentials files.
+or not it can use a local alternative or a default value at startup.
 
 ## Installation
 
@@ -119,20 +110,33 @@ contributors should be familiar with.
 ## Usage
 
 A local API instance can be created on port 8080 via the following commands,
-executed from the root of the project directory.
+executed from the root of the project directory. Note that in development, you must
+to install the process manager `nodemon` globally via `[sudo] npm install -g nodemon`.
 
 To run the API for development:
 ```
 npm run dev
 ```
 
-To run the API in production:
-```
-npm run prod
-```
+Note that `node` must and `nodemon` must be on your path and that the configuration
+for the target environment must be present in the `config` directory. The server will
+restart automatically when changes are made. To stop the API, simply type `Control-C`.
 
-Use `Control-C` to kill the server. Note that `node` must be on your path and that
-the configuration for the target environment must be present in the `config` directory.
+For production, we build a Docker image and deploy this to a container ecosystem. You can
+find the Dockerfile in the project root directory.
+
+## Logging
+
+The API access logs are available in `/temp/logs/api.log` as well as on the console
+during development. In production, the logs are periodically pushed to AWS CloudWatch
+(and are not accessible until they are pushed). Note that the logs (excluding those on
+the console) are optimized for searchability, not readability.
+
+You can clean up the file logs during development by running
+
+```
+npm run clean-logs
+```
 
 ## Documentation
 

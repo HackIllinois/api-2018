@@ -14,11 +14,22 @@ var time = require('./v1/utils/time');
 // NOTE all paths are relative to the root of the project directory
 const DIRECTORY_SEPARATOR = '/';
 const TEMP_DIRECTORY = './temp/';
+const LOG_DIRECTORY = TEMP_DIRECTORY + 'logs/';
 const MAIL_DIRECTORY = TEMP_DIRECTORY + 'mail/';
 const STORAGE_DIRECTORY = TEMP_DIRECTORY + 'storage/';
 
 const META_EXTENSION = '.meta';
 const META_SEPARATOR = '^|';
+const LOG_FILENAME = 'api.log';
+
+/**
+ * Sets up the log file for local development
+ * @return {String}		the path to the log file
+ */
+module.exports.initializeLogfile = function () {
+	mkdirp.sync(LOG_DIRECTORY);
+	return LOG_DIRECTORY + LOG_FILENAME;
+};
 
 /**
  * Writes a new mail entry to the temp directory. When called in non-development
