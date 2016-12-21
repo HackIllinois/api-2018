@@ -16,12 +16,8 @@ var expect = chai.expect;
 describe('EcosystemService',function(){
 
     describe('createEcosystem',function(){
-        var testUser;
         var name;
         before(function(done){
-            testUser = User.forge({ id: 1, email: 'new@example.com' });
-            testUser.related('roles').add({ role: utils.roles.ORGANIZER });
-
             name = "testEcosystem"
 
             done();
@@ -30,7 +26,7 @@ describe('EcosystemService',function(){
             var ecosystem = EcosystemService.createEcosystem(name);
             expect(ecosystem).to.eventually.have.deep.property("attributes.name", name).and.notify(done);
         });
-        it('tries a blank name',function(done){
+        it('fails with a blank name',function(done){
             try{
                 EcosystemService.createEcosystem("");
             }catch(e){
@@ -39,4 +35,5 @@ describe('EcosystemService',function(){
             }
         });
     });
+
 });
