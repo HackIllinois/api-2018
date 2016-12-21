@@ -17,95 +17,101 @@ var assert = chai.assert;
 var expect = chai.expect;
 
 describe('TokenService',function(){
-    describe('findTokenByValue',function(){
-        var testToken;
-        var _findByValue;
-        var tokenVal;
+	var tokenVal;
 
-        before(function(done){
-            tokenVal = utils.crypto.generateResetToken();
-            testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
+	describe('findTokenByValue',function(){
+		var testToken;
+		var _findByValue;
 
-            _findByValue = sinon.stub(Token,'findByValue');
-            _findByValue.withArgs(tokenVal).returns(_Promise.resolve(testToken));
-            _findByValue.withArgs(sinon.match.string).returns(_Promise.resolve(null));
+		before(function(done){
+			tokenVal = utils.crypto.generateResetToken();
+			testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
 
-            done();
-        });
+			_findByValue = sinon.stub(Token,'findByValue');
+			_findByValue.withArgs(tokenVal).returns(_Promise.resolve(testToken));
+			_findByValue.withArgs(sinon.match.string).returns(_Promise.resolve(null));
 
-        it('finds valid token',function(done){
-            var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
-            expect(found).to.eventually.have.deep.property("attributes.user_id", 1,"user ID should be 1")
-                .then(function(){
-                    expect(found).to.eventually.have.deep.property("attributes.value", tokenVal,"token value sould be "+tokenVal)
-                        .and.notify(done);
-                });
-        });
-        it('throws error for invalid scope',function(done){
-            TokenService.findTokenByValue(tokenVal, 'INVALID')
-                .then(function(){
-                    return done("Error was not thrown for INVALID token scope");
-                })
-                .catch(function(err){
-                    expect(err).to.be.instanceof(TypeError);
-                    return done();
-                });
-        });
-        it('throws error with expired token and calls delete on token',function(done){
-            var _get = sinon.stub(Token.prototype,'get');
-            _get.withArgs('created').returns(0);
-            var _destroy = sinon.stub(Token.prototype,'destroy');
-            var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
-            expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
-                .then(function(){
-                    expect(_destroy.neverCalledWith()).to.equal(false);
-                    _get.restore();
-                    _destroy.restore();
-                    done();
-                });
-        });
-        it('throws error if invalid token',function(done){
-            var found = TokenService.findTokenByValue('invalid','DEFAULT');
-            expect(found).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
-        });
+			done();
+		});
 
-        after(function(done){
-            _findByValue.restore();
-            done();
-        });
-    });
+		it('finds valid token',function(done){
+			var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
+			expect(found).to.eventually.have.deep.property("attributes.user_id", 1,"user ID should be 1")
+				.then(function(){
+					expect(found).to.eventually.have.deep.property("attributes.value", tokenVal,"token value sould be "+tokenVal)
+						.and.notify(done);
+				});
+		});
+		it('throws error for invalid scope',function(done){
+			TokenService.findTokenByValue(tokenVal, 'INVALID')
+				.then(function(){
+					return done("Error was not thrown for INVALID token scope");
+				})
+				.catch(function(err){
+					expect(err).to.be.instanceof(TypeError);
+					return done();
+				});
+		});
+		it('throws error with expired token and calls delete on token',function(done){
+			var _get = sinon.stub(Token.prototype,'get');
+			_get.withArgs('created').returns(0);
+			var _destroy = sinon.stub(Token.prototype,'destroy');
+			var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
+			expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
+				.then(function(){
+					expect(_destroy.neverCalledWith()).to.equal(false);
+					_get.restore();
+					_destroy.restore();
+					done();
+				});
+		});
+		it('throws error if invalid token',function(done){
+			var found = TokenService.findTokenByValue('invalid','DEFAULT');
+			expect(found).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+		});
 
-    describe('generateToken',function(){ 
-        var testUser; 
-        before(function(done){
+		after(function(done){
+			_findByValue.restore();
+			done();
+		});
+	});
 
-            var _mockedTokens = {
-                invokeThen : function(){
-                    return _Promise.resolve(null);
-                }
-            }
-            var _mockedWhere = {
-                fetchAll : function(){
-                    return _Promise.resolve(_mockedTokens);
-                }
-            };
+	describe('generateToken',function(){ 
+		var testUser; 
+		var testToken; 
+		var _mockedTokens, _mockedWhere;
+		var _where, _save;
 
-            testUser = User.forge({ id: 1, email: 'new@example.com' }); 
+		before(function(done){
 
-            var _where = sinon.stub(Token,'where'); 
-            _where.returns(_mockedWhere);
+			_mockedTokens = {
+				invokeThen : function(){
+					return _Promise.resolve(null);
+				}
+			}
+			_mockedWhere = {
+				fetchAll : function(){
+					return _Promise.resolve(_mockedTokens);
+				}
+			};
 
-            var _save = sinon.stub(Token.prototype,'save'); 
-            _save.returns(_Promise.resolve(null));  
-            done(); 
-        }); 
-        it('generates a new token',function(done){ 
-            var token = TokenService.generateToken(testUser,'7d'); 
-            expect(token).to.eventually.be.a('string')
-                .then(function(data){
-                    expect(data.length).to.equal(36);
-                    done();
-                });
-        }); 
-    });
+			testUser = User.forge({ id: 1, email: 'new@example.com' }); 
+			testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});  
+
+			_where = sinon.stub(Token,'where'); 
+			_where.returns(_mockedWhere);
+
+			_save = sinon.stub(Token.prototype,'save'); 
+			_save.returns(_Promise.resolve(null));  
+			done(); 
+		}); 
+		it('generates a new token',function(done){ 
+			var token = TokenService.generateToken(testUser,'7d'); 
+			expect(token).to.eventually.be.a('string')
+				.then(function(data){
+					expect(data.length).to.equal(36);
+					done();
+				});
+		}); 
+	});
 });

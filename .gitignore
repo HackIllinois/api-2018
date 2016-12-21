@@ -17,4 +17,4 @@ temp
 /.idea
 
 *.config
-
+.env

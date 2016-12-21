@@ -1,14 +1,16 @@
+/* jshint esversion: 6 */
+
 var errors = require('../errors');
-var logger = require('../../logging');
+var logUtils = require('../utils/logs');
+
+const ERRORS = {
+	UNCAUGHT: 'UNCAUGHT',
+	CLIENT: 'CLIENT',
+	UNKNOWN: 'UNKNOWN',
+};
 
 module.exports = function (err, req, res, next) {
-	if (!(err instanceof Error)) {
-		logger.info("caught error of unknown type");
-		logger.error(err);
-
-		err = new errors.ApiError();
-	}
-	else if (err instanceof Error && err.status === 413) {
+	if (err instanceof Error && err.status === 413) {
 		// caught a body-parser entity length error
 		err = new errors.EntityTooLargeError();
 	}
@@ -17,11 +19,16 @@ module.exports = function (err, req, res, next) {
 		// https://github.com/expressjs/body-parser/issues/122
 		err = new errors.UnprocessableRequestError();
 	}
-	else if (!err.isApiError) {
-		logger.info("caught unhandled error");
-		logger.error(err.stack);
 
+	if (!(err instanceof Error)) {
+		logUtils.logError(req, err, null, ERRORS.UNKNOWN);
 		err = new errors.ApiError();
+	}
+	else if (!err.isApiError) {
+		logUtils.logError(req, err.stack, null, ERRORS.UNCAUGHT);
+		err = new errors.ApiError();
+	} else {
+		logUtils.logError(req, err.message, err.status, ERRORS.CLIENT);
 	}
 
 	var response = {
