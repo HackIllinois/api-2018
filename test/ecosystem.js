@@ -49,9 +49,6 @@ describe('EcosystemService',function(){
 
     describe('getAllEcosystems', function () {
         before(function(done){
-            tracker.on('query', function (query) {
-                query.response([{ name: 'testEcosystem' }]);
-            });
             done();
         });
         beforeEach(function (done) {
@@ -59,6 +56,10 @@ describe('EcosystemService',function(){
             done();
         });
         it('retrieves all current ecosystems', function(done){
+            tracker.on('query', function (query) {
+                query.response([{ name: 'testEcosystem' }]);
+            });
+            
             var ecosystems = EcosystemService.getAllEcosystems();
             expect(ecosystems).to.eventually.not.be.empty.and.notify(done);;
         });

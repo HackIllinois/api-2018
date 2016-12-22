@@ -3,7 +3,7 @@ var Request = require('./Request');
 
 var bodyRequired = ['name'];
 var bodyValidations = {
-	'name': ['string', 'required']
+	'name': ['string', 'required', 'maxLength:100']
 };
 
 function EcosystemCreationRequest(headers, body) {

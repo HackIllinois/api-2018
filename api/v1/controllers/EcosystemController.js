@@ -18,9 +18,8 @@ function createEcosystem (req, res, next) {
 	EcosystemService
 		.createEcosystem(name)
 		.then(function (newEcosystem) {
-			res.body = {};
-			res.body.ecosystem = newEcosystem.attributes.name;
-
+			res.body = newEcosystem.toJSON();
+			
 			next();
 			return null;
 		})
