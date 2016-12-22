@@ -8,13 +8,9 @@ function bookshelfMock (knex) {
 	mockknex.mock(knex);
 	return bookshelf(knex);
 }
-mockery.registerMock('bookshelf', bookshelfMock);
 
-var mockredis = require('redis-mock');
-function redisMock () {
-	return mockredis.createClient();
-}
-mockery.registerMock('redis', redisMock);
+mockery.registerMock('bookshelf', bookshelfMock);
+mockery.registerMock('redis', require('redis-mock'));
 
 mockery.enable({ warnOnUnregistered: false });
 
