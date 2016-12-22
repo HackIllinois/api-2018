@@ -14,4 +14,7 @@ node_modules
 .DS_Store
 temp
 
+/.idea
+
 *.config
+.env

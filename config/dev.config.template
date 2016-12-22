@@ -3,7 +3,7 @@
 ###############################################################################
 #ENV AND PORTS
 NODE_ENV=development
-PROFILE=hackillinois-api
+HACKILLINOIS_ID=instance0
 HACKILLINOIS_PORT=8080
 
 #API KEYS AND PASSWORDS

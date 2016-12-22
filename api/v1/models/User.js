@@ -7,6 +7,7 @@ var _ = require('lodash');
 const SALT_ROUNDS = 12;
 
 var Model = require('./Model');
+
 var UserRole = require('./UserRole');
 var User = Model.extend({
 	tableName: 'users',
@@ -32,7 +33,7 @@ User.findById = function (id) {
 
 /**
  * Finds a user by its email address
- * @param  {String} 			email the email address
+ * @param  {String}                     email the email address
  * @return {Promise<User>}      the found user, or null
  */
 User.findByEmail = function (email) {
@@ -45,12 +46,20 @@ User.findByEmail = function (email) {
  * set to active if user creation succeeds. Validation is performed on-save only
  * @param  {String} email    the user's email
  * @param  {String} password the user's raw password
- * @param  {String}	role the string representation of a role from utils.roles
- * @return {Promise<User>}	 the User object with the related roles joined-in
+ * @param  {String}	role the string representation of a role from utils.roles (optional)
+ * @return {Promise<User>}	 the User object with the related roles joined-in (if any)
  */
 User.create = function (email, password, role) {
 	var user = User.forge({ email: email });
 	var userRole = UserRole.forge({ role: role, active: true });
+
+	if(!role){
+		// No roles were provided, so create the User
+		return user.setPassword(password)
+		.then(function(result){
+			return result.save();
+		});
+	}
 
 	return User
 		.transaction(function (t) {
@@ -150,12 +159,7 @@ User.prototype.hasPassword = function (password) {
  * @return {Object} the serialized form of this User
  */
 User.prototype.serialize = function () {
-	var serialized = _.omit(this.attributes, ['password']);
-
-	var roles = this.related('roles');
-	serialized.roles = (_.isUndefined(roles)) ? null : roles.serialize();
-
-	return serialized;
+	return _.omit(this.attributes, ['password']);
 };
 
 module.exports = User;

@@ -1,10 +1,8 @@
-var Bookshelf = require('bookshelf');
-var Knex = require('knex');
+var config = require('./config');
+var logger = require('./logging');
+
 var _Promise = require('bluebird');
 var milliseconds = require('ms');
-
-var logger = require('./logging');
-var config = require('./config');
 
 var KNEX_CONFIG = {
 	client: 'mysql',
@@ -23,8 +21,12 @@ var KNEX_CONFIG = {
 };
 
 function DatabaseManager() {
-	this._knex = Knex(KNEX_CONFIG);
-	this._bookshelf = Bookshelf(this._knex);
+	this._knex = require('knex')(KNEX_CONFIG);
+
+	this._bookshelf = require('bookshelf')(this._knex);
+	this._bookshelf.plugin('pagination');
+
+	logger.info("connected to database as %s", config.database.primary.user);
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
@@ -40,7 +42,5 @@ DatabaseManager.prototype.instance = function() {
 DatabaseManager.prototype.connection = function () {
 	return this._knex;
 };
-
-logger.info("connected to database as %s", config.database.primary.user);
 
 module.exports = new DatabaseManager();
