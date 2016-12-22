@@ -19,7 +19,6 @@ describe('EcosystemService',function(){
         var name;
         before(function(done){
             name = "testEcosystem"
-
             done();
         });
         it('creates a new ecosystem',function(done){
