@@ -14,6 +14,7 @@ mockery.enable({ warnOnUnregistered: false });
 
 require('./user.js');
 require('./auth.js');
+require('./ecosystem.js');
 require('./permission.js');
 require('./token.js');
 require('./storage.js');
