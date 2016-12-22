@@ -17,6 +17,7 @@ v1.use('/user', controllers.UserController.router);
 v1.use('/upload', controllers.UploadController.router);
 v1.use('/registration', controllers.RegistrationController.router);
 v1.use('/project', controllers.ProjectController.router);
+v1.use('/ecosystem', controllers.EcosystemController.router);
 v1.use('/health', controllers.HealthController.router);
 
 module.exports = v1;
