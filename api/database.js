@@ -1,7 +1,6 @@
 var config = require('./config');
 var logger = require('./logging');
 
-var _Promise = require('bluebird');
 var milliseconds = require('ms');
 
 var KNEX_CONFIG = {
@@ -30,10 +29,6 @@ function DatabaseManager() {
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
-
-DatabaseManager.prototype.instantiate = function() {
-	return _Promise.resolve(this.instance());
-}
 
 DatabaseManager.prototype.instance = function() {
 	return this._bookshelf;
