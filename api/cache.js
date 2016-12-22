@@ -17,6 +17,9 @@ function CacheManager () {
 CacheManager.prototype.constructor = CacheManager;
 
 CacheManager.prototype.instance = function() {
+	if (typeof variable === 'undefined') {
+		throw new TypeError('cache module is not initialized');
+	}
 	return this._cache;
 }
 
