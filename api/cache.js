@@ -5,9 +5,10 @@ var _Promise = require('bluebird');
 var redis = require('redis');
 
 _Promise.promisifyAll(redis.RedisClient.prototype);
-if(!config.isTest) {
+if(redis.Multi) {
 	_Promise.promisifyAll(redis.Multi.prototype);
 }
+
 _REDIS_CONFIG = {
 	host: config.redis.host,
 	port: config.redis.port
