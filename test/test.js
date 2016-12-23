@@ -10,6 +10,8 @@ function bookshelfMock (knex) {
 }
 
 mockery.registerMock('bookshelf', bookshelfMock);
+mockery.registerMock('redis', require('redis-mock'));
+
 mockery.enable({ warnOnUnregistered: false });
 
 require('./user.js');

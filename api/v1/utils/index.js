@@ -8,5 +8,6 @@ module.exports = {
 	storage: require('./storage.js'),
 	time: require('./time.js'),
 	registration: require('./registration.js'),
-	validators: require('./validators.js')
+	validators: require('./validators.js'),
+	cache: require("./cache.js")
 };

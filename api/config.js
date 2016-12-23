@@ -11,6 +11,7 @@ var config = {};
 config.auth = { };
 config.aws = { defaults: {} };
 config.database = {};
+config.redis = {};
 config.database.primary = { pool: {} };
 config.mail = {};
 config.logs = {};
@@ -50,6 +51,9 @@ config.database.primary.name = process.env.DB_NAME;
 config.database.primary.pool.min = 0;
 config.database.primary.pool.max = 7500;
 config.database.primary.pool.idleTimeout = '5s';
+
+config.redis.host = process.env.REDIS_HOST;
+config.redis.port = process.env.REDIS_PORT;
 
 config.mail.key = process.env.HACKILLINOIS_MAIL_KEY;
 config.mail.sinkhole = '.sink.sparkpostmail.com';

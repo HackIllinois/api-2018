@@ -9,7 +9,7 @@ contribute? See the [contribution guidelines](/CONTRIBUTING.md).
 ## Setup
 
 We use Node.js + Express in the application layer. The MySQL RDBMS is used as
-our primary datastore in the persistence layer.
+our primary datastore in the persistence layer. The Redis store is used as our primary cache.
 
 ####  Software Version Note
 
@@ -67,6 +67,8 @@ A list of configuration keys is provided below:
 | DB_PASSWORD | Any string | Sets MySQL password |
 | DB_HOSTNAME | Any valid URI | Sets MySQL host |
 | DB_PORT | Any valid port number | Sets MySQL port |
+| REDIS_HOST | IP address | Sets Redis host |
+| REDIS_PORT | Any valid port number | Sets Redis port |
 
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
@@ -103,6 +105,8 @@ from the root of the project directory. This will run all migration scripts avai
 If you see any errors, such as an inability to access the database, make sure you have
 set up the schema correctly and that you have set any necessary MySQL environment
 variables listed in the configuration section above.
+
+You should also have a local Redis instance which will be used as the cache.
 
 Note that if you're looking to contribute to this codebase, you should read the
 [database README](/database/README.md) as well. It contains important information that all
