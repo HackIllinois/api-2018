@@ -20,19 +20,18 @@ var KNEX_CONFIG = {
 };
 
 function DatabaseManager() {
+	logger.info("connecting to database");
 	this._knex = require('knex')(KNEX_CONFIG);
 
 	this._bookshelf = require('bookshelf')(this._knex);
 	this._bookshelf.plugin('pagination');
-
-	logger.info("connected to database as %s", config.database.primary.user);
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
 
 DatabaseManager.prototype.instance = function() {
 	return this._bookshelf;
-}
+};
 
 DatabaseManager.prototype.connection = function () {
 	return this._knex;
