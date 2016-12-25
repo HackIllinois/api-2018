@@ -1,0 +1,14 @@
+.gitignore
+.dockerignore
+.nodemonignore
+.env
+*.md
+Dockerfile
+!README.md
+
+config/*
+!config/prod.config
+
+node_modules
+test
+temp

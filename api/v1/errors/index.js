@@ -8,6 +8,7 @@ module.exports = {
 	InvalidParameterError: require('./InvalidParameterError.js'),
 	MissingHeaderError: require('./MissingHeaderError.js'),
 	MissingParameterError: require('./MissingParameterError.js'),
+	RedisError: require ('./RedisError.js'),
 	NotFoundError: require('./NotFoundError.js'),
 	TokenExpirationError: require('./TokenExpirationError.js'),
 	UnauthorizedError: require('./UnauthorizedError.js'),

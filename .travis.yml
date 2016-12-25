@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "4.6"
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+cache:
+  directories:
+    - node_modules
+services:
+  #- docker
+before_script:
+  #Docker setup goes here
+  - pwd
+  - cp ~/build/HackIllinois/api-2017/config/test.config.template ~/build/HackIllinois/api-2017/config/test.config
+  - npm install

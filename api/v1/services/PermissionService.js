@@ -25,3 +25,19 @@ module.exports.canCreateUser = function (creator, userRole) {
 	var message = "The requested user cannot be created with the provided credentials";
 	return _Promise.reject(new errors.UnauthorizedError(message));
 };
+
+
+/**
+ * Checks to see if a requestor valid permissions to create a new project
+ * @param  {User} user creating the new project
+ * @return {Promise} resolving to true if the user is an organizer
+ * @throws InvalidParameterError when a user does not have correct permissions
+ */
+module.exports.canCreateProject = function (creator) {
+	if(creator.hasRole(roles.SUPERUSER) || creator.hasRole(roles.ORGANIZERS)){
+		return _Promise.resolve(true);
+	}
+
+	var message = "A project cannot be created with the provided credentials";
+	return _Promise.reject(new errors.UnauthorizedError(message));
+}

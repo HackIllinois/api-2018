@@ -3,7 +3,7 @@
 ###############################################################################
 #ENV AND PORTS
 NODE_ENV=development
-PROFILE=hackillinois-api
+HACKILLINOIS_ID=instance0
 HACKILLINOIS_PORT=8080
 
 #API KEYS AND PASSWORDS
@@ -18,3 +18,7 @@ DB_HOSTNAME=127.0.0.1
 DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=
+
+#REDIS
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379

@@ -1,9 +1,7 @@
-var Bookshelf = require('bookshelf');
-var Knex = require('knex');
-var milliseconds = require('ms');
-
-var logger = require('./logging');
 var config = require('./config');
+var logger = require('./logging');
+
+var milliseconds = require('ms');
 
 var KNEX_CONFIG = {
 	client: 'mysql',
@@ -22,19 +20,21 @@ var KNEX_CONFIG = {
 };
 
 function DatabaseManager() {
-	this._knex = Knex(KNEX_CONFIG);
-	this._bookshelf = Bookshelf(this._knex);
+	logger.info("connecting to database");
+	this._knex = require('knex')(KNEX_CONFIG);
+
+	this._bookshelf = require('bookshelf')(this._knex);
+	this._bookshelf.plugin('pagination');
 }
 
 DatabaseManager.prototype.constructor = DatabaseManager;
 
-DatabaseManager.prototype.instance = function () {
+DatabaseManager.prototype.instance = function() {
 	return this._bookshelf;
 };
+
 DatabaseManager.prototype.connection = function () {
 	return this._knex;
 };
-
-logger.info("connected to database as %s", config.database.primary.user);
 
 module.exports = new DatabaseManager();
