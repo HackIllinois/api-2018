@@ -1,6 +1,4 @@
 var _ = require('lodash');
-var registration = require('../utils/registration');
-
 
 var Model = require('./Model');
 var AttendeeEcosystemInterest = Model.extend({

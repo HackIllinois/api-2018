@@ -32,6 +32,12 @@ var projectInterestValidations = {
     projectId:  ['required', 'integer'],
     attendeeProjectId: ['integer']
 };
+
+var ecosystemInterestValidations = {
+    attendeeId: ['required', 'integer'],
+    ecosystemId:  ['required', 'integer']
+}
+
 var requestedCollaboratorValidations = {
     collaborator: ['required', 'string', 'maxLength:255']
 };
@@ -41,6 +47,7 @@ var bodyValidations = {
 	'attendee': ['required', 'plainObject', validators.nested(attendeeValidations, 'attendee')],
 	'interests': ['required', 'array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(projectInterestValidations, 'interests'), 'interests')],
 	'projects': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
+    'ecointerests': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecointerests'), 'ecointerests')],
 	'extras': ['array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'minLength:1', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
 };
@@ -57,6 +64,7 @@ AttendeeRequest._attendeeValidations = attendeeValidations;
 AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._projectValidations = projectValidations;
 AttendeeRequest._projectInterestValidations = projectInterestValidations;
+AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
 
 AttendeeRequest.prototype = Object.create(Request.prototype);
