@@ -20,7 +20,7 @@ var AttendeeProjectInterest = Model.extend({
 * @param  {Number|String} id	the ID of the attendee with the appropriate type
 * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeProjectInterest or null
 */
-AttendeeProjectInterest.findByAttendeeId = function (userId) {
+AttendeeProjectInterest.findByAttendeeId = function (attendeeId) {
 	return AttendeeProjectInterest.where({ attendee_id: attendeeId }).fetch();
 };
 
