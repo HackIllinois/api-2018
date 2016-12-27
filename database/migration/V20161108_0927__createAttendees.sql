@@ -66,11 +66,6 @@ CREATE TABLE `attendee_projects` (
         ON UPDATE NO ACTION
 );
 
-CREATE TABLE `projects` (
-    `id` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `attendee_project_interests` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `attendee_id` INT UNSIGNED NOT NULL,
