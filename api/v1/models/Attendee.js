@@ -5,6 +5,7 @@ var Model = require('./Model');
 var AttendeeProjectInterest = require('./AttendeeProjectInterest');
 var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
+var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 var Attendee = Model.extend({
 	tableName: 'attendees',
@@ -31,6 +32,9 @@ var Attendee = Model.extend({
 	},
 	projects: function () {
 		return this.hasMany(AttendeeProject);
+	},
+	ecointerests: function () {
+		return this.hasMany(AttendeeEcosystemInterest);
 	},
 	extras: function () {
 		return this.hasMany(AttendeeExtraInfo);

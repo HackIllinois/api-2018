@@ -204,11 +204,14 @@ router.put('/mentor/:id', middleware.request(requests.MentorRequest),
 	middleware.permission(roles.ORGANIZERS), updateMentorById);
 
 
-router.post('/attendee', middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
+router.post('/attendee', middleware.request(requests.AttendeeRequest),
+	middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
 router.get('/attendee', middleware.permission(roles.ATTENDEE), fetchAttendeeByUser);
 router.get('/attendee/:id', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
-router.put('/attendee', middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
-router.put('/attendee/:id', middleware.permission(roles.ORGANIZERS), updateAttendeeById);
+router.put('/attendee', middleware.request(requests.AttendeeRequest),
+	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
+router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
+	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
 
 router.use(middleware.response);
 router.use(middleware.errors);

@@ -21,16 +21,12 @@ var attendeeValidations = {
 var extraInfoValidations = {
     info:       ['string', 'maxLength:255']
 };
+
 var projectValidations = {
     name:       ['required', 'string', 'maxLength:100'],
     description:['required', 'string', 'maxLength:255'],
     repo:       ['required', 'string', 'maxLength:150'],
     isSuggestion: ['required', 'boolean']
-};
-var projectInterestValidations = {
-    type:       ['required', 'string', registration.verifyProjectInterestType],
-    projectId:  ['required', 'integer'],
-    attendeeProjectId: ['integer']
 };
 
 var ecosystemInterestValidations = {
@@ -42,11 +38,10 @@ var requestedCollaboratorValidations = {
     collaborator: ['required', 'string', 'maxLength:255']
 };
 var bodyRequired = ['attendee', 'interests'];
-var bodyAllowed = ['attendee', 'interests', 'projects', 'extras', 'collaborators'];
+var bodyAllowed = ['attendee', 'projects', 'ecointerests', 'extras', 'collaborators'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject', validators.nested(attendeeValidations, 'attendee')],
-	'interests': ['required', 'array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(projectInterestValidations, 'interests'), 'interests')],
-	'projects': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
+	'projects': ['array', 'minLength:1', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
     'ecointerests': ['array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecointerests'), 'ecointerests')],
 	'extras': ['array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'minLength:1', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
@@ -63,7 +58,6 @@ function AttendeeRequest(headers, body) {
 AttendeeRequest._attendeeValidations = attendeeValidations;
 AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._projectValidations = projectValidations;
-AttendeeRequest._projectInterestValidations = projectInterestValidations;
 AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
 

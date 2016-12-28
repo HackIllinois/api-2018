@@ -100,6 +100,20 @@ module.exports.verifyProjectInterestType = function(projectInterestType){
 }
 
 /**
+ * Ensures that the provided project array only has one suggestion and one creation
+ * @param  {Array} projectArray the array of projects to check
+ * @return {Boolean} true when the project array is valid
+ * @throws TypeError when the project array is invalid
+ */
+module.exports.verifyProjectArray = function(projectArray){
+	if (_.filter(projectArray, ['isSuggestion', false]).length > 1){
+		throw new TypeError("The projects supplied are invalid. Attendees can only create 1 project at most.");
+	}
+
+	return true;
+}
+
+/**
  * Ensures that the provided status is in the list
  * of valid status options
  * @param  {String} size the value to check
