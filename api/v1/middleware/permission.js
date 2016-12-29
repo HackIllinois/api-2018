@@ -1,7 +1,6 @@
 var _ = require('lodash');
 
 var errors = require('../errors');
-var UserService = require('../services/UserService');
 
 module.exports = function(allowed, isOwner) {
 	if (!_.isArray(allowed)) {

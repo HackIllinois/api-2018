@@ -1,88 +1,98 @@
-/* jshint esversion: 6 */
-
 var CheckitError = require('checkit').Error;
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var Mentor = require('../models/Mentor');
 var Attendee = require('../models/Attendee');
-var MentorProjectIdea = require('../models/MentorProjectIdea');
 var UserRole = require('../models/UserRole');
 var errors = require('../errors');
 var utils = require('../utils');
 
 /**
- * Persists a mentor and its ideas
- * @param  {Mentor} mentor	a mentor object to be created/updated
- * @param  {Array} ideas 	an array of raw mentor attributes
+ * Persists (insert or update) a model instance and creates (insert only) any
+ * related models as provided by the related mapping. Use #extractRelatedObjects
+ * in combination with #adjustRelatedObjects to update related models.
+ * @param  {Model} model	a model object to be created/updated
+ * @param  {Object} related an object mapping related models to array of related
+ *                          model attribute objects
  * @param  {Transaction} t	a pending transaction
- * @return {Promise<Mentor>} the mentor with related ideas
+ * @return {Promise<Model>} the model with its related models
  */
-function _saveMentorAndIdeas(mentor, ideas, t) {
-	return mentor
-		.save(null, { transacting: t })
-		.then(function (mentor) {
-			return _Promise.map(ideas, function (idea) {
-				return mentor.related('ideas').create(idea, { transacting: t });
-			}).return(mentor);
+function _saveWithRelated(model, related, t) {
+	return model.save(null, { transacting: t }).then(function (model) {
+		var relatedPromises = [];
+
+		_.forIn(related, function (instances, relatedName) {
+			_.forEach(instances, function (attributes) {
+				relatedPromises.push(
+					model.related(relatedName).create(attributes, { transacting: t })
+				);
+			});
 		});
+
+		return _Promise.all(relatedPromises).return(model);
+	});
 }
 
 /**
- * Determines which ideas are new and which are
- * existing ones that need to be updated
- * @param  {Mentor} mentor		the Mentor with whom the ideas are associated
- * @param  {Array} mentorIdeas	the list of MentorProjectIdea objects/attributes
- * @return {Array}				containing the new ideas, updated ideas, and ids of updated ideas
+ * Determines which related objects are new (need to be inserted) and which
+ * are existing ones (need to be updated)
+ * @param  {Model} model	the model with which the related objects are associated
+ * @param  {String} fkName	the name of the column on which all related models
+ *                         	have their foreign key
+ * @param  {Object} related	an object mapping related models to array of related
+ *                          model attribute objects
+ * @return {Object}			mapping of new objects, updated objects, and ids of
+ *                          updated objects
  */
-function _extractMentorIdeas(mentor, mentorIdeas) {
-	var newIdeas = [];
-	var updatedIdeas = [];
-	var updatedIdeaIds = [];
+function _extractRelatedObjects(model, fkName, related) {
+	var result = { new: [], updated: [], updatedIds: [] };
 
-	_.forEach(mentorIdeas, function (idea) {
-		var MESSAGE, SOURCE;
-		if (!_.has(idea, 'id')) {
-			newIdeas.push(idea);
-		} else if (_.isUndefined(mentor.related('ideas').get(idea.id))) {
-			MESSAGE = "A MentorProjectIdea with the given ID does not exist";
-			SOURCE = "idea.id";
-			throw new errors.NotFoundError(MESSAGE, SOURCE);
-		} else if (mentor.related('ideas').get(idea.id).get('mentorId') !== mentor.get('id')){
-			MESSAGE = "A MentorProjectIdea that does not belong to this mentor cannot be updated here";
-			throw new errors.UnauthorizedError(MESSAGE);
-		} else {
-			// TODO remove this once Request validator can marshal recursively
-			idea.mentorId = mentor.get('id');
+	_.forIn(related, function (instances, relatedName) {
+		_.forEach(instances, function (attributes) {
+			var MESSAGE, SOURCE;
+			if (!_.has(attributes, 'id')) {
+				result.new.push(attributes);
+			} else if (_.isUndefined(model.related(relatedName).get(attributes.id))) {
+				MESSAGE = "A related " + relatedName + " object with the given ID does not exist";
+				SOURCE = relatedName + ".id";
+				throw new errors.NotFoundError(MESSAGE, SOURCE);
+			} else if (model.related(relatedName).get(attributes.id).get(fkName) !== model.get('id')){
+				MESSAGE = "A " + relatedName + " object that does not belong to this resource cannot be updated here";
+				throw new errors.UnauthorizedError(MESSAGE);
+			} else {
+				// TODO remove this once Request validator can marshal recursively
+				// (prevents unauthorized reassignment of related object to another model)
+				attributes[fkName] = model.get('id');
 
-			updatedIdeas.push(mentor.related('ideas').get(idea.id).set(idea));
-			updatedIdeaIds.push(idea.id);
-		}
+				result.updated.push(model.related(relatedName).get(attributes.id).set(attributes));
+				result.updatedIds.push(attributes.id);
+			}
+		});
 	});
 
-	return _Promise.all([newIdeas, updatedIdeas, updatedIdeaIds]);
+	return _Promise.resolve(result);
 }
 
 /**
- * Removes unwanted ideas and updates desired ideas
- * @param  {Mentor} mentor			the Mentor with whom the ideas are associated
- * @param  {Array} updatedIdeas		a list of related MentorProjectIdeas with new attributes
- * @param  {Array} updatedIdeaIds	a list of the ids contained in the updatedIdeas
+ * Removes unwanted objects and updates desired objects
+ * @param  {Model} model			the model with which the ideas are associated
+ * @param  {Object} adjustments		the resolved result of #_extractRelatedObjects
  * @param  {Transaction} t			a pending transaction
  * @return {Promise<>}				a promise indicating all changes have been added to the transaction
  */
-function _adjustMentorIdeas(mentor, updatedIdeas, updatedIdeaIds, t) {
-	return mentor.related('ideas')
+function _adjustRelatedObjects(model, adjustments, t) {
+	return model.related(key)
 		.query().transacting(t)
-		.whereNotIn('id', updatedIdeaIds)
+		.whereNotIn('id', adjustments.updatedIds)
 		.delete()
-		.catch(Mentor.NoRowsDeletedError, function () { return null; })
+		.catch(model.NoRowsDeletedError, function () { return null; })
 		.then(function () {
-			mentor.related('ideas').reset();
+			model.related(key).reset();
 
-			return _Promise.map(updatedIdeas, function (idea) {
-				mentor.related('ideas').add(idea);
-				return idea.save(null, { transacting: t, require: false });
+			return _Promise.map(adjustments.updated, function (updated) {
+				model.related(key).add(updated);
+				return updated.save(null, { transacting: t, require: false });
 			});
 		});
 }
@@ -94,15 +104,14 @@ function _adjustMentorIdeas(mentor, updatedIdeas, updatedIdeaIds, t) {
 * @return {Promise<Mentor>} the mentor with related ideas
 * @throws {InvalidParameterError} when a mentor exists for the specified user
 */
-var createMentor = function (user, attributes) {
+module.exports.createMentor = function (user, attributes) {
 	var mentorAttributes = attributes.mentor;
-	var mentorIdeas = attributes.ideas;
+	delete attributes.mentor;
 
 	mentorAttributes.userId = user.get('id');
 	var mentor = Mentor.forge(mentorAttributes);
 
-	return mentor
-		.validate()
+	return mentor.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (validated) {
 			if (user.hasRole(utils.roles.MENTOR, false)) {
@@ -115,7 +124,7 @@ var createMentor = function (user, attributes) {
 				return UserRole
 					.addRole(user, utils.roles.MENTOR, false, t)
 					.then(function (result) {
-						return _saveMentorAndIdeas(mentor, mentorIdeas);
+						return _saveWithRelated(mentor, attributes);
 					});
 				});
 			});
@@ -127,16 +136,14 @@ var createMentor = function (user, attributes) {
 * @return {Promise<Mentor>}	resolving to the associated Mentor model
 * @throws {NotFoundError} when the requested mentor cannot be found
 */
-var findMentorByUser = function (user) {
-	return Mentor
-		.findByUserId(user.get('id'))
-		.tap(function (result) {
-			if (_.isNull(result)) {
-				var message = "A mentor with the given user ID cannot be found";
-				var source = "userId";
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+module.exports.findMentorByUser = function (user) {
+	return Mentor.findByUserId(user.get('id')).tap(function (result) {
+		if (_.isNull(result)) {
+			var message = "A mentor with the given user ID cannot be found";
+			var source = "userId";
+			throw new errors.NotFoundError(message, source);
+		}
+	});
 };
 
 /**
@@ -145,16 +152,14 @@ var findMentorByUser = function (user) {
 * @return {Promise<Mentor>} resolving to the associated Mentor model
 * @throws {NotFoundError} when the requested mentor cannot be found
 */
-var findMentorById = function (id) {
-	return Mentor
-		.findById(id)
-		.tap(function (result) {
-			if (_.isNull(result)) {
-				var message = "A mentor with the given ID cannot be found";
-				var source = "id";
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+module.exports.findMentorById = function (id) {
+	return Mentor.findById(id).tap(function (result) {
+		if (_.isNull(result)) {
+			var message = "A mentor with the given ID cannot be found";
+			var source = "id";
+			throw new errors.NotFoundError(message, source);
+		}
+	});
 };
 
 /**
@@ -164,117 +169,25 @@ var findMentorById = function (id) {
 * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
 * @throws {InvalidParameterError} when a mentor doesn't exist for the specified user
 */
-var updateMentor = function (mentor, attributes) {
+module.exports.updateMentor = function (mentor, attributes) {
 	var mentorAttributes = attributes.mentor;
-	var mentorIdeas = attributes.ideas;
+	delete attributes.mentor;
 
 	mentor.set(mentorAttributes);
 
-	return mentor
-		.validate()
+	return mentor.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (){
-			return _extractMentorIdeas(mentor, mentorIdeas);
+			return _extractRelatedObjects(mentor, 'mentorId', attributes);
 		})
-		.spread(function (newIdeas, updatedIdeas, updatedIdeaIds){
+		.then(function (adjustments){
 			return Mentor.transaction(function (t) {
-				return _adjustMentorIdeas(mentor, updatedIdeas, updatedIdeaIds, t)
-					.then(function () {
-						return _saveMentorAndIdeas(mentor, newIdeas, t);
-					});
+				return _adjustMentorIdeas(mentor, adjustments, t).then(function () {
+					return _saveWithRelated(mentor, { 'ideas': adjustments.new }, t);
 				});
 			});
+		});
 };
-
-
-/**
- * Persists an attendee and its related objects
- * @param  {Mentor} attendee	an attendee object to be created/updated
- * @param  {Object} relatedAttributes 	an object mapping related keys to arrays of raw attributes
- * @param  {Transaction} t	a pending transaction
- * @return {Promise<Mentor>} the attendee with related
- */
-function _saveAttendeeAndRelated(attendee, relatedAttributes, t) {
-	return attendee
-		.save(null, { transacting: t })
-		.then(function (attendee) {
-			var relatedPromises = [];
-			_.mapValues(relatedAttributes, function(valArray, key){
-				var promise = _Promise.map(valArray, function (val) {
-						return attendee.related(key).create(val, { transacting: t });
-				});
-				relatedPromises.push(promise);
-			})
-			return _Promise.all(relatedPromises)
-			.return(attendee);
-		});
-}
-
-/**
- * Determines which relational objects are new and which are existing ones that need to be updated
- * @param  {Attendee} attendee		the Attendee with whom the relational objects are associated
- * @param  {Object} relatedAttributes	an object mapping related keys to arrays of raw objects
- * @return {Object}		mapping to a set of arrays of new objects, updated objects, and ids of updated objects
- */
-function _extractAttendeeRelatedObjects(attendee, relatedAttributes) {
-	var newAndUpdatedMap = _.mapValues(relatedAttributes, function(valArray, key) {
-		var ret = {};
-		ret.new = [];
-		ret.updated = [];
-		ret.updatedIds = [];
-		_.forEach(valArray, function (val) {
-			var MESSAGE, SOURCE;
-			if (!_.has(val, 'id')) {
-				ret.new.push(val);
-			} else if (_.isUndefined(attendee.related(key).get(val.id))) {
-				MESSAGE = "A related " + key + " object with the given ID does not exist";
-				SOURCE = key.slice(0, -2) + ".id";
-				throw new errors.NotFoundError(MESSAGE, SOURCE);
-			} else if (attendee.related(key).get(val.id).get('attendeeId') !== attendee.get('id')){
-				MESSAGE = "A " + key + " object that does not belong to this attendee cannot be updated here";
-				throw new errors.UnauthorizedError(MESSAGE);
-			} else {
-				// TODO remove this once Request validator can marshal recursively
-				val.attendeeId = attendee.get('id');
-
-				ret.updated.push(attendee.related(key).get(val.id).set(val));
-				ret.updatedIds.push(val.id);
-			}
-		});
-		return ret;
-	});
-	return _Promise.props(newAndUpdatedMap);
-}
-
-/**
- * Removes unwanted objects and updates desired objects
- * @param  {Attendee} attendee			the Attendee with whom the ideas are associated
- * @param  {Array} updatedIdeas		a list of related AttendeeProjectIdeas with new attributes
- * @param  {Array} updatedIdeaIds	a list of the ids contained in the updatedIdeas
- * @param  {Transaction} t			a pending transaction
- * @return {Promise<>}				a promise indicating all changes have been added to the transaction
- */
-function _adjustAttendeeRelatedObjects(attendee, newAndUpdatedMap, t) {
-	var relatedPromises = [];
-	_.mapValues(newAndUpdatedMap, function(newAndUpdatedObject, key){
-		var promise = attendee.related(key)
-			.query().transacting(t)
-			.whereNotIn('id', newAndUpdatedObject.updatedIds)
-			.delete()
-			.catch(Attendee.NoRowsDeletedError, function () { return null; })
-			.then(function () {
-				attendee.related(key).reset();
-
-				return _Promise.map(newAndUpdatedObject.updated, function (updated) {
-					attendee.related(key).add(updated);
-					return updated.save(null, { transacting: t, require: false });
-				});
-			});
-		relatedPromises.push(promise);
-	});
-	return _Promise.all(relatedPromises)
-	.return(attendee);
-}
 
 /**
 * Registers an attendee for the given user
@@ -283,15 +196,14 @@ function _adjustAttendeeRelatedObjects(attendee, newAndUpdatedMap, t) {
 * @return {Promise<Attendee>} the attendee with their related properties
 * @throws {InvalidParameterError} when an attendee exists for the specified user
 */
-var createAttendee = function (user, attributes) {
+module.exports.createAttendee = function (user, attributes) {
 	var attendeeAttributes = attributes.attendee;
 	delete attributes.attendee;
 
 	attendeeAttributes.userId = user.get('id');
 	var attendee = Attendee.forge(attendeeAttributes);
 
-	return attendee
-		.validate()
+	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (validated) {
 			if (user.hasRole(utils.roles.ATTENDEE, false)) {
@@ -304,7 +216,7 @@ var createAttendee = function (user, attributes) {
 				return UserRole
 					.addRole(user, utils.roles.ATTENDEE, false, t)
 					.then(function (result) {
-						return _saveAttendeeAndRelated(attendee, attributes, t);
+						return _saveWithRelated(attendee, attributes, t);
 					});
 				});
 			});
@@ -316,16 +228,14 @@ var createAttendee = function (user, attributes) {
 * @return {Promise<Attendee>}	resolving to the associated Attendee model
 * @throws {NotFoundError} when the requested attendee cannot be found
 */
-var findAttendeeByUser = function (user) {
-	return Attendee
-		.findByUserId(user.get('id'))
-		.tap(function (result) {
-			if (_.isNull(result)) {
-				var message = "A attendee with the given user ID cannot be found";
-				var source = "userId";
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+module.exports.findAttendeeByUser = function (user) {
+	return Attendee.findByUserId(user.get('id')).tap(function (result) {
+		if (_.isNull(result)) {
+			var message = "A attendee with the given user ID cannot be found";
+			var source = "userId";
+			throw new errors.NotFoundError(message, source);
+		}
+	});
 };
 
 /**
@@ -334,16 +244,14 @@ var findAttendeeByUser = function (user) {
 * @return {Promise<Attendee>} resolving to the associated Attendee model
 * @throws {NotFoundError} when the requested attendee cannot be found
 */
-var findAttendeeById = function (id) {
-	return Attendee
-		.findById(id)
-		.tap(function (result) {
-			if (_.isNull(result)) {
-				var message = "A attendee with the given ID cannot be found";
-				var source = "id";
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+module.exports.findAttendeeById = function (id) {
+	return Attendee.findById(id).tap(function (result) {
+		if (_.isNull(result)) {
+			var message = "A attendee with the given ID cannot be found";
+			var source = "id";
+			throw new errors.NotFoundError(message, source);
+		}
+	});
 };
 
 /**
@@ -353,36 +261,23 @@ var findAttendeeById = function (id) {
 * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
 * @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
 */
-var updateAttendee = function (attendee, attributes) {
+module.exports.updateAttendee = function (attendee, attributes) {
 	var attendeeAttributes = attributes.attendee;
 	delete attributes.attendee;
 
 	attendee.set(attendeeAttributes);
 
-	return attendee
-		.validate()
+	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (){
-			return _extractAttendeeRelatedObjects(attendee, attributes);
+			return _extractAttendeeRelatedObjects(attendee, 'attendeeId', attributes);
 		})
-		.then(function (newAndUpdatedMap) {
+		.then(function (adjustments) {
 			return Attendee.transaction(function (t) {
-				return _adjustAttendeeRelatedObjects(attendee, newAndUpdatedMap, t)
+				return _adjustAttendeeRelatedObjects(attendee, adjustments, t)
 					.then(function () {
 						return _saveAttendeeAndRelated(attendee, attributes, t);
 					});
 				});
 			});
-};
-
-module.exports = {
-	createMentor: createMentor,
-	findMentorByUser: findMentorByUser,
-	findMentorById: findMentorById,
-	updateMentor: updateMentor,
-
-	createAttendee: createAttendee,
-	findAttendeeByUser: findAttendeeByUser,
-	findAttendeeById: findAttendeeById,
-	updateAttendee: updateAttendee
 };

@@ -5,6 +5,8 @@ var logger = require('../../logging');
 
 var REQUEST_BLACKLIST = ['password'];
 
+// although we won't make use of this now, it might be useful in
+// the future (e.g. logging the body in development but not in production)
 function _filterBody (body, blacklist) {
 	for (var key in body) {
 		var value = body[key];
@@ -17,7 +19,7 @@ function _filterBody (body, blacklist) {
 }
 
 function _makeRequestMetadata (req) {
-	return { id: req.id, method: req.method, url: req.url, body: _filterBody(req.body, REQUEST_BLACKLIST)};
+	return { id: req.id, method: req.method, url: req.originalUrl };
 }
 
 module.exports.logRequest = function (req) {

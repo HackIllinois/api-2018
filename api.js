@@ -18,5 +18,4 @@ instance.use('/v1', api.v1);
 
 var instance = instance.listen(config.port, function() {
 	logger.info("initialized api (http://localhost:%d)", config.port);
-
 });

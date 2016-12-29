@@ -192,7 +192,6 @@ function updateAttendeeById(req, res, next) {
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
-router.use(middleware.request);
 
 router.post('/mentor', middleware.request(requests.MentorRequest),
 	middleware.permission(roles.NONE, _isAuthenticated), createMentor);
@@ -202,7 +201,6 @@ router.put('/mentor', middleware.request(requests.MentorRequest),
 	middleware.permission(roles.MENTOR), updateMentorByUser);
 router.put('/mentor/:id', middleware.request(requests.MentorRequest),
 	middleware.permission(roles.ORGANIZERS), updateMentorById);
-
 
 router.post('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
