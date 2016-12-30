@@ -90,7 +90,7 @@ Request.prototype.marshal = function () {
 		return;
 	}
 
-	this._body = _.pick(this._body, _.merge(this.bodyRequired, this.bodyAllowed));
+	this._body = _.pick(this._body, _.concat(this.bodyRequired, this.bodyAllowed));
 	this._marshalled = true;
 };
 

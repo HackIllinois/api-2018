@@ -15,17 +15,17 @@ var Attendee = Model.extend({
 		firstName: ['required', 'string', 'maxLength:255'],
 		lastName:  ['required', 'string', 'maxLength:255'],
 		shirtSize: ['required', 'string', registration.verifyTshirtSize],
-        diet:       ['required', 'string', registration.verifyDiet],
-        age:       ['required', 'integer', 'min:13', 'max:115'],
-        transportation: ['required', 'string', registration.verifyTransportation],
+		diet:       ['required', 'string', registration.verifyDiet],
+		age:       ['required', 'integer', 'min:13', 'max:115'],
+		transportation: ['required', 'string', registration.verifyTransportation],
 		school:    ['required', 'string', 'maxLength:255'],
 		major:     ['required', 'string', 'maxLength:255'],
-        gender:    ['required', 'string', registration.verifyGender],
-        isNovice:  ['required', 'boolean'],
-        professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
-        github:    ['required', 'string', 'maxLength:50'],
-        interests: ['required', 'string', 'maxLength:255'],
-        status:    ['string', registration.verifyStatus]
+		gender:    ['required', 'string', registration.verifyGender],
+		isNovice:  ['required', 'boolean'],
+		professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
+		github:    ['required', 'string', 'maxLength:50'],
+		interests: ['required', 'string', 'maxLength:255'],
+		status:    ['string', registration.verifyStatus]
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
@@ -33,7 +33,7 @@ var Attendee = Model.extend({
 	projects: function () {
 		return this.hasMany(AttendeeProject);
 	},
-	ecointerests: function () {
+	ecosystemInterests: function () {
 		return this.hasMany(AttendeeEcosystemInterest);
 	},
 	extras: function () {
@@ -51,7 +51,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['interests', 'projects', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['interests', 'projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
 /**
@@ -60,7 +60,7 @@ Attendee.findByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['interests', 'projects', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['interests', 'projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
 module.exports = Attendee;

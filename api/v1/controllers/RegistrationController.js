@@ -57,6 +57,7 @@ function fetchMentorById(req, res, next) {
 }
 
 function updateMentorByUser(req, res, next) {
+	delete req.body.mentor.id;
 	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}
@@ -79,6 +80,7 @@ function updateMentorByUser(req, res, next) {
 }
 
 function updateMentorById(req, res, next) {
+	delete req.body.mentor.id;
 	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}
@@ -147,6 +149,7 @@ function fetchAttendeeById(req, res, next) {
 }
 
 function updateAttendeeByUser(req, res, next) {
+	delete req.body.attendee.id;
 	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}
@@ -169,6 +172,7 @@ function updateAttendeeByUser(req, res, next) {
 }
 
 function updateAttendeeById(req, res, next) {
+	delete req.body.attendee.id;
 	if (!req.user.hasRoles(roles.ORGANIZERS)) {
 		delete req.body.status;
 	}

@@ -2,6 +2,7 @@ var CheckitError = require('checkit').Error;
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
+var Model = require('../models/Model');
 var Mentor = require('../models/Mentor');
 var Attendee = require('../models/Attendee');
 var UserRole = require('../models/UserRole');
@@ -19,7 +20,7 @@ var utils = require('../utils');
  * @return {Promise<Model>} the model with its related models
  */
 function _saveWithRelated(model, related, t) {
-	return model.save(null, { transacting: t }).then(function (model) {
+	return model.save(null, { require: false, transacting: t }).then(function (model) {
 		var relatedPromises = [];
 
 		_.forIn(related, function (instances, relatedName) {
@@ -46,13 +47,15 @@ function _saveWithRelated(model, related, t) {
  *                          updated objects
  */
 function _extractRelatedObjects(model, fkName, related) {
-	var result = { new: [], updated: [], updatedIds: [] };
+	var result = { };
 
 	_.forIn(related, function (instances, relatedName) {
+		result[relatedName] = { new: [], updated: [], updatedIds: [] };
+
 		_.forEach(instances, function (attributes) {
 			var MESSAGE, SOURCE;
 			if (!_.has(attributes, 'id')) {
-				result.new.push(attributes);
+				result[relatedName].new.push(attributes);
 			} else if (_.isUndefined(model.related(relatedName).get(attributes.id))) {
 				MESSAGE = "A related " + relatedName + " object with the given ID does not exist";
 				SOURCE = relatedName + ".id";
@@ -65,8 +68,8 @@ function _extractRelatedObjects(model, fkName, related) {
 				// (prevents unauthorized reassignment of related object to another model)
 				attributes[fkName] = model.get('id');
 
-				result.updated.push(model.related(relatedName).get(attributes.id).set(attributes));
-				result.updatedIds.push(attributes.id);
+				result[relatedName].updated.push(model.related(relatedName).get(attributes.id).set(attributes));
+				result[relatedName].updatedIds.push(attributes.id);
 			}
 		});
 	});
@@ -82,19 +85,27 @@ function _extractRelatedObjects(model, fkName, related) {
  * @return {Promise<>}				a promise indicating all changes have been added to the transaction
  */
 function _adjustRelatedObjects(model, adjustments, t) {
-	return model.related(key)
-		.query().transacting(t)
-		.whereNotIn('id', adjustments.updatedIds)
-		.delete()
-		.catch(model.NoRowsDeletedError, function () { return null; })
-		.then(function () {
-			model.related(key).reset();
+	var relatedPromises = [];
 
-			return _Promise.map(adjustments.updated, function (updated) {
-				model.related(key).add(updated);
-				return updated.save(null, { transacting: t, require: false });
+	_.forIn(adjustments, function (adjustment, relatedName) {
+		var promise = model.related(relatedName)
+			.query().transacting(t)
+			.whereNotIn('id', adjustment.updatedIds)
+			.delete()
+			.catch(Model.NoRowsDeletedError, function () { return null; })
+			.then(function () {
+				model.related(relatedName).reset();
+
+				return _Promise.map(adjustment.updated, function (updated) {
+					model.related(relatedName).add(updated);
+					return updated.save(null, { transacting: t, require: false });
+				});
 			});
-		});
+
+		relatedPromises.push(promise);
+	});
+
+	return _Promise.all(relatedPromises);
 }
 
 /**
@@ -183,7 +194,7 @@ module.exports.updateMentor = function (mentor, attributes) {
 		.then(function (adjustments){
 			return Mentor.transaction(function (t) {
 				return _adjustMentorIdeas(mentor, adjustments, t).then(function () {
-					return _saveWithRelated(mentor, { 'ideas': adjustments.new }, t);
+					return _saveWithRelated(mentor, { 'ideas': adjustments.ideas.new }, t);
 				});
 			});
 		});
@@ -262,6 +273,10 @@ module.exports.findAttendeeById = function (id) {
 * @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
 */
 module.exports.updateAttendee = function (attendee, attributes) {
+	// some attendee registration attributes are optional, but we need to
+	// be sure that they are at least considered for removal during adjustment
+	attributes = _.merge(attributes, { 'projects': [], 'extras': [], 'collaborators': [] });
+
 	var attendeeAttributes = attributes.attendee;
 	delete attributes.attendee;
 
@@ -270,13 +285,16 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function (){
-			return _extractAttendeeRelatedObjects(attendee, 'attendeeId', attributes);
+			return _extractRelatedObjects(attendee, 'attendeeId', attributes);
 		})
 		.then(function (adjustments) {
 			return Attendee.transaction(function (t) {
-				return _adjustAttendeeRelatedObjects(attendee, adjustments, t)
+				return _adjustRelatedObjects(attendee, adjustments, t)
 					.then(function () {
-						return _saveAttendeeAndRelated(attendee, attributes, t);
+						var newRelated = _.mapValues(adjustments, function (adjustment, adjustments) {
+							return adjustment.new;
+						});
+						return _saveWithRelated(attendee, newRelated, t);
 					});
 				});
 			});
