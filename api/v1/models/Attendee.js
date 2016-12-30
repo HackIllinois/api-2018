@@ -21,11 +21,12 @@ var Attendee = Model.extend({
 		school:    ['required', 'string', 'maxLength:255'],
 		major:     ['required', 'string', 'maxLength:255'],
 		gender:    ['required', 'string', registration.verifyGender],
-		isNovice:  ['required', 'boolean'],
 		professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
 		github:    ['required', 'string', 'maxLength:50'],
 		interests: ['required', 'string', 'maxLength:255'],
-		status:    ['string', registration.verifyStatus]
+		status:    ['string', registration.verifyStatus],
+		isNovice:  ['required', 'boolean'],
+		isPrivate:  ['required', 'boolean']
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
