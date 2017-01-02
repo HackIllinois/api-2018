@@ -23,6 +23,7 @@ var Attendee = Model.extend({
 		gender:    ['required', 'string', registration.verifyGender],
 		professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
 		github:    ['required', 'string', 'maxLength:50'],
+		linkedin:  ['required', 'string', 'maxLength:50'],
 		interests: ['required', 'string', 'maxLength:255'],
 		status:    ['string', registration.verifyStatus],
 		isNovice:  ['required', 'boolean'],

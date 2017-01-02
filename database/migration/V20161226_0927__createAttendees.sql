@@ -12,6 +12,7 @@ CREATE TABLE `attendees` (
   `gender` ENUM('MALE', 'FEMALE', 'NON_BINARY', 'OTHER') NOT NULL,
   `professional_interest` ENUM('NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH') NOT NULL DEFAULT 'NONE',
   `github` VARCHAR(50) NOT NULL,
+  `linkedin` VARCHAR(50) NOT NULL,
   `interests` VARCHAR(255) NOT NULL,
   `status` ENUM('ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING') NOT NULL DEFAULT 'PENDING',
   `is_novice` TINYINT(1) NOT NULL DEFAULT 0,

@@ -36,12 +36,13 @@ var bodyValidations = {
 	'attendee.gender': ['required', 'string', registration.verifyGender],
 	'attendee.professionalInterest': ['required', 'string', registration.verifyProfessionalInterest],
 	'attendee.github': ['required', 'string', 'maxLength:50'],
+	'attendee.linkedin':  ['required', 'string', 'maxLength:50'],
 	'attendee.interests': ['required', 'string', 'maxLength:255'],
 	'attendee.status': ['string', registration.verifyStatus],
 	'attendee.isNovice': ['required', 'boolean'],
 	'attendee.isPrivate': ['required', 'boolean'],
 	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
-	'projects': ['array', 'minLength:1', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
+	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:3', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
 };
