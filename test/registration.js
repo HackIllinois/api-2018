@@ -39,6 +39,7 @@ describe('RegistrationService',function(){
                 "shirtSize": "M",
                 "diet": "NONE",
                 "age": 19,
+                "graduationYear": 2019,
                 "transportation": "NOT_NEEDED",
                 "school": "University of Illinois at Urbana-Champaign",
                 "major": "Computer Science",
@@ -48,7 +49,8 @@ describe('RegistrationService',function(){
                 "linkedin": "JDoe1234",
                 "interests": "CS",
                 "isNovice": true,
-                "isPrivate": false
+                "isPrivate": false,
+                "phoneNumber": "12345678910"
             };
             testRegistration.projects = [
             	{
@@ -214,6 +216,7 @@ describe('RegistrationService',function(){
                 "shirtSize": "M",
                 "diet": "NONE",
                 "age": 19,
+                "graduationYear": 2019,
                 "transportation": "NOT_NEEDED",
                 "school": "University of Illinois at Urbana-Champaign",
                 "major": "Computer Science",
@@ -224,6 +227,7 @@ describe('RegistrationService',function(){
                 "interests": "CS",
                 "isNovice": true,
                 "isPrivate": false,
+                "phoneNumber": "12345678910",
                 "userId": 1
             };
             testRegistration.projects = [
