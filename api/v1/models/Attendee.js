@@ -1,7 +1,10 @@
 var _ = require('lodash');
 var registration = require('../utils/registration');
+var utils = require('../utils');
 
 var Model = require('./Model');
+var User = require('./User');
+var Upload = require('./Upload');
 var AttendeeProjectInterest = require('./AttendeeProjectInterest');
 var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
@@ -17,6 +20,7 @@ var Attendee = Model.extend({
 		shirtSize: ['required', 'string', registration.verifyTshirtSize],
 		diet:       ['required', 'string', registration.verifyDiet],
 		age:       ['required', 'integer', 'min:13', 'max:115'],
+		graduationYear: ['required', 'integer', 'min:2017', 'max:2024'],
 		transportation: ['required', 'string', registration.verifyTransportation],
 		school:    ['required', 'string', 'maxLength:255'],
 		major:     ['required', 'string', 'maxLength:255'],
@@ -27,7 +31,8 @@ var Attendee = Model.extend({
 		interests: ['required', 'string', 'maxLength:255'],
 		status:    ['string', registration.verifyStatus],
 		isNovice:  ['required', 'boolean'],
-		isPrivate:  ['required', 'boolean']
+		isPrivate:  ['required', 'boolean'],
+		phoneNumber: ['string', 'maxLength:15']
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
@@ -53,7 +58,23 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['interests', 'projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+};
+
+Attendee.fetchWithResumeByUserId = function (userId) {
+	return Attendee.transaction(function (t){
+		var attendee;
+	    return Attendee.where({ user_id: userId })
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.then(function (a) {
+			attendee = a;
+			return Upload.where({ owner_id: a.get('userId') }).fetch({transacting: t});
+	    })
+		.then(function (u) {
+			attendee.set('resume', u.attributes);
+			return attendee;
+		});
+	});
 };
 
 /**
@@ -62,7 +83,24 @@ Attendee.findByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['interests', 'projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
+
+Attendee.fetchWithResumeById = function (id) {
+	return Attendee.transaction(function (t){
+		var attendee;
+		return Attendee.where({ id: id })
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.then(function (a) {
+			attendee = a;
+			return Upload.where({ owner_id: a.get('userId') }).fetch({transacting: t});
+	    })
+		.then(function (u) {
+			  attendee.set('resume', u.attributes);
+			  return attendee;
+    	});
+	});
+};
+
 
 module.exports = Attendee;

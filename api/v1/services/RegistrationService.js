@@ -236,11 +236,18 @@ module.exports.createAttendee = function (user, attributes) {
 /**
 * Finds an attendee by querying on a user's ID
 * @param  {User} user		the user expected to be associated with an attendee
+* @param  {Boolean} withResume	whether or not to fetch the attendee with its resume
 * @return {Promise<Attendee>}	resolving to the associated Attendee model
 * @throws {NotFoundError} when the requested attendee cannot be found
 */
-module.exports.findAttendeeByUser = function (user) {
-	return Attendee.findByUserId(user.get('id')).tap(function (result) {
+module.exports.findAttendeeByUser = function (user, withResume) {
+	var findFunction;
+	if(withResume)
+		findFunction = Attendee.fetchWithResumeByUserId;
+	else
+		findFunction = Attendee.findByUserId;
+
+	return findFunction(user.get('id')).tap(function (result) {
 		if (_.isNull(result)) {
 			var message = "A attendee with the given user ID cannot be found";
 			var source = "userId";
@@ -252,11 +259,18 @@ module.exports.findAttendeeByUser = function (user) {
 /**
 * Finds an attendee by querying for the given ID
 * @param  {Number} id the ID to query
+* @param  {Boolean} withResume	whether or not to fetch the attendee with its resume
 * @return {Promise<Attendee>} resolving to the associated Attendee model
 * @throws {NotFoundError} when the requested attendee cannot be found
 */
-module.exports.findAttendeeById = function (id) {
-	return Attendee.findById(id).tap(function (result) {
+module.exports.findAttendeeById = function (id, withResume) {
+	var findFunction;
+	if(withResume)
+		findFunction = Attendee.fetchWithResumeById;
+	else
+		findFunction = Attendee.findById;
+
+	return findFunction(id).tap(function (result) {
 		if (_.isNull(result)) {
 			var message = "A attendee with the given ID cannot be found";
 			var source = "id";
@@ -264,6 +278,7 @@ module.exports.findAttendeeById = function (id) {
 		}
 	});
 };
+
 
 /**
 * Updates an attendee and their relational tables by relational user

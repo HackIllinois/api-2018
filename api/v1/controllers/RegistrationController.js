@@ -4,6 +4,7 @@ var services = require('../services');
 var middleware = require('../middleware');
 var requests = require('../requests');
 var roles = require('../utils/roles');
+var mail = require('../utils/mail');
 
 var router = require('express').Router();
 
@@ -108,6 +109,7 @@ function createAttendee(req, res, next) {
 
 	services.RegistrationService.createAttendee(req.user, req.body)
 		.then(function (attendee) {
+			services.MailService.addToList(req.user, mail.lists.applicants);
 			res.body = attendee.toJSON();
 
 			next();
@@ -121,7 +123,7 @@ function createAttendee(req, res, next) {
 
 function fetchAttendeeByUser(req, res, next) {
 	services.RegistrationService
-		.findAttendeeByUser(req.user)
+		.findAttendeeByUser(req.user, true)
 		.then(function(attendee){
 			res.body = attendee.toJSON();
 
@@ -135,7 +137,7 @@ function fetchAttendeeByUser(req, res, next) {
 }
 
 function fetchAttendeeById(req, res, next) {
-	services.RegistrationService.findAttendeeById(req.params.id)
+	services.RegistrationService.findAttendeeById(req.params.id, true)
 		.then(function(attendee){
 			res.body = attendee.toJSON();
 
