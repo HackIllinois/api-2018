@@ -54,13 +54,19 @@ var Attendee = Model.extend({
 
 /**
 * Finds an attendee by its relational user's id, joining in its related project ideas
-* @param  {Number|String} id	the ID of the attendee with the appropriate type
+* @param  {Number|String} userId	the ID of the attendee's relational user
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
 	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
+
+/**
+* Same as Attendee.findByUserId, only appending a resume object to the result
+* @param  {Number|String} userId	the ID of the attendee's relational user
+* @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
+*/
 Attendee.fetchWithResumeByUserId = function (userId) {
 	return Attendee.transaction(function (t){
 		var attendee;
@@ -68,7 +74,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
-			return Upload.where({ owner_id: a.get('userId') }).fetch({transacting: t});
+			return Upload.where({ owner_id: userId, bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
 			attendee.set('resume', u.attributes);
@@ -86,6 +92,11 @@ Attendee.findById = function (id) {
 	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
+/**
+* Same as Attendee.findById, only appending a resume object to the result
+* @param  {Number|String} id	the ID of the attendee with the appropriate type
+* @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
+*/
 Attendee.fetchWithResumeById = function (id) {
 	return Attendee.transaction(function (t){
 		var attendee;
@@ -93,7 +104,7 @@ Attendee.fetchWithResumeById = function (id) {
 		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
-			return Upload.where({ owner_id: a.get('userId') }).fetch({transacting: t});
+			return Upload.where({ owner_id: a.get('userId'), bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
 			  attendee.set('resume', u.attributes);

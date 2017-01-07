@@ -19,17 +19,17 @@ var expect = chai.expect;
 var tracker = require('mock-knex').getTracker();
 
 describe('RegistrationService',function(){
+    var _saveAttendee;
+    var _saveAttendeeEcosystemInterest;
+    var _saveAttendeeExtraInfo;
+    var _saveAttendeeProject;
+    var _saveAttendeeRequestedCollaborator;
 
     describe('createAttendee', function () {
         var testUser;
         var testRegistration;
         var _forgeAttendee;
-        var _saveAttendee;
-        var _createAttendeeEcosystemInterest;
-        var _createAttendeeExtraInfo;
-        var _createAttendeeProject;
-        var _createAttendeeRequestedCollaborator;
-
+        
         before(function(done){
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             testRegistration = {};
@@ -77,10 +77,10 @@ describe('RegistrationService',function(){
             ];
             _forgeAttendee = sinon.spy(Attendee, 'forge');
             _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-            _createAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
-            _createAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-            _createAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
-            _createAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
+            _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
+            _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
+            _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
+            _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
             done();
         });
@@ -101,10 +101,10 @@ describe('RegistrationService',function(){
 
                 assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, "Attendee forge not called with right parameters");
                 assert(_saveAttendee.calledOnce, "Attendee save not called");
-                assert(_createAttendeeProject.calledOnce, "AttendeeProject save not called");
-                assert(_createAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
-                assert(_createAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
-                assert(_createAttendeeRequestedCollaborator.calledOnce, "AttendeeRequestedCollaborator save not called");
+                assert(_saveAttendeeProject.calledOnce, "AttendeeProject save not called");
+                assert(_saveAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
+                assert(_saveAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
+                assert(_saveAttendeeRequestedCollaborator.calledOnce, "AttendeeRequestedCollaborator save not called");
                 return done();
             }).catch(function (err) {
 				return done(err);
@@ -124,10 +124,10 @@ describe('RegistrationService',function(){
 		after(function(done) {
 			_forgeAttendee.restore();
 			_saveAttendee.restore();
-			_createAttendeeProject.restore();
-			_createAttendeeExtraInfo.restore();
-			_createAttendeeEcosystemInterest.restore();
-			_createAttendeeRequestedCollaborator.restore();
+			_saveAttendeeProject.restore();
+			_saveAttendeeExtraInfo.restore();
+			_saveAttendeeEcosystemInterest.restore();
+			_saveAttendeeRequestedCollaborator.restore();
 			done();
 		});
     });
@@ -201,11 +201,6 @@ describe('RegistrationService',function(){
         var testAttendee;
         var testRegistration;
         var _setAttendee;
-        var _saveAttendee;
-        var _createAttendeeEcosystemInterest;
-        var _createAttendeeExtraInfo;
-        var _createAttendeeProject;
-        var _createAttendeeRequestedCollaborator;
 
         before(function(done){
             testRegistration = {};
@@ -258,10 +253,10 @@ describe('RegistrationService',function(){
 
             _setAttendee = sinon.spy(Attendee.prototype, 'set');
             _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-            _createAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
-            _createAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-            _createAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
-            _createAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
+            _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
+            _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
+            _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
+            _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
             done();
         });
@@ -280,10 +275,10 @@ describe('RegistrationService',function(){
             attendee.then(function() {
                 assert(_setAttendee.withArgs(attendeeParams).calledOnce, "Attendee update not called with right parameters");
                 assert(_saveAttendee.calledOnce, "Attendee save not called");
-                assert(_createAttendeeProject.calledOnce, "AttendeeProject save not called");
-                assert(_createAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
-                assert(_createAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
-                assert(!_createAttendeeRequestedCollaborator.called, "AttendeeRequestedCollaborator save called when not updated");
+                assert(_saveAttendeeProject.calledOnce, "AttendeeProject save not called");
+                assert(_saveAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
+                assert(_saveAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
+                assert(!_saveAttendeeRequestedCollaborator.called, "AttendeeRequestedCollaborator save called when not updated");
                 return done();
             }).catch(function (err) {
 				return done(err);
@@ -296,10 +291,10 @@ describe('RegistrationService',function(){
 		after(function(done) {
 			_setAttendee.restore();
 			_saveAttendee.restore();
-			_createAttendeeProject.restore();
-			_createAttendeeExtraInfo.restore();
-			_createAttendeeEcosystemInterest.restore();
-			_createAttendeeRequestedCollaborator.restore();
+			_saveAttendeeProject.restore();
+			_saveAttendeeExtraInfo.restore();
+			_saveAttendeeEcosystemInterest.restore();
+			_saveAttendeeRequestedCollaborator.restore();
 			done();
 		});
     });
