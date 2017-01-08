@@ -15,6 +15,7 @@ mockery.registerMock('redis', require('redis-mock'));
 mockery.enable({ warnOnUnregistered: false });
 
 require('./user.js');
+require('./registration.js');
 require('./auth.js');
 require('./ecosystem.js');
 require('./permission.js');

@@ -1,4 +1,10 @@
 module.exports = {
+	Attendee: require('./Attendee'),
+	AttendeeExtraInfo: require('./AttendeeExtraInfo'),
+	AttendeeProject: require('./AttendeeProject'),
+	AttendeeProjectInterest: require('./AttendeeProjectInterest'),
+	AttendeeRequestedCollaborator: require('./AttendeeRequestedCollaborator'),
+	Project: require('./Project'),
 	Ecosystem: require('./Ecosystem'),
 	MailingList: require('./MailingList'),
 	MailingListUser: require('./MailingListUser'),

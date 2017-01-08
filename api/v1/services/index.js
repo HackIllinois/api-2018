@@ -4,8 +4,8 @@ module.exports = {
 	MailService: require('./MailService'),
 	PermissionService: require('./PermissionService'),
 	ProjectService: require('./ProjectService'),
+	RegistrationService: require('./RegistrationService'),
 	StorageService: require('./StorageService'),
 	UserService: require('./UserService'),
-	TokenService: require('./TokenService'),
-	RegistrationService: require('./RegistrationService')
+	TokenService: require('./TokenService')
 };

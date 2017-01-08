@@ -16,6 +16,11 @@ Project.findByName = function (name) {
 	return Project.where({ name:name }).fetch();
 }
 
+/**
+ * Finds an project by its ID
+ * @param  {Number|String} id	the ID of the model with the appropriate type
+ * @return {Promise<Model>}		a Promise resolving to the resulting model or null
+ */
 Project.findById = function (id) {
 	return Project.where({ id:id }).fetch();
 }
