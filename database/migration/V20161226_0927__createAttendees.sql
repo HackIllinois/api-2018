@@ -16,7 +16,7 @@ CREATE TABLE `attendees` (
   `linkedin` VARCHAR(50) NOT NULL,
   `interests` VARCHAR(255) NOT NULL,
   `status` ENUM('ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING') NOT NULL DEFAULT 'PENDING',
-  `finalized` TINYINT(1) NULL DEFAULT 0,
+  `finalized` TINYINT(1) NOT NULL DEFAULT 0,
   `wave` TINYINT(1) NULL DEFAULT 0,
   `reviewer` VARCHAR(50) NULL,
   `review_time` INT UNSIGNED NULL,
