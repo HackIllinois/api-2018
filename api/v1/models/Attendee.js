@@ -30,6 +30,10 @@ var Attendee = Model.extend({
 		linkedin:  ['required', 'string', 'maxLength:50'],
 		interests: ['required', 'string', 'maxLength:255'],
 		status:    ['string', registration.verifyStatus],
+		finalized: ['boolean'],
+		wave: 	   ['integer', 'max:3'],
+		reviewer:  ['string'],
+		reviewTime: ['integer'],
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
 		phoneNumber: ['string', 'maxLength:15']
