@@ -13,8 +13,8 @@ _.forEach(ALL_RESPONSES, function (response) {
  * @throws TypeError when the response is invalid
  */
 module.exports.verifyResponse = function (response) {
-    if (!module.exports.isIn(ALL_RESPONSES, response)) {
-        throw new TypeError(response + " is not a valid role");
+    if (!_.includes(ALL_RESPONSES, response.attendeeResponse)) {
+        throw new TypeError(response + " is not a valid response");
     }
 
     return true;
