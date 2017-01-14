@@ -248,6 +248,31 @@ function getAttendeeBatch(req, res, next) {
 		});
 }
 
+function getAttendeeBatchWithFilter(req, res, next) {
+	_.defaults(req.query, {'page': 1, 'count': 25, 'category': 'firstName', 'ascending': 1});
+	var page = parseInt(req.query.page);
+	var count = parseInt(req.query.count);
+	var category = req.query.category;
+	var ascending = parseInt(req.query.ascending);
+	var query = req.query.query;
+
+	_validateGetAllRequest(page, count, category, ascending)
+		.then(function () {
+			return services.RegistrationService.findSomeAttendees(page, count, category, ascending, query)
+		})
+		.then(function (results) {
+			res.body = {};
+			res.body.attendees = results;
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -268,7 +293,8 @@ router.put('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
 router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
-router.get('/all', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
+router.get('/allAttendees', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
+router.get('/searchAttendees', middleware.permission(roles.ORGANIZERS), getAttendeeBatchWithFilter);
 
 router.use(middleware.response);
 router.use(middleware.errors);
