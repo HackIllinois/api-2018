@@ -340,19 +340,32 @@ module.exports.updateAttendee = function (attendee, attributes) {
 
 
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
-	var orderString = ascending ? '' : '-' + category;
-	return Attendee
-		.query(function (qb) {
-			qb.groupBy('attendees.id');
-		})
-		.orderBy(orderString)
+	var direction = ascending ? 'ASC' : 'DSC';
+	return Attendee.forge()
+		.orderBy(category, direction)
 		.fetchPage({
 			pageSize: count,
 			page: page
 		})
 		.then(function (results) {
 			var attendees = _.map(results.models, 'attributes');
-			console.log(attendees)
+			return attendees;
+		});
+}
+
+module.exports.findSomeAttendees = function(page, count, category, ascending, searchTerm) {
+	var direction = ascending ? 'ASC' : 'DSC';
+	return Attendee
+		.query(function (qb) {
+			qb.where('first_name', 'LIKE', searchTerm).orWhere('last_name', 'LIKE', searchTerm);
+		})
+		.orderBy(category, direction)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
 }
