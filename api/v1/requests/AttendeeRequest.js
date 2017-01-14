@@ -1,6 +1,7 @@
 var Request = require('./Request');
 var validators = require('../utils/validators');
 var registration = require('../utils/registration');
+var rsvp = require('../utils/rsvp');
 
 var extraInfoValidations = {
 	info:       ['string', 'maxLength:255']
