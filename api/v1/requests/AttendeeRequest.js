@@ -27,7 +27,7 @@ var attendeeResponseValidatations = {
 }
 
 var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['projects', 'extras', 'collaborators'];
+var bodyAllowed = ['projects', 'extras', 'collaborators', 'response'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
