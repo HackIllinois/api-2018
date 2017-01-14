@@ -21,6 +21,11 @@ var requestedCollaboratorValidations = {
 	collaborator: ['required', 'string', 'maxLength:255']
 };
 
+var attendeeResponseValidatations = {
+	attendeeId: ['required', 'integer'],
+	attendeeResponse:  ['required', 'string', rsvp.verifyResponse]
+}
+
 var bodyRequired = ['attendee', 'ecosystemInterests'];
 var bodyAllowed = ['projects', 'extras', 'collaborators'];
 var bodyValidations = {
@@ -46,7 +51,8 @@ var bodyValidations = {
 	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
 	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:3', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
-	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
+	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')],
+	'response':  ['array', 'maxLength:1', validators.array(validators.nested(attendeeResponseValidatations, 'response'), 'response')]
 };
 
 function AttendeeRequest(headers, body) {
@@ -61,6 +67,7 @@ AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._projectValidations = projectValidations;
 AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
+AttendeeRequest._responseValidations = attendeeResponseValidatations;
 
 AttendeeRequest.prototype = Object.create(Request.prototype);
 AttendeeRequest.prototype.constructor = AttendeeRequest;

@@ -10,6 +10,7 @@ var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
 var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
+var AttendeeRSVP = require('./AttendeeRSVP');
 var Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
@@ -48,6 +49,9 @@ var Attendee = Model.extend({
 	},
 	collaborators: function () {
 		return this.hasMany(AttendeeRequestedCollaborator);
+	},
+	response : function () {
+		return this.hasOne(AttendeeRSVP);
 	}
 });
 
@@ -58,7 +62,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'response']});
 };
 
 
@@ -71,7 +75,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 	return Attendee.transaction(function (t){
 		var attendee;
 	    return Attendee.where({ user_id: userId })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'response'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			return Upload.where({ owner_id: userId, bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
@@ -89,7 +93,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'response']});
 };
 
 /**
@@ -101,7 +105,7 @@ Attendee.fetchWithResumeById = function (id) {
 	return Attendee.transaction(function (t){
 		var attendee;
 		return Attendee.where({ id: id })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'response'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			return Upload.where({ owner_id: a.get('userId'), bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
