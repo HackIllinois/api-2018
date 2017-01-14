@@ -1,15 +1,43 @@
+var _ = require('lodash');
 var bodyParser = require('body-parser');
+var _Promise = require('bluebird');
 
 var services = require('../services');
 var middleware = require('../middleware');
 var requests = require('../requests');
 var roles = require('../utils/roles');
 var mail = require('../utils/mail');
+var registration = require('../utils/registration');
+var errors = require('../errors');
 
 var router = require('express').Router();
 
 function _isAuthenticated (req) {
 	return req.auth && (req.user !== undefined);
+}
+
+function _validateGetAllRequest(page, count, category, ascending){
+	if(_.isNaN(page)){
+		var message = "Invalid page parameter";
+		var source = "page";
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+	if(_.isNaN(count)){
+		var message = "Invalid count parameter";
+		var source = "count";
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+	if(_.isNaN(ascending) || (ascending != 0 && ascending != 1)){
+		var message = "Invalid ascending parameter";
+		var source = "ascending";
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+	if(_.isNaN(category) || !registration.verifyCategory(category)){
+		var message = "Invalid category parameter";
+		var source = "category";
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+	return _Promise.resolve(true);
 }
 
 function createMentor(req, res, next) {
@@ -196,6 +224,30 @@ function updateAttendeeById(req, res, next) {
 		});
 }
 
+function getAttendeeBatch(req, res, next) {
+	_.defaults(req.query, {'page': 1, 'count': 25, 'category': 'firstName', 'ascending': 1});
+	var page = parseInt(req.query.page);
+	var count = parseInt(req.query.count);
+	var category = req.query.category;
+	var ascending = parseInt(req.query.ascending);
+
+	_validateGetAllRequest(page, count, category, ascending)
+		.then(function () {
+			return services.RegistrationService.fetchAllAttendees(page, count, category, ascending)
+		})
+		.then(function (results) {
+			res.body = {};
+			res.body.attendees = results;
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -216,6 +268,7 @@ router.put('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
 router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
+router.get('/all', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
 
 router.use(middleware.response);
 router.use(middleware.errors);

@@ -7,6 +7,7 @@ var PROFESSIONAL_INTERESTS = ['INTERNSHIP', 'FULLTIME', 'BOTH'];
 var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
+var CATEGORIES = ['FIRST_NAME', 'LAST_NAME', 'GRADUATION_YEAR', 'SCHOOL', 'STATUS', 'WAVE', 'FINALIZED']
 
 /**
  * Ensures that the provided tshirt-size is in the list
@@ -122,6 +123,21 @@ module.exports.verifyProjectArray = function(projectArray){
 module.exports.verifyStatus = function (status) {
 	if (!_.includes(STATUSES, status)) {
 		throw new TypeError(status + " is not a valid status");
+	}
+
+	return true;
+};
+
+/**
+ * Ensures that the provided category is in the list
+ * of valid categories
+ * @param  {String} category the value to check
+ * @return {Boolean} true when the category is valid
+ * @throws TypeError when the category is invalid
+ */
+module.exports.verifyCategory = function (category) {
+	if (!_.includes(CATEGORIES, category)) {
+		throw new TypeError(category + " is not a valid status");
 	}
 
 	return true;

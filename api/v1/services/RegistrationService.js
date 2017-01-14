@@ -337,3 +337,22 @@ module.exports.updateAttendee = function (attendee, attributes) {
 				});
 			});
 };
+
+
+module.exports.fetchAllAttendees = function(page, count, category, ascending) {
+	var orderString = ascending ? '' : '-' + category;
+	return Attendee
+		.query(function (qb) {
+			qb.groupBy('attendees.id');
+		})
+		.orderBy(orderString)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
+			console.log(attendees)
+			return attendees;
+		});
+}
