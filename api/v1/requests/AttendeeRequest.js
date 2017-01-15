@@ -1,6 +1,7 @@
 var Request = require('./Request');
 var validators = require('../utils/validators');
 var registration = require('../utils/registration');
+var rsvp = require('../utils/rsvp');
 
 var extraInfoValidations = {
 	info:       ['string', 'maxLength:255']
@@ -21,8 +22,12 @@ var requestedCollaboratorValidations = {
 	collaborator: ['required', 'string', 'maxLength:255']
 };
 
+var attendeeRSVPValidations = {
+	attendeeAttendance: ['required', 'string', rsvp.verifyAttendanceReply]
+};
+
 var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['projects', 'extras', 'collaborators'];
+var bodyAllowed = ['projects', 'extras', 'collaborators', 'rsvp'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
@@ -46,7 +51,8 @@ var bodyValidations = {
 	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
 	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:3', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
-	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
+	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')],
+	'rsvp': ['array', 'maxLength:1', validators.array(validators.nested(attendeeRSVPValidations, 'rsvp'), 'rsvp')]
 };
 
 function AttendeeRequest(headers, body) {
@@ -61,6 +67,7 @@ AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._projectValidations = projectValidations;
 AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
+AttendeeRequest._attendeeRSVPValidations = attendeeRSVPValidations;
 
 AttendeeRequest.prototype = Object.create(Request.prototype);
 AttendeeRequest.prototype.constructor = AttendeeRequest;
