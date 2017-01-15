@@ -23,7 +23,7 @@ var requestedCollaboratorValidations = {
 };
 
 var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['projects', 'extras', 'collaborators', 'response'];
+var bodyAllowed = ['projects', 'extras', 'collaborators', 'reply'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
@@ -48,7 +48,8 @@ var bodyValidations = {
 	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:3', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')],
-	'response':  ['string', rsvp.verifyResponse]
+	'reply': ['plainObject'],
+	'reply.attendeeResponse': ['required', 'string', rsvp.verifyReply]
 };
 
 function AttendeeRequest(headers, body) {

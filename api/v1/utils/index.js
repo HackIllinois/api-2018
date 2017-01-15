@@ -8,6 +8,7 @@ module.exports = {
 	storage: require('./storage.js'),
 	time: require('./time.js'),
 	registration: require('./registration.js'),
+	rsvp: require('./rsvp.js'),
 	validators: require('./validators.js'),
 	cache: require("./cache.js")
 };

@@ -12,8 +12,8 @@ _.forEach(ALL_RESPONSES, function (response) {
  * @return {Boolean} true when the response is valid
  * @throws TypeError when the response is invalid
  */
-module.exports.verifyResponse = function (response) {
-    if (!_.includes(ALL_RESPONSES, response.attendeeResponse)) {
+module.exports.verifyReply = function (response) {
+    if (!_.includes(ALL_RESPONSES, response)) {
         throw new TypeError(response + " is not a valid response");
     }
 
