@@ -51,7 +51,7 @@ var Attendee = Model.extend({
 		return this.hasMany(AttendeeRequestedCollaborator);
 	},
 	rsvp: function () {
-		return this.hasOne(AttendeeRSVP);
+		return this.hasMany(AttendeeRSVP);
 	}
 });
 
