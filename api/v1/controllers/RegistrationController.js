@@ -16,7 +16,7 @@ function _isAuthenticated (req) {
 	return req.auth && (req.user !== undefined);
 }
 
-function _validateGetAllRequest(page, count, category, ascending){
+function _validateGetAttendeesRequest(page, count, category, ascending){
 	if(_.isNaN(page)){
 		var message = "Invalid page parameter";
 		var source = "page";
@@ -231,9 +231,9 @@ function getAttendeeBatch(req, res, next) {
 	var category = req.query.category;
 	var ascending = parseInt(req.query.ascending);
 
-	_validateGetAllRequest(page, count, category, ascending)
+	_validateGetAttendeesRequest(page, count, category, ascending)
 		.then(function () {
-			return services.RegistrationService.fetchAllAttendees(page, count, category, ascending)
+			return services.RegistrationService.fetchAllAttendees(page, count, category, ascending);
 		})
 		.then(function (results) {
 			res.body = {};
@@ -248,7 +248,7 @@ function getAttendeeBatch(req, res, next) {
 		});
 }
 
-function getAttendeeBatchWithFilter(req, res, next) {
+function searchAttendees(req, res, next) {
 	_.defaults(req.query, {'page': 1, 'count': 25, 'category': 'firstName', 'ascending': 1});
 	var page = parseInt(req.query.page);
 	var count = parseInt(req.query.count);
@@ -256,9 +256,56 @@ function getAttendeeBatchWithFilter(req, res, next) {
 	var ascending = parseInt(req.query.ascending);
 	var query = req.query.query;
 
-	_validateGetAllRequest(page, count, category, ascending)
+	_validateGetAttendeesRequest(page, count, category, ascending)
+		.then(function() {
+			if(_.isUndefined(query)){
+				var message = "Invalid query parameter";
+				var source = "query";
+				return _Promise.reject(new errors.InvalidParameterError(message, source));
+			}
+			return _Promise.resolve(true);
+		})
 		.then(function () {
-			return services.RegistrationService.findAttendeesByName(page, count, category, ascending, query)
+			return services.RegistrationService.findAttendeesByName(page, count, category, ascending, query);
+		})
+		.then(function (results) {
+			res.body = {};
+			res.body.attendees = results;
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
+function filterAttendees(req, res, next) {
+	_.defaults(req.query, {'page': 1, 'count': 25, 'category': 'firstName', 'ascending': 1});
+	var page = parseInt(req.query.page);
+	var count = parseInt(req.query.count);
+	var category = req.query.category;
+	var ascending = parseInt(req.query.ascending);
+	var filterCategory = req.query.filterCategory;
+	var filterVal = req.query.filterVal;
+
+	_validateGetAttendeesRequest(page, count, category, ascending)
+		.then(function () {
+			if(_.isUndefined(filterCategory) || !registration.verifyCategory(filterCategory)){
+				var message = "Invalid filterCategory parameter";
+				var source = "filterCategory";
+				return _Promise.reject(new errors.InvalidParameterError(message, source));
+			}
+			if(_.isUndefined(filterVal)){
+				var message = "Invalid filterVal parameter";
+				var source = "filterVal";
+				return _Promise.reject(new errors.InvalidParameterError(message, source));	
+			}
+			return _Promise.resolve(true);
+		})
+		.then(function () {
+			return services.RegistrationService.filterAttendees(page, count, category, ascending, filterCategory, filterVal);
 		})
 		.then(function (results) {
 			res.body = {};
@@ -294,7 +341,8 @@ router.put('/attendee', middleware.request(requests.AttendeeRequest),
 router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
 router.get('/allAttendees', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
-router.get('/searchAttendees', middleware.permission(roles.ORGANIZERS), getAttendeeBatchWithFilter);
+router.get('/searchAttendees', middleware.permission(roles.ORGANIZERS), searchAttendees);
+router.get('/filterAttendees', middleware.permission(roles.ORGANIZERS), filterAttendees);
 
 router.use(middleware.response);
 router.use(middleware.errors);
