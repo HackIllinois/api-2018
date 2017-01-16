@@ -346,3 +346,20 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 			return attendees;
 		});
 }
+
+module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
+	var ordering = (ascending ? '' : '-') + category;
+	return Attendee
+		.query(function (qb) {
+			qb.where(filterCategory, '=', filterVal);
+		})
+		.orderBy(ordering)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
+			return attendees;
+		});
+}
