@@ -35,3 +35,8 @@ INSERT INTO `mailing_lists` (`name`) VALUES ('sponsors');
 INSERT INTO `mailing_lists` (`name`) VALUES ('mentors');
 INSERT INTO `mailing_lists` (`name`) VALUES ('volunteers');
 INSERT INTO `mailing_lists` (`name`) VALUES ('test');
+
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_1');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_2');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_3');
+INSERT INTO `mailing_lists` (`name`) VALUES ('rejected');
