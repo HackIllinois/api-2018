@@ -4,10 +4,14 @@ var _ = require('lodash');
 
 var Model = require('../models/Model');
 var Mentor = require('../models/Mentor');
+var User = require('../models/User');
+var MailingList = require('../models/MailingList');
 var Attendee = require('../models/Attendee');
 var UserRole = require('../models/UserRole');
 var errors = require('../errors');
 var utils = require('../utils');
+
+var MailService = require('../services/MailService');
 
 /**
  * Persists (insert or update) a model instance and creates (insert only) any
@@ -106,6 +110,111 @@ function _adjustRelatedObjects(model, adjustments, t) {
 	});
 
 	return _Promise.all(relatedPromises);
+}
+
+
+function _addToMailingList(oldAttributes, newAttributes){
+	//Status not finalized or nothing has changed, don't add to any list
+	if(!newAttributes.finalized || (newAttributes.status === oldAttributes.status && newAttributes.wave == oldAttributes.wave)){
+		return;
+	}
+
+	var oldWave = oldAttributes.wave;
+	var newWave = newAttributes.wave;
+	var oldStatus = oldAttributes.status;
+	var newStatus = newAttributes.status;
+	var curUser = {}
+
+	//Changed from Pending
+	if(oldStatus === "PENDING" && newStatus !== "PENDING"){
+		switch(newStatus){
+			case "ACCEPTED":
+				var listName = "wave_" + newAttributes.wave;
+				return User.findById(oldAttributes.userId)
+					.then(function (user){
+						curUser = user.attributes;
+						return MailingList.findByName(listName);
+					})
+					.then(function (newList) {
+						return MailService.addToList(curUser, newList.attributes);
+					});
+			case "REJECTED":
+				return User.findById(oldAttributes.userId)
+					.then(function (user) {
+						curUser = user.attributes;
+						return MailingList.findByName("rejected");
+					})
+					.then(function (rejectList) {
+						return MailService.addToList(curUser, rejectList.attributes);
+					});
+			case "WAITLISTED":
+				return User.findById(oldAttributes.userId)
+					.then(function (user) {
+						curUser = user.attributes;
+						return MailingList.findByName("waitlisted");
+					})
+					.then(function (waitList) {
+						return MailService.addToList(curUser, waitList.attributes);
+					});
+			default:
+				return _Promise.resolve(false);
+		}
+	}
+	//Applicant's wave was changed
+	else if(oldWave != newWave && oldStatus === newStatus && newStatus === "ACCEPTED"){
+		var oldListName = "wave_" + oldWave;
+		var newListName = "wave_" + newWave;
+
+		return User.findById(oldAttributes.userId)
+			.then(function (user) {
+				curUser = user;
+				return MailingList.findByName(oldListName);
+			})
+			.then(function (oldList) {
+				return MailService.removeFromList(curUser, oldList.attributes);
+			})
+			.then(function () {
+				return MailingList.findByName(newListName);
+			})
+			.then(function (newList) {
+				return MailService.addToList(curUser, newList.attributes);
+			});		
+	}
+	//Applicant accepted off of waitlist
+	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
+		return User.findById(oldAttributes.userId)
+			.then(function (user) {
+				curUser = user;
+				return MailingList.findByName("waitlisted");
+			})
+			.then(function (waitList) {
+				return MailService.removeFromList(curUser, waitList.attributes);
+			})
+			.then(function () {
+				var newListName = "wave_" + newWave;
+				return MailingList.findByName(newListName);
+			})
+			.then(function (newList) {
+				return MailService.addToList(curUser, newList.attributes);
+			});
+	}
+	//Applicant rejected off of waitlist
+	else if(oldStatus === "WAITLISTED" && newStatus === "REJECTED"){
+		return User.findById(oldAttributes.userId)
+			.then(function (user) {
+				curUser = user;
+				return MailingList.findByName("waitlisted");
+			})
+			.then(function (waitList) {
+				return MailService.removeFromList(curUser, waitList.attributes);
+			})
+			.then(function () {
+				return MailingList.findByName("rejected");
+			})
+			.then(function (rejectList) {
+				return MailService.addToList(curUser, rejectList.attributes);
+			});
+	}
 }
 
 /**
@@ -295,6 +404,7 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	var attendeeAttributes = attributes.attendee;
 	delete attributes.attendee;
 
+	_addToMailingList(attendee.attributes, attendeeAttributes);
 	attendee.set(attendeeAttributes);
 
 	return attendee.validate()
