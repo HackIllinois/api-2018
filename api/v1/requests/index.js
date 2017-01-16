@@ -8,5 +8,6 @@ module.exports = {
 	ProjectMentorRequest: require('./ProjectMentorRequest'),
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
-	UploadRequest: require('./UploadRequest')
+	UploadRequest: require('./UploadRequest'),
+	RSVPRequest: require('./RSVPRequest')
 };
