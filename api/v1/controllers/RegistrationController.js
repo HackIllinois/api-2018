@@ -258,7 +258,7 @@ function getAttendeeBatchWithFilter(req, res, next) {
 
 	_validateGetAllRequest(page, count, category, ascending)
 		.then(function () {
-			return services.RegistrationService.findSomeAttendees(page, count, category, ascending, query)
+			return services.RegistrationService.findAttendeesByName(page, count, category, ascending, query)
 		})
 		.then(function (results) {
 			res.body = {};

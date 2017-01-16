@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var _Promise = require('bluebird');
 
 var TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
 var STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
@@ -7,7 +8,7 @@ var PROFESSIONAL_INTERESTS = ['INTERNSHIP', 'FULLTIME', 'BOTH'];
 var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
-var CATEGORIES = ['FIRST_NAME', 'LAST_NAME', 'GRADUATION_YEAR', 'SCHOOL', 'STATUS', 'WAVE', 'FINALIZED']
+var CATEGORIES = ['first_name', 'last_name', 'graduation_year', 'school', 'status', 'wave', 'finalized']
 
 
 /**
@@ -138,7 +139,7 @@ module.exports.verifyStatus = function (status) {
  */
 module.exports.verifyCategory = function (category) {
 	if (!_.includes(CATEGORIES, category)) {
-		throw new TypeError(category + " is not a valid status");
+		return false;
 	}
 
 	return true;

@@ -317,9 +317,9 @@ module.exports.updateAttendee = function (attendee, attributes) {
 
 
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
-	var direction = ascending ? 'ASC' : 'DSC';
+	var ordering = (ascending ? '' : '-') + category;
 	return Attendee.forge()
-		.orderBy(category, direction)
+		.orderBy(ordering)
 		.fetchPage({
 			pageSize: count,
 			page: page
@@ -330,13 +330,13 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
 		});
 }
 
-module.exports.findSomeAttendees = function(page, count, category, ascending, searchTerm) {
-	var direction = ascending ? 'ASC' : 'DSC';
+module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
+	var ordering = (ascending ? '' : '-') + category;
 	return Attendee
 		.query(function (qb) {
 			qb.where('first_name', 'LIKE', searchTerm).orWhere('last_name', 'LIKE', searchTerm);
 		})
-		.orderBy(category, direction)
+		.orderBy(ordering)
 		.fetchPage({
 			pageSize: count,
 			page: page
