@@ -115,7 +115,7 @@ function _adjustRelatedObjects(model, adjustments, t) {
 
 function _addToMailingList(oldAttributes, newAttributes){
 	//Status not finalized or nothing has changed, don't add to any list
-	if(!newAttributes.finalized || (newAttributes.status === oldAttributes.status && newAttributes.wave == oldAttributes.wave)){
+	if(!newAttributes.finalized){
 		return;
 	}
 
@@ -125,8 +125,29 @@ function _addToMailingList(oldAttributes, newAttributes){
 	var newStatus = newAttributes.status;
 	var curUser = {}
 
+	//If the status of the user has just been finalized
+	if(newAttributes.finalized != oldAttributes.finalized){
+		console.log("FIFTH")
+		return User.findById(oldAttributes.userId)
+			.then(function (user){
+				curUser = user.attributes;
+				if(newAttributes.status == "ACCEPTED"){
+					listName = "wave_" + newAttributes.wave;
+				}else if(newAttributes.status == "REJECTED"){
+					listName = "rejected";
+				}else{
+					listName = "waitlisted";
+				}
+				return MailingList.findByName(listName);
+			})
+			.then(function (newList) {
+				return MailService.addToList(curUser, newList.attributes);
+			});
+	}
+
 	//Changed from Pending
 	if(oldStatus === "PENDING" && newStatus !== "PENDING"){
+		console.log("FIRST");
 		switch(newStatus){
 			case "ACCEPTED":
 				var listName = "wave_" + newAttributes.wave;
@@ -162,6 +183,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 	}
 	//Applicant's wave was changed
 	else if(oldWave != newWave && oldStatus === newStatus && newStatus === "ACCEPTED"){
+		console.log("SECOND");
 		var oldListName = "wave_" + oldWave;
 		var newListName = "wave_" + newWave;
 
@@ -182,6 +204,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 	}
 	//Applicant accepted off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
+		console.log("THIRD");
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				curUser = user;
@@ -200,6 +223,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 	}
 	//Applicant rejected off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "REJECTED"){
+		console.log("FOURTH");
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				curUser = user;
