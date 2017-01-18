@@ -127,9 +127,8 @@ function _addToMailingList(oldAttributes, newAttributes){
 	var newStatus = newAttributes.status;
 	var curUser = {}
 
-	//If the status of the user has just been finalized
+	//If the status of the user has just been finalized - this is the initial decision
 	if(newAttributes.finalized != oldAttributes.finalized){
-		console.log("FIFTH")
 		return User.findById(oldAttributes.userId)
 			.then(function (user){
 				curUser = user.attributes;
@@ -146,46 +145,8 @@ function _addToMailingList(oldAttributes, newAttributes){
 				return MailService.addToList(curUser, newList.attributes);
 			});
 	}
-
-	//Changed from Pending
-	if(oldStatus === "PENDING" && newStatus !== "PENDING"){
-		console.log("FIRST");
-		switch(newStatus){
-			case "ACCEPTED":
-				var listName = "wave_" + newAttributes.wave;
-				return User.findById(oldAttributes.userId)
-					.then(function (user){
-						curUser = user.attributes;
-						return MailingList.findByName(listName);
-					})
-					.then(function (newList) {
-						return MailService.addToList(curUser, newList.attributes);
-					});
-			case "REJECTED":
-				return User.findById(oldAttributes.userId)
-					.then(function (user) {
-						curUser = user.attributes;
-						return MailingList.findByName("rejected");
-					})
-					.then(function (rejectList) {
-						return MailService.addToList(curUser, rejectList.attributes);
-					});
-			case "WAITLISTED":
-				return User.findById(oldAttributes.userId)
-					.then(function (user) {
-						curUser = user.attributes;
-						return MailingList.findByName("waitlisted");
-					})
-					.then(function (waitList) {
-						return MailService.addToList(curUser, waitList.attributes);
-					});
-			default:
-				return _Promise.resolve(false);
-		}
-	}
 	//Applicant's wave was changed
 	else if(oldWave != newWave && oldStatus === newStatus && newStatus === "ACCEPTED"){
-		console.log("SECOND");
 		var oldListName = "wave_" + oldWave;
 		var newListName = "wave_" + newWave;
 
@@ -206,7 +167,6 @@ function _addToMailingList(oldAttributes, newAttributes){
 	}
 	//Applicant accepted off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
-		console.log("THIRD");
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				curUser = user;
@@ -225,7 +185,6 @@ function _addToMailingList(oldAttributes, newAttributes){
 	}
 	//Applicant rejected off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "REJECTED"){
-		console.log("FOURTH");
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				curUser = user;
