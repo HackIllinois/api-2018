@@ -112,7 +112,12 @@ function _adjustRelatedObjects(model, adjustments, t) {
 	return _Promise.all(relatedPromises);
 }
 
-
+/**
+ * Adds people to the correct mailing lists based on decisions
+ * @param  {Object} oldAttributes	the old set of attributes for a user
+ * @param  {Object} newAttributes	the new set of attributes for a user
+ * @return {Promise<MailingListUser>}	a promise with the save result 
+ */
 function _addToMailingList(oldAttributes, newAttributes){
 	//Status not finalized or nothing has changed, don't add to any list
 	if(!newAttributes.finalized){
@@ -408,7 +413,14 @@ module.exports.updateAttendee = function (attendee, attributes) {
 			});
 };
 
-
+/**
+* Fetches all attendees by a specified order and category
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param {string} category to sort by
+* @param {int} ascending 0 or 1 signaling what way to order the results
+* @return {Promise} resolving to a the list of attendees
+*/
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
 	var ordering = (ascending ? '' : '-') + category;
 	return Attendee.forge()
@@ -423,6 +435,15 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
 		});
 }
 
+/**
+* Fetches attendees by either first or last name
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param  {string} category to sort by
+* @param  {int} ascending 0 or 1 signaling what way to order the results
+* @param  {string} searchTerm the name of the person to find
+* @return {Promise} resolving to a the list of attendees
+*/
 module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
 	var ordering = (ascending ? '' : '-') + category;
 	return Attendee
@@ -440,6 +461,16 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 		});
 }
 
+/**
+* Fetches attendees by either first or last name
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param  {string} category to sort by
+* @param  {int} ascending 0 or 1 signaling what way to order the results
+* @param  {string} filterCategory the category to filter by
+* @param  {string} filterVal the value of the filter to go by
+* @return {Promise} resolving to a the list of attendees
+*/
 module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
 	var ordering = (ascending ? '' : '-') + category;
 	return Attendee
