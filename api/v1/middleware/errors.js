@@ -3,12 +3,6 @@
 var errors = require('../errors');
 var logUtils = require('../utils/logs');
 
-const ERRORS = {
-	UNCAUGHT: 'UNCAUGHT',
-	CLIENT: 'CLIENT',
-	UNKNOWN: 'UNKNOWN',
-};
-
 module.exports = function (err, req, res, next) {
 	if (err instanceof Error && err.status === 413) {
 		// caught a body-parser entity length error
@@ -21,14 +15,14 @@ module.exports = function (err, req, res, next) {
 	}
 
 	if (!(err instanceof Error)) {
-		logUtils.logError(req, err, null, ERRORS.UNKNOWN);
+		logUtils.logError(req, err, null, logUtils.errorTypes.UNKNOWN);
 		err = new errors.ApiError();
 	}
 	else if (!err.isApiError) {
-		logUtils.logError(req, err.stack, null, ERRORS.UNCAUGHT);
+		logUtils.logError(req, err.stack, null, logUtils.errorTypes.UNCAUGHT);
 		err = new errors.ApiError();
 	} else {
-		logUtils.logError(req, err.message, err.status, ERRORS.CLIENT);
+		logUtils.logError(req, err.message, err.status, logUtils.errorTypes.CLIENT);
 	}
 
 	var response = {

@@ -1,9 +1,14 @@
-/* esversion: 6 */
+/* jshint esversion: 6 */
 var _ = require('lodash');
 
 var logger = require('../../logging');
 
-var REQUEST_BLACKLIST = ['password'];
+const REQUEST_BLACKLIST = ['password'];
+const ERROR_TYPES = {
+	UNCAUGHT: 'UNCAUGHT',
+	CLIENT: 'CLIENT',
+	UNKNOWN: 'UNKNOWN',
+};
 
 // although we won't make use of this now, it might be useful in
 // the future (e.g. logging the body in development but not in production)
@@ -22,12 +27,18 @@ function _makeRequestMetadata (req) {
 	return { id: req.id, method: req.method, url: req.originalUrl };
 }
 
+function _makeResponseMetadata (req, res) {
+	return { id: req.id, status: res.statusCode };
+}
+
+module.exports.errorTypes = ERROR_TYPES;
+
 module.exports.logRequest = function (req) {
-	logger.info("received request", _makeRequestMetadata(req));
+	logger.debug("received request", _makeRequestMetadata(req));
 };
 
 module.exports.logResponse = function (req, res) {
-	logger.info("sending response", { id: req.id, body: res.body, status: res.status });
+	logger.debug("sent response", _makeResponseMetadata(req, res));
 };
 
 module.exports.logError = function (req, error, status, cause) {
@@ -36,5 +47,6 @@ module.exports.logError = function (req, error, status, cause) {
 	metadata.error = error;
 	metadata.status = status || 500;
 
-	logger.error(metadata);
+  var level = (cause !== ERROR_TYPES.CLIENT) ? 'error' : 'debug';
+  logger.log(level, "an error was thrown", metadata);
 };

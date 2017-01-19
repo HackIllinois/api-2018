@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge) 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge)
 [![Build Status](https://travis-ci.org/HackIllinois/api-2017.svg?branch=staging)](https://travis-ci.org/HackIllinois/api-2017)
 
 # HackIllinois API (2017)
@@ -56,7 +56,6 @@ A list of configuration keys is provided below:
 | --- | --------------- | ------- |
 | NODE_ENV | 'production', 'development', 'testing' | Determines how environment should be configured |
 | AWS | 0 or 1 | Whether or not to use AWS |
-| HACKILLINOIS_ID | Any string | Sets the identifier used to represent this instance |
 | HACKILLINOIS_SECRET | Any string | Sets the master secret |
 | HACKILLINOIS_PORT | Any valid port number | Sets the port |
 | HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Sets the default superuser email |

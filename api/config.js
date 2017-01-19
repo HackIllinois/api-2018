@@ -23,7 +23,6 @@ config.environment = process.env.NODE_ENV;
 config.isProduction = (config.environment === PRODUCTION_IDENTIFIER);
 config.isDevelopment = (config.environment === DEVELOPMENT_IDENTIFIER);
 config.isTest = (config.environment === TEST_IDENTIFIER);
-config.id = process.env.HACKILLINOIS_ID;
 config.secret = process.env.HACKILLINOIS_SECRET;
 config.port = process.env.HACKILLINOIS_PORT;
 
