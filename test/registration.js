@@ -48,6 +48,7 @@ describe('RegistrationService',function(){
                 "github": "JDoe1234",
                 "linkedin": "JDoe1234",
                 "interests": "CS",
+                "finalized": false,
                 "isNovice": true,
                 "isPrivate": false,
                 "phoneNumber": "12345678910"
@@ -220,6 +221,8 @@ describe('RegistrationService',function(){
                 "github": "JDoe1234",
                 "linkedin": "JDoe1234",
                 "interests": "CS",
+                "finalized": false,
+                "status": "ACCEPTED",
                 "isNovice": true,
                 "isPrivate": false,
                 "phoneNumber": "12345678910",
