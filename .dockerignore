@@ -3,6 +3,7 @@
 .nodemonignore
 .env
 *.md
+dump.rdb
 Dockerfile
 !README.md
 
