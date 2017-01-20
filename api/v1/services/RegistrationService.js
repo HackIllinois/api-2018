@@ -120,7 +120,7 @@ function _adjustRelatedObjects(model, adjustments, t) {
  */
 function _addToMailingList(oldAttributes, newAttributes){
 	//Status not finalized or nothing has changed, don't add to any list
-	if(!newAttributes.finalized){
+	if(_.isUndefined(newAttributes.status) || newAttributes.status === "PENDING"){
 		return;
 	}
 
@@ -131,7 +131,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 	var curUser = {}
 
 	//If the status of the user has just been finalized - this is the initial decision
-	if(newAttributes.finalized != oldAttributes.finalized){
+	if(oldAttributes.status === "PENDING" && newAttributes.status !== "PENDING"){
 		return User.findById(oldAttributes.userId)
 			.then(function (user){
 				curUser = user.attributes;
@@ -142,6 +142,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 				}else{
 					listName = "waitlisted";
 				}
+				console.log(listName);
 				return MailingList.findByName(listName);
 			})
 			.then(function (newList) {
