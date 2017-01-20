@@ -52,6 +52,9 @@ function fetchRSVPByUser(req, res, next) {
         })
         .then(function (rsvp) {
             res.body = rsvp.toJSON();
+            if(!res.body.type) {
+                delete res.body.type;
+            }
 
             return next();
         })
@@ -69,6 +72,9 @@ function fetchRSVPByAttendeeId(req, res, next) {
         })
         .then(function(rsvp){
             res.body = rsvp.toJSON();
+            if(!res.body.type) {
+                delete res.body.type;
+            }
 
             return next();
         })
