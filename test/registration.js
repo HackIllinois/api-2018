@@ -52,7 +52,9 @@ describe('RegistrationService',function(){
                 "isNovice": true,
                 "isPrivate": false,
 				"hasLightningInterest": false,
-                "phoneNumber": "12345678910"
+                "phoneNumber": "12345678910",
+                "wave": 0,
+                "priority": 0
             };
             testRegistration.projects = [
             	{
@@ -228,7 +230,9 @@ describe('RegistrationService',function(){
                 "isPrivate": false,
 				"hasLightningInterest": false,
                 "phoneNumber": "12345678910",
-                "userId": 1
+                "userId": 1,
+                "priority": 1,
+                "wave": 2
             };
             testRegistration.projects = [
             	{

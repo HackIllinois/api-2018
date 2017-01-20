@@ -144,7 +144,6 @@ function _addToMailingList(oldAttributes, newAttributes){
 				}else{
 					listName = "waitlisted";
 				}
-				console.log(listName);
 				return MailingList.findByName(listName);
 			})
 			.then(function (newList) {
