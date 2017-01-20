@@ -119,7 +119,8 @@ CREATE TABLE `attendee_project_interests` (
 CREATE TABLE `attendee_rsvps` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`attendee_id` INT UNSIGNED NOT NULL,
-	`attendee_attendance` ENUM('YES', 'NO', 'YES_TO_CREATE') NOT NULL,
+	`is_attending` TINYINT(1) NOT NULL,
+	`type` ENUM('CREATE', 'CONTRIBUTE'),
 	PRIMARY KEY (`id`),
 	INDEX `fk_attendee_rsvps_attendee_id_idx` (`attendee_id` ASC),
 	CONSTRAINT `fk_attendee_rsvps_attendee_id`

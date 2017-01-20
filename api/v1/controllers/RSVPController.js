@@ -1,11 +1,11 @@
 var bodyParser = require('body-parser');
+var _Promise = require('bluebird');
 
 var services = require('../services');
 var middleware = require('../middleware');
 var requests = require('../requests');
 var roles = require('../utils/roles');
 var mail = require('../utils/mail');
-var User = require('../models/User');
 
 var router = require('express').Router();
 
@@ -14,30 +14,29 @@ function _isAuthenticated (req) {
 }
 
 function _removeFromList(rsvpCurrent, rsvpNew) {
-    if(rsvpCurrent.get('attendeeAttendance') !== 'NO' && rsvpNew.attendeeAttendance === 'NO')
-        return true;
-    return false;
+    return rsvpCurrent.get('isAttending') && !rsvpNew.isAttending;
 }
 
 function _addToList(rsvpCurrent, rsvpNew) {
-    if(rsvpCurrent.get('attendeeAttendance') === 'NO' && rsvpNew.attendeeAttendance !== 'NO')
-        return true;
-    return false;
+    return !rsvpCurrent.get('isAttending') && rsvpNew.isAttending;
 }
 
 function createRSVP(req, res, next) {
+    if(!req.body.isAttending)
+        delete req.body.type;
+
     services.RegistrationService
         .findAttendeeByUser(req.user)
         .then(function(attendee) {
-            services.RSVPService
-                .createRSVP(attendee, req.user, req.body)
-                .then(function (rsvp) {
-                    if(rsvp.get('attendeeAttendance') !== 'NO')
-                        services.MailService.addToList(req.user, mail.lists.attendees);
-                    res.body = rsvp.toJSON();
+           return services.RSVPService
+                .createRSVP(attendee, req.user, req.body);
+        })
+        .then(function(rsvp) {
+            if(rsvp.get('isAttending'))
+                services.MailService.addToList(req.user, mail.lists.attendees);
+            res.body = rsvp.toJSON();
 
-                    return next();
-                })
+            return next();
         })
         .catch(function(error) {
             return next(error);
@@ -48,13 +47,13 @@ function fetchRSVPByUser(req, res, next) {
     services.RegistrationService
         .findAttendeeByUser(req.user)
         .then(function(attendee) {
-            services.RSVPService
-                .findRSVPByAttendee(attendee)
-                .then(function(rsvp){
-                    res.body = rsvp.toJSON();
+            return services.RSVPService
+                .findRSVPByAttendee(attendee);
+        })
+        .then(function (rsvp) {
+            res.body = rsvp.toJSON();
 
-                    return next();
-                })
+            return next();
         })
         .catch(function(error) {
             return next(error);
@@ -66,12 +65,12 @@ function fetchRSVPByAttendeeId(req, res, next) {
         .findAttendeeById(req.params.id)
         .then(function(attendee) {
             services.RSVPService
-                .findRSVPByAttendee(attendee)
-                .then(function(rsvp){
-                    res.body = rsvp.toJSON();
+                .findRSVPByAttendee(attendee);
+        })
+        .then(function(rsvp){
+            res.body = rsvp.toJSON();
 
-                    return next();
-                })
+            return next();
         })
         .catch(function(error) {
             return next(error);
@@ -79,24 +78,18 @@ function fetchRSVPByAttendeeId(req, res, next) {
 }
 
 function updateRSVPByUser(req, res, next) {
+    if(!req.body.isAttending)
+        delete req.body.type;
+
     services.RegistrationService
         .findAttendeeByUser(req.user)
         .then(function(attendee) {
-            services.RSVPService
-                .findRSVPByAttendee(attendee)
-                .then(function (rsvp) {
-                    if(_addToList(rsvp, req.body))
-                        services.MailService.addToList(req.user, mail.lists.attendees);
-                    if(_removeFromList(rsvp, req.body))
-                        services.MailService.removeFromList(req.user, mail.lists.attendees);
+            return _updateRSVPByAttendee(req.user, attendee, req.body);
+        })
+        .then(function(rsvp){
+            res.body = rsvp.toJSON();
 
-                    return services.RSVPService.updateRSVP(rsvp, req.body);
-                })
-                .then(function(rsvp){
-                    res.body = rsvp.toJSON();
-
-                    return next();
-                })
+            return next();
         })
         .catch(function (error) {
             return next(error);
@@ -104,40 +97,47 @@ function updateRSVPByUser(req, res, next) {
 }
 
 function updateRSVPById(req, res, next) {
+    if(!req.body.isAttending)
+        delete req.body.type;
+
     services.RegistrationService
         .findAttendeeById(req.params.id)
         .then(function(attendee) {
-            services.RSVPService
-                .findRSVPByAttendee(attendee)
-                .then(function (rsvp) {
-                    if(_addToList(rsvp, req.body))
-                        services.MailService.addToList(req.user, mail.lists.attendees);
-                    if(_removeFromList(rsvp, req.body))
-                        services.MailService.removeFromList(req.user, mail.lists.attendees);
+            return _updateRSVPByAttendee(req.user, attendee, req.body)
+        })
+        .then(function(rsvp){
+            res.body = rsvp.toJSON();
 
-                    return services.RSVPService.updateRSVP(rsvp, req.body);
-                })
-                .then(function(rsvp){
-                    res.body = rsvp.toJSON();
-
-                    return next();
-                })
+            return next();
         })
         .catch(function (error) {
             return next(error);
         });
 }
 
+function _updateRSVPByAttendee(user, attendee, newRSVP) {
+    return services.RSVPService
+        .findRSVPByAttendee(attendee)
+        .then(function (rsvp) {
+            if(_addToList(rsvp, newRSVP))
+                services.MailService.addToList(user, mail.lists.attendees);
+            if(_removeFromList(rsvp, newRSVP))
+                services.MailService.removeFromList(user, mail.lists.attendees);
+
+            return services.RSVPService.updateRSVP(rsvp, newRSVP);
+        });
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('/', middleware.request(requests.RSVPRequest),
+router.post('/attendee', middleware.request(requests.RSVPRequest),
     middleware.permission(roles.NONE, _isAuthenticated), createRSVP);
-router.get('/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
-router.get('/:id', middleware.permission(roles.ORGANIZERS), fetchRSVPByAttendeeId);
-router.put('/', middleware.request(requests.RSVPRequest),
+router.get('/attendee/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
+router.get('/attendee/:id', middleware.permission(roles.ORGANIZERS), fetchRSVPByAttendeeId);
+router.put('/attendee/', middleware.request(requests.RSVPRequest),
     middleware.permission(roles.ATTENDEE), updateRSVPByUser);
-router.put('/:id', middleware.request(requests.RSVPRequest),
+router.put('/attendee/:id', middleware.request(requests.RSVPRequest),
     middleware.permission(roles.ORGANIZERS), updateRSVPById);
 
 router.use(middleware.response);
