@@ -10,6 +10,7 @@ var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
 var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
+var CheckIn = require('./CheckIn');
 var Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
@@ -48,6 +49,9 @@ var Attendee = Model.extend({
 	},
 	collaborators: function () {
 		return this.hasMany(AttendeeRequestedCollaborator);
+	},
+	checkIn: function() {
+		return this.hasOne(CheckIn)
 	}
 });
 

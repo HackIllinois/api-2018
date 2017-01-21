@@ -3,6 +3,7 @@ var registration = require('../utils/registration');
 
 var Model = require('./Model');
 var MentorProjectIdea = require('./MentorProjectIdea');
+var checkIn = require('./checkIn');
 var Mentor = Model.extend({
 	tableName: 'mentors',
 	idAttribute: 'id',
@@ -19,6 +20,9 @@ var Mentor = Model.extend({
 	},
 	ideas: function () {
 		return this.hasMany(MentorProjectIdea);
+	},
+	checkIn: function () {
+		return this.hasOne(checkIn);
 	}
 });
 
