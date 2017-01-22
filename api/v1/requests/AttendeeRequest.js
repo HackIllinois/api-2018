@@ -6,6 +6,7 @@ var extraInfoValidations = {
 	info:       ['string', 'maxLength:255']
 };
 
+// NOTE: these are currently not supported
 var projectValidations = {
 	name:       ['required', 'string', 'maxLength:100'],
 	description:['required', 'string', 'maxLength:255'],
@@ -22,7 +23,7 @@ var requestedCollaboratorValidations = {
 };
 
 var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['projects', 'extras', 'collaborators'];
+var bodyAllowed = ['extras', 'collaborators'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
@@ -42,6 +43,7 @@ var bodyValidations = {
 	'attendee.status': ['string', registration.verifyStatus],
 	'attendee.isNovice': ['required', 'boolean'],
 	'attendee.isPrivate': ['required', 'boolean'],
+	'attendee.hasLightningInterest': ['boolean'],
 	'attendee.phoneNumber': ['string', 'maxLength:15'],
 	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
 	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],

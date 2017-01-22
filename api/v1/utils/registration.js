@@ -8,7 +8,6 @@ var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
 
-
 /**
  * Ensures that the provided tshirt-size is in the list
  * of valid size options
