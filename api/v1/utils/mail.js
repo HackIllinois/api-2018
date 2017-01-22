@@ -9,6 +9,7 @@ module.exports.templates.passwordReset = 'password_reset';
 module.exports.lists.test = { name: 'test', id: 'test' };
 module.exports.lists.idlers = { name: 'idlers', id: 'idlers-2017' };
 module.exports.lists.applicants = { name: 'applicants', id: 'applicants-2017' };
+module.exports.lists.lightningTalks = { name: 'lightning_talks', id: 'lightning-talks-2017' };
 module.exports.lists.accepted = { name: 'accepted', id: 'accepted-2017' };
 module.exports.lists.waitlisted = { name: 'waitlisted', id: 'waitlisted-2017' };
 module.exports.lists.software = { name: 'software', id: 'software-2017' };

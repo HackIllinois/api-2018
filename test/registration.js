@@ -29,7 +29,7 @@ describe('RegistrationService',function(){
         var testUser;
         var testRegistration;
         var _forgeAttendee;
-        
+
         before(function(done){
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             testRegistration = {};
@@ -50,6 +50,7 @@ describe('RegistrationService',function(){
                 "interests": "CS",
                 "isNovice": true,
                 "isPrivate": false,
+				"hasLightningInterest": false,
                 "phoneNumber": "12345678910"
             };
             testRegistration.projects = [
@@ -222,6 +223,7 @@ describe('RegistrationService',function(){
                 "interests": "CS",
                 "isNovice": true,
                 "isPrivate": false,
+				"hasLightningInterest": false,
                 "phoneNumber": "12345678910",
                 "userId": 1
             };
