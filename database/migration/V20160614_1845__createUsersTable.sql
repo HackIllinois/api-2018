@@ -7,4 +7,22 @@ CREATE TABLE `users` (
   `created` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC));
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC)
+);
+
+CREATE TABLE `checkins` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` INT UNSIGNED NOT NULL,
+    `checked_in` TINYINT(1) NOT NULL DEFAULT 0,
+    `time` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `travel` ENUM('NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL') NOT NULL DEFAULT 'NOT_NEEDED',
+    `location` ENUM('SIEBEL', 'ECEB'),
+    `swag` TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    INDEX `fk_checkins_user_id` (`user_id` ASC),
+    CONSTRAINT `fk_checkins_user_id`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `users` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);

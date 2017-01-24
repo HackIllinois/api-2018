@@ -9,8 +9,8 @@ var CheckIn =  Model.extend({
         userId: ['required', 'integer'],
         checkedIn: ['required', 'boolean'],
         time: ['required'],
-        travel: ['required'],
-        location: ['required'],
+        travel: ['required', 'string'],
+        location: ['required', 'string'],
         swag: ['required', 'boolean']
     }
 });
