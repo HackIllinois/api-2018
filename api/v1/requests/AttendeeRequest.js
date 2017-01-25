@@ -23,7 +23,7 @@ var requestedCollaboratorValidations = {
 };
 
 var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['extras', 'collaborators'];
+var bodyAllowed = ['projects', 'extras', 'collaborators'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
