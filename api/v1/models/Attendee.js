@@ -58,7 +58,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
 
@@ -71,7 +71,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 	return Attendee.transaction(function (t){
 		var attendee;
 	    return Attendee.where({ user_id: userId })
-		.fetch({withRelated: ['ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			return Upload.where({ owner_id: userId, bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
@@ -89,7 +89,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
 };
 
 /**
@@ -101,7 +101,7 @@ Attendee.fetchWithResumeById = function (id) {
 	return Attendee.transaction(function (t){
 		var attendee;
 		return Attendee.where({ id: id })
-		.fetch({withRelated: ['ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			return Upload.where({ owner_id: a.get('userId'), bucket: utils.storage.buckets.resumes }).fetch({transacting: t});

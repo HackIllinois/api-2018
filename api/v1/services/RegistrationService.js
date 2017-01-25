@@ -292,7 +292,7 @@ module.exports.findAttendeeById = function (id, withResume) {
 module.exports.updateAttendee = function (attendee, attributes) {
 	// some attendee registration attributes are optional, but we need to
 	// be sure that they are at least considered for removal during adjustment
-	attributes = _.merge(attributes, { 'extras': [], 'collaborators': [] });
+	attributes = _.merge(attributes, { 'projects': [], 'extras': [], 'collaborators': [] });
 
 	var attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
