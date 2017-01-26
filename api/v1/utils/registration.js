@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var _Promise = require('bluebird');
 
 var TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
 var STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];

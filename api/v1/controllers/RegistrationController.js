@@ -335,14 +335,14 @@ router.put('/mentor/:id', middleware.request(requests.MentorRequest),
 router.post('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
 router.get('/attendee', middleware.permission(roles.ATTENDEE), fetchAttendeeByUser);
-router.get('/attendee/:id', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
+router.get('/attendee/all', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
+router.get('/attendee/search', middleware.permission(roles.ORGANIZERS), searchAttendees);
+router.get('/attendee/filter', middleware.permission(roles.ORGANIZERS), filterAttendees);
+router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
 router.put('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
 router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
-router.get('/allAttendees', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
-router.get('/searchAttendees', middleware.permission(roles.ORGANIZERS), searchAttendees);
-router.get('/filterAttendees', middleware.permission(roles.ORGANIZERS), filterAttendees);
 
 router.use(middleware.response);
 router.use(middleware.errors);

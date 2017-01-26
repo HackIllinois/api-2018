@@ -47,7 +47,8 @@ var bodyValidations = {
 	'attendee.isNovice': ['required', 'boolean'],
 	'attendee.isPrivate': ['required', 'boolean'],
 	'attendee.phoneNumber': ['string', 'maxLength:15'],
-	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:2', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
+	'attendee.ecosystemSelected': ['integer'],
+	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:4', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
 	'projects': ['array', 'maxLength:2', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:3', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
