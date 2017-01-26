@@ -414,7 +414,7 @@ module.exports.updateAttendee = function (attendee, attributes) {
 		}
 	}
 
-	_addToMailingList(attendee.attributes, attendeeAttributes);
+	_addToMailingList(attendee.attributes, attendeeAttrs);
 	attendee.set(attendeeAttrs);
 
 	return attendee.validate()

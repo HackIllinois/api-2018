@@ -79,10 +79,15 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
+			if(_.isNull(a)){
+				return null;
+			}
 			return Upload.where({ owner_id: userId, bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
-			attendee.set('resume', (u !== null) ? u.attributes : u);
+			if(!_.isNull(u)){
+				attendee.set('resume', (u !== null) ? u.attributes : u);
+			}
 			return attendee;
 		});
 	});
@@ -109,11 +114,16 @@ Attendee.fetchWithResumeById = function (id) {
 		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
 		.then(function (a) {
 			attendee = a;
+			if(_.isNull(a)){
+				return null;
+			}
 			return Upload.where({ owner_id: a.get('userId'), bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
-			  attendee.set('resume', u.attributes);
-			  return attendee;
+			if(!_.isNull(u)){
+				attendee.set('resume', (u !== null) ? u.attributes : u);
+			}
+			return attendee;
     	});
 	});
 };
