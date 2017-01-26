@@ -224,6 +224,25 @@ function updateAttendeeById(req, res, next) {
 		});
 }
 
+function updateAttendeeDecision (req, res, next) {
+	services.RegistrationService
+		.findAttendeeById(req.params.id)
+		.then (function (attendee) {
+			console.log(attendee);
+			return services.RegistrationService.applyDecision(attendee, req.body);
+		})
+		.then(function (attendee) {
+			res.body = attendee.toJSON();
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 function getAttendeeBatch(req, res, next) {
 	_.defaults(req.query, {'page': 1, 'count': 25, 'category': 'firstName', 'ascending': 1});
 	var page = parseInt(req.query.page);
@@ -341,7 +360,8 @@ router.get('/attendee/filter', middleware.permission(roles.ORGANIZERS), filterAt
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
 router.put('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
-router.put('/attendee/:id', middleware.request(requests.AttendeeRequest),
+router.put('/attendee/decision/:id', middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
+router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
 
 router.use(middleware.response);

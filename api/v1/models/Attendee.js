@@ -128,5 +128,10 @@ Attendee.fetchWithResumeById = function (id) {
 	});
 };
 
+/*Attendee.parse = function(attrs) {
+	attrs.isNovice = !!attrs.isNovice;
+	attrs.isPrivate = !!attrs.isPrivate;
+}*/
+
 
 module.exports = Attendee;

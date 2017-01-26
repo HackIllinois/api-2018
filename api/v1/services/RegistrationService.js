@@ -116,7 +116,7 @@ function _adjustRelatedObjects(model, adjustments, t) {
 /**
  * Adds people to the correct mailing lists based on decisions
  * @param  {Object} oldAttributes	the old set of attributes for a user
- * @param  {Object} newAttributes	the new set of attributes for a user
+ * @param  {Object} newAttributes	the new set of decision attributes for a user
  * @return {Promise<MailingListUser>}	a promise with the save result 
  */
 function _addToMailingList(oldAttributes, newAttributes){
@@ -403,7 +403,6 @@ module.exports.updateAttendee = function (attendee, attributes) {
 		}
 	}
 
-	_addToMailingList(attendee.attributes, attendeeAttrs);
 	attendee.set(attendeeAttrs);
 
 	return attendee.validate()
@@ -423,6 +422,21 @@ module.exports.updateAttendee = function (attendee, attributes) {
 				});
 			});
 };
+
+
+module.exports.applyDecision = function (attendee, decisionAttrs) {
+	_addToMailingList(attendee.attributes, decisionAttrs);
+	attendee.set(decisionAttrs);
+
+	return attendee.validate()
+		.catch(CheckitError, utils.errors.handleValidationError)
+		.then(function () {
+			return attendee.save();
+		})
+		.then(function (model) {
+			return model;
+		})
+}
 
 /**
 * Fetches all attendees by a specified order and category
