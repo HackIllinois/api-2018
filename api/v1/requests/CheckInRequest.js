@@ -4,8 +4,8 @@ var bodyRequired = ['userId'];
 var bodyAllowed = ['checkedIn', 'travel', 'location', 'swag'];
 var bodyValidations = {
     checkedIn: ['required', 'boolean'],
-    travel: ['required'],
-    location: ['required'],
+    travel: ['required', 'string', registration.verifyTransportation],
+    location: ['required', 'string', registration.verifyLocation],
     swag: ['required', 'boolean']
 };
 

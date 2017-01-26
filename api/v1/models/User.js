@@ -9,6 +9,7 @@ const SALT_ROUNDS = 12;
 var Model = require('./Model');
 
 var UserRole = require('./UserRole');
+var CheckIn = require('./CheckIn');
 var User = Model.extend({
 	tableName: 'users',
 	idAttribute: 'id',
@@ -19,6 +20,9 @@ var User = Model.extend({
 	},
 	roles: function () {
 		return this.hasMany(UserRole);
+	},
+	checkIn: function () {
+		return this.hasOne(checkIn);
 	}
 });
 
@@ -52,6 +56,7 @@ User.findByEmail = function (email) {
 User.create = function (email, password, role) {
 	var user = User.forge({ email: email });
 	var userRole = UserRole.forge({ role: role, active: true });
+	var checkIn = CheckIn.forge({ checkedIn: false, swag: false});
 
 	if(!role){
 		// No roles were provided, so create the User
@@ -72,6 +77,10 @@ User.create = function (email, password, role) {
 
 					userRole.set({ userId: user.get('id') });
 					return userRole.save(null, { transacting: t });
+				})
+				.then(function (result){
+					checkIn.set({ userId: user.get('id')});
+					return checkIn.save(null, { transacting: t});
 				})
 				.then(function (result) {
 					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles'], transacting: t });

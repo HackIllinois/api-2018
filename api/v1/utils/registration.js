@@ -7,6 +7,7 @@ var PROFESSIONAL_INTERESTS = ['INTERNSHIP', 'FULLTIME', 'BOTH'];
 var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
+var LOCATIONS = ['ECEB', 'SIEBEL']
 
 /**
  * Ensures that the provided tshirt-size is in the list
@@ -126,3 +127,17 @@ module.exports.verifyStatus = function (status) {
 
 	return true;
 };
+
+/**
+ * Ensures that location upon check in is valid
+ * @param {String} location the check in location
+ * @return {Boolean} true when the location is valid
+ * @throws TypeError when the location is invalid
+ */
+module.exports.verifyLocation = function (location) {
+	if (!_.includes(LOCATIONS, location)) {
+		throw new TypeError(location + " is not a valid check in location");
+	}
+
+	return true;
+}

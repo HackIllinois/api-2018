@@ -8,15 +8,14 @@ var CheckIn =  Model.extend({
     validations: {
         userId: ['required', 'integer'],
         checkedIn: ['required', 'boolean'],
-        time: ['required'],
-        travel: ['required', 'string'],
-        location: ['required', 'string'],
+        travel: ['required', 'string', registration.verifyTransportation],
+        location: ['required', 'string', registration.verifyLocation],
         swag: ['required', 'boolean']
     }
 });
 
 
-CheckIn.findById = function (id) {
+CheckIn.findByUserId = function (id) {
     return CheckIn.where({ userId: id }).fetch();
 }
 
