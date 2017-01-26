@@ -12,7 +12,6 @@ var UserRole = require('../models/UserRole');
 var MailService = require('../services/MailService');
 var errors = require('../errors');
 var utils = require('../utils');
-
 var MailService = require('../services/MailService');
 
 /**
@@ -130,13 +129,13 @@ function _addToMailingList(oldAttributes, newAttributes){
 	var newWave = newAttributes.wave;
 	var oldStatus = oldAttributes.status;
 	var newStatus = newAttributes.status;
-	var curUser = {}
+	var currentUser;
 
 	//If the status of the user has just been finalized - this is the initial decision
-	if(oldAttributes.status === "PENDING" && newAttributes.status !== "PENDING"){
+	if(oldStatus === "PENDING" && newStatus !== "PENDING"){
 		return User.findById(oldAttributes.userId)
 			.then(function (user){
-				curUser = user.attributes;
+				currentUser = user.attributes;
 				if(newAttributes.status == "ACCEPTED"){
 					listName = "wave_" + newAttributes.wave;
 				}else if(newAttributes.status == "REJECTED"){
@@ -147,7 +146,7 @@ function _addToMailingList(oldAttributes, newAttributes){
 				return MailingList.findByName(listName);
 			})
 			.then(function (newList) {
-				return MailService.addToList(curUser, newList.attributes);
+				return MailService.addToList(currentUser, newList.attributes);
 			});
 	}
 	//Applicant's wave was changed
@@ -157,52 +156,52 @@ function _addToMailingList(oldAttributes, newAttributes){
 
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
-				curUser = user;
+				currentUser = user;
 				return MailingList.findByName(oldListName);
 			})
 			.then(function (oldList) {
-				return MailService.removeFromList(curUser, oldList.attributes);
+				return MailService.removeFromList(currentUser, oldList.attributes);
 			})
 			.then(function () {
 				return MailingList.findByName(newListName);
 			})
 			.then(function (newList) {
-				return MailService.addToList(curUser, newList.attributes);
+				return MailService.addToList(currentUser, newList.attributes);
 			});		
 	}
 	//Applicant accepted off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
-				curUser = user;
+				currentUser = user;
 				return MailingList.findByName("waitlisted");
 			})
 			.then(function (waitList) {
-				return MailService.removeFromList(curUser, waitList.attributes);
+				return MailService.removeFromList(currentUser, waitList.attributes);
 			})
 			.then(function () {
 				var newListName = "wave_" + newWave;
 				return MailingList.findByName(newListName);
 			})
 			.then(function (newList) {
-				return MailService.addToList(curUser, newList.attributes);
+				return MailService.addToList(currentUser, newList.attributes);
 			});
 	}
 	//Applicant rejected off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "REJECTED"){
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
-				curUser = user;
+				currentUser = user;
 				return MailingList.findByName("waitlisted");
 			})
 			.then(function (waitList) {
-				return MailService.removeFromList(curUser, waitList.attributes);
+				return MailService.removeFromList(currentUser, waitList.attributes);
 			})
 			.then(function () {
 				return MailingList.findByName("rejected");
 			})
 			.then(function (rejectList) {
-				return MailService.addToList(curUser, rejectList.attributes);
+				return MailService.addToList(currentUser, rejectList.attributes);
 			});
 	}
 }

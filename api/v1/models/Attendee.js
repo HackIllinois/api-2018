@@ -36,7 +36,8 @@ var Attendee = Model.extend({
 		reviewTime: ['integer'],
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
-		phoneNumber: ['string', 'maxLength:15']
+		phoneNumber: ['string', 'maxLength:15'],
+		ecosystemSelected: ['integer']
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
