@@ -137,54 +137,46 @@ function _addToMailingList(oldAttributes, newAttributes){
 			.then(function (user){
 				currentUser = user.attributes;
 				if(newAttributes.status == "ACCEPTED"){
-					listName = "wave_" + newAttributes.wave;
+					listName = "wave" + newAttributes.wave;
 				}else if(newAttributes.status == "REJECTED"){
 					listName = "rejected";
 				}else{
 					listName = "waitlisted";
 				}
-				return MailingList.findByName(listName);
-			})
-			.then(function (newList) {
-				return MailService.addToList(currentUser, newList.attributes);
+				var newList = utils.mail.lists[listName];
+				return MailService.addToList(currentUser, newList);
 			});
 	}
 	//Applicant's wave was changed
 	else if(oldWave != newWave && oldStatus === newStatus && newStatus === "ACCEPTED"){
-		var oldListName = "wave_" + oldWave;
-		var newListName = "wave_" + newWave;
+		var oldListName = "wave" + oldWave;
+		var newListName = "wave" + newWave;
 
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				currentUser = user;
-				return MailingList.findByName(oldListName);
+				var oldList = utils.mail.lists[oldListName];
+				var newList = utils.mail.lists[newListName];
+
+				var promises = [];
+				promises.push(MailService.removeFromList(currentUser, oldList));
+				promises.push(MailService.addToList(currentUser, newList));
+				return _Promise.all(promises);
 			})
-			.then(function (oldList) {
-				return MailService.removeFromList(currentUser, oldList.attributes);
-			})
-			.then(function () {
-				return MailingList.findByName(newListName);
-			})
-			.then(function (newList) {
-				return MailService.addToList(currentUser, newList.attributes);
-			});		
 	}
 	//Applicant accepted off of waitlist
 	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				currentUser = user;
-				return MailingList.findByName("waitlisted");
-			})
-			.then(function (waitList) {
-				return MailService.removeFromList(currentUser, waitList.attributes);
-			})
-			.then(function () {
-				var newListName = "wave_" + newWave;
-				return MailingList.findByName(newListName);
-			})
-			.then(function (newList) {
-				return MailService.addToList(currentUser, newList.attributes);
+				var waitList = utils.mail.lists.waitlisted;
+				var newListName = "wave" + newWave;
+				var newList = utils.mail.lists[newListName];
+
+				var promises = [];
+				promises.push(MailService.removeFromList(currentUser, waitList));
+				promises.push(MailService.addToList(currentUser, newList));
+				return _Promise.all(promises);
 			});
 	}
 	//Applicant rejected off of waitlist
@@ -192,16 +184,13 @@ function _addToMailingList(oldAttributes, newAttributes){
 		return User.findById(oldAttributes.userId)
 			.then(function (user) {
 				currentUser = user;
-				return MailingList.findByName("waitlisted");
-			})
-			.then(function (waitList) {
-				return MailService.removeFromList(currentUser, waitList.attributes);
-			})
-			.then(function () {
-				return MailingList.findByName("rejected");
-			})
-			.then(function (rejectList) {
-				return MailService.addToList(currentUser, rejectList.attributes);
+				var waitList = utils.mail.lists.waitlisted;
+				var rejectList = utils.mail.lists.rejected;
+
+				var promises = [];
+				promises.push(MailService.removeFromList(currentUser, waitList));
+				promises.push(MailService.addToList(currentUser, rejectList));
+				return _Promise.all(promises);
 			});
 	}
 }
