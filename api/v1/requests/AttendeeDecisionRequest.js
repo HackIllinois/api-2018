@@ -2,7 +2,7 @@ var roles = require('../utils/roles');
 var registration = require('../utils/registration');
 var Request = require('./Request');
 
-var bodyRequired = ['priority', 'wave', 'status'];
+var bodyRequired = ['priority', 'wave', 'status', 'acceptanceType'];
 var bodyAllowed = ['reviewer', 'reviewTime', 'acceptedEcosystemId'];
 var bodyValidations = {
 	'priority':  ['required', 'integer', 'max:10'],
@@ -10,7 +10,8 @@ var bodyValidations = {
 	'status':    ['required', 'string', registration.verifyStatus],
 	'reviewer':  ['string'],
 	'reviewTime': ['integer'],
-	'acceptedEcosystemId': ['integer']
+	'acceptedEcosystemId': ['integer'],
+	'acceptanceType': ['string', registration.verifyAcceptanceType]
 };
 
 function AttendeeDecisionRequest(headers, body) {

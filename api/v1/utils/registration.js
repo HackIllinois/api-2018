@@ -7,7 +7,8 @@ var PROFESSIONAL_INTERESTS = ['INTERNSHIP', 'FULLTIME', 'BOTH'];
 var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
-var CATEGORIES = ['first_name', 'last_name', 'graduation_year', 'school', 'status', 'wave', 'finalized']
+var CATEGORIES = ['first_name', 'last_name', 'graduation_year', 'school', 'status', 'wave', 'finalized'];
+var ACCEPTANCE_TYPES = ['create', 'contribute'];
 
 /**
  * Ensures that the provided tshirt-size is in the list
@@ -138,6 +139,15 @@ module.exports.verifyStatus = function (status) {
 module.exports.verifyCategory = function (category) {
 	if (!_.includes(CATEGORIES, category)) {
 		return false;
+	}
+
+	return true;
+};
+
+
+module.exports.verifyAcceptanceType = function (type) {
+	if (!_.includes(ACCEPTANCE_TYPES, type)) {
+		throw new TypeError(type + " is not a valid acceptance type");
 	}
 
 	return true;

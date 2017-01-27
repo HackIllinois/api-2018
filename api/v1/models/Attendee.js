@@ -37,6 +37,7 @@ var Attendee = Model.extend({
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
 		phoneNumber: ['string', 'maxLength:15'],
+		acceptanceType: ['string', registration.verifyAcceptanceType],
 		acceptedEcosystemId: ['integer']
 	},
 	interests: function () {
