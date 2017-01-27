@@ -1,0 +1,23 @@
+###############################################################################
+#                               DEV_ENV_CONFIG
+###############################################################################
+#ENV AND PORTS
+NODE_ENV=development
+HACKILLINOIS_PORT=8080
+
+#API KEYS AND PASSWORDS
+HACKILLINOIS_SECRET=VERY_SPECIAL_KEY
+HACKILLINOIS_SUPERUSER_EMAIL=admin@example.com
+HACKILLINOIS_SUPERUSER_PASSWORD=ABCD1234!
+HACKILLINOIS_MAIL_KEY=
+
+#DATABASE
+DB_NAME=hackillinois
+DB_HOSTNAME=127.0.0.1
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=
+
+#REDIS
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379

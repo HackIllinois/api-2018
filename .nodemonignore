@@ -1,0 +1,12 @@
+database/**
+resources/**
+node_modules/**
+temp/**
+
+.gitignore
+.nodemonignore
+.env
+.DS_STORE
+package.json
+CONTRIBUTING.md
+README.md
