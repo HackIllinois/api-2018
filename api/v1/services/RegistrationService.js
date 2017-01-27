@@ -193,6 +193,37 @@ function _addToMailingList(oldAttributes, newAttributes){
 				return _Promise.all(promises);
 			});
 	}
+	// Move applicant from accepted to rejected or waitlisted
+	else if(oldStatus === "ACCEPTED" && newStatus !== "ACCEPTED"){
+		if(newStatus === "REJECTED"){
+			console.log("1");
+			return User.findById(oldAttributes.userId)
+				.then(function (user) {
+					currentUser = user;
+					var oldListName = "wave" + oldWave;
+					var oldList = utils.mail.lists[oldListName];
+					var rejectList = utils.mail.lists.rejected;
+
+					var promises = [];
+					promises.push(MailService.removeFromList(currentUser, oldList));
+					promises.push(MailService.addToList(currentUser, rejectList));
+					return _Promise.all(promises);
+				});
+		}else if(newStatus === "WAITLISTED"){
+			return User.findById(oldAttributes.userId)
+				.then(function (user) {
+					currentUser = user;
+					var oldListName = "wave" + oldWave;
+					var oldList = utils.mail.lists[oldListName];
+					var waitList = utils.mail.lists.waitlisted;
+
+					var promises = [];
+					promises.push(MailService.removeFromList(currentUser, oldList));
+					promises.push(MailService.addToList(currentUser, waitList));
+					return _Promise.all(promises);
+				});
+		}
+	}
 }
 
 /**
@@ -431,7 +462,6 @@ module.exports.applyDecision = function (attendee, decisionAttrs) {
 	decisionAttrs.isNovice = !!attendee.attributes.isNovice;
 	decisionAttrs.isPrivate = !!attendee.attributes.isPrivate;
 
-	console.log(decisionAttrs);
 	attendee.set(decisionAttrs);
 
 	return attendee.validate()
