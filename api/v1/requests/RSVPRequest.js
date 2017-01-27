@@ -5,7 +5,7 @@ var bodyRequired = ['isAttending'];
 var bodyAllowed = ['type'];
 var bodyValidations = {
     'isAttending': ['required', 'boolean'],
-    'rsvpType': ['string', rsvp.verifyAttendanceReply]
+    'type': ['string', rsvp.verifyAttendanceReply]
 };
 
 function RSVPRequest(headers, body) {
