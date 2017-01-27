@@ -32,7 +32,7 @@ module.exports.createRSVP = function (attendee, user, attributes) {
                 throw new errors.InvalidParameterError(message, source);
             }
 
-            var userRole = user.getRole(utils.roles.ATTENDEE)
+            var userRole = user.getRole(utils.roles.ATTENDEE);
             UserRole.setActive(userRole, true);
 
             return rsvp.save();
@@ -65,7 +65,7 @@ module.exports.findRSVPByAttendee = function (attendee) {
  * @param {Object} attributes the new RSVP data to set
  * @returns {Promise} the resolved RSVP
  */
-module.exports.updateRSVP = function (rsvp, attributes) {
+module.exports.updateRSVP = function (user, rsvp, attributes) {
     rsvp.set({'type': null});
     rsvp.set(attributes);
 
@@ -73,6 +73,9 @@ module.exports.updateRSVP = function (rsvp, attributes) {
         .validate()
         .catch(CheckitError, utils.errors.handleValidationError)
         .then(function (validated) {
+            var userRole = user.getRole(utils.roles.ATTENDEE);
+            rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false);
+
             return rsvp.save();
         });
 };

@@ -130,7 +130,7 @@ function _updateRSVPByAttendee(user, attendee, newRSVP) {
             if(_removeFromList(rsvp, newRSVP))
                 services.MailService.removeFromList(user, mail.lists.attendees);
 
-            return services.RSVPService.updateRSVP(rsvp, newRSVP);
+            return services.RSVPService.updateRSVP(user, rsvp, newRSVP);
         });
 }
 
