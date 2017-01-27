@@ -118,7 +118,7 @@ function _adjustRelatedObjects(model, adjustments, t) {
  * @return {Boolean} whether or not the pairing is valid
  */
 function _hasValidAttendeeAssignment (projects, ecosystemInterests) {
-	return projects && ecosystemInterests && (projects.length > 0 || ecosystemInterests.length > 0);
+	return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
 }
 
 /**
@@ -310,7 +310,7 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	// some attendee registration attributes are optional, but we need to
 	// be sure that they are at least considered for removal during adjustment
 	attributes = _.merge(attributes, { 'ecosystemInterests': [], 'projects': [], 'extras': [], 'collaborators': [] });
-	
+
 	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
 		var message = "One project or ecosystem interest must be provided";
 		var source = ['projects', 'ecosystemInterests'];
