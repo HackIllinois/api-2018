@@ -5,7 +5,9 @@ var _ = require('lodash');
 var Model = require('../models/Model');
 var Mentor = require('../models/Mentor');
 var Attendee = require('../models/Attendee');
+var User = require('../models/User');
 var UserRole = require('../models/UserRole');
+var MailService = require('../services/MailService');
 var errors = require('../errors');
 var utils = require('../utils');
 
@@ -208,11 +210,11 @@ module.exports.updateMentor = function (mentor, attributes) {
 * @throws {InvalidParameterError} when an attendee exists for the specified user
 */
 module.exports.createAttendee = function (user, attributes) {
-	var attendeeAttributes = attributes.attendee;
+	var attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
 
-	attendeeAttributes.userId = user.get('id');
-	var attendee = Attendee.forge(attendeeAttributes);
+	attendeeAttrs.userId = user.get('id');
+	var attendee = Attendee.forge(attendeeAttrs);
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
@@ -292,10 +294,31 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	// be sure that they are at least considered for removal during adjustment
 	attributes = _.merge(attributes, { 'projects': [], 'extras': [], 'collaborators': [] });
 
-	var attendeeAttributes = attributes.attendee;
+	var attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
 
-	attendee.set(attendeeAttributes);
+	var user = User.forge({ id: attendee.get('userId') });
+	if (!_.isUndefined(attendeeAttrs.status) && (attendee.get('status') !== attendeeAttrs.status)) {
+		// reviewer has changed status; might need to add/remove from lightning list
+		// TODO move this block out of here when separate review feature is available
+		if (attendeeAttrs.status !== 'ACCEPTED') {
+			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+		} else if (attendeeAttrs.hasLightningInterest) {
+			MailService.addToList(user, utils.mail.lists.lightningTalks);
+		}
+	} else if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
+		// preferences were changed but status stays the same
+		if (attendee.get('status') !== 'ACCEPTED') {
+			// we do not add attendees to this list until they have been accepted
+		}
+		else if (attendeeAttrs.hasLightningInterest) {
+			MailService.addToList(user, utils.mail.lists.lightningTalks);
+		} else {
+			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+		}
+	}
+
+	attendee.set(attendeeAttrs);
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
