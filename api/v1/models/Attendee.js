@@ -37,7 +37,7 @@ var Attendee = Model.extend({
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
 		phoneNumber: ['string', 'maxLength:15'],
-		ecosystemSelected: ['integer']
+		acceptedEcosystemId: ['integer']
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
@@ -128,10 +128,12 @@ Attendee.fetchWithResumeById = function (id) {
 	});
 };
 
-/*Attendee.parse = function(attrs) {
+Attendee.parse = function(attrs) {
 	attrs.isNovice = !!attrs.isNovice;
 	attrs.isPrivate = !!attrs.isPrivate;
-}*/
+	console.log("PARSEDs")
+	return attrs;
+}
 
 
 module.exports = Attendee;

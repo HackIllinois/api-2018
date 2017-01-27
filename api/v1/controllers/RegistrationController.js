@@ -228,7 +228,6 @@ function updateAttendeeDecision (req, res, next) {
 	services.RegistrationService
 		.findAttendeeById(req.params.id)
 		.then (function (attendee) {
-			console.log(attendee);
 			return services.RegistrationService.applyDecision(attendee, req.body);
 		})
 		.then(function (attendee) {
@@ -360,7 +359,8 @@ router.get('/attendee/filter', middleware.permission(roles.ORGANIZERS), filterAt
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
 router.put('/attendee', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
-router.put('/attendee/decision/:id', middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
+router.put('/attendee/decision/:id',  middleware.request(requests.AttendeeDecisionRequest),
+	middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
 

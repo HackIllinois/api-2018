@@ -426,6 +426,12 @@ module.exports.updateAttendee = function (attendee, attributes) {
 
 module.exports.applyDecision = function (attendee, decisionAttrs) {
 	_addToMailingList(attendee.attributes, decisionAttrs);
+
+	//This is jank but it works
+	decisionAttrs.isNovice = !!attendee.attributes.isNovice;
+	decisionAttrs.isPrivate = !!attendee.attributes.isPrivate;
+
+	console.log(decisionAttrs);
 	attendee.set(decisionAttrs);
 
 	return attendee.validate()

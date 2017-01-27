@@ -1,5 +1,6 @@
 module.exports = {
 	AttendeeRequest: require('./AttendeeRequest'),
+	AttendeeDecisionRequest: require('./AttendeeDecisionRequest'),
 	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
 	BasicAuthRequest: require('./BasicAuthRequest'),
 	EcosystemCreationRequest: require('./EcosystemCreationRequest'),

@@ -10,6 +10,9 @@ ADD COLUMN `reviewer` VARCHAR(50) NULL;
 ALTER TABLE `attendees`
 ADD COLUMN `review_time` INT UNSIGNED NULL;
 
+ALTER TABLE `attendees`
+ADD COLUMN `accepted_ecosystem_id` INT UNSIGNED NULL;
+
 INSERT INTO `mailing_lists` (`name`) VALUES ('wave_1');
 INSERT INTO `mailing_lists` (`name`) VALUES ('wave_2');
 INSERT INTO `mailing_lists` (`name`) VALUES ('wave_3');
