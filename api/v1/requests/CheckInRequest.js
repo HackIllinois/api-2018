@@ -1,10 +1,11 @@
 var Request = require('./Request');
 
-var bodyRequired = ['userId'];
-var bodyAllowed = ['checkedIn', 'travel', 'location', 'swag'];
+
+var bodyRequired = [];
+var bodyAllowed = ['checked_in', 'location', 'swag'];
 var bodyValidations = {
+    user_d: ['required', 'integer'],
     checkedIn: ['required', 'boolean'],
-    travel: ['required', 'string', registration.verifyTransportation],
     location: ['required', 'string', registration.verifyLocation],
     swag: ['required', 'boolean']
 };

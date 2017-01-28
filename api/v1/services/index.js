@@ -7,5 +7,6 @@ module.exports = {
 	RegistrationService: require('./RegistrationService'),
 	StorageService: require('./StorageService'),
 	UserService: require('./UserService'),
-	TokenService: require('./TokenService')
+	TokenService: require('./TokenService'),
+	CheckInService: require('./CheckInService')
 };

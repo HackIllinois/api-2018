@@ -14,7 +14,7 @@ var utils = require('../utils');
  * @returns {Promise} the resolved CheckIn for the user
  * @throws {NotFoundError} when the user has no check in
  */
-module.exports.findByUserId = function (userId){
+module.exports.findCheckInByUserId = function (userId){
     return CheckIn
         .findByUserId(userId)
         .then(function (checkin){
@@ -26,26 +26,57 @@ module.exports.findByUserId = function (userId){
 
             return _Promise.resolve(checkin);
         })
+        .catch(function(error){
+            return _Promise.reject(error);
+        })
 };
 
 /**
  * Updates portions of the checkin that are included
  * @param checkin the CheckIn to update
  * @param {Obejct} attributes the new CheckIn data to set
- * @returns {Promise} the resovled CheckIn for the user
+ * @returns {Promise} the resolved CheckIn for the user
  */
 module.exports.updateCheckIn = function (checkin, attributes){
-    if (attributes.checkedIn){
-        checkin.set({'checkedIn': attributes.checkedIn})
+
+    if(!checkin.get('checkedIn')){
+        checkin.set({'checkedIn': false});
+        if (attributes.checkedIn == true){
+            checkin.set({'checkedIn': attributes.checkedIn, 'time': utils.time.sqlTime()});
+        }else if (attributes.checkedIn !== false && attributes.checkedIn != undefined){
+            message = "checkedIn must be true or false";
+            source = "checkedIn";
+            throw new errors.InvalidParameterError(message, source);
+        }
+    }else{
+        checkin.set({'checkedIn': true});
+        if (attributes.checkedIn == true){
+            var message = "User already checked in";
+            var source = "CheckIn";
+            throw new errors.UnauthorizedError(message, source);
+        }
     }
-    if (attributes.travel){
-        checkin.set({'checkedIn': attributes.travel})
+
+    if(!checkin.get('swag')){
+        checkin.set({'swag': false});
+        if (attributes.swag === true){
+            checkin.set({'swag': attributes.swag})
+        }else if (attributes.swag !== false && attributes.swag != undefined){
+            message = "swag must be true or false";
+            source = "swag";
+            throw new errors.InvalidParameterError(message, source);
+        }
+    }else{
+        checkin.set({'swag': true});
+        if (attributes.swag == true){
+            var message = "Swag has already been checked";
+            var source = "swag";
+            throw new errors.UnauthorizedError(message, source);
+        }
     }
+
     if (attributes.location){
-        checkin.set({'checkedIn': attributes.location})
-    }
-    if (attributes.swag){
-        checkin.set({'checkedIn': attributes.swag})
+        checkin.set({'location': attributes.location})
     }
 
     return checkin

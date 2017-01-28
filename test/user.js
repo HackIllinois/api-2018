@@ -11,7 +11,7 @@ var User = require('../api/v1/models/User.js');
 var assert = chai.assert;
 var expect = chai.expect;
 
-describe('UserService',function(){
+describe('UserService',function (){
 	describe('createUser', function () {
 		var _createUser;
 		var _findByEmail;
