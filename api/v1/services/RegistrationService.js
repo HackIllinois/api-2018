@@ -195,6 +195,17 @@ function _addToMailingList(attendee, decision){
 }
 
 /**
+ * Determines whether or not an attendee has at least one
+ * project or ecosystem interest
+ * @param  {Array}  projects	the projects list (or undefined)
+ * @param  {Array}  ecosystemInterests the ecosystem interests list (or undefined)
+ * @return {Boolean} whether or not the pairing is valid
+ */
+function _hasValidAttendeeAssignment (projects, ecosystemInterests) {
+	return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
+}
+
+/**
 * Registers a mentor and their project ideas for the given user
 * @param  {Object} user the user for which a mentor will be registered
 * @param  {Object} attributes a JSON object holding the mentor attributes
@@ -294,6 +305,12 @@ module.exports.updateMentor = function (mentor, attributes) {
 * @throws {InvalidParameterError} when an attendee exists for the specified user
 */
 module.exports.createAttendee = function (user, attributes) {
+	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
+		var message = "One project or ecosystem interest must be provided";
+		var source = ['projects', 'ecosystemInterests'];
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+
 	var attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
 
@@ -376,7 +393,13 @@ module.exports.findAttendeeById = function (id, withResume) {
 module.exports.updateAttendee = function (attendee, attributes) {
 	// some attendee registration attributes are optional, but we need to
 	// be sure that they are at least considered for removal during adjustment
-	attributes = _.merge(attributes, { 'projects': [], 'extras': [], 'collaborators': [] });
+	attributes = _.merge(attributes, { 'ecosystemInterests': [], 'projects': [], 'extras': [], 'collaborators': [] });
+
+	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
+		var message = "One project or ecosystem interest must be provided";
+		var source = ['projects', 'ecosystemInterests'];
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
 
 	var attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;

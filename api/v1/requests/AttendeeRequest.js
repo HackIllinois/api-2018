@@ -22,8 +22,8 @@ var requestedCollaboratorValidations = {
 	collaborator: ['required', 'string', 'maxLength:255']
 };
 
-var bodyRequired = ['attendee', 'ecosystemInterests'];
-var bodyAllowed = ['projects', 'extras', 'collaborators'];
+var bodyRequired = ['attendee'];
+var bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'collaborators'];
 var bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
@@ -44,7 +44,7 @@ var bodyValidations = {
 	'attendee.isPrivate': ['required', 'boolean'],
 	'attendee.hasLightningInterest': ['boolean'],
 	'attendee.phoneNumber': ['string', 'maxLength:15'],
-	'ecosystemInterests': ['required', 'array', 'minLength:1', 'maxLength:4', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
+	'ecosystemInterests': ['array', 'maxLength:4', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'), 'ecosystemInterests')],
 	'projects': ['array', 'maxLength:1', registration.verifyProjectArray, validators.array(validators.nested(projectValidations, 'projects'), 'projects')],
 	'extras': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
 	'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'), 'collaborators')]
