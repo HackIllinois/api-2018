@@ -7,7 +7,7 @@ var PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
 var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
-var CATEGORIES = ['first_name', 'last_name', 'graduation_year', 'school', 'status', 'wave', 'finalized'];
+var CATEGORIES = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
 var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 /**

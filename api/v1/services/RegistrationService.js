@@ -461,7 +461,7 @@ module.exports.applyDecision = function (attendee, decisionAttrs) {
 * @return {Promise} resolving to a the list of attendees
 */
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
-	var ordering = (ascending ? '' : '-') + category;
+	var ordering = (ascending ? '' : '-') + utils.database.format(category);
 	return Attendee.forge()
 		.orderBy(ordering)
 		.fetchPage({
@@ -484,7 +484,7 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
 * @return {Promise} resolving to a the list of attendees
 */
 module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
-	var ordering = (ascending ? '' : '-') + category;
+	var ordering = (ascending ? '' : '-') + utils.database.format(category);
 	return Attendee
 		.query(function (qb) {
 			qb.where('first_name', 'LIKE', searchTerm).orWhere('last_name', 'LIKE', searchTerm);
