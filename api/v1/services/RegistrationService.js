@@ -4,6 +4,8 @@ var _ = require('lodash');
 
 var Model = require('../models/Model');
 var Mentor = require('../models/Mentor');
+var User = require('../models/User');
+var MailingList = require('../models/MailingList');
 var Attendee = require('../models/Attendee');
 var User = require('../models/User');
 var UserRole = require('../models/UserRole');
@@ -108,6 +110,88 @@ function _adjustRelatedObjects(model, adjustments, t) {
 	});
 
 	return _Promise.all(relatedPromises);
+}
+
+/**
+ * Adds people to the correct mailing lists based on decisions
+ * @param  {Object} attendee	the old set of attributes for an attendee
+ * @param  {Object} decision	the set of decision attributes for an attendee
+ * @return {Promise<MailingListUser>}	a promise with the save result
+ */
+function _addToMailingList(attendee, decision){
+	// status not finalized or nothing has changed, don't add to any list
+	if(!decision.status || decision.status === "PENDING"){
+		return;
+	}
+
+	var user = User.forge({ id: attendee.userId });
+	var promises;
+
+	// if the status of the user has just been finalized - this is the initial decision
+	if(attendee.status === "PENDING" && decision.status !== "PENDING"){
+		if(decision.status == "ACCEPTED"){
+			listName = "wave" + decision.wave;
+		} else if(decision.status == "REJECTED"){
+			listName = "rejected";
+		} else{
+			listName = "waitlisted";
+		}
+
+		promises = [];
+		promises.push(MailService.addToList(user, utils.mail.lists[listName]));
+		if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
+			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+		}
+
+		return _Promise.all(promises);
+	}
+	// applicant's wave was changed
+	else if(attendee.wave != decision.wave && attendee.status === decision.status && decision.status === "ACCEPTED"){
+		var oldListName = "wave" + attendee.wave;
+		var newListName = "wave" + decision.wave;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
+		promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
+		return _Promise.all(promises);
+	}
+	// applicant accepted off of waitlist (or removed from rejected)
+
+	else if((attendee.status === "WAITLISTED" || attendee.status === "REJECTED") && decision.status === "ACCEPTED"){
+		var waveListName = "wave" + decision.wave;
+		var outgoingList = (attendee.status === "WAITLISTED") ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, outgoingList));
+		promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
+		if (attendee.hasLightningInterest) {
+			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+		}
+		return _Promise.all(promises);
+	}
+	// applicant rejected off of waitlist
+	else if(attendee.status === "WAITLISTED" && decision.status === "REJECTED"){
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
+		promises.push(MailService.addToList(user, utils.mail.lists.rejected));
+		return _Promise.all(promises);
+	}
+	// move applicant from accepted to rejected or waitlisted
+	else if(attendee.status === "ACCEPTED" && decision.status !== "ACCEPTED"){
+		var oldWaveName = "wave" + attendee.wave;
+		var incomingList = (attendee.status === "WAITLISTED") ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
+		promises.push(MailService.addToList(user, incomingList));
+		if (attendee.hasLightningInterest) {
+			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+		}
+
+		return _Promise.all(promises);
+	}
+
+	return _Promise.resolve();
 }
 
 /**
@@ -321,16 +405,8 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	delete attributes.attendee;
 
 	var user = User.forge({ id: attendee.get('userId') });
-	if (!_.isUndefined(attendeeAttrs.status) && (attendee.get('status') !== attendeeAttrs.status)) {
-		// reviewer has changed status; might need to add/remove from lightning list
-		// TODO move this block out of here when separate review feature is available
-		if (attendeeAttrs.status !== 'ACCEPTED') {
-			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
-		} else if (attendeeAttrs.hasLightningInterest) {
-			MailService.addToList(user, utils.mail.lists.lightningTalks);
-		}
-	} else if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
-		// preferences were changed but status stays the same
+	if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
+		// preferences were changed
 		if (attendee.get('status') !== 'ACCEPTED') {
 			// we do not add attendees to this list until they have been accepted
 		}
@@ -359,4 +435,94 @@ module.exports.updateAttendee = function (attendee, attributes) {
 					});
 				});
 			});
+};
+
+
+module.exports.applyDecision = function (attendee, decisionAttrs) {
+	var prevAttendeeAttrs = _.clone(attendee.attributes);
+
+	return attendee.validate()
+		.catch(CheckitError, utils.errors.handleValidationError)
+		.then(function () {
+			return attendee.save(decisionAttrs, { patch: true, require: false });
+		})
+		.then(function (model) {
+			_addToMailingList(prevAttendeeAttrs, decisionAttrs);
+			return model;
+		});
+};
+
+/**
+* Fetches all attendees by a specified order and category
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param {string} category to sort by
+* @param {int} ascending 0 or 1 signaling what way to order the results
+* @return {Promise} resolving to a the list of attendees
+*/
+module.exports.fetchAllAttendees = function(page, count, category, ascending) {
+	var ordering = (ascending ? '' : '-') + category;
+	return Attendee.forge()
+		.orderBy(ordering)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
+			return attendees;
+		});
+};
+
+/**
+* Fetches attendees by either first or last name
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param  {string} category to sort by
+* @param  {int} ascending 0 or 1 signaling what way to order the results
+* @param  {string} searchTerm the name of the person to find
+* @return {Promise} resolving to a the list of attendees
+*/
+module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
+	var ordering = (ascending ? '' : '-') + category;
+	return Attendee
+		.query(function (qb) {
+			qb.where('first_name', 'LIKE', searchTerm).orWhere('last_name', 'LIKE', searchTerm);
+		})
+		.orderBy(ordering)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
+			return attendees;
+		});
+};
+
+/**
+* Fetches attendees by either first or last name
+* @param  {int} page the page of the paginated response JSON
+* @param  {int} number of results of per page
+* @param  {string} category to sort by
+* @param  {int} ascending 0 or 1 signaling what way to order the results
+* @param  {string} filterCategory the category to filter by
+* @param  {string} filterVal the value of the filter to go by
+* @return {Promise} resolving to a the list of attendees
+*/
+module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
+	var ordering = (ascending ? '' : '-') + category;
+	return Attendee
+		.query(function (qb) {
+			qb.where(filterCategory, '=', filterVal);
+		})
+		.orderBy(ordering)
+		.fetchPage({
+			pageSize: count,
+			page: page
+		})
+		.then(function (results) {
+			var attendees = _.map(results.models, 'attributes');
+			return attendees;
+		});
 };
