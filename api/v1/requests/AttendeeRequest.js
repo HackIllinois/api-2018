@@ -40,7 +40,6 @@ var bodyValidations = {
 	'attendee.github': ['required', 'string', 'maxLength:50'],
 	'attendee.linkedin':  ['required', 'string', 'maxLength:50'],
 	'attendee.interests': ['required', 'string', 'maxLength:255'],
-	'attendee.status': ['string', registration.verifyStatus],
 	'attendee.isNovice': ['required', 'boolean'],
 	'attendee.isPrivate': ['required', 'boolean'],
 	'attendee.hasLightningInterest': ['boolean'],

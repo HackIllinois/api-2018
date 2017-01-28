@@ -1,10 +1,7 @@
-/* jshint esversion: 6 */
-
 var checkit = require('checkit');
-var inflection = require('inflection');
-var _ = require('lodash');
 
 var database = require('../../database');
+var databaseUtils = require('../utils/database');
 var bookshelf = database.instance();
 
 /**
@@ -51,7 +48,7 @@ Model.prototype.initialize = function () {
  * @return {Object}       the transformed attributes (underscored)
  */
 Model.prototype.format = function (attrs) {
-	return _.mapKeys(attrs, (v, k) => inflection.underscore(k, true));
+	return databaseUtils.format(attrs);
 };
 
 /**
@@ -60,7 +57,7 @@ Model.prototype.format = function (attrs) {
  * @return {Object}       the transformed attributes (camel-cased)
  */
 Model.prototype.parse = function (attrs) {
-	return _.mapKeys(attrs, (v, k) => inflection.camelize(k, true));
+	return databaseUtils.parse(attrs);
 };
 
 /**
