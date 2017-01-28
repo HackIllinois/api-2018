@@ -8,17 +8,13 @@ module.exports.format = function (target) {
 		return _.mapKeys(target, (v, k) => inflection.underscore(k, true));
 	}
 	if (_.isArray(target)) {
-		return _.map(target, (v) => inflection.underscore(v, true));
+		return _.map(target, (v) => _.isString(v) ? inflection.underscore(v, true) : v);
 	}
-	return inflection.underscore(target, true);
+	return _.isString(v) ? inflection.underscore(target, true) : target;
 };
 
 module.exports.parse = function (target) {
 	if (_.isObject(target)) {
 		return _.mapKeys(target, (v, k) => inflection.camelize(k, true));
 	}
-	if (_.isArray(target)) {
-		return _.map(target, (v) => inflection.camelize(v, true));
-	}
-	return inflection.camelize(target, true);
 };
