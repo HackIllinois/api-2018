@@ -8,7 +8,7 @@ var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
 var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
 var CATEGORIES = ['first_name', 'last_name', 'graduation_year', 'school', 'status', 'wave', 'finalized'];
-var ACCEPTANCE_TYPES = ['create', 'contribute'];
+var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 /**
  * Ensures that the provided tshirt-size is in the list
@@ -146,7 +146,7 @@ module.exports.verifyCategory = function (category) {
 
 
 module.exports.verifyAcceptanceType = function (type) {
-	if (!_.includes(ACCEPTANCE_TYPES, type)) {
+	if (type && !_.includes(ACCEPTANCE_TYPES, type)) {
 		throw new TypeError(type + " is not a valid acceptance type");
 	}
 

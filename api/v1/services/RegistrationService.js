@@ -12,7 +12,6 @@ var UserRole = require('../models/UserRole');
 var MailService = require('../services/MailService');
 var errors = require('../errors');
 var utils = require('../utils');
-var MailService = require('../services/MailService');
 
 /**
  * Persists (insert or update) a model instance and creates (insert only) any
@@ -115,115 +114,84 @@ function _adjustRelatedObjects(model, adjustments, t) {
 
 /**
  * Adds people to the correct mailing lists based on decisions
- * @param  {Object} oldAttributes	the old set of attributes for a user
- * @param  {Object} newAttributes	the new set of decision attributes for a user
- * @return {Promise<MailingListUser>}	a promise with the save result 
+ * @param  {Object} attendee	the old set of attributes for an attendee
+ * @param  {Object} decision	the set of decision attributes for an attendee
+ * @return {Promise<MailingListUser>}	a promise with the save result
  */
-function _addToMailingList(oldAttributes, newAttributes){
-	//Status not finalized or nothing has changed, don't add to any list
-	if(_.isUndefined(newAttributes.status) || newAttributes.status === "PENDING"){
+function _addToMailingList(attendee, decision){
+	// status not finalized or nothing has changed, don't add to any list
+	if(!decision.status || decision.status === "PENDING"){
 		return;
 	}
 
-	var oldWave = oldAttributes.wave;
-	var newWave = newAttributes.wave;
-	var oldStatus = oldAttributes.status;
-	var newStatus = newAttributes.status;
-	var currentUser;
+	var user = User.forge({ id: attendee.userId });
+	var promises;
 
-	//If the status of the user has just been finalized - this is the initial decision
-	if(oldStatus === "PENDING" && newStatus !== "PENDING"){
-		return User.findById(oldAttributes.userId)
-			.then(function (user){
-				currentUser = user.attributes;
-				if(newAttributes.status == "ACCEPTED"){
-					listName = "wave" + newAttributes.wave;
-				}else if(newAttributes.status == "REJECTED"){
-					listName = "rejected";
-				}else{
-					listName = "waitlisted";
-				}
-				var newList = utils.mail.lists[listName];
-				return MailService.addToList(currentUser, newList);
-			});
-	}
-	//Applicant's wave was changed
-	else if(oldWave != newWave && oldStatus === newStatus && newStatus === "ACCEPTED"){
-		var oldListName = "wave" + oldWave;
-		var newListName = "wave" + newWave;
-
-		return User.findById(oldAttributes.userId)
-			.then(function (user) {
-				currentUser = user;
-				var oldList = utils.mail.lists[oldListName];
-				var newList = utils.mail.lists[newListName];
-
-				var promises = [];
-				promises.push(MailService.removeFromList(currentUser, oldList));
-				promises.push(MailService.addToList(currentUser, newList));
-				return _Promise.all(promises);
-			})
-	}
-	//Applicant accepted off of waitlist
-	else if(oldStatus === "WAITLISTED" && newStatus === "ACCEPTED"){
-		return User.findById(oldAttributes.userId)
-			.then(function (user) {
-				currentUser = user;
-				var waitList = utils.mail.lists.waitlisted;
-				var newListName = "wave" + newWave;
-				var newList = utils.mail.lists[newListName];
-
-				var promises = [];
-				promises.push(MailService.removeFromList(currentUser, waitList));
-				promises.push(MailService.addToList(currentUser, newList));
-				return _Promise.all(promises);
-			});
-	}
-	//Applicant rejected off of waitlist
-	else if(oldStatus === "WAITLISTED" && newStatus === "REJECTED"){
-		return User.findById(oldAttributes.userId)
-			.then(function (user) {
-				currentUser = user;
-				var waitList = utils.mail.lists.waitlisted;
-				var rejectList = utils.mail.lists.rejected;
-
-				var promises = [];
-				promises.push(MailService.removeFromList(currentUser, waitList));
-				promises.push(MailService.addToList(currentUser, rejectList));
-				return _Promise.all(promises);
-			});
-	}
-	// Move applicant from accepted to rejected or waitlisted
-	else if(oldStatus === "ACCEPTED" && newStatus !== "ACCEPTED"){
-		if(newStatus === "REJECTED"){
-			console.log("1");
-			return User.findById(oldAttributes.userId)
-				.then(function (user) {
-					currentUser = user;
-					var oldListName = "wave" + oldWave;
-					var oldList = utils.mail.lists[oldListName];
-					var rejectList = utils.mail.lists.rejected;
-
-					var promises = [];
-					promises.push(MailService.removeFromList(currentUser, oldList));
-					promises.push(MailService.addToList(currentUser, rejectList));
-					return _Promise.all(promises);
-				});
-		}else if(newStatus === "WAITLISTED"){
-			return User.findById(oldAttributes.userId)
-				.then(function (user) {
-					currentUser = user;
-					var oldListName = "wave" + oldWave;
-					var oldList = utils.mail.lists[oldListName];
-					var waitList = utils.mail.lists.waitlisted;
-
-					var promises = [];
-					promises.push(MailService.removeFromList(currentUser, oldList));
-					promises.push(MailService.addToList(currentUser, waitList));
-					return _Promise.all(promises);
-				});
+	// if the status of the user has just been finalized - this is the initial decision
+	if(attendee.status === "PENDING" && decision.status !== "PENDING"){
+		if(decision.status == "ACCEPTED"){
+			listName = "wave" + decision.wave;
+		} else if(decision.status == "REJECTED"){
+			listName = "rejected";
+		} else{
+			listName = "waitlisted";
 		}
+
+		promises = [];
+		promises.push(MailService.addToList(user, utils.mail.lists[listName]));
+		if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
+			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+		}
+
+		return _Promise.all(promises);
 	}
+	// applicant's wave was changed
+	else if(attendee.wave != decision.wave && attendee.status === decision.status && decision.status === "ACCEPTED"){
+		var oldListName = "wave" + attendee.wave;
+		var newListName = "wave" + decision.wave;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
+		promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
+		return _Promise.all(promises);
+	}
+	// applicant accepted off of waitlist (or removed from rejected)
+
+	else if((attendee.status === "WAITLISTED" || attendee.status === "REJECTED") && decision.status === "ACCEPTED"){
+		var waveListName = "wave" + decision.wave;
+		var outgoingList = (attendee.status === "WAITLISTED") ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, outgoingList));
+		promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
+		if (attendee.hasLightningInterest) {
+			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+		}
+		return _Promise.all(promises);
+	}
+	// applicant rejected off of waitlist
+	else if(attendee.status === "WAITLISTED" && decision.status === "REJECTED"){
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
+		promises.push(MailService.addToList(user, utils.mail.lists.rejected));
+		return _Promise.all(promises);
+	}
+	// move applicant from accepted to rejected or waitlisted
+	else if(attendee.status === "ACCEPTED" && decision.status !== "ACCEPTED"){
+		var oldWaveName = "wave" + attendee.wave;
+		var incomingList = (attendee.status === "WAITLISTED") ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+
+		promises = [];
+		promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
+		promises.push(MailService.addToList(user, incomingList));
+		if (attendee.hasLightningInterest) {
+			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+		}
+
+		return _Promise.all(promises);
+	}
+
+	return _Promise.resolve();
 }
 
 /**
@@ -414,16 +382,8 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	delete attributes.attendee;
 
 	var user = User.forge({ id: attendee.get('userId') });
-	if (!_.isUndefined(attendeeAttrs.status) && (attendee.get('status') !== attendeeAttrs.status)) {
-		// reviewer has changed status; might need to add/remove from lightning list
-		// TODO move this block out of here when separate review feature is available
-		if (attendeeAttrs.status !== 'ACCEPTED') {
-			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
-		} else if (attendeeAttrs.hasLightningInterest) {
-			MailService.addToList(user, utils.mail.lists.lightningTalks);
-		}
-	} else if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
-		// preferences were changed but status stays the same
+	if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
+		// preferences were changed
 		if (attendee.get('status') !== 'ACCEPTED') {
 			// we do not add attendees to this list until they have been accepted
 		}
@@ -456,23 +416,18 @@ module.exports.updateAttendee = function (attendee, attributes) {
 
 
 module.exports.applyDecision = function (attendee, decisionAttrs) {
-	_addToMailingList(attendee.attributes, decisionAttrs);
-
-	//This is jank but it works
-	decisionAttrs.isNovice = !!attendee.attributes.isNovice;
-	decisionAttrs.isPrivate = !!attendee.attributes.isPrivate;
-
-	attendee.set(decisionAttrs);
+	var prevAttendeeAttrs = _.clone(attendee.attributes);
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
 		.then(function () {
-			return attendee.save();
+			return attendee.save(decisionAttrs, { patch: true, require: false });
 		})
 		.then(function (model) {
+			_addToMailingList(prevAttendeeAttrs, decisionAttrs);
 			return model;
-		})
-}
+		});
+};
 
 /**
 * Fetches all attendees by a specified order and category
@@ -494,7 +449,7 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
 			var attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
-}
+};
 
 /**
 * Fetches attendees by either first or last name
@@ -520,7 +475,7 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 			var attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
-}
+};
 
 /**
 * Fetches attendees by either first or last name
@@ -547,4 +502,4 @@ module.exports.filterAttendees = function(page, count, category, ascending, filt
 			var attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
-}
+};

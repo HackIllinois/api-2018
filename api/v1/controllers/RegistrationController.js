@@ -17,30 +17,32 @@ function _isAuthenticated (req) {
 }
 
 function _validateGetAttendeesRequest(page, count, category, ascending){
+	var message, source;
 	if(_.isNaN(page)){
-		var message = "Invalid page parameter";
-		var source = "page";
+		message = "Invalid page parameter";
+		source = "page";
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	if(_.isNaN(count)){
-		var message = "Invalid count parameter";
-		var source = "count";
+		message = "Invalid count parameter";
+		source = "count";
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
-	if(_.isNaN(ascending) || (ascending != 0 && ascending != 1)){
-		var message = "Invalid ascending parameter";
-		var source = "ascending";
+	if(_.isNaN(ascending) || (ascending !== 0 && ascending != 1)){
+		message = "Invalid ascending parameter";
+		source = "ascending";
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	if(_.isNaN(category) || !registration.verifyCategory(category)){
-		var message = "Invalid category parameter";
-		var source = "category";
+		message = "Invalid category parameter";
+		source = "category";
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 	return _Promise.resolve(true);
 }
 
 function _deleteExtraAttendeeParams (req) {
+	// NOTE this can be removed when we marshal recursively
 	delete req.body.attendee.status;
 	delete req.body.attendee.wave;
 	delete req.body.attendee.priority;
@@ -165,6 +167,7 @@ function fetchAttendeeByUser(req, res, next) {
 		.findAttendeeByUser(req.user, true)
 		.then(function(attendee){
 			res.body = attendee.toJSON();
+			delete res.body.data.reviewer;
 
 			next();
 			return null;
@@ -235,6 +238,8 @@ function updateAttendeeDecision (req, res, next) {
 	services.RegistrationService
 		.findAttendeeById(req.params.id)
 		.then (function (attendee) {
+			req.body.reviewer = req.user.get('email');
+			req.body.reviewTime = new Date();
 			return services.RegistrationService.applyDecision(attendee, req.body);
 		})
 		.then(function (attendee) {
@@ -325,7 +330,7 @@ function filterAttendees(req, res, next) {
 			if(_.isUndefined(filterVal)){
 				var message = "Invalid filterVal parameter";
 				var source = "filterVal";
-				return _Promise.reject(new errors.InvalidParameterError(message, source));	
+				return _Promise.reject(new errors.InvalidParameterError(message, source));
 			}
 			return _Promise.resolve(true);
 		})

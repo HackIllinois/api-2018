@@ -33,7 +33,7 @@ var Attendee = Model.extend({
 		status:    ['string', registration.verifyStatus],
 		wave: 	   ['integer', 'max:5'],
 		reviewer:  ['string'],
-		reviewTime: ['integer'],
+		reviewTime: ['date'],
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
 		phoneNumber: ['string', 'maxLength:15'],
@@ -54,6 +54,12 @@ var Attendee = Model.extend({
 	},
 	collaborators: function () {
 		return this.hasMany(AttendeeRequestedCollaborator);
+	},
+	parse: function (attrs) {
+		attrs = Model.prototype.parse(attrs);
+		attrs.isNovice = !!attrs.isNovice;
+		attrs.isPrivate = !!attrs.isPrivate;
+		return attrs;
 	}
 });
 
@@ -128,12 +134,5 @@ Attendee.fetchWithResumeById = function (id) {
     	});
 	});
 };
-
-Attendee.parse = function(attrs) {
-	attrs.isNovice = !!attrs.isNovice;
-	attrs.isPrivate = !!attrs.isPrivate;
-	return attrs;
-};
-
 
 module.exports = Attendee;
