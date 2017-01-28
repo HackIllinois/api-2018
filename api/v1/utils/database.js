@@ -10,7 +10,7 @@ module.exports.format = function (target) {
 	if (_.isArray(target)) {
 		return _.map(target, (v) => _.isString(v) ? inflection.underscore(v, true) : v);
 	}
-	return _.isString(v) ? inflection.underscore(target, true) : target;
+	return _.isString(target) ? inflection.underscore(target, true) : target;
 };
 
 module.exports.parse = function (target) {
