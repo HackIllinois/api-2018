@@ -40,6 +40,17 @@ function _validateGetAttendeesRequest(page, count, category, ascending){
 	return _Promise.resolve(true);
 }
 
+function _deleteExtraAttendeeParams (req) {
+	delete req.body.attendee.status;
+	delete req.body.attendee.wave;
+	delete req.body.attendee.priority;
+	delete req.body.attendee.reviewer;
+	delete req.body.attendee.reviewTime;
+	delete req.body.attendee.acceptedEcosystemId;
+	delete req.body.attendee.acceptanceType;
+	return req;
+}
+
 function createMentor(req, res, next) {
 	delete req.body.status;
 
@@ -133,7 +144,7 @@ function updateMentorById(req, res, next) {
 
 
 function createAttendee(req, res, next) {
-	delete req.body.status;
+	req = _deleteExtraAttendeeParams(req);
 
 	services.RegistrationService.createAttendee(req.user, req.body)
 		.then(function (attendee) {
@@ -180,9 +191,7 @@ function fetchAttendeeById(req, res, next) {
 
 function updateAttendeeByUser(req, res, next) {
 	delete req.body.attendee.id;
-	if (!req.user.hasRoles(roles.ORGANIZERS)) {
-		delete req.body.status;
-	}
+	req = _deleteExtraAttendeeParams(req);
 
 	services.RegistrationService
 		.findAttendeeByUser(req.user)
@@ -203,9 +212,7 @@ function updateAttendeeByUser(req, res, next) {
 
 function updateAttendeeById(req, res, next) {
 	delete req.body.attendee.id;
-	if (!req.user.hasRoles(roles.ORGANIZERS)) {
-		delete req.body.status;
-	}
+	req = _deleteExtraAttendeeParams(req);
 
 	services.RegistrationService
 		.findAttendeeById(req.params.id)
