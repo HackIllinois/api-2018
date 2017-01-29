@@ -12,6 +12,73 @@ var errors = require('../errors');
 var utils = require('../utils');
 var cache = utils.cache;
 
+/**
+ * Returns a function that takes a query result and populates a stats object
+ * @param  {String} key	the key to use to nest the stats
+ * @param  {Object} stats	the stats object to be populated
+ * @return {Function} The generated function
+ */
+function _populateStats(key, stats){
+    return function(result){
+        stats[key] = {};
+        _.forEach(result.models, function(model){
+            stats[key][model.attributes.name] = model.attributes.count;
+        });
+    };
+}
+
+/**
+ * Returns a function that takes a query result and populates a stats object
+ * Differs from above in that it doesn't process a collection
+ * @param  {String} key	the key to use to map a count result
+ * @param  {Object} stats	the stats object to be populated
+ * @return {Function} The generated function
+ */
+function _populateStatsField(key, stats){
+    return function(result){
+        stats[key] = result.attributes.count;
+    };
+}
+
+/**
+ * Queries Attendee ecosystems interests and performs a callback on the results
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateEcosystems(cb){
+    return AttendeeEcosystemInterest.query(function(qb){
+        qb.select('e.name').count('ecosystem_id as count').from('attendee_ecosystem_interests as aei').innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id').groupBy('aei.ecosystem_id');
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+/**
+ * Queries an attendee attribute and counts the unique entries
+ * @param  {String} attribute the attribute to query for
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateAttendeeAttribute(attribute, cb){
+    return Attendee.query(function(qb){
+        qb.select(attribute + ' as name').count(attribute + ' as count').from('attendees').groupBy(attribute);
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+/**
+ * Queries the total number of attendees
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateAttendees(cb){
+    return Attendee.query(function(qb){
+    qb.count('id as count');
+    })
+    .fetch()
+    .then(cb);
+}
 
 /**
 * Fetches the current stats, requerying them if not cached
@@ -28,103 +95,43 @@ module.exports.fetchStats = function () {
         }
         else {
             var stats = {}
-            var populateStats = function(key) {
-                return function(result){
-                    stats[key] = {};
-                    _.forEach(result.models, function(model){
-                        stats[key][model.attributes.name] = model.attributes.count;
-                    });
-                };
-            };
             var queries = [];
 
-            // Ecosystems stats
-            var ecosystemsQuery = AttendeeEcosystemInterest.query(function(qb){
-                qb.select('e.name').count('ecosystem_id as count').from('attendee_ecosystem_interests as aei').innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id').groupBy('aei.ecosystem_id');
-            })
-            .fetchAll()
-            .then(populateStats('ecosystems'));
+            var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
             queries.push(ecosystemsQuery);
 
-            // School  stats
-            var schoolQuery = Attendee.query(function(qb){
-                qb.select('school as name').count('school as count').from('attendees').groupBy('school');
-            })
-            .fetchAll()
-            .then(populateStats('school'));
+            var schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
             queries.push(schoolQuery);
 
-            // Transportation preference stats
-            var transportationQuery = Attendee.query(function(qb){
-                qb.select('transportation as name').count('transportation as count').from('attendees').groupBy('transportation');
-            })
-            .fetchAll()
-            .then(populateStats('transportation'));
+            var transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
             queries.push(transportationQuery);
 
-            // Dietary preference stats
-            var dietQuery = Attendee.query(function(qb){
-                qb.select('diet as name').count('diet as count').from('attendees').groupBy('diet');
-            })
-            .fetchAll()
-            .then(populateStats('diet'));
+            var dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
             queries.push(dietQuery);
 
-            // Shirt size stats
-            var shirtSizeQuery = Attendee.query(function(qb){
-                qb.select('shirt_size as name').count('shirt_size as count').from('attendees').groupBy('shirt_size');
-            })
-            .fetchAll()
-            .then(populateStats('shirtSize'));
+            var shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
             queries.push(shirtSizeQuery);
 
-            // Gender stats
-            var genderQuery = Attendee.query(function(qb){
-                qb.select('gender as name').count('gender as count').from('attendees').groupBy('gender');
-            })
-            .fetchAll()
-            .then(populateStats('gender'));
+            var genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
             queries.push(genderQuery);
 
-            // Year stats
-            var graduationYearQuery = Attendee.query(function(qb){
-                qb.select('graduation_year as name').count('graduation_year as count').from('attendees').groupBy('graduation_year');
-            })
-            .fetchAll()
-            .then(populateStats('graduationYear'));
+            var graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
             queries.push(graduationYearQuery);
 
-            // Major stats
-            var majorQuery = Attendee.query(function(qb){
-                qb.select('major as name').count('major as count').from('attendees').groupBy('major');
-            })
-            .fetchAll()
-            .then(populateStats('major'));
+            var majorQuery =  _populateAttendeeAttribute('major', _populateStats('major', stats));
             queries.push(majorQuery);
 
-            // Novice stats
-            var isNoviceQuery = Attendee.query(function(qb){
-                qb.select('is_novice as name').count('is_novice as count').from('attendees').groupBy('is_novice');
-            })
-            .fetchAll()
-            .then(populateStats('isNovice'));
+            var isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
             queries.push(isNoviceQuery);
 
-            // Total attendee stats
-            var attendeeQuery = Attendee.query(function(qb){
-                qb.count('id as count');
-            })
-            .fetch()
-            .then(function(model){
-                stats.attendees = model.attributes.count;
-            });
+            var attendeeQuery =  _populateAttendees(_populateStatsField('attendees', stats));
             queries.push(attendeeQuery);
 
             return _Promise.all(queries)
             .then(function(){
-                var tenMinutesFromNow = (10*60);
                 return cache.storeString('stats', JSON.stringify(stats))
                 .then(function(){
+                    var tenMinutesFromNow = (10*60);
                     return cache.expireKey('stats', tenMinutesFromNow)
                     .then(function(){
                         return stats;
