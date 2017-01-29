@@ -4,6 +4,8 @@ module.exports = {
 	UploadController: require('./UploadController.js'),
 	UserController: require('./UserController.js'),
 	RegistrationController: require('./RegistrationController.js'),
+	PermissionController: require('./PermissionController.js'),
 	ProjectController: require('./ProjectController.js'),
-	HealthController: require('./HealthController.js')
+	HealthController: require('./HealthController.js'),
+	StatsController: require('./StatsController.js')
 };
