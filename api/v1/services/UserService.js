@@ -118,3 +118,13 @@ module.exports.resetPassword = function (user, password) {
 			return updated.save();
 		});
 };
+
+module.exports.deleteUser = function (user) {
+	if(user.hasRole(utils.roles.ATTENDEE, false)) {
+		var message = "The provided user has already filled out a registration";
+		var source = "AttendeeRole";
+		throw new errors.InvalidParameterError(message, source);
+	}
+
+	return user.destroy();
+};
