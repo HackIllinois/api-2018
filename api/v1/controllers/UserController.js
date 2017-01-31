@@ -100,24 +100,6 @@ function requestPasswordReset (req, res, next) {
 		});
 }
 
-function deleteUser (req, res , next) {
-	var userEmail = req.body.email;
-
-	services.UserService
-		.findUserByEmail(userEmail)
-		.then(function (user) {
-			return services.UserService.deleteUser(user);
-		})
-		.then(function () {
-			res.body = {};
-
-			return next();
-		})
-		.catch(function (error){
-			return next(error);
-		});
-}
-
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -126,7 +108,6 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
-router.delete('/', middleware.permission(roles.SUPERUSER), deleteUser);
 
 router.use(middleware.response);
 router.use(middleware.errors);
