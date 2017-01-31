@@ -50,7 +50,7 @@ function deleteEcosystem (req, res, next) {
 	EcosystemService
 		.deleteEcosystem(name)
 		.then(function () {
-			res.body = {};
+			res.body = {}
 
 			next();
 			return null;
