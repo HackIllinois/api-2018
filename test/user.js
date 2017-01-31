@@ -193,8 +193,8 @@ describe('UserService',function(){
 				});
 		});
 		it('throws an exception when deleting a user with a role', function(done) {
-			expect(() => UserService.deleteUser(invalidToDeleteUser)).to.throw(errors.InvalidParameterError);
-			done();
+			var invalidDeletion = UserService.deleteUser(invalidToDeleteUser);
+			expect(invalidDeletion).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done)
 		});
 		afterEach(function (done) {
 			tracker.uninstall();
