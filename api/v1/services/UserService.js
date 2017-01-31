@@ -122,7 +122,7 @@ module.exports.resetPassword = function (user, password) {
 module.exports.deleteUser = function (user) {
 	if(user.hasRoles(utils.roles.ALL, false)) {
 		var message = "The provided user has a role and can not be deleted";
-		var source = "UserRole";
+		var source = null;
 		throw new errors.InvalidParameterError(message, source);
 	}
 

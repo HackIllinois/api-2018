@@ -167,14 +167,11 @@ describe('UserService',function(){
 		before(function(done) {
 			toDeleteUser = User.forge({ id: 1, email: 'to@delete.com'});
 			invalidToDeleteUser = User.forge({ id: 2, email: 'cant@delete.com'});
-			invalidToDeleteUser.setPassword('password123')
-				.then(function(updatedUser) {
-					updatedUser.related('roles').add({ role: utils.roles.ATTENDEE});
+			invalidToDeleteUser.related('roles').add({ role: utils.roles.ATTENDEE});
 
-					_destroy = sinon.spy(User.prototype,'destroy');
+			_destroy = sinon.spy(User.prototype,'destroy');
 
-					done();
-				});
+			done();
 		});
 		beforeEach(function (done) {
 			tracker.install();
@@ -186,8 +183,7 @@ describe('UserService',function(){
 			});
 
 			var deleteValid = UserService.deleteUser(toDeleteUser);
-			deleteValid
-				.then(function () {
+			deleteValid.then(function () {
 					assert(_destroy.calledOnce, "User destroy not called");
 
 					done();
