@@ -120,9 +120,9 @@ module.exports.resetPassword = function (user, password) {
 };
 
 module.exports.deleteUser = function (user) {
-	if(user.hasRole(utils.roles.ATTENDEE, false)) {
-		var message = "The provided user has already filled out a registration";
-		var source = "AttendeeRole";
+	if(user.hasRoles(utils.roles.ALL, false)) {
+		var message = "The provided user has a role and can not be deleted";
+		var source = "UserRole";
 		throw new errors.InvalidParameterError(message, source);
 	}
 

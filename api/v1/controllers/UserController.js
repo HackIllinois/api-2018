@@ -126,7 +126,7 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
-router.delete('/', middleware.permission(roles.ORGANIZERS), deleteUser);
+router.delete('/', middleware.permission(roles.SUPERUSER), deleteUser);
 
 router.use(middleware.response);
 router.use(middleware.errors);

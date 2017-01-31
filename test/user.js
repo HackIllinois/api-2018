@@ -10,6 +10,7 @@ var User = require('../api/v1/models/User.js');
 
 var assert = chai.assert;
 var expect = chai.expect;
+var tracker = require('mock-knex').getTracker();
 
 describe('UserService',function(){
 	describe('createUser', function () {
@@ -157,5 +158,55 @@ describe('UserService',function(){
 			_save.restore();
 			done();
 		});
-	})
+	});
+
+	describe('deleteUser', function() {
+		var toDeleteUser;
+		var invalidToDeleteUser;
+		var _destroy;
+		before(function(done) {
+			toDeleteUser = User.forge({ id: 1, email: 'to@delete.com'});
+			invalidToDeleteUser = User.forge({ id: 2, email: 'cant@delete.com'});
+			invalidToDeleteUser.setPassword('password123')
+				.then(function(updatedUser) {
+					updatedUser.related('roles').add({ role: utils.roles.ATTENDEE});
+
+					_destroy = sinon.spy(User.prototype,'destroy');
+
+					done();
+				});
+		});
+		beforeEach(function (done) {
+			tracker.install();
+			done();
+		});
+		it('deletes a user with no role', function(done) {
+			tracker.on('query', function (query) {
+				query.response([]);
+			});
+
+			var deleteValid = UserService.deleteUser(toDeleteUser);
+			deleteValid
+				.then(function () {
+					assert(_destroy.calledOnce, "User destroy not called");
+
+					done();
+				})
+				.catch(function (err) {
+					done(err);
+				});
+		});
+		it('throws an exception when deleting a user with a role', function(done) {
+			expect(() => UserService.deleteUser(invalidToDeleteUser)).to.throw(errors.InvalidParameterError);
+			done();
+		});
+		afterEach(function (done) {
+			tracker.uninstall();
+			done();
+		});
+		after(function(done) {
+			_destroy.restore();
+			done();
+		});
+	});
 });
