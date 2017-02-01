@@ -8,6 +8,15 @@ var errors = require('../errors');
 var utils = require('../utils');
 
 /**
+ * Gets an rsvp by its id
+ * @param {integer} id the id of the RSVP to find
+ * @returns {Promise} the resolved rsvp
+ */
+module.exports.getRSVPById = function (id) {
+    return RSVP.findById(id);
+};
+
+/**
  * Creates an RSVP and sets the users attendee role to active
  * @param {Attendee} attendee the associated attendee for the rsvp
  * @param {User} user the associated user for the rsvp

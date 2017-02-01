@@ -63,13 +63,9 @@ function fetchRSVPByUser(req, res, next) {
         })
 }
 
-function fetchRSVPByAttendeeId(req, res, next) {
-    services.RegistrationService
-        .findAttendeeById(req.params.id)
-        .then(function(attendee) {
-            services.RSVPService
-                .findRSVPByAttendee(attendee);
-        })
+function fetchRSVPById(req, res, next) {
+    services.RSVPService
+        .getRSVPById(req.params.id)
         .then(function(rsvp){
             res.body = rsvp.toJSON();
             if(!res.body.type) {
@@ -102,35 +98,19 @@ function updateRSVPByUser(req, res, next) {
         });
 }
 
-function updateRSVPById(req, res, next) {
-    if(!req.body.isAttending)
-        delete req.body.type;
-
-    services.RegistrationService
-        .findAttendeeById(req.params.id)
-        .then(function(attendee) {
-            return _updateRSVPByAttendee(req.user, attendee, req.body)
-        })
-        .then(function(rsvp){
-            res.body = rsvp.toJSON();
-
-            return next();
-        })
-        .catch(function (error) {
-            return next(error);
-        });
-}
-
 function _updateRSVPByAttendee(user, attendee, newRSVP) {
     return services.RSVPService
         .findRSVPByAttendee(attendee)
         .then(function (rsvp) {
-            if(_addToList(rsvp, newRSVP))
-                services.MailService.addToList(user, mail.lists.attendees);
-            if(_removeFromList(rsvp, newRSVP))
-                services.MailService.removeFromList(user, mail.lists.attendees);
+            return services.RSVPService.updateRSVP(user, rsvp, newRSVP)
+                .then(function (updatedRSVP) {
+                    if(_addToList(rsvp, newRSVP))
+                        services.MailService.addToList(user, mail.lists.attendees);
+                    if(_removeFromList(rsvp, newRSVP))
+                        services.MailService.removeFromList(user, mail.lists.attendees);
 
-            return services.RSVPService.updateRSVP(user, rsvp, newRSVP);
+                    return updatedRSVP
+                });
         });
 }
 
@@ -138,13 +118,11 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/attendee', middleware.request(requests.RSVPRequest),
-    middleware.permission(roles.NONE, _isAuthenticated), createRSVP);
+    middleware.permission(roles.ATTENDEE, _isAuthenticated), createRSVP);
 router.get('/attendee/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
-router.get('/attendee/:id', middleware.permission(roles.ORGANIZERS), fetchRSVPByAttendeeId);
+router.get('/attendee/:id', middleware.permission(roles.ORGANIZERS), fetchRSVPById);
 router.put('/attendee/', middleware.request(requests.RSVPRequest),
     middleware.permission(roles.ATTENDEE), updateRSVPByUser);
-router.put('/attendee/:id', middleware.request(requests.RSVPRequest),
-    middleware.permission(roles.ORGANIZERS), updateRSVPById);
 
 router.use(middleware.response);
 router.use(middleware.errors);

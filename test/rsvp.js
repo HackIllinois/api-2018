@@ -2,6 +2,7 @@ var _Promise = require('bluebird');
 
 var chai = require('chai');
 var sinon = require('sinon');
+var _ = require('lodash');
 
 var errors = require('../api/v1/errors');
 var utils = require('../api/v1/utils');
@@ -32,44 +33,7 @@ describe('RSVPService',function(){
                 "id": 1,
                 "userId": 1,
                 "firstName": "John",
-                "lastName": "Doe",
-                "shirtSize": "M",
-                "diet": "NONE",
-                "age": 19,
-                "graduationYear": 2019,
-                "transportation": "NOT_NEEDED",
-                "school": "University of Illinois at Urbana-Champaign",
-                "major": "Computer Science",
-                "gender": "MALE",
-                "professionalInterest": "BOTH",
-                "github": "JDoe1234",
-                "linkedin": "JDoe5678",
-                "interests": "CS",
-                "isNovice": true,
-                "isPrivate": false,
-                "hasLightningInterest": false,
-                "phoneNumber": "12345678910",
-                "ecosystemInterests": [
-                    {
-                        "ecosystemId": 1,
-                        "attendeeId": 1,
-                        "id": 1
-                    }
-                ],
-                "collaborators": [
-                    {
-                        "collaborator": "collaborator@hackillinois.org",
-                        "attendeeId": 1,
-                        "id": 1
-                    }
-                ],
-                "extras": [
-                    {
-                        "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
-                        "attendeeId": 1,
-                        "id": 1
-                    }
-                ]
+                "lastName": "Doe"
             });
 
             testRSVP =  {
@@ -101,14 +65,14 @@ describe('RSVPService',function(){
 
                 assert(_forgeRSVP.called, "RSVP forge not called with right parameters");
                 assert(_saveRSVP.calledOnce, "RSVP save not called");
-                assert(_userRole.get('active'), "AttendeeRole not set to active");
+                assert(_userRole.get('active'), "Attendee role not set to active");
                 return done();
             }).catch(function (err) {
                 return done(err);
             });
         });
         it('throws an error for an RSVP in which the type is not present when expected',function(done){
-            var testRSVPClone = JSON.parse(JSON.stringify(testRSVP));
+            var testRSVPClone = _.clone(testRSVP);
             delete testRSVPClone.type;
 
             var RSVP = RSVPService.createRSVP(testAttendee, testUser, testRSVPClone);
@@ -198,7 +162,7 @@ describe('RSVPService',function(){
             done();
         });
         it('updates an RSVP',function(done){
-            var testRSVPClone = JSON.parse(JSON.stringify(testRSVP));
+            var testRSVPClone = _.clone(testRSVP);
 
             tracker.on('query', function (query) {
                 query.response([0]);
