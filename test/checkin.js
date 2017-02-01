@@ -46,21 +46,31 @@ describe("CheckInService", function () {
 
     describe("updateCheckIn", function () {
 
-        var testCheckIn;
-        var testAttendeeCheckIn;
+        var testCheckIn1;
+        var testCheckIn2;
+        var testAttendeeCheckIn1;
+        var testAttendeeCheckIn2;
 
         before(function (done) {
-            testCheckIn = {
-                "checked_in": false,
+            testCheckIn1 = {
+                "checkedIn": false,
                 "userId": 2342,
                 "location": "NONE"
             };
 
-            testAttendeeCheckIn = CheckIn.forge(testCheckIn);
+            testAttendeeCheckIn1 = CheckIn.forge(testCheckIn1);
 
-            testCheckIn.checked_in = true;
-            testCheckIn.location = "SIEBEL";
-            testCheckIn.swag = true;
+            testCheckIn2 = {
+                "checkedIn": true,
+                "userId": 4342,
+                "location": "NONE"
+            };
+
+            testAttendeeCheckIn2 = CheckIn.forge(testCheckIn2);
+
+            testCheckIn1.checked_in = true;
+            testCheckIn1.location = "SIEBEL";
+            testCheckIn1.swag = true;
 
             done();
         });
@@ -71,10 +81,20 @@ describe("CheckInService", function () {
                 query.response([1]);
             });
 
-            var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn, testCheckIn);
-            assert(updatedCheckIn.get('checked_in'), "Checked in wasn't updated properly");
+            var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn1, testCheckIn1);
+            assert(updatedCheckIn.get('checkedIn'), "Checked in wasn't updated properly");
 
             done();
+        });
+
+        it('throws error for requesting to check in if user is already checked in', function (done){
+
+            var errorAttributes = {
+                "checkedIn": true
+            };
+
+            var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn2, errorAttributes);
+            expect(updatedCheckIn).to.eventually.be.rejectedWith(errors.UnauthorizedError).and.notify(done);
         });
 
     });

@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var registration = require('../utils/registration');
+var checkin = require('../utils/check_in');
 var CheckIt = require('checkit');
 
 
@@ -10,7 +10,7 @@ var CheckIn =  Model.extend({
     validations: {
         userId: ['required', 'integer'],
         checkedIn: ['required', 'boolean'],
-        location: ['required', 'string', registration.verifyLocation],
+        location: ['required', 'string', checkin.verifyLocation],
         swag: ['required', 'boolean']
     }
 });
