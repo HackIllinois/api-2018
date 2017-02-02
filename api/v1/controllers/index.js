@@ -7,5 +7,6 @@ module.exports = {
 	PermissionController: require('./PermissionController.js'),
 	ProjectController: require('./ProjectController.js'),
 	HealthController: require('./HealthController.js'),
+	RSVPController: require('./RSVPController.js')
 	StatsController: require('./StatsController.js')
 };
