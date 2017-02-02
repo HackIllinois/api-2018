@@ -18,3 +18,11 @@ module.exports.lists.staff = { name: 'staff', id: 'staff-2017' };
 module.exports.lists.sponsors = { name: 'sponsors', id: 'sponsors-2017' };
 module.exports.lists.mentors = { name: 'mentors', id: 'mentors-2017' };
 module.exports.lists.volunteers = { name: 'volunteers', id: 'volunteers-2017' };
+
+//mapping of applicant decision waves to mailing list name
+module.exports.lists.wave1 = { name: 'wave_1', id: 'wave-1-2017' };
+module.exports.lists.wave2 = { name: 'wave_2', id: 'wave-2-2017' };
+module.exports.lists.wave3 = { name: 'wave_3', id: 'wave-3-2017' };
+module.exports.lists.wave4 = { name: 'wave_4', id: 'wave-4-2017' };
+module.exports.lists.wave5 = { name: 'wave_5', id: 'wave-5-2017' };
+module.exports.lists.rejected = { name: 'rejected', id: 'rejected-2017'};
