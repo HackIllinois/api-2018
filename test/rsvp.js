@@ -53,7 +53,7 @@ describe('RSVPService',function(){
             done();
         });
         it('creates a rsvp for a valid attendee and sets its attendee role',function(done){
-            var testRSVPClone = JSON.parse(JSON.stringify(testRSVP));
+            var testRSVPClone = _.clone(testRSVP);
 
             tracker.on('query', function (query) {
                 query.response([]);
