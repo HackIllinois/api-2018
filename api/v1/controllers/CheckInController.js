@@ -5,6 +5,7 @@ var services = require('../services');
 var middleware = require('../middleware');
 var requests = require('../requests');
 var roles = require('../utils/roles');
+var errors = require('../errors');
 
 var router = require('express').Router();
 
@@ -20,7 +21,7 @@ function updateCheckInByUserId (req, res, next) {
             return next();
         })
         .catch(function (error){
-           return next(error);
+            return next(error);
         });
 }
 
@@ -44,14 +45,29 @@ function fetchCheckInByUser (req, res, next) {
             return next();
         })
         .catch(function (error){
-            return next(error)
+            return next(error);
         });
+}
+
+function createCheckIn (req, res, next) {
+    services.CheckInService
+        .createCheckIn(req.params.id, req.body)
+        .then(function (checkin){
+            // console.log(checkin);
+            res.body = checkin.toJSON();
+            return next();
+        })
+        .catch(function (error){
+            return next(error);
+        })
 }
 
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
+router.post('/:id', middleware.request(requests.CheckInRequest),
+    middleware.permission(roles.ORGANIZERS), createCheckIn)
 router.put('/:id', middleware.request(requests.CheckInRequest),
     middleware.permission(roles.ORGANIZERS), updateCheckInByUserId);
 router.get('/:id', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);

@@ -87,12 +87,12 @@ describe('UserService',function (){
 			var testUser = User.forge({ id: 1, email: 'new@example.com' });
 			testUser.setPassword('password123');
 
-				_findById = sinon.stub(User, 'findById');
+			_findById = sinon.stub(User, 'findById');
 
-				_findById.withArgs(1).returns(_Promise.resolve(testUser));
-				_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+			_findById.withArgs(1).returns(_Promise.resolve(testUser));
+			_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 
-				done();
+			done();
 		});
 		it('finds existing user',function(done){
 			var user = UserService.findUserById(1);

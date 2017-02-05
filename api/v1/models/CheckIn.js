@@ -12,6 +12,12 @@ var CheckIn =  Model.extend({
         checkedIn: ['required', 'boolean'],
         location: ['required', 'string', checkin.verifyLocation],
         swag: ['required', 'boolean']
+    },
+    parse: function (attrs) {
+        attrs = Model.prototype.parse(attrs);
+        attrs.checkedIn = !!attrs.checkedIn;
+        attrs.swag = !!attrs.swag;
+        return attrs;
     }
 });
 

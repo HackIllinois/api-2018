@@ -21,6 +21,6 @@ require('./ecosystem.js');
 require('./permission.js');
 require('./token.js');
 require('./storage.js');
-require('./CheckIn.js');
+require('./checkin.js');
 
 mockery.disable();

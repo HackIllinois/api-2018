@@ -56,22 +56,12 @@ User.findByEmail = function (email) {
 User.create = function (email, password, role) {
 	var user = User.forge({ email: email });
 	var userRole = UserRole.forge({ role: role, active: true });
-	var checkin = CheckIn.forge({ checkedIn: false, location: 'DCL', swag: false});
 
 	if(!role){
-		return User
-			.transaction(function (t) {
-				return user.setPassword(password)
-					.then(function (result) {
-						return result.save(null, { transacting: t });
-					})
-					.then(function (result){
-						checkin.set({ userId: user.get('id')});
-						return checkin.save(null, { transacting: t});
-					})
-					.then(function (result) {
-						return User.where({ id: user.get('id') }).fetch({ withRelated: ['checkIn'], transacting: t });
-					});
+		// No roles were provided, so create the User
+		return user.setPassword(password)
+			.then(function(result){
+				return result.save();
 			});
 	}
 	return User
@@ -86,12 +76,8 @@ User.create = function (email, password, role) {
 					userRole.set({ userId: user.get('id') });
 					return userRole.save(null, { transacting: t });
 				})
-				.then(function (result){
-					checkin.set({ user_id: user.get('id')});
-					return checkin.save(null, { transacting: t});
-				})
 				.then(function (result) {
-					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles', 'checkIn'], transacting: t });
+					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles'], transacting: t });
 				});
 		});
 };

@@ -3,7 +3,7 @@ var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var CheckIn = require('../models/CheckIn');
-var UserRole = require('../models/UserRole');
+var UserService = require('../services/UserService');
 var errors = require('../errors');
 var utils = require('../utils');
 
@@ -22,7 +22,6 @@ _updateFlag = function (checkin, attributes, key, time){
 
     var update = {};
     if(!checkin.get(key)){
-        update[key] = false;
         if (attributes[key] == true){
             update[key] = true;
             if (time){
@@ -30,11 +29,10 @@ _updateFlag = function (checkin, attributes, key, time){
             }
         }
     }else{
-        update[key] = true;
         if (attributes[key] == true){
             var message = key + " is already true";
             var source = key;
-            throw new errors.UnauthorizedError(message, source);
+            throw new errors.InvalidParameterError(message, source);
         }else if (attributes[key] == false){
             update[key] = false;
         }
@@ -80,7 +78,6 @@ module.exports.updateCheckIn = function (checkin, attributes){
     if (attributes.location){
         checkin.set({'location': attributes.location})
     }
-
     return checkin
         .validate()
         .catch(CheckitError, utils.errors.handleValidationError)
@@ -88,4 +85,36 @@ module.exports.updateCheckIn = function (checkin, attributes){
             return checkin.save();
         });
 
+};
+
+/**
+ * Creates a CheckIn object for given user with the given attributes
+ * @param {Number} id user id
+ * @param {Object} attributes values requested
+ * @returns {Promise} resolving to CheckIn object
+ */
+module.exports.createCheckIn = function (id, attributes){
+
+    return CheckIn.findByUserId(id)
+        .then(function (checkin){
+            if (!_.isNull(checkin)) {
+                var message = "A check in record already exists for this user";
+                var source = "userId";
+                throw new errors.InvalidParameterError(message, source);
+            }
+            return UserService.findUserById(id)
+                .then(function (user){
+                    var checkin = CheckIn.forge({ userId: id, checkedIn: false, location: "DCL", swag: false});
+                    return checkin.save()
+                        .then(function(ci){
+                            return module.exports.updateCheckIn(ci, attributes);
+                        });
+                })
+                .catch(function (error){
+                    throw error;
+                });
+        })
+        .catch(function (error) {
+            throw error;
+        });
 };
