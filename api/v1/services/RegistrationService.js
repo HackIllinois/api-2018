@@ -84,17 +84,19 @@ function _extractRelatedObjects(model, fkName, related) {
 /**
  * Removes unwanted objects and updates desired objects
  * @param  {Model} model			the model with which the ideas are associated
+ * @param  {String} parentKey		the foreign key name for the associated model
  * @param  {Object} adjustments		the resolved result of #_extractRelatedObjects
  * @param  {Transaction} t			a pending transaction
  * @return {Promise<>}				a promise indicating all changes have been added to the transaction
  */
-function _adjustRelatedObjects(model, adjustments, t) {
+function _adjustRelatedObjects(model, parentKey, adjustments, t) {
 	var relatedPromises = [];
 
 	_.forIn(adjustments, function (adjustment, relatedName) {
 		var promise = model.related(relatedName)
 			.query().transacting(t)
 			.whereNotIn('id', adjustment.updatedIds)
+			.where(parentKey, model.get('id'))
 			.delete()
 			.catch(Model.NoRowsDeletedError, function () { return null; })
 			.then(function () {
@@ -290,7 +292,7 @@ module.exports.updateMentor = function (mentor, attributes) {
 		})
 		.then(function (adjustments){
 			return Mentor.transaction(function (t) {
-				return _adjustMentorIdeas(mentor, adjustments, t).then(function () {
+				return _adjustMentorIdeas(mentor, "mentor_id", adjustments, t).then(function () {
 					return _saveWithRelated(mentor, { 'ideas': adjustments.ideas.new }, t);
 				});
 			});
@@ -426,7 +428,7 @@ module.exports.updateAttendee = function (attendee, attributes) {
 		})
 		.then(function (adjustments) {
 			return Attendee.transaction(function (t) {
-				return _adjustRelatedObjects(attendee, adjustments, t)
+				return _adjustRelatedObjects(attendee, "attendee_id", adjustments, t)
 					.then(function () {
 						var newRelated = _.mapValues(adjustments, function (adjustment, adjustments) {
 							return adjustment.new;
@@ -511,7 +513,8 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 * @return {Promise} resolving to a the list of attendees
 */
 module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
-	var ordering = (ascending ? '' : '-') + category;
+	var ordering = (ascending ? '' : '-') + utils.database.format(category);
+	filterCategory = utils.database.format(filterCategory);
 	return Attendee
 		.query(function (qb) {
 			qb.where(filterCategory, '=', filterVal);

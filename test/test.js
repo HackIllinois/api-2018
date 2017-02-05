@@ -21,5 +21,6 @@ require('./ecosystem.js');
 require('./permission.js');
 require('./token.js');
 require('./storage.js');
+require('./rsvp.js');
 
 mockery.disable();

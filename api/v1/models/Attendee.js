@@ -10,6 +10,7 @@ var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
 var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
+var AttendeeRSVP = require('./AttendeeRSVP');
 var Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
@@ -55,6 +56,9 @@ var Attendee = Model.extend({
 	collaborators: function () {
 		return this.hasMany(AttendeeRequestedCollaborator);
 	},
+	rsvp: function () {
+		return this.hasOne(AttendeeRSVP);
+  },
 	parse: function (attrs) {
 		attrs = Model.prototype.parse(attrs);
 		attrs.isNovice = !!attrs.isNovice;
@@ -70,7 +74,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']});
 };
 
 
@@ -83,7 +87,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 	return Attendee.transaction(function (t){
 		var attendee;
 	    return Attendee.where({ user_id: userId })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			if(_.isNull(a)){
@@ -106,7 +110,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']});
 };
 
 /**
@@ -118,7 +122,7 @@ Attendee.fetchWithResumeById = function (id) {
 	return Attendee.transaction(function (t){
 		var attendee;
 		return Attendee.where({ id: id })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'], transacting: t})
 		.then(function (a) {
 			attendee = a;
 			if(_.isNull(a)){
