@@ -97,9 +97,12 @@ describe("CheckInService", function () {
             var errorAttributes = {
                 "checkedIn": true
             };
-            // var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn2, errorAttributes);
-            // expect(updatedCheckIn).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
-            done();
+            try {
+                var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn2, errorAttributes);
+            }catch(e){
+                expect(e).to.have.deep.property("type", 'InvalidParameterError');
+                done();
+            }
         });
         after(function(done) {
             _save.restore();
@@ -111,6 +114,9 @@ describe("CheckInService", function () {
 
         var testCheckIn;
         var testAttendeeCheckIn;
+        var _findByUserId;
+        var _findUserById;
+        var _save;
 
         before(function(done) {
             testCheckIn = {
@@ -120,14 +126,14 @@ describe("CheckInService", function () {
 
             var existingCheckIn = CheckIn.forge({ id: 1, checked_in: false, user_id: 2342, location: "ECEB"})
 
-            var _findByUserId = sinon.stub(CheckIn, 'findByUserId');
+            _findByUserId = sinon.stub(CheckIn, 'findByUserId');
             _findByUserId.withArgs(2342).returns(_Promise.resolve(existingCheckIn));
             _findByUserId.withArgs(3232).returns(_Promise.resolve(null));
 
-            var _findUserById = sinon.stub(UserService, 'findUserById');
+            _findUserById = sinon.stub(UserService, 'findUserById');
             _findUserById.withArgs(3232).returns(_Promise.resolve(User.forge({id: 1})));
 
-            var _save = sinon.stub(CheckIn.prototype, 'save', function() {
+            _save = sinon.stub(CheckIn.prototype, 'save', function() {
                 return _Promise.resolve(this);
             });
 
@@ -144,6 +150,12 @@ describe("CheckInService", function () {
             var newCheckIn = CheckInService.createCheckIn(2342, testCheckIn);
             expect(newCheckIn).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
         });
+        after(function(done) {
+            _save.restore();
+            _findUserById.restore();
+            _findByUserId.restore();
+            done();
+        })
     });
 
 });
