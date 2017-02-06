@@ -25,10 +25,14 @@ module.exports = function (err, req, res, next) {
 		logUtils.logError(req, err.message, err.status, logUtils.errorTypes.CLIENT);
 	}
 
+	if (res.headersSent) {
+		return next();
+	}
+
 	var response = {
 		meta: null,
 		error: err.toJSON()
 	};
 
-	res.status(err.status).json(response);
+	return res.status(err.status).json(response);
 };

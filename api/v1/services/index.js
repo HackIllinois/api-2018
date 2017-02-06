@@ -5,8 +5,10 @@ module.exports = {
 	PermissionService: require('./PermissionService'),
 	ProjectService: require('./ProjectService'),
 	RegistrationService: require('./RegistrationService'),
+	StatsService: require('./StatsService'),
 	StorageService: require('./StorageService'),
 	UserService: require('./UserService'),
 	TokenService: require('./TokenService'),
-	CheckInService: require('./CheckInService')
+	CheckInService: require('./CheckInService'),
+	RSVPService: require('./RSVPService')
 };

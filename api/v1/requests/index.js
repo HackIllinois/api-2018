@@ -1,5 +1,6 @@
 module.exports = {
 	AttendeeRequest: require('./AttendeeRequest'),
+	AttendeeDecisionRequest: require('./AttendeeDecisionRequest'),
 	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
 	BasicAuthRequest: require('./BasicAuthRequest'),
 	EcosystemCreationRequest: require('./EcosystemCreationRequest'),
@@ -9,5 +10,6 @@ module.exports = {
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
 	UploadRequest: require('./UploadRequest'),
-	CheckInRequest: require('./CheckInRequest')
+	CheckInRequest: require('./CheckInRequest'),
+	RSVPRequest: require('./RSVPRequest')
 };

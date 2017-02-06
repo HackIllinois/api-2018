@@ -102,8 +102,8 @@ User.prototype.setPassword = function (password) {
  * @return {UserRole}	 the desired role, or undefined
  */
 User.prototype.getRole = function (role) {
-	return _.find(this.related('roles').models, function (role) {
-		return role.role === role;
+	return _.find(this.related('roles').models, function (roleInUser) {
+		return roleInUser.get('role') === role;
 	});
 };
 

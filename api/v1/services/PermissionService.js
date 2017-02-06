@@ -40,4 +40,24 @@ module.exports.canCreateProject = function (creator) {
 
 	var message = "A project cannot be created with the provided credentials";
 	return _Promise.reject(new errors.UnauthorizedError(message));
+};
+
+
+/**
+ * Checks to see if a requestor is an organizer (or superuser)
+ * @param  {User} user to check roles for
+ * @return {Promise} resolving to true if the user is an organizer, false otherwise
+ */
+module.exports.isOrganizer = function (user){
+	if (user.hasRole(roles.SUPERUSER)) {
+		// the superuser is allowed
+		return _Promise.resolve(true);
+	}
+	if (user.hasRoles(roles.ORGANIZERS)) {
+		// the user is an organizer
+		return _Promise.resolve(true);
+	}
+	// return false
+	return _Promise.resolve(false);
+
 }

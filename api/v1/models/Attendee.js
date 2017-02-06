@@ -10,6 +10,7 @@ var AttendeeProject = require('./AttendeeProject');
 var AttendeeExtraInfo = require('./AttendeeExtraInfo');
 var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
+var AttendeeRSVP = require('./AttendeeRSVP');
 var Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
@@ -29,10 +30,16 @@ var Attendee = Model.extend({
 		github:    ['required', 'string', 'maxLength:50'],
 		linkedin:  ['required', 'string', 'maxLength:50'],
 		interests: ['required', 'string', 'maxLength:255'],
+		priority:  ['integer', 'max:10'],
 		status:    ['string', registration.verifyStatus],
+		wave: 	   ['integer', 'max:5'],
+		reviewer:  ['string'],
+		reviewTime: ['date'],
 		isNovice:  ['required', 'boolean'],
 		isPrivate:  ['required', 'boolean'],
-		phoneNumber: ['string', 'maxLength:15']
+		phoneNumber: ['string', 'maxLength:15'],
+		acceptanceType: ['string', registration.verifyAcceptanceType],
+		acceptedEcosystemId: ['integer']
 	},
 	interests: function () {
 		return this.hasMany(AttendeeProjectInterest);
@@ -48,6 +55,15 @@ var Attendee = Model.extend({
 	},
 	collaborators: function () {
 		return this.hasMany(AttendeeRequestedCollaborator);
+	},
+	rsvp: function () {
+		return this.hasOne(AttendeeRSVP);
+  },
+	parse: function (attrs) {
+		attrs = Model.prototype.parse(attrs);
+		attrs.isNovice = !!attrs.isNovice;
+		attrs.isPrivate = !!attrs.isPrivate;
+		return attrs;
 	}
 });
 
@@ -58,7 +74,7 @@ var Attendee = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
 */
 Attendee.findByUserId = function (userId) {
-	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ user_id: userId }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']});
 };
 
 
@@ -71,13 +87,18 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 	return Attendee.transaction(function (t){
 		var attendee;
 	    return Attendee.where({ user_id: userId })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'], transacting: t})
 		.then(function (a) {
 			attendee = a;
+			if(_.isNull(a)){
+				return null;
+			}
 			return Upload.where({ owner_id: userId, bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
-			attendee.set('resume', (u !== null) ? u.attributes : u);
+			if(!_.isNull(u)){
+				attendee.set('resume', (u !== null) ? u.attributes : u);
+			}
 			return attendee;
 		});
 	});
@@ -89,7 +110,7 @@ Attendee.fetchWithResumeByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Attendee.findById = function (id) {
-	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators']});
+	return Attendee.where({ id: id }).fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']});
 };
 
 /**
@@ -101,17 +122,21 @@ Attendee.fetchWithResumeById = function (id) {
 	return Attendee.transaction(function (t){
 		var attendee;
 		return Attendee.where({ id: id })
-		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators'], transacting: t})
+		.fetch({withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'], transacting: t})
 		.then(function (a) {
 			attendee = a;
+			if(_.isNull(a)){
+				return null;
+			}
 			return Upload.where({ owner_id: a.get('userId'), bucket: utils.storage.buckets.resumes }).fetch({transacting: t});
 	    })
 		.then(function (u) {
-			  attendee.set('resume', u.attributes);
-			  return attendee;
+			if(!_.isNull(u)){
+				attendee.set('resume', (u !== null) ? u.attributes : u);
+			}
+			return attendee;
     	});
 	});
 };
-
 
 module.exports = Attendee;

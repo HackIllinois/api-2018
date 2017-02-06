@@ -48,10 +48,13 @@ describe('RegistrationService',function(){
                 "github": "JDoe1234",
                 "linkedin": "JDoe1234",
                 "interests": "CS",
+                "finalized": false,
                 "isNovice": true,
                 "isPrivate": false,
-				"hasLightningInterest": false,
-                "phoneNumber": "12345678910"
+				        "hasLightningInterest": false,
+                "phoneNumber": "12345678910",
+                "wave": 0,
+                "priority": 0
             };
             testRegistration.projects = [
             	{
@@ -221,11 +224,15 @@ describe('RegistrationService',function(){
                 "github": "JDoe1234",
                 "linkedin": "JDoe1234",
                 "interests": "CS",
+                "finalized": false,
+                "status": "ACCEPTED",
                 "isNovice": true,
                 "isPrivate": false,
 				"hasLightningInterest": false,
                 "phoneNumber": "12345678910",
-                "userId": 1
+                "userId": 1,
+                "priority": 1,
+                "wave": 2
             };
             testRegistration.projects = [
             	{
