@@ -354,17 +354,10 @@ function filterAttendees(req, res, next) {
 
 function sendMailinglist(req, res, next) {
 	var listName = req.body.listName;
-	var mailList = mail.lists.listName;
+	var mailList = mail.lists[listName]
 	var template = req.body.template;
-
-	if(_.isUndefined(mailList)){
-		message = "Invalid listName parameter";
-		source = "listName";
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
-
-	services.MailService
-		.sendToList(mailList, template)
+	
+	services.MailService.sendToList(mailList, template)
 		.then(function () {
 			res.body = {};
 
