@@ -10,6 +10,7 @@ var mail = require('../utils/mail');
 var registration = require('../utils/registration');
 var errors = require('../errors');
 
+
 var router = require('express').Router();
 
 function _isAuthenticated (req) {
@@ -351,6 +352,31 @@ function filterAttendees(req, res, next) {
 		});
 }
 
+function sendMailinglist(req, res, next) {
+	var listName = req.body.listName;
+	var mailList = mail.lists.listName;
+	var template = req.body.template;
+
+	if(_.isUndefined(mailList)){
+		message = "Invalid listName parameter";
+		source = "listName";
+		return _Promise.reject(new errors.InvalidParameterError(message, source));
+	}
+
+	services.MailService
+		.sendToList(mailList, template)
+		.then(function () {
+			res.body = {};
+
+			next();
+			return null;
+		})
+		.catch(function (error) {
+			next(error);
+			return null;
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -376,6 +402,9 @@ router.put('/attendee/decision/:id',  middleware.request(requests.AttendeeDecisi
 	middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
+
+router.put('/sendlist', middleware.request(requests.SendListRequest), 
+	middleware.permission(roles.ORGANIZERS), sendMailinglist);
 
 router.use(middleware.response);
 router.use(middleware.errors);
