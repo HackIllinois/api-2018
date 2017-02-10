@@ -10,5 +10,6 @@ module.exports = {
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
 	UploadRequest: require('./UploadRequest'),
-	RSVPRequest: require('./RSVPRequest')
+	RSVPRequest: require('./RSVPRequest'),
+	UniversalTrackingRequest: require('./UniversalTrackingRequest')
 };
