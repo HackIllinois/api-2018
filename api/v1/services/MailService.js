@@ -135,12 +135,6 @@ function send(recipients, template, substitutions) {
  * @throws {ExternalProviderError}	when the mail client returns an error
  */
 function sendToList(list, template, substitutions) {
-	//Set the mailing list as sent
-	MailingList.findByName(list.name)
-		.then(function (mailingList){
-			mailingList.set({sent : true}).save();
-		});
-
 	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
 		handleOperationUnsuccessful(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
 		return _Promise.resolve(true);
