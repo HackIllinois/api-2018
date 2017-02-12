@@ -18,7 +18,7 @@ describe("CheckInService", function () {
         var _findByUserId;
 
         before(function (done) {
-            var testCheckIn = CheckIn.forge({ id: 1, checked_in: false, user_id: 2342, location: "ECEB"})
+            var testCheckIn = CheckIn.forge({ id: 1, user_id: 2342, location: "ECEB"})
 
             _findByUserId = sinon.stub(CheckIn, 'findByUserId');
 
@@ -117,11 +117,11 @@ describe("CheckInService", function () {
         before(function(done) {
             testCheckIn = {
                 "userId": 3232,
-                "checkedIn": true,
-                "swag": true
+                "swag": true,
+                "location": "DCL"
             }
 
-            var existingCheckIn = CheckIn.forge({ id: 1, checked_in: false, user_id: 2342, location: "ECEB"})
+            var existingCheckIn = CheckIn.forge({ id: 1,  user_id: 2342, location: "ECEB"})
 
             _findByUserId = sinon.stub(CheckIn, 'findByUserId');
             _findByUserId.withArgs(2342).returns(_Promise.resolve(existingCheckIn));
