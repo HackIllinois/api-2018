@@ -352,6 +352,8 @@ function filterAttendees(req, res, next) {
 		});
 }
 
+router.use(bodyParser.json());
+router.use(middleware.auth);
 
 router.post('/mentor', middleware.request(requests.MentorRequest),
 	middleware.permission(roles.NONE, _isAuthenticated), createMentor);
