@@ -10,14 +10,12 @@ var CheckIn = require('../api/v1/models/CheckIn.js');
 var UserService = require('../api/v1/services/UserService');
 var User = require('../api/v1/models/User')
 
-var assert = chai.assert;
 var expect = chai.expect;
-var tracker = require('mock-knex').getTracker();
 
 describe("CheckInService", function () {
     describe("findCheckInByUserId", function () {
 
-        var _findByUserId
+        var _findByUserId;
 
         before(function (done) {
             var testCheckIn = CheckIn.forge({ id: 1, checked_in: false, user_id: 2342, location: "ECEB"})
@@ -48,29 +46,25 @@ describe("CheckInService", function () {
 
     describe("updateCheckIn", function () {
 
-        var testCheckIn1;
-        var testCheckIn2;
-        var testAttendeeCheckIn1;
-        var testAttendeeCheckIn2;
+        var testCheckIn;
+        var testAttendeeCheckIn;
         var _save;
+        var _findByUserId;
+        var _get;
 
         before(function (done) {
-            testCheckIn1 = {
-                "checkedIn": false,
+            testCheckIn = {
                 "userId": 2342,
                 "location": "DCL",
                 "swag": false
             };
-            testAttendeeCheckIn1 = CheckIn.forge(testCheckIn1);
 
-            testCheckIn2 = {
-                "checkedIn": true,
-                "userId": 4342,
-                "location": "DCL",
-                "swag": false
-            };
-            testAttendeeCheckIn2 = CheckIn.forge(testCheckIn2);
+            _findByUserId = sinon.stub(CheckIn, 'findByUserId');
 
+            _get = sinon.stub(CheckIn.prototype, 'get');
+            _get.withArgs("userId").returns(testCheckIn["userId"]);
+            _get.withArgs("location").returns(testCheckIn["location"]);
+            _get.withArgs("swag").returns(testCheckIn["swag"]);
             _save = sinon.stub(CheckIn.prototype, 'save', function() {
                 return this;
             });
@@ -78,33 +72,36 @@ describe("CheckInService", function () {
             done();
         });
 
-        it('updates status of CheckIn variables', function (done){
-            testCheckIn1.checkedIn = true;
-            testCheckIn1.location = "SIEBEL";
-            testCheckIn1.swag = true;
+        it('updates status of CheckIn variables when changing swag from false to true', function (done){
+            testAttendeeCheckIn = CheckIn.forge(testCheckIn);
+            _findByUserId.withArgs(2342).returns(_Promise.resolve(testAttendeeCheckIn));
+            testCheckIn.location = "SIEBEL";
+            testCheckIn.swag = true;
 
-            var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn1, testCheckIn1);
-            expect(updatedCheckIn).to.eventually.have.deep.property("attributes.checkedIn", true)
-                .then(function (data) {
-                    expect(updatedCheckIn).to.eventually.have.deep.property("attributes.location", "SIEBEL")
-                        .then(function (data) {
-                            expect(updatedCheckIn).to.eventually.have.deep.property("attributes.swag", true)
-                                .and.notify(done);
-                        });
-                });
+            CheckInService.updateCheckIn(testCheckIn)
+                .then(function(checkin) {
+                    expect(checkin).to.have.deep.property("attributes.location", "SIEBEL");
+                    expect(checkin).to.have.deep.property("attributes.swag", true);
+                    done();
+                })
         });
-        it('throws error for requesting to check in if user is already checked in', function (done){
-            var errorAttributes = {
-                "checkedIn": true
-            };
-            try {
-                var updatedCheckIn = CheckInService.updateCheckIn(testAttendeeCheckIn2, errorAttributes);
-            }catch(e){
-                expect(e).to.have.deep.property("type", 'InvalidParameterError');
-                done();
-            }
+        it('cannot change swag from true to false', function (done){
+            testAttendeeCheckIn = CheckIn.forge(testCheckIn);
+            _get.withArgs("swag").returns(testCheckIn["swag"]);
+            _findByUserId.withArgs(2342).returns(_Promise.resolve(testAttendeeCheckIn));
+            testCheckIn.userId = 2342;
+            testCheckIn.swag = false;
+
+            CheckInService.updateCheckIn(testCheckIn)
+                .then(function(checkin) {
+                    expect(checkin).to.have.deep.property("attributes.location", "SIEBEL");
+                    expect(checkin).to.have.deep.property("attributes.swag", true);
+                    done();
+                })
         });
         after(function(done) {
+            _get.restore();
+            _findByUserId.restore();
             _save.restore();
             done();
         });
@@ -113,13 +110,13 @@ describe("CheckInService", function () {
     describe("createCheckIn", function() {
 
         var testCheckIn;
-        var testAttendeeCheckIn;
         var _findByUserId;
         var _findUserById;
         var _save;
 
         before(function(done) {
             testCheckIn = {
+                "userId": 3232,
                 "checkedIn": true,
                 "swag": true
             }
@@ -140,14 +137,12 @@ describe("CheckInService", function () {
             done();
         });
         it("creates a valid CheckIn", function(done) {
-            var newCheckIn = CheckInService.createCheckIn(3232, testCheckIn);
-            expect(newCheckIn).to.eventually.have.deep.property("attributes.checkedIn",true)
-                .then(function (data) {
-                    expect(newCheckIn).to.eventually.have.deep.property("attributes.swag", true).and.notify(done)
-                });
+            var newCheckIn = CheckInService.createCheckIn(testCheckIn);
+            expect(newCheckIn).to.eventually.have.deep.property("attributes.swag", true).and.notify(done)
         });
         it("fails when user already has CheckIn", function(done) {
-            var newCheckIn = CheckInService.createCheckIn(2342, testCheckIn);
+            testCheckIn.userId = 2342;
+            var newCheckIn = CheckInService.createCheckIn(testCheckIn);
             expect(newCheckIn).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
         });
         after(function(done) {

@@ -1,8 +1,7 @@
 CREATE TABLE `checkins` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT UNSIGNED NOT NULL,
-    `checked_in` TINYINT(1) NOT NULL DEFAULT 0,
-    `time` DATETIME NULL,
+    `time` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
     `location` ENUM('SIEBEL', 'ECEB', 'DCL') NOT NULL,
     `swag` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),

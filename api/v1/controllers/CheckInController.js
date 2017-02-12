@@ -5,17 +5,13 @@ var services = require('../services');
 var middleware = require('../middleware');
 var requests = require('../requests');
 var roles = require('../utils/roles');
-var errors = require('../errors');
 
 var router = require('express').Router();
 
 
 function updateCheckInByUserId (req, res, next) {
     services.CheckInService
-        .findCheckInByUserId(req.params.id)
-        .then(function (checkin){
-            return services.CheckInService.updateCheckIn(checkin, req.body);
-        })
+        .updateCheckin(req.body)
         .then(function (response){
             res.body = response.toJSON();
             return next();
@@ -51,9 +47,8 @@ function fetchCheckInByUser (req, res, next) {
 
 function createCheckIn (req, res, next) {
     services.CheckInService
-        .createCheckIn(req.params.id, req.body)
+        .createCheckIn(req.body)
         .then(function (checkin){
-            // console.log(checkin);
             res.body = checkin.toJSON();
             return next();
         })
@@ -66,11 +61,11 @@ function createCheckIn (req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('/:id', middleware.request(requests.CheckInRequest),
+router.post('/', middleware.request(requests.CreateCheckInRequest),
     middleware.permission(roles.ORGANIZERS), createCheckIn)
-router.put('/:id', middleware.request(requests.CheckInRequest),
+router.put('/', middleware.request(requests.UpdateCheckInRequest),
     middleware.permission(roles.ORGANIZERS), updateCheckInByUserId);
-router.get('/:id', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);
+router.get('/user/:id', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);
 router.get('/', fetchCheckInByUser);
 
 router.use(middleware.response);

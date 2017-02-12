@@ -11,17 +11,3 @@ module.exports.unix = function () {
 module.exports.toMilliseconds = function (description) {
 	return milliseconds(description);
 };
-
-module.exports.sqlTime = function() {
-
-	function pad (text) {
-		var padding = "00";
-		return text = padding.substring(0, padding.length - text.length) + text;
-	}
-
-	var date = new Date();
-	var dateValues = (date.toLocaleDateString()).toString().split('/');
-
-	return dateValues[2] + "-" + pad(dateValues[0]) + "-" + pad(dateValues[1]) + " " + pad(date.getHours()) +
-	":" + pad(date.getMinutes())+":" + pad(date.getSeconds());
-}

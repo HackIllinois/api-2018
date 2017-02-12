@@ -51,7 +51,7 @@ describe('RegistrationService',function(){
                 "finalized": false,
                 "isNovice": true,
                 "isPrivate": false,
-				        "hasLightningInterest": false,
+				                    "hasLightningInterest": false,
                 "phoneNumber": "12345678910",
                 "wave": 0,
                 "priority": 0

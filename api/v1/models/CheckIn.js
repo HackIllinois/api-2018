@@ -9,7 +9,6 @@ var CheckIn =  Model.extend({
     idAttribute: 'id',
     validations: {
         userId: ['required', 'integer'],
-        checkedIn: ['required', 'boolean'],
         location: ['required', 'string', checkin.verifyLocation],
         swag: ['required', 'boolean']
     },
