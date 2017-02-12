@@ -12,6 +12,7 @@ var _ = require('lodash');
 var config = require('../../config');
 var logger = require('../../logging');
 var files = require('../../files');
+var errors = require('../errors');
 
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
@@ -134,6 +135,12 @@ function send(recipients, template, substitutions) {
  * @throws {ExternalProviderError}	when the mail client returns an error
  */
 function sendToList(list, template, substitutions) {
+	//Set the mailing list as sent
+	MailingList.findByName(list.name)
+		.then(function (mailingList){
+			mailingList.set({sent : true}).save();
+		});
+
 	if (config.isDevelopment && !_isWhitelistedList(list.name)) {
 		handleOperationUnsuccessful(template, list.name, substitutions, LIST_NOT_WHITELISTED_REASON);
 		return _Promise.resolve(true);
@@ -213,9 +220,37 @@ function sendDisabled(recipients, template, substitutions) {
 	return _Promise.resolve(true);
 }
 
+
+/**
+ * Checks to see if an acceptance list was already sent
+ * @param  {Object} list				the internal list representation in question
+ * @return {Promise<true>}				an empty promise
+ */
+function checkIfSent(list) {
+	return MailingList
+		.findByName(list.name)
+		.then(function (mailingList) {
+			if(_.isNull(mailingList) || mailingList.attributes.sent){
+				var message = "List was already sent";
+				var source = "listName";
+				return _Promise.reject(new errors.InvalidParameterError(message, source));
+			}
+			return _Promise.resolve(true);
+		});
+}
+
+function markAsSent(list) {
+	return MailingList.findByName(list.name)
+		.then(function (mailingList){
+			mailingList.set({sent : true}).save();
+		});
+}
+
 module.exports.clientName = CLIENT_NAME;
 module.exports.addToList = addToList;
 module.exports.removeFromList = removeFromList;
+module.exports.checkIfSent = checkIfSent;
+module.exports.markAsSent = markAsSent;
 if (client.isEnabled) {
 	module.exports.send = send;
 	module.exports.sendToList = sendToList;

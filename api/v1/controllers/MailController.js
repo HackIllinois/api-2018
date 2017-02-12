@@ -12,12 +12,24 @@ var errors = require('../errors');
 var router = require('express').Router();
 
 
+var acceptanceLists = ["wave1", "wave2", "wave3", "wave4", "wave5"];
+
+
 function sendMailinglist(req, res, next) {
 	var listName = req.body.listName;
 	var mailList = mail.lists[listName]
 	var template = req.body.template;
 	
-	services.MailService.sendToList(mailList, template)
+	services.MailService.checkIfSent(mailList)
+		.then(function () {
+			return services.MailService.sendToList(mailList, template);
+		})
+		.then(function () {
+			if(acceptanceLists.includes(listName)){
+				return services.MailService.markAsSent(mailList);
+			}
+			return _Promise.resolve(true);
+		})
 		.then(function () {
 			res.body = {};
 			res.body.sent = true;
@@ -30,7 +42,6 @@ function sendMailinglist(req, res, next) {
 			return null;
 		});
 }
-
 
 
 router.use(bodyParser.json());
