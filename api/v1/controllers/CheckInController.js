@@ -1,5 +1,4 @@
 var bodyParser = require('body-parser');
-var _Promise = require('bluebird');
 
 var services = require('../services');
 var middleware = require('../middleware');
@@ -11,7 +10,7 @@ var router = require('express').Router();
 
 function updateCheckInByUserId (req, res, next) {
     services.CheckInService
-        .updateCheckin(req.body)
+        .updateCheckIn(req.body)
         .then(function (response){
             res.body = response.toJSON();
             return next();
@@ -62,10 +61,10 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.CreateCheckInRequest),
-    middleware.permission(roles.ORGANIZERS), createCheckIn)
+    middleware.permission(roles.ORGANIZERS), createCheckIn);
 router.put('/', middleware.request(requests.UpdateCheckInRequest),
     middleware.permission(roles.ORGANIZERS), updateCheckInByUserId);
-router.get('/user/:id', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);
+router.get('/user/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);
 router.get('/', fetchCheckInByUser);
 
 router.use(middleware.response);

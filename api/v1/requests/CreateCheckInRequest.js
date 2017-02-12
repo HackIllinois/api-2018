@@ -11,7 +11,7 @@ var bodyValidations = {
 };
 
 
-function CheckInRequest(headers, body) {
+function CreateCheckInRequest(headers, body) {
     Request.call(this, headers, body);
 
     this.bodyRequired = bodyRequired;
@@ -20,7 +20,7 @@ function CheckInRequest(headers, body) {
 };
 
 
-CheckInRequest.prototype = Object.create(Request.prototype);
-CheckInRequest.prototype.constructor = CheckInRequest;
+CreateCheckInRequest.prototype = Object.create(Request.prototype);
+CreateCheckInRequest.prototype.constructor = CreateCheckInRequest;
 
-module.exports = CheckInRequest;
+module.exports = CreateCheckInRequest;

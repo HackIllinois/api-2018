@@ -14,8 +14,9 @@ var CheckIn =  Model.extend({
     },
     parse: function (attrs) {
         attrs = Model.prototype.parse(attrs);
-        attrs.checkedIn = !!attrs.checkedIn;
-        attrs.swag = !!attrs.swag;
+        if (Number.isInteger(attrs.swag)) {
+            attrs.swag = !!attrs.swag
+        }
         return attrs;
     }
 });

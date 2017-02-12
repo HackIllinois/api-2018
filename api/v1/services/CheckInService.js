@@ -1,8 +1,10 @@
+var CheckitError = require('checkit').Error;
 var _ = require('lodash');
 
 var CheckIn = require('../models/CheckIn');
 var UserService = require('../services/UserService');
 var errors = require('../errors');
+var utils = require('../utils');
 
 
 /**
@@ -35,7 +37,7 @@ module.exports.updateCheckIn = function (attributes){
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
                 "location": attributes.location
-            }
+            };
             checkin.set(updates, {patch: true});
             return checkin.save();
         });
@@ -47,7 +49,6 @@ module.exports.updateCheckIn = function (attributes){
  * @returns {Promise} resolving to CheckIn object
  */
 module.exports.createCheckIn = function (attributes){
-
     return CheckIn.findByUserId(attributes.userId)
         .then(function (checkin){
             if (!_.isNull(checkin)) {
@@ -55,7 +56,12 @@ module.exports.createCheckIn = function (attributes){
                 var source = "userId";
                 throw new errors.InvalidParameterError(message, source);
             }
-            checkin = CheckIn.forge({ userId: attributes.id, location: attributes.location, swag: attributes.swag});
-            return checkin.save();
+            checkin = CheckIn.forge({ userId: attributes.userId, location: attributes.location, swag: attributes.swag});
+            return checkin
+                .validate()
+                .catch(CheckitError, utils.errors.handleValidationError)
+                .then(function(validation) {
+                    return checkin.save();
+                })
         });
 };

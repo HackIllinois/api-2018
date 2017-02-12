@@ -2,15 +2,16 @@ var Request = require('./Request');
 var checkin = require('../utils/check_in');
 
 
-var bodyRequired = [];
-var bodyAllowed = ['location', 'swag'];
+var bodyRequired = ['userId', 'location'];
+var bodyAllowed = ['swag'];
 var bodyValidations = {
-    location: ['string', checkin.verifyLocation],
+    userId: ['required', 'integer'],
+    location: ['required','string', checkin.verifyLocation],
     swag: ['boolean']
 };
 
 
-function CheckInRequest(headers, body) {
+function UpdateCheckInRequest(headers, body) {
     Request.call(this, headers, body);
 
     this.bodyRequired = bodyRequired;
@@ -19,7 +20,7 @@ function CheckInRequest(headers, body) {
 };
 
 
-CheckInRequest.prototype = Object.create(Request.prototype);
-CheckInRequest.prototype.constructor = CheckInRequest;
+UpdateCheckInRequest.prototype = Object.create(Request.prototype);
+UpdateCheckInRequest.prototype.constructor = UpdateCheckInRequest;
 
-module.exports = CheckInRequest;
+module.exports = UpdateCheckInRequest;

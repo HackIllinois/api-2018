@@ -10,6 +10,7 @@ module.exports = {
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
 	UploadRequest: require('./UploadRequest'),
-	CheckInRequest: require('./UpdateCheckInRequest'),
+	UpdateCheckInRequest: require('./UpdateCheckInRequest'),
+	CreateCheckInRequest: require('./CreateCheckInRequest'),
 	RSVPRequest: require('./RSVPRequest')
 };
