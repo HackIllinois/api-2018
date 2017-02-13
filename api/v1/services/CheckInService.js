@@ -50,18 +50,20 @@ module.exports.updateCheckIn = function (attributes){
  */
 module.exports.createCheckIn = function (attributes){
     return CheckIn.findByUserId(attributes.userId)
-        .then(function (checkin){
+        .then(function (checkin) {
             if (!_.isNull(checkin)) {
                 var message = "A check in record already exists for this user";
                 var source = "userId";
                 throw new errors.InvalidParameterError(message, source);
             }
+            return UserService.findUserById(attributes.userId);
+        })
+        .then(function(user) {
             checkin = CheckIn.forge({ userId: attributes.userId, location: attributes.location, swag: attributes.swag});
-            return checkin
-                .validate()
-                .catch(CheckitError, utils.errors.handleValidationError)
-                .then(function(validation) {
-                    return checkin.save();
-                })
+            return checkin.validate();
+        })
+        .catch(CheckitError, utils.errors.handleValidationError)
+        .then(function(validation) {
+            return checkin.save();
         });
 };
