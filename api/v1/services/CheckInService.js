@@ -49,9 +49,10 @@ module.exports.updateCheckIn = function (attributes){
  * @returns {Promise} resolving to CheckIn object
  */
 module.exports.createCheckIn = function (attributes){
+    var checkin;
     return CheckIn.findByUserId(attributes.userId)
-        .then(function (checkin) {
-            if (!_.isNull(checkin)) {
+        .then(function (existingCheckin) {
+            if (!_.isNull(existingCheckin)) {
                 var message = "A check in record already exists for this user";
                 var source = "userId";
                 throw new errors.InvalidParameterError(message, source);
