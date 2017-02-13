@@ -2,11 +2,10 @@ var Request = require('./Request');
 var checkin = require('../utils/check_in');
 
 
-var bodyRequired = ['userId', 'location'];
-var bodyAllowed = ['swag'];
+var bodyRequired = [];
+var bodyAllowed = ['swag', 'location'];
 var bodyValidations = {
-    userId: ['required', 'integer'],
-    location: ['required','string', checkin.verifyLocation],
+    location: ['string', checkin.verifyLocation],
     swag: ['boolean']
 };
 

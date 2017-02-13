@@ -36,7 +36,7 @@ module.exports.updateCheckIn = function (attributes){
         .then(function(checkin) {
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
-                "location": attributes.location
+                "location": attributes.location || checkin.get('location')
             };
             checkin.set(updates, {patch: true});
             return checkin.save();
