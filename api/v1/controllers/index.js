@@ -1,4 +1,5 @@
 module.exports = {
+	AnnouncementController: require('./AnnouncementController.js'),
 	AuthController: require('./AuthController.js'),
 	EcosystemController: require('./EcosystemController.js'),
 	UploadController: require('./UploadController.js'),

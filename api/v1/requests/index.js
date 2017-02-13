@@ -1,4 +1,5 @@
 module.exports = {
+	AnnouncementRequest: require('./AnnouncementRequest'),
 	AttendeeRequest: require('./AttendeeRequest'),
 	AttendeeDecisionRequest: require('./AttendeeDecisionRequest'),
 	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
