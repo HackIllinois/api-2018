@@ -1,15 +1,13 @@
+var CheckitError = require('checkit').Error;
 var _ = require('lodash');
+var _Promise = require('bluebird');
 
 var cache = require('../../cache').instance();
-var errors = require('../errors');
 var TrackingItem = require('../models/UniversalTrackingItem');
+var errors = require('../errors');
+var utils = require('../utils');
 
-module.exports.getActiveEvents = function () {
-    return TrackingItem.query(function (qb) {
-        qb.select(['id', 'name', 'count']).where(qb.knex.raw('DATEADD(ss, duration, created)'), '<', Date.now());
-    })
-    .fetchAll();
-};
+const TrackingFooter = "UniversalTracking";
 
 module.exports.createTrackingEvent = function (attributes) {
     var trackingItem = TrackingItem.forge(attributes);
@@ -17,55 +15,68 @@ module.exports.createTrackingEvent = function (attributes) {
     return trackingItem
         .validate()
         .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function () {
-            cache.multi()
-                .set(trackingItem.get('name'), true)
-                .expire(trackingItem.get('name'), trackingItem.get('duration'))
-                .exec()
-                .catch(function (err) {
-                    var message = err;
-                    var source = trackingItem.get('name');
-                    throw new errors.RedisError(message, source);
-                });
-
-            return trackingItem.save();
+        .then(function (validated) {
+            return TrackingItem.findByName(attributes.name);
         })
-};
-
-module.exports.addEventParticipant = function(eventName, participantId) {
-    return cache.get(eventName)
         .then(function (result) {
-            if(_.isNil(result)) {
-                var message = 'The eventname is invalid';
-                var source = eventName;
+            if (!_.isNull(result)) {
+                var message = "This event is already being tracked";
+                var source = "name";
                 throw new errors.InvalidParameterError(message, source);
             }
 
-            return cache.get(participantId + eventName)
+            return cache.getAsync('trackedEvent')
+        })
+        .then(function (result) {
+            if(!_.isNil(result)) {
+                return cache.ttlAsync('trackedEvent')
+                    .then(function (ttl) {
+                        var message = "An event is already being tracked at this time, seconds left: " + ttl;
+                        var source = trackingItem.get('name');
+                        return _Promise.reject(new errors.InvalidTrackingStateError(message, source));
+                    });
+            }
+
+            return cache.multi()
+                .set('trackedEvent', trackingItem.get('name'))
+                .expire('trackedEvent', trackingItem.get('duration'))
+                .execAsync()
+                .then(function () {
+                    return trackingItem.save();
+                });;
+        })
+};
+
+module.exports.addEventParticipant = function(participantId) {
+    return cache.getAsync('trackedEvent')
+        .then(function (currentEvent) {
+            if(_.isNil(currentEvent)) {
+                var message = "No event is currently being tracked";
+                var source = "EventTracking";
+                throw new errors.InvalidTrackingStateError(message, source);
+            }
+
+            return cache.getAsync(participantId + TrackingFooter)
                 .then(function (result) {
                     if(!_.isNil(result)) {
                         var message = 'This attendee has already participated in this event!';
                         var source = participantId;
-                        throw new errors.InvalidParameterError(message, source);
+                        return _Promise.reject(new errors.InvalidParameterError(message, source));
                     }
+
+                    return _Promise.resolve(currentEvent);
                 });
         })
-        .then(function () {
-           return cache.ttl(eventName)
+        .then(function (currentTrackedEvent) {
+           return cache.ttlAsync('trackedEvent')
                 .then(function (ttl) {
                     return cache.multi()
-                        .set(participantId + eventName, true)
-                        .expire(participantId + eventName, ttl)
-                        .exec()
-                        .catch(function (err) {
-                            var message = err;
-                            var source = eventName;
-                            throw new errors.RedisError(message, source);
+                        .set(participantId + TrackingFooter, true)
+                        .expire(participantId + TrackingFooter, ttl)
+                        .execAsync()
+                        .then(function () {
+                            return TrackingItem.query().where('name', currentTrackedEvent).increment('count',1);
                         });
-                })
-               .then(function () {
-                   TrackingItem.query().where('name', eventName).increment('count',1);
-                   return cache.get(participantId+eventName);
-               })
+                });
         });
 };
