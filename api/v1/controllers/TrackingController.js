@@ -33,10 +33,11 @@ function addTrackedEventParticipant(req, res, next) {
 }
 
 router.use(bodyParser.json());
+router.use(middleware.auth);
 
-router.post('/', middleware.auth, middleware.request(requests.UniversalTrackingRequest),
+router.post('/', middleware.request(requests.UniversalTrackingRequest),
     middleware.permission(roles.ORGANIZERS), createTrackedEvent);
-router.get('/:participantId', addTrackedEventParticipant);
+router.get('/:participantId', middleware.permission(roles.HOSTS), addTrackedEventParticipant);
 
 router.use(middleware.response);
 router.use(middleware.errors);
