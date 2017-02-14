@@ -11,6 +11,13 @@ var utils = require('../utils');
 const TrackingNamespace = "utracking_";
 const TrackedEvent = "trackedEvent";
 
+/**
+ * Allows an Admin to post a new tracking event if one is not being trucked
+ * @param {Object} attributes the attributes of the event to be tracked
+ * @return {Promise} resolving to the event model
+ * @throws {InvalidParameterError} when the provided event is already a tracked event
+ * @throws {InvalidTrackingStateError} when an active event is already occurring
+ */
 module.exports.createTrackingEvent = function (attributes) {
     var trackingItem = TrackingItem.forge(attributes);
 
@@ -51,6 +58,12 @@ module.exports.createTrackingEvent = function (attributes) {
         });
 };
 
+/**
+ * Allows a Host to determine if an attendee has already participated in a tracked event
+ * @param {Object} participantId the id of the user to track
+ * @throws {InvalidTrackingStateError} when there is no event being currently tracked
+ * @throws {InvalidParameterError} when an attendee has already participated in an event
+ */
 module.exports.addEventParticipant = function(participantId) {
     var currentEvent;
     return cache.getAsync(TrackedEvent)
@@ -81,7 +94,7 @@ module.exports.addEventParticipant = function(participantId) {
                 .execAsync();
         })
         .then(function () {
-            TrackingItem.query().where('name', currentTrackedEvent).increment('count',1);
+            TrackingItem.query().where('name', currentEvent).increment('count',1);
             return;
         });
 };
