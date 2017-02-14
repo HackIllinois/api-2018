@@ -1,7 +1,7 @@
 var UnprocessableRequestError = require('./UnprocessableRequestError.js');
 
-var ERROR_TYPE = 'TrackingInProgressError';
-var ERROR_TITLE = 'Tracking In Progress';
+var ERROR_TYPE = 'InvalidTrackingStateError';
+var ERROR_TITLE = 'Invalid Tracking State';
 var DEFAULT_MESSAGE = "An error occurred with the current state of the event tracking system";
 
 function TrackingInProgressError(message, source) {

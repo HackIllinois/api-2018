@@ -1,1 +1,1 @@
-DROP TABLE `event_tracking`;
+DROP TABLE `tracking_events`;

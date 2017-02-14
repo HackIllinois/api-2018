@@ -36,7 +36,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.UniversalTrackingRequest),
-    middleware.permission(roles.ORGANIZERS), createTrackedEvent);
+    middleware.permission(roles.ADMIN), createTrackedEvent);
 router.get('/:participantId', middleware.permission(roles.HOSTS), addTrackedEventParticipant);
 
 router.use(middleware.response);

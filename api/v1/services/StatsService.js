@@ -7,7 +7,7 @@ var Attendee = require('../models/Attendee');
 var AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest');
 var Ecosystem = require('../models/Ecosystem');
 var User = require('../models/User');
-var TrackedEvent = require('../models/UniversalTrackingItem');
+var TrackedEvent = require('../models/TrackingEvent');
 
 var errors = require('../errors');
 var utils = require('../utils');
