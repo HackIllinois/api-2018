@@ -8,5 +8,6 @@ module.exports = {
 	ProjectController: require('./ProjectController.js'),
 	HealthController: require('./HealthController.js'),
 	RSVPController: require('./RSVPController.js'),
-	StatsController: require('./StatsController.js')
+	StatsController: require('./StatsController.js'),
+	TrackingController: require('./TrackingController.js')
 };

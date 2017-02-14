@@ -10,4 +10,8 @@ var UniversalTrackingItem = Model.extend({
     }
 });
 
+UniversalTrackingItem.findByName = function (searchName) {
+    return UniversalTrackingItem.where({ name: searchName }).fetch();
+};
+
 module.exports = UniversalTrackingItem;
