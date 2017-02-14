@@ -4,9 +4,10 @@ var _ = require('lodash');
 var database = require('../../database');
 
 var Attendee = require('../models/Attendee');
-var AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest')
+var AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest');
 var Ecosystem = require('../models/Ecosystem');
 var User = require('../models/User');
+var TrackedEvent = require('../models/UniversalTrackingItem');
 
 var errors = require('../errors');
 var utils = require('../utils');
@@ -81,6 +82,19 @@ function _populateAttendees(cb){
 }
 
 /**
+ * Queries the current stats for tracked events
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateTrackedEvents(cb){
+    return TrackedEvent.query(function(qb){
+        qb.select('name', 'count').groupBy('name');
+    })
+        .fetchAll()
+        .then(cb);
+}
+
+/**
 * Fetches the current stats, requerying them if not cached
 * @return {Promise<Object>}	resolving to key-value pairs of stats
 */
@@ -94,7 +108,7 @@ module.exports.fetchStats = function () {
             });
         }
         else {
-            var stats = {}
+            var stats = {};
             var queries = [];
 
             var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
@@ -126,6 +140,9 @@ module.exports.fetchStats = function () {
 
             var attendeeQuery =  _populateAttendees(_populateStatsField('attendees', stats));
             queries.push(attendeeQuery);
+
+            var trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
+            queries.push(trackedEventQuery);
 
             return _Promise.all(queries)
             .then(function(){
