@@ -32,7 +32,7 @@ module.exports.createTrackingEvent = function (attributes) {
             if(!_.isNil(result)) {
                 return cache.ttlAsync('trackedEvent')
                     .then(function (ttl) {
-                        var message = "An event is already being tracked at this time, time left: " + ttl.toHMS();
+                        var message = result + " is already being tracked at this time, time left: " + ttl.toHMS();
                         var source = trackingItem.get('name');
                         return _Promise.reject(new errors.InvalidTrackingStateError(message, source));
                     });
