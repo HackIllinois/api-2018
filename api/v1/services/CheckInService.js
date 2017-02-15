@@ -50,22 +50,18 @@ module.exports.updateCheckIn = function (attributes){
  * @throws {InvalidParameterError} when the user has already checked in
  */
 module.exports.createCheckIn = function (attributes){
-    var checkin;
-    return CheckIn.findByUserId(attributes.userId)
+    var checkin = CheckIn.forge(attributes);
+    return checkin.validate()
+        .catch(CheckitError, utils.errors.handleValidationError)
+        .then(function(validation) {
+            return CheckIn.findByUserId(attributes.userId);
+        })
         .then(function (existingCheckin) {
             if (!_.isNull(existingCheckin)) {
                 var message = "A check in record already exists for this user";
                 var source = "userId";
                 throw new errors.InvalidParameterError(message, source);
             }
-            return UserService.findUserById(attributes.userId);
-        })
-        .then(function(user) {
-            checkin = CheckIn.forge({ userId: attributes.userId, location: attributes.location, swag: attributes.swag});
-            return checkin.validate();
-        })
-        .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function(validation) {
             return checkin.save();
         });
 };

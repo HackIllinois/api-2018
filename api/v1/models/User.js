@@ -64,6 +64,7 @@ User.create = function (email, password, role) {
 				return result.save();
 			});
 	}
+
 	return User
 		.transaction(function (t) {
 			return user.setPassword(password)
