@@ -307,7 +307,6 @@ module.exports.updateMentor = function (mentor, attributes) {
 * @throws {InvalidParameterError} when an attendee exists for the specified user
 */
 module.exports.createAttendee = function (user, attributes) {
-
 	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
 		var message = "One project or ecosystem interest must be provided";
 		var source = ['projects', 'ecosystemInterests'];
@@ -408,7 +407,6 @@ module.exports.updateAttendee = function (attendee, attributes) {
 	delete attributes.attendee;
 
 	var user = User.forge({ id: attendee.get('userId') });
-  
 	if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
 		// preferences were changed
 		if (attendee.get('status') !== 'ACCEPTED') {

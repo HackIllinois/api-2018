@@ -9,7 +9,7 @@ var router = require('express').Router();
 
 
 function updateCheckInByUserId (req, res, next) {
-    req.body["userId"] = req.params.id;
+    req.body.userId = req.params.id;
     services.CheckInService
         .updateCheckIn(req.body)
         .then(function (response){
@@ -46,7 +46,7 @@ function fetchCheckInByUser (req, res, next) {
 }
 
 function createCheckIn (req, res, next) {
-    req.body["userId"] = req.params.id;
+    req.body.userId = req.params.id;
     services.CheckInService
         .createCheckIn(req.body)
         .then(function (checkin){

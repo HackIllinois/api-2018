@@ -1,4 +1,3 @@
-
 var _ = require('lodash');
 
 var LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
