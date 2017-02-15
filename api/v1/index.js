@@ -28,6 +28,7 @@ v1.use('/project', controllers.ProjectController.router);
 v1.use('/ecosystem', controllers.EcosystemController.router);
 v1.use('/health', controllers.HealthController.router);
 v1.use('/rsvp', controllers.RSVPController.router);
+v1.use('/announcement', controllers.AnnouncementController.router);
 v1.use('/stats', controllers.StatsController.router);
 v1.use('/mail', controllers.MailController.router);
 
