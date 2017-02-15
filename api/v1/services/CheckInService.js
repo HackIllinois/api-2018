@@ -45,8 +45,9 @@ module.exports.updateCheckIn = function (attributes){
 
 /**
  * Creates a CheckIn object for given user with the given attributes
- * @param {Object} attributes values requested
+ * @param {Object} attribute values requested
  * @returns {Promise} resolving to CheckIn object
+ * @throws {InvalidParameterError} when the user has already checked in
  */
 module.exports.createCheckIn = function (attributes){
     var checkin;
