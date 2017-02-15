@@ -1,4 +1,5 @@
 module.exports = {
+	AnnouncementController: require('./AnnouncementController.js'),
 	AuthController: require('./AuthController.js'),
 	EcosystemController: require('./EcosystemController.js'),
 	UploadController: require('./UploadController.js'),
@@ -9,5 +10,6 @@ module.exports = {
 	HealthController: require('./HealthController.js'),
 	CheckInController: require('./CheckInController.js'),
 	RSVPController: require('./RSVPController.js'),
-	StatsController: require('./StatsController.js')
+	StatsController: require('./StatsController.js'),
+	MailController: require('./MailController.js')
 };

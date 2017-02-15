@@ -10,6 +10,7 @@ var mail = require('../utils/mail');
 var registration = require('../utils/registration');
 var errors = require('../errors');
 
+
 var router = require('express').Router();
 
 function _isAuthenticated (req) {

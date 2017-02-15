@@ -1,0 +1,2 @@
+ALTER TABLE `mailing_lists`
+ADD COLUMN `sent` TINYINT(1) NULL DEFAULT 0 AFTER `name`;
