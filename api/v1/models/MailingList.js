@@ -6,7 +6,10 @@ var MailingListUser = require('./MailingListUser');
 
 var MailingList = Model.extend({
 	tableName: 'mailing_lists',
-	idAttribute: 'id'
+	idAttribute: 'id',
+	validations: {
+		sent: ['boolean']
+	}
 });
 
 /**

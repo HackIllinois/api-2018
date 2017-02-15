@@ -513,7 +513,8 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 * @return {Promise} resolving to a the list of attendees
 */
 module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
-	var ordering = (ascending ? '' : '-') + category;
+	var ordering = (ascending ? '' : '-') + utils.database.format(category);
+	filterCategory = utils.database.format(filterCategory);
 	return Attendee
 		.query(function (qb) {
 			qb.where(filterCategory, '=', filterVal);
