@@ -9,6 +9,7 @@ module.exports = {
 	ProjectMentorRequest: require('./ProjectMentorRequest'),
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
+	SendListRequest: require('./SendListRequest'),
 	UploadRequest: require('./UploadRequest'),
 	RSVPRequest: require('./RSVPRequest')
 };
