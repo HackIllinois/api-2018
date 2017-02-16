@@ -13,5 +13,6 @@ module.exports = {
 	UserRole: require('./UserRole'),
 	Token: require('./Token'),
 	Mentor: require('./Mentor'),
-	MentorProjectIdea: require('./MentorProjectIdea')
+	MentorProjectIdea: require('./MentorProjectIdea'),
+	UniversalTrackingItem: require('./TrackingEvent')
 };

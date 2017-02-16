@@ -11,3 +11,11 @@ module.exports.unix = function () {
 module.exports.toMilliseconds = function (description) {
 	return milliseconds(description);
 };
+
+module.exports.secondsToHHMMSS = function (numSeconds) {
+	numSeconds = Number(numSeconds);
+	var h = Math.floor(numSeconds / 3600);
+	var m = Math.floor(numSeconds % 3600 / 60);
+	var s = Math.floor(numSeconds % 3600 % 60);
+	return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s);
+};

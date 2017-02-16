@@ -12,5 +12,6 @@ module.exports = {
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
 	SendListRequest: require('./SendListRequest'),
 	UploadRequest: require('./UploadRequest'),
-	RSVPRequest: require('./RSVPRequest')
+	RSVPRequest: require('./RSVPRequest'),
+	UniversalTrackingRequest: require('./UniversalTrackingRequest')
 };
