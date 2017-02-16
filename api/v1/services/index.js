@@ -10,5 +10,6 @@ module.exports = {
 	UserService: require('./UserService'),
 	TokenService: require('./TokenService'),
 	CheckInService: require('./CheckInService'),
-	RSVPService: require('./RSVPService')
+	RSVPService: require('./RSVPService'),
+	TrackingService: require('./TrackingService')
 };

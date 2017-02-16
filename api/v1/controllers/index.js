@@ -11,5 +11,6 @@ module.exports = {
 	CheckInController: require('./CheckInController.js'),
 	RSVPController: require('./RSVPController.js'),
 	StatsController: require('./StatsController.js'),
+	TrackingController: require('./TrackingController.js'),
 	MailController: require('./MailController.js')
 };

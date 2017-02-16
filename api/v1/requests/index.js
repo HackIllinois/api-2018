@@ -14,5 +14,6 @@ module.exports = {
 	UploadRequest: require('./UploadRequest'),
 	UpdateCheckInRequest: require('./UpdateCheckInRequest'),
 	CreateCheckInRequest: require('./CreateCheckInRequest'),
-	RSVPRequest: require('./RSVPRequest')
+	RSVPRequest: require('./RSVPRequest'),
+	UniversalTrackingRequest: require('./UniversalTrackingRequest')
 };

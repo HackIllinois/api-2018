@@ -5,6 +5,7 @@ module.exports = {
 	AttendeeProjectInterest: require('./AttendeeProjectInterest'),
 	AttendeeRequestedCollaborator: require('./AttendeeRequestedCollaborator'),
 	AttendeeRSVP: require('./AttendeeRSVP'),
+	CheckIn: require('./CheckIn'),
 	Project: require('./Project'),
 	Ecosystem: require('./Ecosystem'),
 	MailingList: require('./MailingList'),
@@ -14,5 +15,5 @@ module.exports = {
 	Token: require('./Token'),
 	Mentor: require('./Mentor'),
 	MentorProjectIdea: require('./MentorProjectIdea'),
-	CheckIn: require('./CheckIn')
+	UniversalTrackingItem: require('./TrackingEvent')
 };
