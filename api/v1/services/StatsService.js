@@ -4,6 +4,7 @@ var _ = require('lodash');
 var database = require('../../database');
 
 var Attendee = require('../models/Attendee');
+var AttendeeRSVP = require('../models/AttendeeRSVP');
 var AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest')
 var Ecosystem = require('../models/Ecosystem');
 var User = require('../models/User');
@@ -48,6 +49,19 @@ function _populateStatsField(key, stats){
 function _populateEcosystems(cb){
     return AttendeeEcosystemInterest.query(function(qb){
         qb.select('e.name').count('ecosystem_id as count').from('attendee_ecosystem_interests as aei').innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id').groupBy('aei.ecosystem_id');
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+/**
+ * Queries Attendee ecosystems interests and performs a callback on the results
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateRSVPs(cb){
+    return AttendeeRSVP.query(function(qb){
+        qb.select('is_attending as name').count('is_attending as count').from('attendee_rsvps').groupBy('is_attending');
     })
     .fetchAll()
     .then(cb);
@@ -126,6 +140,12 @@ module.exports.fetchStats = function () {
 
             var attendeeQuery =  _populateAttendees(_populateStatsField('attendees', stats));
             queries.push(attendeeQuery);
+
+            var statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
+            queries.push(statusQuery);
+
+            var RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
+            queries.push(RSVPsQuery);
 
             return _Promise.all(queries)
             .then(function(){
