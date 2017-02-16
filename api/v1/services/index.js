@@ -9,6 +9,7 @@ module.exports = {
 	StorageService: require('./StorageService'),
 	UserService: require('./UserService'),
 	TokenService: require('./TokenService'),
+	CheckInService: require('./CheckInService'),
 	RSVPService: require('./RSVPService'),
 	TrackingService: require('./TrackingService')
 };
