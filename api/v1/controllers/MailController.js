@@ -25,7 +25,7 @@ function sendMailinglist(req, res, next) {
 			return services.MailService.sendToList(mailList, template);
 		})
 		.then(function () {
-			if(acceptanceLists.includes(listName)){
+			if(_.includes(acceptanceLists, listName)){
 				return services.MailService.markAsSent(mailList);
 			}
 			return _Promise.resolve(true);
