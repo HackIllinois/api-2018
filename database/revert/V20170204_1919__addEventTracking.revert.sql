@@ -1,0 +1,1 @@
+DROP TABLE `tracking_events`;

@@ -11,6 +11,7 @@ module.exports = {
 	RedisError: require ('./RedisError.js'),
 	NotFoundError: require('./NotFoundError.js'),
 	TokenExpirationError: require('./TokenExpirationError.js'),
+	InvalidTrackingStateError: require('./InvalidTrackingStateError'),
 	UnauthorizedError: require('./UnauthorizedError.js'),
 	UnprocessableRequestError: require('./UnprocessableRequestError.js')
 };
