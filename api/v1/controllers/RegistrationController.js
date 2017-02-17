@@ -10,6 +10,7 @@ var mail = require('../utils/mail');
 var registration = require('../utils/registration');
 var errors = require('../errors');
 
+
 var router = require('express').Router();
 
 function _isAuthenticated (req) {
@@ -167,7 +168,7 @@ function fetchAttendeeByUser(req, res, next) {
 		.findAttendeeByUser(req.user, true)
 		.then(function(attendee){
 			res.body = attendee.toJSON();
-			delete res.body.data.reviewer;
+			delete res.body.reviewer;
 
 			next();
 			return null;
@@ -203,6 +204,7 @@ function updateAttendeeByUser(req, res, next) {
 		})
 		.then(function(attendee){
 			res.body = attendee.toJSON();
+			delete res.body.reviewer;
 
 			next();
 			return null;

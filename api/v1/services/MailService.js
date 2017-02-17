@@ -12,6 +12,7 @@ var _ = require('lodash');
 var config = require('../../config');
 var logger = require('../../logging');
 var files = require('../../files');
+var errors = require('../errors');
 
 var ExternalProviderError = require('../errors/ExternalProviderError');
 var MailingList = require('../models/MailingList');
@@ -213,9 +214,37 @@ function sendDisabled(recipients, template, substitutions) {
 	return _Promise.resolve(true);
 }
 
+
+/**
+ * Checks to see if an acceptance list was already sent
+ * @param  {Object} list				the internal list representation in question
+ * @return {Promise<true>}				an empty promise
+ */
+function checkIfSent(list) {
+	return MailingList
+		.findByName(list.name)
+		.then(function (mailingList) {
+			if(_.isNull(mailingList) || mailingList.attributes.sent){
+				var message = "List was already sent";
+				var source = "listName";
+				return _Promise.reject(new errors.InvalidParameterError(message, source));
+			}
+			return _Promise.resolve(true);
+		});
+}
+
+function markAsSent(list) {
+	return MailingList.findByName(list.name)
+		.then(function (mailingList){
+			mailingList.set({sent : true}).save();
+		});
+}
+
 module.exports.clientName = CLIENT_NAME;
 module.exports.addToList = addToList;
 module.exports.removeFromList = removeFromList;
+module.exports.checkIfSent = checkIfSent;
+module.exports.markAsSent = markAsSent;
 if (client.isEnabled) {
 	module.exports.send = send;
 	module.exports.sendToList = sendToList;

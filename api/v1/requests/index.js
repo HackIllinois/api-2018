@@ -1,4 +1,5 @@
 module.exports = {
+	AnnouncementRequest: require('./AnnouncementRequest'),
 	AttendeeRequest: require('./AttendeeRequest'),
 	AttendeeDecisionRequest: require('./AttendeeDecisionRequest'),
 	AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),
@@ -9,5 +10,10 @@ module.exports = {
 	ProjectMentorRequest: require('./ProjectMentorRequest'),
 	ResetTokenRequest: require('./ResetTokenRequest'),
 	ResetPasswordRequest: require('./ResetPasswordRequest'),
-	UploadRequest: require('./UploadRequest')
+	SendListRequest: require('./SendListRequest'),
+	UploadRequest: require('./UploadRequest'),
+	UpdateCheckInRequest: require('./UpdateCheckInRequest'),
+	CreateCheckInRequest: require('./CreateCheckInRequest'),
+	RSVPRequest: require('./RSVPRequest'),
+	UniversalTrackingRequest: require('./UniversalTrackingRequest')
 };

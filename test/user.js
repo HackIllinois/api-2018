@@ -10,10 +10,9 @@ var User = require('../api/v1/models/User.js');
 
 var assert = chai.assert;
 var expect = chai.expect;
-var tracker = require('mock-knex').getTracker();
 
-describe('UserService',function(){
-	describe('createUser', function () {
+describe('UserService',function() {
+	describe('createUser', function() {
 		var _createUser;
 		var _findByEmail;
 
@@ -88,12 +87,12 @@ describe('UserService',function(){
 			var testUser = User.forge({ id: 1, email: 'new@example.com' });
 			testUser.setPassword('password123');
 
-				_findById = sinon.stub(User, 'findById');
+			_findById = sinon.stub(User, 'findById');
 
-				_findById.withArgs(1).returns(_Promise.resolve(testUser));
-				_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+			_findById.withArgs(1).returns(_Promise.resolve(testUser));
+			_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 
-				done();
+			done();
 		});
 		it('finds existing user',function(done){
 			var user = UserService.findUserById(1);
@@ -158,51 +157,5 @@ describe('UserService',function(){
 			_save.restore();
 			done();
 		});
-	});
-
-	describe('deleteUser', function() {
-		var toDeleteUser;
-		var invalidToDeleteUser;
-		var _destroy;
-		before(function(done) {
-			toDeleteUser = User.forge({ id: 1, email: 'to@delete.com'});
-			invalidToDeleteUser = User.forge({ id: 2, email: 'cant@delete.com'});
-			invalidToDeleteUser.related('roles').add({ role: utils.roles.ATTENDEE});
-
-			_destroy = sinon.spy(User.prototype,'destroy');
-
-			done();
-		});
-		beforeEach(function (done) {
-			tracker.install();
-			done();
-		});
-		it('deletes a user with no role', function(done) {
-			tracker.on('query', function (query) {
-				query.response([]);
-			});
-
-			var deleteValid = UserService.deleteUser(toDeleteUser);
-			deleteValid.then(function () {
-					assert(_destroy.calledOnce, "User destroy not called");
-
-					done();
-				})
-				.catch(function (err) {
-					done(err);
-				});
-		});
-		it('throws an exception when deleting a user with a role', function(done) {
-			var invalidDeletion = UserService.deleteUser(invalidToDeleteUser);
-			expect(invalidDeletion).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done)
-		});
-		afterEach(function (done) {
-			tracker.uninstall();
-			done();
-		});
-		after(function(done) {
-			_destroy.restore();
-			done();
-		});
-	});
+	})
 });

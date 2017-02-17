@@ -118,13 +118,3 @@ module.exports.resetPassword = function (user, password) {
 			return updated.save();
 		});
 };
-
-module.exports.deleteUser = function (user) {
-	if(user.hasRoles(utils.roles.ALL, false)) {
-		var message = "The provided user has a role and can not be deleted";
-		var source = null;
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
-
-	return user.destroy();
-};

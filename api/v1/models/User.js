@@ -9,6 +9,7 @@ const SALT_ROUNDS = 12;
 var Model = require('./Model');
 
 var UserRole = require('./UserRole');
+var CheckIn = require('./CheckIn');
 var User = Model.extend({
 	tableName: 'users',
 	idAttribute: 'id',
@@ -19,6 +20,9 @@ var User = Model.extend({
 	},
 	roles: function () {
 		return this.hasMany(UserRole);
+	},
+	checkIn: function () {
+		return this.hasOne(CheckIn);
 	}
 });
 
@@ -56,9 +60,9 @@ User.create = function (email, password, role) {
 	if(!role){
 		// No roles were provided, so create the User
 		return user.setPassword(password)
-		.then(function(result){
-			return result.save();
-		});
+			.then(function(result){
+				return result.save();
+			});
 	}
 
 	return User
@@ -99,8 +103,8 @@ User.prototype.setPassword = function (password) {
  * @return {UserRole}	 the desired role, or undefined
  */
 User.prototype.getRole = function (role) {
-	return _.find(this.related('roles').models, function (role) {
-		return role.role === role;
+	return _.find(this.related('roles').models, function (roleInUser) {
+		return roleInUser.get('role') === role;
 	});
 };
 
