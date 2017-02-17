@@ -22,7 +22,16 @@ module.exports.findCheckInByUserId = function (userId){
                 var source = "userId";
                 throw new errors.NotFoundError(message, source);
             }
-            return checkin;
+            NetworkCredential.findByUserId(userId)
+            .then(function(credentials){
+                if (!_.isNull(credentials)) {
+                    return {
+                        "checkin": checkin,
+                        "credentials": credentials
+                    };
+                }
+                return {"checkin": checkin};
+            })
         })
 };
 
@@ -39,7 +48,7 @@ module.exports.updateCheckIn = function (attributes){
                 "location": attributes.location || checkin.get('location')
             };
             checkin.set(updates, {patch: true});
-            return checkin.save();
+            return {"checkin": checkin.save()};
         });
 };
 
@@ -62,6 +71,30 @@ module.exports.createCheckIn = function (attributes){
                 var source = "userId";
                 throw new errors.InvalidParameterError(message, source);
             }
-            return checkin.save();
+            return CheckIn.transaction(function (t) {
+                return checkin.save({transacting: t})
+                .then(function(model){
+                    if(attributes.credentialsRequested){
+                        return NetworkCredentials.findUnassigned()
+                        .then(function(networkCredential){
+                            var updates = {
+                                "userId": attributes.userId,
+                                "assigned": true
+                            };
+                            networkCredential.set(updates);
+                            return networkCredential.save({transacting: t})
+                            .then(function(creds){
+                                return {
+                                    "checkin": model,
+                                    "credentials": creds
+                                };
+                            });
+                        });
+                    }
+                    else {
+                        return {"checkin": model};
+                    }
+                });
+            });
         });
 };
