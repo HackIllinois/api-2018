@@ -123,7 +123,7 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
-router.get('/email/:email', middleware.permission(roles.ORGANIZERS), getUserByEmail);
+router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
 
 router.use(middleware.response);
 router.use(middleware.errors);

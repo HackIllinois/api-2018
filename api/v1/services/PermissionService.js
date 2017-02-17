@@ -44,7 +44,7 @@ module.exports.canCreateProject = function (creator) {
 
 
 /**
- * Checks to see if a requestor is an organizer (or superuser)
+ * Checks to see if a requester is an organizer (or superuser)
  * @param  {User} user to check roles for
  * @return {Promise} resolving to true if the user is an organizer, false otherwise
  */
@@ -60,4 +60,20 @@ module.exports.isOrganizer = function (user){
 	// return false
 	return _Promise.resolve(false);
 
-}
+};
+
+/**
+ * Checks to see if a requester is a host
+ * @param  {User} user to check roles for
+ * @return {Promise} resolving to true if the user is a host, false otherwise
+ */
+module.exports.isOrganizer = function (user){
+	if (user.hasRole(roles.SUPERUSER)) {
+		return _Promise.resolve(true);
+	}
+	if (user.hasRoles(roles.HOSTS)) {
+		return _Promise.resolve(true);
+	}
+	return _Promise.resolve(false);
+
+};
