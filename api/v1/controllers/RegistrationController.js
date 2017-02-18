@@ -352,6 +352,25 @@ function filterAttendees(req, res, next) {
 		});
 }
 
+function fetchAttendeeForVolunteer(req, res, next) {
+	services.UserService.findUserById(req.params.id)
+		.then(function(user) {
+			return services.RegistrationService.findAttendeeByUser(user, false);
+		})
+		.then(function (attendee) {
+			res.body = {};
+			res.body.firstName = attendee.get('firstName');
+			res.body.lastName = attendee.get('lastName');
+			res.body.shirtSize = attendee.get('shirtSize');
+			res.body.diet = attendee.get('diet');
+
+			return next();
+		})
+		.catch(function (error) {
+			return next(error);
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -377,6 +396,8 @@ router.put('/attendee/decision/:id',  middleware.request(requests.AttendeeDecisi
 	middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
+
+router.get('/attendee/byuser/:id(\\d+)', middleware.permission(roles.HOSTS), fetchAttendeeForVolunteer);
 
 router.use(middleware.response);
 router.use(middleware.errors);
