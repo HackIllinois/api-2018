@@ -352,7 +352,7 @@ function filterAttendees(req, res, next) {
 		});
 }
 
-function fetchAttendeeForVolunteer(req, res, next) {
+function fetchAttendeeForHost(req, res, next) {
 	services.UserService.findUserById(req.params.id)
 		.then(function(user) {
 			return services.RegistrationService.findAttendeeByUser(user, false);
@@ -396,8 +396,7 @@ router.put('/attendee/decision/:id',  middleware.request(requests.AttendeeDecisi
 	middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
 	middleware.permission(roles.ORGANIZERS), updateAttendeeById);
-
-router.get('/attendee/byuser/:id(\\d+)', middleware.permission(roles.HOSTS), fetchAttendeeForVolunteer);
+router.get('/attendee/user/:id(\\d+)', middleware.permission(roles.HOSTS), fetchAttendeeForHost);
 
 router.use(middleware.response);
 router.use(middleware.errors);
