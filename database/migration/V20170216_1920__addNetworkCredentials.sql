@@ -5,8 +5,8 @@ CREATE TABLE `network_credentials` (
   `password` VARCHAR(25) NOT NULL,
   `assigned` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  INDEX `fk_attendees_user_id_idx` (`user_id` ASC),
-  CONSTRAINT `fk_attendees_user_id`
+  INDEX `fk_network_credentials_user_id_idx` (`user_id` ASC),
+  CONSTRAINT `fk_network_credentials_user_id`
 	FOREIGN KEY (`user_id`)
 	REFERENCES `users` (`id`)
 	ON DELETE NO ACTION

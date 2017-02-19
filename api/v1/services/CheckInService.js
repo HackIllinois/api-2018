@@ -2,6 +2,7 @@ var CheckitError = require('checkit').Error;
 var _ = require('lodash');
 
 var CheckIn = require('../models/CheckIn');
+var CheckIn = require('../models/NetworkCredential');
 var UserService = require('../services/UserService');
 var errors = require('../errors');
 var utils = require('../utils');
@@ -59,6 +60,8 @@ module.exports.updateCheckIn = function (attributes){
  * @throws {InvalidParameterError} when the user has already checked in
  */
 module.exports.createCheckIn = function (attributes){
+    var credentialsRequested =  attributes.credentialsRequested;
+    delete attributes.credentialsRequested;
     var checkin = CheckIn.forge(attributes);
     return checkin.validate()
         .catch(CheckitError, utils.errors.handleValidationError)
@@ -72,17 +75,18 @@ module.exports.createCheckIn = function (attributes){
                 throw new errors.InvalidParameterError(message, source);
             }
             return CheckIn.transaction(function (t) {
-                return checkin.save({transacting: t})
+                return checkin.save(null, {transacting: t})
                 .then(function(model){
-                    if(attributes.credentialsRequested){
-                        return NetworkCredentials.findUnassigned()
+                    if(credentialsRequested){
+                        return NetworkCredential.findUnassigned()
                         .then(function(networkCredential){
                             var updates = {
                                 "userId": attributes.userId,
                                 "assigned": true
                             };
-                            networkCredential.set(updates);
-                            return networkCredential.save({transacting: t})
+                            console.log(networkCredential);
+
+                            return networkCredential.save(updates, {transacting: t, patch:true})
                             .then(function(creds){
                                 return {
                                     "checkin": model,
