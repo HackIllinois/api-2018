@@ -363,6 +363,10 @@ function fetchAttendeeForHost(req, res, next) {
 			res.body.lastName = attendee.get('lastName');
 			res.body.shirtSize = attendee.get('shirtSize');
 			res.body.diet = attendee.get('diet');
+			res.body.status = attendee.get('status');
+			res.body.school = attendee.get('school');
+			res.body.acceptanceType = attendee.get('acceptanceType');
+			res.body.acceptedEcosystemId = attendee.get('acceptedEcosystemId');
 
 			return next();
 		})
