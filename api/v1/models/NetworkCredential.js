@@ -2,7 +2,7 @@ var utils = require('../utils');
 
 var Model = require('./Model');
 var NetworkCredential = Model.extend({
-	tableName: 'attendees',
+	tableName: 'network_credentials',
 	idAttribute: 'id',
 	validations: {
 		userId:    ['required', 'integer'],

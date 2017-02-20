@@ -2,7 +2,7 @@ var CheckitError = require('checkit').Error;
 var _ = require('lodash');
 
 var CheckIn = require('../models/CheckIn');
-var CheckIn = require('../models/NetworkCredential');
+var NetworkCredential = require('../models/NetworkCredential');
 var UserService = require('../services/UserService');
 var errors = require('../errors');
 var utils = require('../utils');
@@ -23,7 +23,7 @@ module.exports.findCheckInByUserId = function (userId){
                 var source = "userId";
                 throw new errors.NotFoundError(message, source);
             }
-            NetworkCredential.findByUserId(userId)
+            return NetworkCredential.findByUserId(userId)
             .then(function(credentials){
                 if (!_.isNull(credentials)) {
                     return {
@@ -42,14 +42,27 @@ module.exports.findCheckInByUserId = function (userId){
  * @returns {Promise} the resolved CheckIn for the user
  */
 module.exports.updateCheckIn = function (attributes){
-    return module.exports.findCheckInByUserId(attributes.userId)
+    return CheckIn
+        .findByUserId(attributes.userId)
         .then(function(checkin) {
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
                 "location": attributes.location || checkin.get('location')
             };
             checkin.set(updates, {patch: true});
-            return {"checkin": checkin.save()};
+            return checkin.save()
+            .then(function(model){
+                return NetworkCredential.findByUserId(attributes.userId)
+                .then(function(credentials){
+                    if (!_.isNull(credentials)) {
+                        return {
+                            "checkin": model,
+                            "credentials": credentials
+                        };
+                    }
+                    return {"checkin": model};
+                })
+            })
         });
 };
 
@@ -84,8 +97,6 @@ module.exports.createCheckIn = function (attributes){
                                 "userId": attributes.userId,
                                 "assigned": true
                             };
-                            console.log(networkCredential);
-
                             return networkCredential.save(updates, {transacting: t, patch:true})
                             .then(function(creds){
                                 return {
