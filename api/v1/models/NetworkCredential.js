@@ -2,7 +2,7 @@ var utils = require('../utils');
 
 var Model = require('./Model');
 var NetworkCredential = Model.extend({
-	tableName: 'attendees',
+	tableName: 'network_credentials',
 	idAttribute: 'id',
 	validations: {
 		userId:    ['required', 'integer'],
@@ -10,7 +10,6 @@ var NetworkCredential = Model.extend({
 		password:  ['required', 'string', 'maxLength:25'],
 		assigned:  ['required', 'boolean']
 	}
-
 });
 
 
@@ -37,6 +36,7 @@ NetworkCredential.findById = function (id) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 NetworkCredential.findUnassigned = function () {
+	// return NetworkCredential.where({ assigned: 0 }).fetch();
 	return NetworkCredential.where({ assigned: 0 }).fetch();
 };
 

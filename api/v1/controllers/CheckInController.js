@@ -13,7 +13,8 @@ function updateCheckInByUserId (req, res, next) {
     services.CheckInService
         .updateCheckIn(req.body)
         .then(function (response){
-            res.body = response.toJSON();
+            console.log(response.checkin.toJSON());
+            res.body = response.checkin.toJSON();
             return next();
         })
         .catch(function (error){
@@ -24,8 +25,13 @@ function updateCheckInByUserId (req, res, next) {
 function fetchCheckInByUserId (req, res, next) {
     services.CheckInService
         .findCheckInByUserId(req.params.id)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (fetchedCheckin){
+            var body = {};
+            body.checkin = fetchedCheckin.checkin.toJSON();
+            if (fetchedCheckin.credentials) {
+                body.credentials = fetchedCheckin.credentials.toJSON()
+            }
+            res.body = body;
             return next();
         })
         .catch(function (error){
@@ -36,8 +42,13 @@ function fetchCheckInByUserId (req, res, next) {
 function fetchCheckInByUser (req, res, next) {
     services.CheckInService
         .findCheckInByUserId(req.user.id)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (fetchedCheckin){
+            var body = {};
+            body.checkin = fetchedCheckin.checkin.toJSON();
+            if (fetchedCheckin.credentials) {
+                body.credentials = fetchedCheckin.credentials.toJSON()
+            }
+            res.body = body;
             return next();
         })
         .catch(function (error){
@@ -49,8 +60,13 @@ function createCheckIn (req, res, next) {
     req.body.userId = req.params.id;
     services.CheckInService
         .createCheckIn(req.body)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (createdCheckin){
+            var body = {};
+            body.checkin = createdCheckin.checkin.toJSON();
+            if (createdCheckin.credentials) {
+                body.credentials = createdCheckin.credentials.toJSON()
+            }
+            res.body = body;
             return next();
         })
         .catch(function (error){

@@ -12,7 +12,6 @@ var bodyValidations = {
 function UpdateCheckInRequest(headers, body) {
     Request.call(this, headers, body);
 
-    this.bodyRequired = bodyRequired;
     this.bodyAllowed = bodyAllowed;
     this.bodyValidations = bodyValidations;
 };

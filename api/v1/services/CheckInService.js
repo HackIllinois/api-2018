@@ -1,8 +1,9 @@
 var CheckitError = require('checkit').Error;
 var _ = require('lodash');
+var _Promise = require('bluebird');
 
 var CheckIn = require('../models/CheckIn');
-var CheckIn = require('../models/NetworkCredential');
+var NetworkCredential = require('../models/NetworkCredential');
 var UserService = require('../services/UserService');
 var errors = require('../errors');
 var utils = require('../utils');
@@ -11,7 +12,7 @@ var utils = require('../utils');
 /**
  * Finds a CheckIn by User ID
  * @param {Number} userId id of requested user
- * @returns {Promise} the resolved CheckIn for the user
+ * @returns {Promise} the resolving to obect {checkin: {CheckIn object}, credentials: {Credential object}}
  * @throws {NotFoundError} when the user has no check in
  */
 module.exports.findCheckInByUserId = function (userId){
@@ -23,7 +24,7 @@ module.exports.findCheckInByUserId = function (userId){
                 var source = "userId";
                 throw new errors.NotFoundError(message, source);
             }
-            NetworkCredential.findByUserId(userId)
+            return NetworkCredential.findByUserId(userId)
             .then(function(credentials){
                 if (!_.isNull(credentials)) {
                     return {
@@ -39,11 +40,12 @@ module.exports.findCheckInByUserId = function (userId){
 /**
  * Updates the CheckIn values to request
  * @param {Obejct} attributes to be updated
- * @returns {Promise} the resolved CheckIn for the user
+ * @returns {Promise} the resolved obect {checkin: {CheckIn object}}
  */
 module.exports.updateCheckIn = function (attributes){
     return module.exports.findCheckInByUserId(attributes.userId)
-        .then(function(checkin) {
+        .then(function(fetchedCheckin) {
+            checkin = fetchedCheckin.checkin;
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
                 "location": attributes.location || checkin.get('location')
@@ -56,7 +58,7 @@ module.exports.updateCheckIn = function (attributes){
 /**
  * Creates a CheckIn object for given user with the given attributes
  * @param {Object} attribute values requested
- * @returns {Promise} resolving to CheckIn object
+ * @returns {Promise} resolving to obect {checkin: {CheckIn object}, credentials: {Credential object}}
  * @throws {InvalidParameterError} when the user has already checked in
  */
 module.exports.createCheckIn = function (attributes){
@@ -80,11 +82,16 @@ module.exports.createCheckIn = function (attributes){
                     if(credentialsRequested){
                         return NetworkCredential.findUnassigned()
                         .then(function(networkCredential){
+                            if (_.isNull(networkCredential)) {
+                                var message = "There are no more unassigned credentials";
+                                var source = "credentialsRequested";
+                                throw new errors.NotFoundError(message, source);
+                            }
+
                             var updates = {
                                 "userId": attributes.userId,
                                 "assigned": true
                             };
-                            console.log(networkCredential);
 
                             return networkCredential.save(updates, {transacting: t, patch:true})
                             .then(function(creds){
