@@ -27,9 +27,24 @@ function isOrganizer(req, res, next) {
 		});
 }
 
+function isHost(req, res, next) {
+	var user = req.user;
+	PermissionService.isHost(user)
+		.then(function (isHost) {
+			res.body = {};
+			res.body.allowed = isHost;
+
+			return next();
+		})
+		.catch(function (error) {
+			return next(error);
+		});
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
+router.get('/host', middleware.permission(roles.ALL), isHost);
 router.get('/organizer', middleware.permission(roles.ALL), isOrganizer);
 
 router.use(middleware.response);

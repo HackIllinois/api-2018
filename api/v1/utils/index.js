@@ -11,5 +11,6 @@ module.exports = {
 	time: require('./time.js'),
 	registration: require('./registration.js'),
 	validators: require('./validators.js'),
-	cache: require("./cache.js")
+	cache: require("./cache.js"),
+	checkin: require("./check_in.js")
 };
