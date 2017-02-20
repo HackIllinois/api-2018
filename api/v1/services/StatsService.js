@@ -2,6 +2,7 @@ var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var database = require('../../database');
+var knex = database.connection();
 
 var Attendee = require('../models/Attendee');
 var AttendeeRSVP = require('../models/AttendeeRSVP');
@@ -55,6 +56,26 @@ function _populateEcosystems(cb){
 }
 
 /**
+ * Queries (attending) Attendee ecosystems interests and performs a callback on the results
+ * Attending is defined as a ACCEPTED status and is_attending RSVP
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateAttendingEcosystems(cb){
+    return AttendeeEcosystemInterest.query(function(qb){
+        qb.select('e.name').count('ecosystem_id as count').from('attendee_ecosystem_interests as aei').innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
+        .whereExists(function() {
+            this.select('*').from('attendees').whereRaw('attendees.id = aei.attendee_id').andWhere('status', 'ACCEPTED')
+            .whereExists(function() {
+                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
+            });
+        }).groupBy('aei.ecosystem_id');
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+/**
  * Queries Attendee ecosystems interests and performs a callback on the results
  * @param  {Function} cb the function to process the query results with
  * @return {Promise} resolving to the return value of the callback
@@ -76,6 +97,23 @@ function _populateRSVPs(cb){
 function _populateAttendeeAttribute(attribute, cb){
     return Attendee.query(function(qb){
         qb.select(attribute + ' as name').count(attribute + ' as count').from('attendees').groupBy(attribute);
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+/**
+ * Queries an (attending) attendee attribute and counts the unique entries
+ * Attending is defined as a ACCEPTED status and is_attending RSVP
+ * @param  {String} attribute the attribute to query for
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateAttendingAttendeeAttribute(attribute, cb){
+    return Attendee.query(function(qb){
+        qb.select(attribute + ' as name').count(attribute + ' as count').where('status', 'ACCEPTED').whereExists(function() {
+            this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
+        }).groupBy(attribute);
     })
     .fetchAll()
     .then(cb);
@@ -109,34 +147,53 @@ module.exports.fetchStats = function () {
         }
         else {
             var stats = {}
+            stats.attending = {};
             var queries = [];
 
             var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
             queries.push(ecosystemsQuery);
+            var attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats.attending));
+            queries.push(attendingEcosystemsQuery);
 
             var schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
             queries.push(schoolQuery);
+            var attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats.attending));
+            queries.push(attendingSchoolQuery);
 
             var transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
             queries.push(transportationQuery);
+            var attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats.attending));
+            queries.push(attendingTransportationQuery);
 
             var dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
             queries.push(dietQuery);
+            var attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats.attending));
+            queries.push(attendingDietQuery);
 
             var shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
             queries.push(shirtSizeQuery);
+            var attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats.attending));
+            queries.push(attendingShirtSizeQuery);
 
             var genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
             queries.push(genderQuery);
+            var attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats.attending));
+            queries.push(attendingGenderQuery);
 
             var graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
             queries.push(graduationYearQuery);
+            var attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats.attending));
+            queries.push(attendingGraduationYearQuery);
 
             var majorQuery =  _populateAttendeeAttribute('major', _populateStats('major', stats));
             queries.push(majorQuery);
+            var attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats.attending));
+            queries.push(attendingMajorQuery);
 
             var isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
             queries.push(isNoviceQuery);
+            var attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats.attending));
+            queries.push(attendingIsNoviceQuery);
 
             var attendeeQuery =  _populateAttendees(_populateStatsField('attendees', stats));
             queries.push(attendeeQuery);
