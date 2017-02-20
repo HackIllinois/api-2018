@@ -93,6 +93,11 @@ module.exports.createCheckIn = function (attributes){
                     if(credentialsRequested){
                         return NetworkCredential.findUnassigned()
                         .then(function(networkCredential){
+                            if (_.isNull(networkCredential)) {
+                                var message = "There are no remaining unassigned network credentials";
+                                var source = "NetworkCredential";
+                                throw new errors.UnprocessableRequestError(message, source);
+                            }
                             var updates = {
                                 "userId": attributes.userId,
                                 "assigned": true
