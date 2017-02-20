@@ -42,16 +42,16 @@ module.exports.findCheckInByUserId = function (userId){
  * @returns {Promise} the resolved CheckIn for the user
  */
 module.exports.updateCheckIn = function (attributes){
-    return CheckIn
-        .findByUserId(attributes.userId)
+    return module.exports.findCheckInByUserId(attributes.userId)
         .then(function(checkin) {
+            checkin = checkin.checkin;
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
                 "location": attributes.location || checkin.get('location')
             };
             checkin.set(updates, {patch: true});
             return checkin.save()
-            .then(function(model){
+            .then(function(model) {
                 return NetworkCredential.findByUserId(attributes.userId)
                 .then(function(credentials){
                     if (!_.isNull(credentials)) {
@@ -62,7 +62,7 @@ module.exports.updateCheckIn = function (attributes){
                     }
                     return {"checkin": model};
                 })
-            })
+            });
         });
 };
 
@@ -97,7 +97,8 @@ module.exports.createCheckIn = function (attributes){
                                 "userId": attributes.userId,
                                 "assigned": true
                             };
-                            return networkCredential.save(updates, {transacting: t, patch:true})
+                            networkCredential.set(updates, {patch:true});
+                            return networkCredential.save(null, {transacting: t})
                             .then(function(creds){
                                 return {
                                     "checkin": model,
