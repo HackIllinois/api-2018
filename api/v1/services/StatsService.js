@@ -2,7 +2,6 @@ var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var database = require('../../database');
-var knex = database.connection();
 
 var Attendee = require('../models/Attendee');
 var AttendeeRSVP = require('../models/AttendeeRSVP');
@@ -83,6 +82,20 @@ function _populateAttendingEcosystems(cb){
 function _populateRSVPs(cb){
     return AttendeeRSVP.query(function(qb){
         qb.select('is_attending as name').count('is_attending as count').from('attendee_rsvps').groupBy('is_attending');
+    })
+    .fetchAll()
+    .then(cb);
+}
+
+
+/**
+ * Queries Attendee ecosystems interests and performs a callback on the results
+ * @param  {Function} cb the function to process the query results with
+ * @return {Promise} resolving to the return value of the callback
+ */
+function _populateRSVPTypes(cb){
+    return AttendeeRSVP.query(function(qb){
+        qb.select('type as name').count('is_attending as count').from('attendee_rsvps').groupBy('type');
     })
     .fetchAll()
     .then(cb);
@@ -203,6 +216,9 @@ module.exports.fetchStats = function () {
 
             var RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
             queries.push(RSVPsQuery);
+
+            var RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats.attending));
+            queries.push(RSVPTypesQuery);
 
             return _Promise.all(queries)
             .then(function(){
