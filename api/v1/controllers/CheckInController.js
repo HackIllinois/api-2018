@@ -1,4 +1,5 @@
 var bodyParser = require('body-parser');
+var _ = require('lodash');
 
 var services = require('../services');
 var middleware = require('../middleware');
@@ -14,7 +15,9 @@ function updateCheckInByUserId (req, res, next) {
         .updateCheckIn(req.body)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            response.credentials = response.credentials.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
             res.body = response;
             return next();
         })
@@ -28,7 +31,9 @@ function fetchCheckInByUserId (req, res, next) {
         .findCheckInByUserId(req.params.id)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            response.credentials = response.credentials.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
             res.body = response;
             return next();
         })
@@ -42,7 +47,9 @@ function fetchCheckInByUser (req, res, next) {
         .findCheckInByUserId(req.user.id)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            response.credentials = response.credentials.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
             res.body = response;
             return next();
         })
@@ -57,7 +64,9 @@ function createCheckIn (req, res, next) {
         .createCheckIn(req.body)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            response.credentials = response.credentials.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
             res.body = response;
             return next();
         })

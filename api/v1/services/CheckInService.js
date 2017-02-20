@@ -31,7 +31,7 @@ module.exports.findCheckInByUserId = function (userId){
                         "credentials": credentials
                     };
                 }
-                return {"checkin": checkin};
+                return {"checkin": checkin, "credentials": null};
             })
         })
 };
@@ -60,7 +60,7 @@ module.exports.updateCheckIn = function (attributes){
                             "credentials": credentials
                         };
                     }
-                    return {"checkin": model};
+                    return {"checkin": model, "credentials": null};
                 })
             });
         });
@@ -113,7 +113,7 @@ module.exports.createCheckIn = function (attributes){
                         });
                     }
                     else {
-                        return {"checkin": model};
+                        return {"checkin": model, "credentials": null};
                     }
                 });
             });
