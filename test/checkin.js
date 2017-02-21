@@ -7,6 +7,7 @@ var errors = require('../api/v1/errors');
 var utils = require('../api/v1/utils');
 var CheckInService = require('../api/v1/services/CheckInService.js');
 var CheckIn = require('../api/v1/models/CheckIn.js');
+var NetworkCredential = require('../api/v1/models/NetworkCredential.js');
 var UserService = require('../api/v1/services/UserService');
 var User = require('../api/v1/models/User')
 
@@ -30,7 +31,7 @@ describe("CheckInService", function () {
 
         it('finds a CheckIn using valid user id', function (done) {
             var checkin = CheckInService.findCheckInByUserId(2342);
-            expect(checkin).to.eventually.have.deep.property("attributes.id", 1).and.notify(done);
+            expect(checkin).to.eventually.have.deep.property("checkin.attributes.id", 1).and.notify(done);
         });
 
         it('throws error for requesting a CheckIn for non-existent user', function (done) {
@@ -66,7 +67,7 @@ describe("CheckInService", function () {
             _get.withArgs("location").returns(testCheckIn["location"]);
             _get.withArgs("swag").returns(testCheckIn["swag"]);
             _save = sinon.stub(CheckIn.prototype, 'save', function() {
-                return this;
+                return _Promise.resolve(this);
             });
 
             done();
@@ -80,8 +81,8 @@ describe("CheckInService", function () {
 
             CheckInService.updateCheckIn(testCheckIn)
                 .then(function(checkin) {
-                    expect(checkin).to.have.deep.property("attributes.location", "SIEBEL");
-                    expect(checkin).to.have.deep.property("attributes.swag", true);
+                    expect(checkin).to.have.deep.property("checkin.attributes.location", "SIEBEL");
+                    expect(checkin).to.have.deep.property("checkin.attributes.swag", true);
                     done();
                 })
         });
@@ -94,8 +95,8 @@ describe("CheckInService", function () {
 
             CheckInService.updateCheckIn(testCheckIn)
                 .then(function(checkin) {
-                    expect(checkin).to.have.deep.property("attributes.location", "SIEBEL");
-                    expect(checkin).to.have.deep.property("attributes.swag", true);
+                    expect(checkin).to.have.deep.property("checkin.attributes.location", "SIEBEL");
+                    expect(checkin).to.have.deep.property("checkin.attributes.swag", true);
                     done();
                 })
         });
@@ -112,14 +113,24 @@ describe("CheckInService", function () {
         var testCheckIn;
         var _findByUserId;
         var _findUserById;
+        var _findUnassigned;
         var _save;
+        var _saveCreds;
 
         before(function(done) {
             testCheckIn = {
                 "userId": 3232,
                 "swag": true,
-                "location": "DCL"
+                "location": "DCL",
+                "credentialsRequested": true
             }
+
+            var unassignedNetworkCredential = NetworkCredential.forge({
+                "userId": null,
+                "account": "ACCOUNT",
+                "password": "PASSWORD",
+                "assigned": false
+            });
 
             var existingCheckIn = CheckIn.forge({ id: 1,  user_id: 2342, location: "ECEB"})
 
@@ -130,7 +141,14 @@ describe("CheckInService", function () {
             _findUserById = sinon.stub(UserService, 'findUserById');
             _findUserById.withArgs(3232).returns(_Promise.resolve(User.forge({id: 1})));
 
+            _findUnassigned = sinon.stub(NetworkCredential, 'findUnassigned');
+            _findUnassigned.returns(_Promise.resolve(unassignedNetworkCredential));
+
             _save = sinon.stub(CheckIn.prototype, 'save', function() {
+                return _Promise.resolve(this);
+            });
+
+            _saveCreds = sinon.stub(NetworkCredential.prototype, 'save', function() {
                 return _Promise.resolve(this);
             });
 
@@ -138,7 +156,13 @@ describe("CheckInService", function () {
         });
         it("creates a valid CheckIn", function(done) {
             var newCheckIn = CheckInService.createCheckIn(testCheckIn);
-            expect(newCheckIn).to.eventually.have.deep.property("attributes.swag", true).and.notify(done)
+            expect(newCheckIn).to.eventually.have.deep.property("checkin.attributes.swag", true)
+            .then(function() {
+                expect(newCheckIn).to.eventually.have.deep.property("credentials.attributes.assigned", true)
+                .then(function(){
+                    expect(newCheckIn).to.eventually.have.deep.property("credentials.attributes.userId", 3232).and.notify(done);
+                })
+            });
         });
         it("fails when user already has CheckIn", function(done) {
             testCheckIn.userId = 2342;

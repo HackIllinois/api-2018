@@ -32,7 +32,7 @@ module.exports.findCheckInByUserId = function (userId){
                         "credentials": credentials
                     };
                 }
-                return {"checkin": checkin};
+                return {"checkin": checkin, "credentials": null};
             })
         })
 };
@@ -44,14 +44,27 @@ module.exports.findCheckInByUserId = function (userId){
  */
 module.exports.updateCheckIn = function (attributes){
     return module.exports.findCheckInByUserId(attributes.userId)
-        .then(function(fetchedCheckin) {
-            checkin = fetchedCheckin.checkin;
+
+        .then(function(checkin) {
+            checkin = checkin.checkin;
             var updates = {
                 "swag": attributes.swag || checkin.get('swag'),
                 "location": attributes.location || checkin.get('location')
             };
             checkin.set(updates, {patch: true});
-            return {"checkin": checkin.save()};
+            return checkin.save()
+            .then(function(model) {
+                return NetworkCredential.findByUserId(attributes.userId)
+                .then(function(credentials){
+                    if (!_.isNull(credentials)) {
+                        return {
+                            "checkin": model,
+                            "credentials": credentials
+                        };
+                    }
+                    return {"checkin": model, "credentials": null};
+                })
+            });
         });
 };
 
@@ -83,17 +96,16 @@ module.exports.createCheckIn = function (attributes){
                         return NetworkCredential.findUnassigned()
                         .then(function(networkCredential){
                             if (_.isNull(networkCredential)) {
-                                var message = "There are no more unassigned credentials";
-                                var source = "credentialsRequested";
-                                throw new errors.NotFoundError(message, source);
+                                var message = "There are no remaining unassigned network credentials";
+                                var source = "NetworkCredential";
+                                throw new errors.UnprocessableRequestError(message, source);
                             }
-
                             var updates = {
                                 "userId": attributes.userId,
                                 "assigned": true
                             };
-
-                            return networkCredential.save(updates, {transacting: t, patch:true})
+                            networkCredential.set(updates, {patch:true});
+                            return networkCredential.save(null, {transacting: t})
                             .then(function(creds){
                                 return {
                                     "checkin": model,
@@ -103,7 +115,7 @@ module.exports.createCheckIn = function (attributes){
                         });
                     }
                     else {
-                        return {"checkin": model};
+                        return {"checkin": model, "credentials": null};
                     }
                 });
             });
