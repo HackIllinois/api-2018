@@ -94,7 +94,6 @@ module.exports.addEventParticipant = function(participantId) {
                 .execAsync();
         })
         .then(function () {
-            TrackingItem.query().where('name', currentEvent).increment('count',1);
-            return;
+            return TrackingItem.query().where('name', currentEvent).increment('count',1);
         });
 };

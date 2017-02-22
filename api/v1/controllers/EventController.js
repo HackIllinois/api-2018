@@ -69,7 +69,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
-router.get('/', middleware.permission(roles.ORGANIZERS), getAllEvents);
+router.get('/', middleware.permission(roles.NONE), getAllEvents);
 router.get('/location', middleware.permission(roles.ORGANIZERS), getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
 

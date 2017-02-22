@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var ALL_TAGS = ['HACKATHON', 'SCHEDULE'];
+var ALL_TAGS = ['HACKATHON', 'SCHEDULE', 'ANNOUNCEMENT'];
 
 module.exports.verifyTag = function(tag){
     if (!_.includes(ALL_TAGS, tag)) {
@@ -7,4 +7,8 @@ module.exports.verifyTag = function(tag){
     }
 
     return true;
-}
+};
+
+module.exports.verifyDate = function(date) {
+    return !!Date.parse(date);
+};
