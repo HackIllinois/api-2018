@@ -36,23 +36,25 @@ module.exports.createEvent = function (params) {
     var event = params.event;
     var locations = params.eventLocations;
 
-    return Bookshelf.transaction(function (t) {
-        return Event.findByName(event.name)
-            .then(function (result) {
-                if (!_.isNull(result)) {
-                    var message = "An event with the given name already exists";
-                    var source = "name";
-                    throw new errors.InvalidParameterError(message, source);
-                }
+    return EventEvent.findByName(event.name)
+        .then(function (result) {
+            if (!_.isNull(result)) {
+                var message = "An event with the given name already exists";
+                var source = "name";
+                throw new errors.InvalidParameterError(message, source);
+            }
 
-                var event = Event.forge({event});
-                return event.save(null, {transacting: t});
-            })
-            .tap(function (result) {
-                return _Promise.map(locations, function(location) {
-                   return new EventLocation(location).save({'event_id':result.id}, {transacting: t});
-                });
+            return null;
+        })
+        .then(function () {
+            return Bookshelf.transaction(function (t) {
+                return new Event(event)
+                    .save(null, {transacting: t})
+                    .tap(function (result) {
+                        return _Promise.map(locations, function(location) {
+                            return new EventLocation(location).save({'event_id':result.id}, {transacting: t});
+                        });
+                    });
             });
-    });
-
+        });
 };
