@@ -9,13 +9,14 @@ var eventLocationValidations = {
 var bodyRequired = ['event'];
 var bodyAllowed = ['eventLocations'];
 var bodyValidations = {
-    'name': ['required', 'string', 'maxLength:255'],
-    'shortName': ['required', 'string', 'maxLength:25'],
-    'description': ['required', 'string', 'maxLength:2047'],
-    'tracking': ['required', 'boolean'],
-    'startTime': ['required', 'date'],
-    'endTime': ['required', 'date'],
-    'tag': ['required', 'string', events.verifyTag],
+    'event': ['required', 'plainObject'],
+    'event.name': ['required', 'string', 'maxLength:255'],
+    'event.shortName': ['required', 'string', 'maxLength:25'],
+    'event.description': ['required', 'string', 'maxLength:2047'],
+    'event.tracking': ['required', 'boolean'],
+    'event.startTime': ['required', 'date'],
+    'event.endTime': ['required', 'date'],
+    'event.tag': ['required', 'string', events.verifyTag],
     'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'), 'eventLocations')]
 };
 

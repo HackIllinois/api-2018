@@ -10,7 +10,7 @@ var router = require('express').Router();
 
 
 function createLocation (req, res, next) {
-    EventService.createLocation(req.body)
+    services.EventService.createLocation(req.body)
         .then(function (result) {
             res.body = result.toJSON();
 
@@ -24,7 +24,7 @@ function createLocation (req, res, next) {
 }
 
 function getAllLocations (req, res, next) {
-    EventService.getAllLocations()
+    services.EventService.getAllLocations()
         .then(function (results) {
             res.body = results.toJSON();
 
@@ -38,7 +38,7 @@ function getAllLocations (req, res, next) {
 }
 
 function createEvent (req, res, next) {
-    EventService.createEvent(req.body)
+    services.EventService.createEvent(req.body)
         .then(function (result) {
             res.body = result.toJSON();
 
@@ -52,7 +52,7 @@ function createEvent (req, res, next) {
 }
 
 function getAllEvents (req, res, next) {
-    RegistrationService.getAllEvents()
+    services.RegistrationService.getAllEvents()
         .then(function (result) {
             res.body = result.toJSON();
 

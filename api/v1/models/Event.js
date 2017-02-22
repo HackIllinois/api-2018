@@ -25,8 +25,12 @@ var Event = Model.extend({
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
-Event.findById = function (id) {
+Event.prototype.findById = function (id) {
     return Event.where({ id: id }).fetch({withRelated: ['locations']});
+};
+
+Event.prototype.findByName = function (name) {
+    return Event.where({ name: name }).fetch({withRelated: ['locations']});
 };
 
 module.exports = Event;
