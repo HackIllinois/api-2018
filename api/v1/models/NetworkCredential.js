@@ -36,7 +36,6 @@ NetworkCredential.findById = function (id) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 NetworkCredential.findUnassigned = function () {
-	// return NetworkCredential.where({ assigned: 0 }).fetch();
 	return NetworkCredential.where({ assigned: 0 }).fetch();
 };
 
