@@ -18,5 +18,6 @@ module.exports = {
 	Token: require('./Token'),
 	Mentor: require('./Mentor'),
 	MentorProjectIdea: require('./MentorProjectIdea'),
-	UniversalTrackingItem: require('./TrackingEvent')
+	UniversalTrackingItem: require('./TrackingEvent'),
+	NetworkCredential: require('./NetworkCredential')
 };
