@@ -5,7 +5,7 @@ var NetworkCredential = Model.extend({
 	tableName: 'network_credentials',
 	idAttribute: 'id',
 	validations: {
-		userId:    ['required', 'integer'],
+		userId:    ['integer'],
 		account: ['required', 'string', 'maxLength:25'],
 		password:  ['required', 'string', 'maxLength:25'],
 		assigned:  ['required', 'boolean']

@@ -26,13 +26,7 @@ module.exports.findCheckInByUserId = function (userId){
             }
             return NetworkCredential.findByUserId(userId)
             .then(function(credentials){
-                if (!_.isNull(credentials)) {
-                    return {
-                        "checkin": checkin,
-                        "credentials": credentials
-                    };
-                }
-                return {"checkin": checkin, "credentials": null};
+                return {"checkin": checkin, "credentials": credentials};
             })
         })
 };
@@ -56,13 +50,7 @@ module.exports.updateCheckIn = function (attributes){
             .then(function(model) {
                 return NetworkCredential.findByUserId(attributes.userId)
                 .then(function(credentials){
-                    if (!_.isNull(credentials)) {
-                        return {
-                            "checkin": model,
-                            "credentials": credentials
-                        };
-                    }
-                    return {"checkin": model, "credentials": null};
+                    return {"checkin": model, "credentials": credentials};
                 })
             });
         });
@@ -113,8 +101,7 @@ module.exports.createCheckIn = function (attributes){
                                 };
                             });
                         });
-                    }
-                    else {
+                    } else {
                         return {"checkin": model, "credentials": null};
                     }
                 });
