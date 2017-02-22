@@ -13,7 +13,7 @@ module.exports.getAllLocations = function () {
 
 module.exports.createLocation = function (params) {
     params.name = params.name.toLowerCase();
-    var location = Location.forge({params});
+    var location = Location.forge(params);
 
     return Location
         .findByName(params.name)
@@ -29,14 +29,14 @@ module.exports.createLocation = function (params) {
 };
 
 module.exports.getAllEvents = function () {
-    Event.where('end_time', '>=', Date.now()).fetch({withRelated: ['locations']});
+    return Event.where('end_time', '>=', Date.now()).fetch({withRelated: ['locations']});
 };
 
 module.exports.createEvent = function (params) {
     var event = params.event;
     var locations = params.eventLocations;
 
-    return EventEvent.findByName(event.name)
+    return Event.findByName(event.name)
         .then(function (result) {
             if (!_.isNull(result)) {
                 var message = "An event with the given name already exists";
@@ -52,9 +52,13 @@ module.exports.createEvent = function (params) {
                     .save(null, {transacting: t})
                     .tap(function (result) {
                         return _Promise.map(locations, function(location) {
-                            return new EventLocation(location).save({'event_id':result.id}, {transacting: t});
+                            location.eventId = result.id;
+                            return new EventLocation(location).save(null, {transacting: t});
                         });
                     });
             });
+        })
+        .then(function () {
+            return Event.findByName(event.name);
         });
 };

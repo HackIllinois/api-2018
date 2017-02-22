@@ -13,8 +13,8 @@ var bodyValidations = {
     'event.shortName': ['required', 'string', 'maxLength:25'],
     'event.description': ['required', 'string', 'maxLength:2047'],
     'event.tracking': ['required', 'boolean'],
-    'event.startTime': ['required', 'date'],
-    'event.endTime': ['required', 'date'],
+    'event.startTime': ['required'],
+    'event.endTime': ['required'],
     'event.tag': ['required', 'string', events.verifyTag],
     'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'), 'eventLocations')]
 };
@@ -23,7 +23,6 @@ function EventCreationRequest(headers, body) {
     Request.call(this, headers, body);
 
     this.bodyRequired = bodyRequired;
-    this.bodyAllowed = bodyAllowed;
     this.bodyValidations = bodyValidations;
 }
 

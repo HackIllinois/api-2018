@@ -52,7 +52,7 @@ function createEvent (req, res, next) {
 }
 
 function getAllEvents (req, res, next) {
-    services.RegistrationService.getAllEvents()
+    services.EventService.getAllEvents()
         .then(function (result) {
             res.body = result.toJSON();
 

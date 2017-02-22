@@ -11,8 +11,8 @@ var Event = Model.extend({
         shortName: ['required', 'string', 'maxLength:25'],
         description: ['required', 'string', 'maxLength:2047'],
         tracking: ['required', 'boolean'],
-        startTime: ['required', 'date'],
-        endTime: ['required', 'date'],
+        startTime: ['required'],
+        endTime: ['required'],
         tag: ['required', 'string', events.verifyTag]
     },
     locations: function () {
@@ -20,11 +20,11 @@ var Event = Model.extend({
     }
 });
 
-Event.prototype.findById = function (id) {
+Event.findById = function (id) {
     return Event.where({ id: id }).fetch({withRelated: ['locations']});
 };
 
-Event.prototype.findByName = function (name) {
+Event.findByName = function (name) {
     return Event.where({ name: name }).fetch({withRelated: ['locations']});
 };
 
