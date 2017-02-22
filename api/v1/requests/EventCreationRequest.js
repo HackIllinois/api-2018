@@ -6,8 +6,7 @@ var eventLocationValidations = {
     locationId:  ['required', 'integer']
 };
 
-var bodyRequired = ['event'];
-var bodyAllowed = ['eventLocations'];
+var bodyRequired = ['event', 'eventLocations'];
 var bodyValidations = {
     'event': ['required', 'plainObject'],
     'event.name': ['required', 'string', 'maxLength:255'],

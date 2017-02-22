@@ -1,9 +1,8 @@
-var roles = require('../utils/roles');
 var Request = require('./Request');
 
-var bodyRequired = ['name, shortName, latitude, longitude'];
+var bodyRequired = ['name', 'shortName', 'latitude', 'longitude'];
 var bodyValidations = {
-    'name': ['string', 'required', 'maxLength:255'],
+    'name': ['required', 'string', 'maxLength:255'],
     'shortName': ['required', 'string', 'maxLength:25'],
     'latitude': ['required', 'number'],
     'longitude': ['required', 'number']
