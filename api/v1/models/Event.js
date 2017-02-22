@@ -20,11 +20,6 @@ var Event = Model.extend({
     }
 });
 
-/**
- * Finds an attendee by its ID, joining in its related project ideas
- * @param  {Number|String} id	the ID of the model with the appropriate type
- * @return {Promise<Model>}		a Promise resolving to the resulting model or null
- */
 Event.prototype.findById = function (id) {
     return Event.where({ id: id }).fetch({withRelated: ['locations']});
 };
