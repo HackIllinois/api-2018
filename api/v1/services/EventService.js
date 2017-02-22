@@ -29,7 +29,7 @@ module.exports.createLocation = function (params) {
 };
 
 module.exports.getAllEvents = function () {
-    return Event.where('end_time', '>=', Date.now()).fetch({withRelated: ['locations']});
+    return Event.where('end_time', '>=', Date.now()).fetchAll({withRelated: ['locations']});
 };
 
 module.exports.createEvent = function (params) {
