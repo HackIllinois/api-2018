@@ -7,4 +7,8 @@ module.exports.verifyTag = function(tag){
     }
 
     return true;
-}
+};
+
+module.exports.verifyDate = function(date) {
+    return !!Date.parse(date);
+};

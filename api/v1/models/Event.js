@@ -11,8 +11,8 @@ var Event = Model.extend({
         shortName: ['required', 'string', 'maxLength:25'],
         description: ['required', 'string', 'maxLength:2047'],
         tracking: ['required', 'boolean'],
-        startTime: ['required'],
-        endTime: ['required'],
+        startTime: ['required', events.verifyDate],
+        endTime: ['required', events.verifyDate],
         tag: ['required', 'string', events.verifyTag]
     },
     locations: function () {
