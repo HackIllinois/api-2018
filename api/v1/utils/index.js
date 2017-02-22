@@ -2,6 +2,7 @@ module.exports = {
 	crypto: require('./crypto.js'),
 	database: require('./database.js'),
 	errors: require('./errors.js'),
+	events: require('./events.js'),
 	mail: require('./mail.js'),
 	logs: require('./logs.js'),
 	roles: require('./roles.js'),

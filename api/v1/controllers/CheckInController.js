@@ -1,4 +1,5 @@
 var bodyParser = require('body-parser');
+var _ = require('lodash');
 
 var services = require('../services');
 var middleware = require('../middleware');
@@ -13,7 +14,11 @@ function updateCheckInByUserId (req, res, next) {
     services.CheckInService
         .updateCheckIn(req.body)
         .then(function (response){
-            res.body = response.toJSON();
+            response.checkin = response.checkin.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
+            res.body = response;
             return next();
         })
         .catch(function (error){
@@ -24,8 +29,12 @@ function updateCheckInByUserId (req, res, next) {
 function fetchCheckInByUserId (req, res, next) {
     services.CheckInService
         .findCheckInByUserId(req.params.id)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (response){
+            response.checkin = response.checkin.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
+            res.body = response;
             return next();
         })
         .catch(function (error){
@@ -36,8 +45,12 @@ function fetchCheckInByUserId (req, res, next) {
 function fetchCheckInByUser (req, res, next) {
     services.CheckInService
         .findCheckInByUserId(req.user.id)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (response){
+            response.checkin = response.checkin.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
+            res.body = response;
             return next();
         })
         .catch(function (error){
@@ -49,8 +62,12 @@ function createCheckIn (req, res, next) {
     req.body.userId = req.params.id;
     services.CheckInService
         .createCheckIn(req.body)
-        .then(function (checkin){
-            res.body = checkin.toJSON();
+        .then(function (response){
+            response.checkin = response.checkin.toJSON();
+            if(!_.isNull(response.credentials)){
+                response.credentials = response.credentials.toJSON();
+            }
+            res.body = response;
             return next();
         })
         .catch(function (error){

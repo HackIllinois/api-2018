@@ -8,6 +8,9 @@ module.exports = {
 	CheckIn: require('./CheckIn'),
 	Project: require('./Project'),
 	Ecosystem: require('./Ecosystem'),
+	Event: require('./Event'),
+	EventLocation: require('./EventLocation'),
+	Location: require('./Location'),
 	MailingList: require('./MailingList'),
 	MailingListUser: require('./MailingListUser'),
 	User: require('./User'),
@@ -15,5 +18,6 @@ module.exports = {
 	Token: require('./Token'),
 	Mentor: require('./Mentor'),
 	MentorProjectIdea: require('./MentorProjectIdea'),
-	UniversalTrackingItem: require('./TrackingEvent')
+	UniversalTrackingItem: require('./TrackingEvent'),
+	NetworkCredential: require('./NetworkCredential')
 };
