@@ -13,8 +13,8 @@ var bodyValidations = {
     'event.shortName': ['required', 'string', 'maxLength:25'],
     'event.description': ['required', 'string', 'maxLength:2047'],
     'event.tracking': ['required', 'boolean'],
-    'event.startTime': ['required'],
-    'event.endTime': ['required'],
+    'event.startTime': ['required', events.verifyDate],
+    'event.endTime': ['required', events.verifyDate],
     'event.tag': ['required', 'string', events.verifyTag],
     'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'), 'eventLocations')]
 };
