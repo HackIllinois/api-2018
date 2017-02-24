@@ -357,8 +357,8 @@ module.exports.fetchLiveEventStats = function () {
                     .then(function(){
                         return cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
                             .then(function(){
-                                var tenMinutesFromNow = (10*60);
-                                return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
+                                var oneMinuteFromNow = 60;
+                                return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
                                     .then(function(){
                                         return stats;
                                     });
