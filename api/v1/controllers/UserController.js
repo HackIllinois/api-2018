@@ -122,7 +122,7 @@ router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
 	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
-router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
+router.get('/:id', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
 
 router.use(middleware.response);
