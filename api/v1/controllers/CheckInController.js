@@ -80,10 +80,10 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/user/:id(\\d+)', middleware.request(requests.CreateCheckInRequest),
-    middleware.permission(roles.ORGANIZERS), createCheckIn);
+    middleware.permission(roles.HOSTS), createCheckIn);
 router.put('/user/:id(\\d+)', middleware.request(requests.UpdateCheckInRequest),
-    middleware.permission(roles.ORGANIZERS), updateCheckInByUserId);
-router.get('/user/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchCheckInByUserId);
+    middleware.permission(roles.HOSTS), updateCheckInByUserId);
+router.get('/user/:id(\\d+)', middleware.permission(roles.HOSTS), fetchCheckInByUserId);
 router.get('/', fetchCheckInByUser);
 
 router.use(middleware.response);
