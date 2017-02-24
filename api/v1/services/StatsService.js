@@ -65,11 +65,25 @@ function _populateAttendingEcosystems(cb){
     return Attendee.query(function(qb){
         qb.select('e.name').count('accepted_ecosystem_id as count').innerJoin('ecosystems as e', 'e.id', 'accepted_ecosystem_id')
             .whereExists(function() {
-                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
+                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1).andWhere('type', 'CONTRIBUTE');
             }).groupBy('accepted_ecosystem_id');
     })
     .fetchAll()
     .then(cb);
+}
+
+function _populateCheckedInEcosystems(cb){
+    return Attendee.query(function(qb){
+        qb.select('e.name').count('accepted_ecosystem_id as count').innerJoin('ecosystems as e', 'e.id', 'accepted_ecosystem_id')
+            .whereExists(function() {
+                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1).andWhere('type', 'CONTRIBUTE')
+                    .whereExists(function() {
+                        this.select('*').from('checkins').whereRaw('attendees.user_id = checkins.user_id');
+                    });
+            }).groupBy('accepted_ecosystem_id');
+    })
+        .fetchAll()
+        .then(cb);
 }
 
 /**
@@ -170,14 +184,17 @@ module.exports.fetchStats = function () {
             });
         }
         else {
-            var stats = {}
+            var stats = {};
             stats.attending = {};
+            stats.checkedin = {};
             var queries = [];
 
             var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
             queries.push(ecosystemsQuery);
             var attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats.attending));
             queries.push(attendingEcosystemsQuery);
+            var checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats.checkedin));
+            queries.push(checkedInEcosystemsQuery);
 
             var schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
             queries.push(schoolQuery);
