@@ -62,14 +62,11 @@ function _populateEcosystems(cb){
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingEcosystems(cb){
-    return AttendeeEcosystemInterest.query(function(qb){
-        qb.select('e.name').count('ecosystem_id as count').from('attendee_ecosystem_interests as aei').innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
-        .whereExists(function() {
-            this.select('*').from('attendees').whereRaw('attendees.id = aei.attendee_id').andWhere('status', 'ACCEPTED')
+    return Attendee.query(function(qb){
+        qb.select('e.name').count('accepted_ecosystem_id as count').innerJoin('ecosystems as e', 'e.id', 'accepted_ecosystem_id')
             .whereExists(function() {
                 this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
-            });
-        }).groupBy('aei.ecosystem_id');
+            }).groupBy('accepted_ecosystem_id');
     })
     .fetchAll()
     .then(cb);
