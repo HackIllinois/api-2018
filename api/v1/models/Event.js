@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var events = require('../utils/events');
+var time = require('../utils/time');
 
 var Model = require('./Model');
 var EventLocation = require('./EventLocation');
@@ -11,9 +11,8 @@ var Event = Model.extend({
         shortName: ['required', 'string', 'maxLength:25'],
         description: ['required', 'string', 'maxLength:2047'],
         tracking: ['required', 'boolean'],
-        startTime: ['required', events.verifyDate],
-        endTime: ['required', events.verifyDate],
-        tag: ['required', 'string', events.verifyTag]
+        startTime: ['required', time.verifyDate],
+        endTime: ['required', time.verifyDate]
     },
     locations: function () {
         return this.hasMany(EventLocation);

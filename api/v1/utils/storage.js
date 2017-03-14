@@ -2,6 +2,7 @@ var config = require('../../config');
 
 module.exports.buckets = {};
 
+// TODO generify this
 // the base of the buckets are given here. the extensions will be added
 // automatically at the end of the exports
 module.exports.buckets.resumes = 'hackillinois-resumes';

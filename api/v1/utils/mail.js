@@ -1,6 +1,7 @@
 module.exports.templates = {};
 module.exports.lists = {};
 
+//TODO load these from elsewhere?
 // mapping internal template identifiers to client template identifiers
 module.exports.templates.test = 'test';
 module.exports.templates.passwordReset = 'password_reset';

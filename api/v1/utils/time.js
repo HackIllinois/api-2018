@@ -12,6 +12,10 @@ module.exports.toMilliseconds = function (description) {
 	return milliseconds(description);
 };
 
+module.exports.verifyDate= function(date) {
+    return !!Date.parse(date);
+};
+
 module.exports.secondsToHHMMSS = function (numSeconds) {
 	numSeconds = Number(numSeconds);
 	var h = Math.floor(numSeconds / 3600);
