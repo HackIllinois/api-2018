@@ -5,7 +5,6 @@ var milliseconds = require('ms');
 
 var KNEX_CONFIG = {
 	client: 'mysql',
-	debug: true,
 	connection: {
 		host: config.database.primary.host,
 		port: config.database.primary.port,
