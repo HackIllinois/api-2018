@@ -60,5 +60,5 @@ module.exports.createEvent = function (params) {
                         });
                     });
             });
-        })
+        });
 };
