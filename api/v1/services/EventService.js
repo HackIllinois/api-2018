@@ -60,8 +60,5 @@ module.exports.createEvent = function (params) {
                         });
                     });
             });
-        }) //TODO see if there is a way to eliminate this final promise block
-        .then(function () {
-            return Event.findByName(event.name);
-        });
+        })
 };
