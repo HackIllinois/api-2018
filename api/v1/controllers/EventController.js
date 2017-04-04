@@ -51,8 +51,8 @@ function createEvent (req, res, next) {
         });
 }
 
-function getAllEvents (req, res, next) {
-    services.EventService.getAllEvents()
+function getAllActiveEvents (req, res, next) {
+    services.EventService.getAllActiveEvents()
         .then(function (result) {
             res.body = result.toJSON();
 
@@ -69,8 +69,8 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
-router.get('/', getAllEvents);
-router.get('/location', middleware.permission(roles.ORGANIZERS), getAllLocations);
+router.get('/active', getAllActiveEvents);
+router.get('/location/all', middleware.permission(roles.ORGANIZERS), getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
 
 router.use(middleware.response);
