@@ -12,7 +12,6 @@ var Location = Model.extend({
 });
 
 Location.findByName = function (name) {
-    name = name.toLowerCase();
     return Location.where({ name:name }).fetch();
 };
 

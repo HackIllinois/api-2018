@@ -1,6 +1,6 @@
 var Request = require('./Request');
 var validators = require('../utils/validators');
-var events = require('../utils/events');
+var time = require('../utils/time');
 
 var eventLocationValidations = {
     locationId:  ['required', 'integer']
@@ -13,9 +13,8 @@ var bodyValidations = {
     'event.shortName': ['required', 'string', 'maxLength:25'],
     'event.description': ['required', 'string', 'maxLength:2047'],
     'event.tracking': ['required', 'boolean'],
-    'event.startTime': ['required', events.verifyDate],
-    'event.endTime': ['required', events.verifyDate],
-    'event.tag': ['required', 'string', events.verifyTag],
+    'event.startTime': ['required', time.verifyDate],
+    'event.endTime': ['required', time.verifyDate],
     'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'), 'eventLocations')]
 };
 
