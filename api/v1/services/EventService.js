@@ -15,17 +15,16 @@ module.exports.createLocation = function (params) {
     params.name = params.name.toLowerCase();
     var location = Location.forge(params);
 
-    return Location
-        .findByName(params.name)
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "A location with the given name already exists";
-                var source = "name";
-                throw new errors.InvalidParameterError(message, source);
-            }
-
-            return location.save();
-        });
+    return location.save()
+    .catch(function (err) {
+	    	if(err.code === errors.Constants.DupEntry) {
+					var message = "An ecosystem with the given name already exists";
+					var source = "name";
+					throw new errors.InvalidParameterError(message, source);
+				} else {
+					throw err;
+				}
+		});
 };
 
 module.exports.getAllEvents = function () {
@@ -36,29 +35,29 @@ module.exports.createEvent = function (params) {
     var event = params.event;
     var locations = params.eventLocations;
 
-    return Event.findByName(event.name)
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "An event with the given name already exists";
-                var source = "name";
-                throw new errors.InvalidParameterError(message, source);
-            }
-
-            return null;
-        })
-        .then(function () {
-            return Bookshelf.transaction(function (t) {
-                return new Event(event)
-                    .save(null, {transacting: t})
-                    .tap(function (result) {
-                        return _Promise.map(locations, function(location) {
-                            location.eventId = result.id;
-                            return new EventLocation(location).save(null, {transacting: t});
-                        });
-                    });
-            });
-        })
-        .then(function () {
-            return Event.findByName(event.name);
-        });
+    return Bookshelf.transaction(function (t) {
+      return new Event(event)
+          .save(null, {transacting: t})
+          .then(function (result) {
+              return _Promise.map(locations, function(location) {
+                  location.eventId = result.id;
+                  return new EventLocation(location).save(null, {transacting: t});
+              })
+              .then(function (locationResult) {
+                return {
+                    "event": result,
+                    "eventLocations": locationResult
+                };
+              });
+          });
+    })
+    .catch(function (err) {
+      	if(err.code === errors.Constants.DupEntry) {
+          var message = "An event with the given name already exists";
+          var source = "name";
+          throw new errors.InvalidParameterError(message, source);
+  			} else {
+  				throw err;
+  			}
+  	});
 };

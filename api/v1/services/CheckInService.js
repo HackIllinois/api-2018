@@ -69,42 +69,43 @@ module.exports.createCheckIn = function (attributes){
     return checkin.validate()
         .catch(CheckitError, utils.errors.handleValidationError)
         .then(function(validation) {
-            return CheckIn.findByUserId(attributes.userId);
+          return CheckIn.transaction(function (t) {
+              return checkin.save(null, {transacting: t})
+              .then(function(model){
+                  if(credentialsRequested){
+                      return NetworkCredential.findUnassigned()
+                      .then(function(networkCredential){
+                          if (_.isNull(networkCredential)) {
+                              var message = "There are no remaining unassigned network credentials";
+                              var source = "NetworkCredential";
+                              throw new errors.UnprocessableRequestError(message, source);
+                          }
+                          var updates = {
+                              "userId": attributes.userId,
+                              "assigned": true
+                          };
+                          networkCredential.set(updates, {patch:true});
+                          return networkCredential.save(null, {transacting: t})
+                          .then(function(creds){
+                              return {
+                                  "checkin": model,
+                                  "credentials": creds
+                              };
+                          });
+                      });
+                  } else {
+                      return {"checkin": model, "credentials": null};
+                  }
+              });
+          });
         })
-        .then(function (existingCheckin) {
-            if (!_.isNull(existingCheckin)) {
-                var message = "A check in record already exists for this user";
-                var source = "userId";
-                throw new errors.InvalidParameterError(message, source);
-            }
-            return CheckIn.transaction(function (t) {
-                return checkin.save(null, {transacting: t})
-                .then(function(model){
-                    if(credentialsRequested){
-                        return NetworkCredential.findUnassigned()
-                        .then(function(networkCredential){
-                            if (_.isNull(networkCredential)) {
-                                var message = "There are no remaining unassigned network credentials";
-                                var source = "NetworkCredential";
-                                throw new errors.UnprocessableRequestError(message, source);
-                            }
-                            var updates = {
-                                "userId": attributes.userId,
-                                "assigned": true
-                            };
-                            networkCredential.set(updates, {patch:true});
-                            return networkCredential.save(null, {transacting: t})
-                            .then(function(creds){
-                                return {
-                                    "checkin": model,
-                                    "credentials": creds
-                                };
-                            });
-                        });
-                    } else {
-                        return {"checkin": model, "credentials": null};
-                    }
-                });
-            });
-        });
+        .catch(function (err) {
+    	    	if(err.code === errors.Constants.DupEntry) {
+              var message = "A check in record already exists for this user";
+              var source = "userId";
+              throw new errors.InvalidParameterError(message, source);
+    				} else {
+    					throw err;
+    				}
+    		});
 };

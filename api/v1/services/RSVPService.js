@@ -32,20 +32,20 @@ module.exports.createRSVP = function (attendee, user, attributes) {
         .validate()
         .catch(CheckitError, utils.errors.handleValidationError)
         .then(function (validated) {
-            return RSVP.findByAttendeeId(attributes.attendeeId);
-        })
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "An RSVP already exists for the given attendee";
-                var source = "attendeeId";
-                throw new errors.InvalidParameterError(message, source);
-            }
-
-            var userRole = user.getRole(utils.roles.ATTENDEE);
-            UserRole.setActive(userRole, true);
-
             return rsvp.save();
         })
+        .then(function (result) {
+            var userRole = user.getRole(utils.roles.ATTENDEE);
+            UserRole.setActive(userRole, true);
+        }).catch(function (err) {
+    	    	if(err.code === errors.Constants.DupEntry) {
+              var message = "An RSVP already exists for the given attendee";
+              var source = "attendeeId";
+              throw new errors.InvalidParameterError(message, source);
+    				} else {
+    					throw err;
+    				}
+    		});
 };
 
 /**

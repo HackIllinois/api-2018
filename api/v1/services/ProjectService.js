@@ -27,16 +27,16 @@ module.exports.createProject = function (attributes) {
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
-			return Project.findByName(attributes.name);
-		})
-		.then(function (result){
-			if (!_.isNull(result)) {
-				var message = "A project with the given name already exists";
-				var source = "name";
-				throw new errors.InvalidParameterError(message, source);
-			}
-
 			return project.save()
+		})
+		.catch(function (err) {
+	    	if(err.code === errors.Constants.DupEntry) {
+					var message = "A project with the given name already exists";
+					var source = "name";
+					throw new errors.InvalidParameterError(message, source);
+				} else {
+					throw err;
+				}
 		});
 }
 
@@ -185,4 +185,3 @@ module.exports.getAllProjects = function (page, count, isPublished) {
 			return projects;
 		});
 }
-
