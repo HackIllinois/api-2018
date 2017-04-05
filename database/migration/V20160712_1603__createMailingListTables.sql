@@ -1,6 +1,7 @@
 CREATE TABLE `mailing_lists` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
+  `sent` TINYINT(1) NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `mailing_lists_name_UNIQUE` (`name` ASC));
 
@@ -26,9 +27,7 @@ INSERT INTO `mailing_lists` (`name`) VALUES ('idlers');
 INSERT INTO `mailing_lists` (`name`) VALUES ('applicants');
 INSERT INTO `mailing_lists` (`name`) VALUES ('accepted');
 INSERT INTO `mailing_lists` (`name`) VALUES ('waitlisted');
-INSERT INTO `mailing_lists` (`name`) VALUES ('software');
-INSERT INTO `mailing_lists` (`name`) VALUES ('hardware');
-INSERT INTO `mailing_lists` (`name`) VALUES ('open_source');
+INSERT INTO `mailing_lists` (`name`) VALUES ('attendees');
 INSERT INTO `mailing_lists` (`name`) VALUES ('admins');
 INSERT INTO `mailing_lists` (`name`) VALUES ('staff');
 INSERT INTO `mailing_lists` (`name`) VALUES ('sponsors');

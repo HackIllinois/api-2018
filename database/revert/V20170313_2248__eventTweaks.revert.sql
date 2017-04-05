@@ -1,2 +1,0 @@
-ALTER TABLE `events` 
-ADD COLUMN `tag` ENUM('HACKATHON', 'SCHEDULE') NOT NULL AFTER `end_time`;
