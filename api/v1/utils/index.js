@@ -1,5 +1,6 @@
 module.exports = {
 	crypto: require('./crypto.js'),
+	cache: require('./cache.js'),
 	database: require('./database.js'),
 	errors: require('./errors.js'),
 	mail: require('./mail.js'),
