@@ -46,14 +46,10 @@ module.exports.createTrackingEvent = function (attributes) {
               .expire(TRACKED_EVENT, trackingItem.get('duration'))
               .execAsync();
         })
-        .catch(function (err) {
-    	    	if(err.code === errors.Constants.DupEntry) {
+        .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
               var message = "This event is already being tracked";
               var source = "name";
               throw new errors.InvalidParameterError(message, source);
-    				} else {
-    					throw err;
-    				}
     		});
 };
 

@@ -16,14 +16,10 @@ module.exports.createLocation = function (params) {
     var location = Location.forge(params);
 
     return location.save()
-    .catch(function (err) {
-	    	if(err.code === errors.Constants.DupEntry) {
-					var message = "An ecosystem with the given name already exists";
-					var source = "name";
-					throw new errors.InvalidParameterError(message, source);
-				} else {
-					throw err;
-				}
+    .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
+				var message = "An ecosystem with the given name already exists";
+				var source = "name";
+				throw new errors.InvalidParameterError(message, source);
 		});
 };
 
@@ -54,13 +50,9 @@ module.exports.createEvent = function (params) {
               });
           });
     })
-    .catch(function (err) {
-      	if(err.code === errors.Constants.DupEntry) {
-          var message = "An event with the given name already exists";
-          var source = "name";
-          throw new errors.InvalidParameterError(message, source);
-  			} else {
-  				throw err;
-  			}
+    .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
+        var message = "An event with the given name already exists";
+        var source = "name";
+        throw new errors.InvalidParameterError(message, source);
   	});
 };

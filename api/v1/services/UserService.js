@@ -35,14 +35,10 @@ module.exports.createUser = function (email, password, role) {
 
 			return _Promise.resolve(result);
 		})
-		.catch(function (err) {
-			if(err.code === errors.Constants.DupEntry) {
+		.catch((err) => err.code === errors.Constants.DupEntry, function (err) {
 				var message = "A user with the given email already exists";
 				var source = "email";
 				throw new errors.InvalidParameterError(message, source);
-			} else {
-				throw err;
-			}
 		});
 };
 

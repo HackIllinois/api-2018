@@ -140,7 +140,7 @@ function _populateAttendingAttendeeAttribute(attribute, cb){
  */
 function _populateAttendees(cb){
     return Attendee.query(function(qb){
-    qb.count('id as count');
+      qb.sum('a as attending').from('attendee_rsvps as a');
     })
     .fetch()
     .then(cb);

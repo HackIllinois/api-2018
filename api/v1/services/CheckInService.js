@@ -99,13 +99,9 @@ module.exports.createCheckIn = function (attributes){
               });
           });
         })
-        .catch(function (err) {
-    	    	if(err.code === errors.Constants.DupEntry) {
-              var message = "A check in record already exists for this user";
-              var source = "userId";
-              throw new errors.InvalidParameterError(message, source);
-    				} else {
-    					throw err;
-    				}
+        .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
+            var message = "A check in record already exists for this user";
+            var source = "userId";
+            throw new errors.InvalidParameterError(message, source);
     		});
 };

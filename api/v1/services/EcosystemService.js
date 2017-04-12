@@ -12,14 +12,10 @@ module.exports.createEcosystem = function (name) {
 	var ecosystem = Ecosystem.forge({name: name.toLowerCase()});
 
 	return ecosystem.save()
-		.catch(function (err) {
-	    	if(err.code === errors.Constants.DupEntry) {
+		.catch((err) => err.code === errors.Constants.DupEntry, function (err) {
 					var message = "An ecosystem with the given name already exists";
 					var source = "name";
 					throw new errors.InvalidParameterError(message, source);
-				} else {
-					throw err;
-				}
 		});
 }
 

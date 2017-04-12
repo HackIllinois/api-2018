@@ -8,9 +8,7 @@ var Event = Model.extend({
     idAttribute: 'id',
     validations: {
         name: ['required', 'string', 'maxLength:255'],
-        shortName: ['required', 'string', 'maxLength:25'],
         description: ['required', 'string', 'maxLength:2047'],
-        tracking: ['required', 'boolean'],
         startTime: ['required', time.verifyDate],
         endTime: ['required', time.verifyDate]
     },

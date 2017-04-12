@@ -1,7 +1,6 @@
 CREATE TABLE `locations` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `short_name` VARCHAR(25) NOT NULL,
   `longitude` DOUBLE NOT NULL,
   `latitude` DOUBLE NOT NULL,
   PRIMARY KEY (`id`));
@@ -10,12 +9,9 @@ CREATE TABLE `locations` (
 CREATE TABLE `events` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `name` VARCHAR(255) NOT NULL,
-   `short_name` VARCHAR(25) NOT NULL,
-   `tracking` BOOLEAN NOT NULL,
    `description` VARCHAR(2047) NOT NULL,
-   `created` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
    `start_time` DATETIME NOT NULL,
-   `end_time` DATETIME NOT NULL
+   `end_time` DATETIME NOT NULL,
    PRIMARY KEY (`id`)
 );
 
