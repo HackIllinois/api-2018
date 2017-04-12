@@ -40,11 +40,14 @@ module.exports.createTrackingEvent = function (attributes) {
 
             return trackingItem.save();
         })
-        .then(function () {
+        .then(function (result) {
             return cache.multi()
               .set(TRACKED_EVENT, trackingItem.get('name'))
               .expire(TRACKED_EVENT, trackingItem.get('duration'))
-              .execAsync();
+              .execAsync()
+              .then(function() {
+                return result;
+              });
         })
         .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
               var message = "This event is already being tracked";
