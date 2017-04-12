@@ -3,6 +3,7 @@ CREATE TABLE `locations` (
   `name` VARCHAR(255) NOT NULL,
   `longitude` DOUBLE NOT NULL,
   `latitude` DOUBLE NOT NULL,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC),
   PRIMARY KEY (`id`));
 
 

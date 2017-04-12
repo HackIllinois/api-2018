@@ -12,7 +12,6 @@ module.exports.getAllLocations = function () {
 };
 
 module.exports.createLocation = function (params) {
-    params.name = params.name.toLowerCase();
     var location = Location.forge(params);
 
     return location.save()
@@ -38,6 +37,7 @@ module.exports.createEvent = function (params) {
       return new Event(event)
           .save(null, {transacting: t})
           .then(function (result) {
+            if(locations) {
               return _Promise.map(locations, function(location) {
                   location.eventId = result.id;
                   return new EventLocation(location).save(null, {transacting: t});
@@ -48,6 +48,12 @@ module.exports.createEvent = function (params) {
                     "eventLocations": locationResult
                 };
               });
+            } else {
+              return {
+                  "event": result,
+                  "eventLocations": null
+              };
+            }
           });
     })
     .catch((err) => err.code === errors.Constants.DupEntry, function (err) {

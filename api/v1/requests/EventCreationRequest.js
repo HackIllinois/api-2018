@@ -6,7 +6,8 @@ var eventLocationValidations = {
     locationId:  ['required', 'integer']
 };
 
-var bodyRequired = ['event', 'eventLocations'];
+var bodyRequired = ['event'];
+var bodyAllowed = ['eventLocations']
 var bodyValidations = {
     'event': ['required', 'plainObject'],
     'event.name': ['required', 'string', 'maxLength:255'],
@@ -20,6 +21,7 @@ function EventCreationRequest(headers, body) {
     Request.call(this, headers, body);
 
     this.bodyRequired = bodyRequired;
+    this.bodyAllowed = bodyAllowed;
     this.bodyValidations = bodyValidations;
 }
 

@@ -1,5 +1,6 @@
 var bodyParser = require('body-parser');
 var _Promise = require('bluebird');
+var _ = require('lodash');
 
 var services = require('../services');
 var middleware = require('../middleware');
@@ -40,7 +41,15 @@ function getAllLocations (req, res, next) {
 function createEvent (req, res, next) {
     services.EventService.createEvent(req.body)
         .then(function (result) {
-            res.body = result.toJSON();
+            result.event = result.event.toJSON();
+            if(_.isNull(result.eventLocations)){
+                delete result.eventLocations;
+            }
+            for (var i = 0; i < result.eventLocations.length; i++) {
+              result.eventLocations[i] = result.eventLocations[i].toJSON();
+            }
+
+            res.body = result;
 
             next();
             return null;
