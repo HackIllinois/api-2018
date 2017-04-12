@@ -44,9 +44,10 @@ function createEvent (req, res, next) {
             result.event = result.event.toJSON();
             if(_.isNull(result.eventLocations)){
                 delete result.eventLocations;
-            }
-            for (var i = 0; i < result.eventLocations.length; i++) {
-              result.eventLocations[i] = result.eventLocations[i].toJSON();
+            } else {
+              for (var i = 0; i < result.eventLocations.length; i++) {
+                result.eventLocations[i] = result.eventLocations[i].toJSON();
+              }
             }
 
             res.body = result;

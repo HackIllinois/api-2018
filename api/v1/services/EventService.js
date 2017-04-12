@@ -16,7 +16,7 @@ module.exports.createLocation = function (params) {
 
     return location.save()
     .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
-				var message = "An ecosystem with the given name already exists";
+				var message = "A location with the given name already exists";
 				var source = "name";
 				throw new errors.InvalidParameterError(message, source);
 		});
