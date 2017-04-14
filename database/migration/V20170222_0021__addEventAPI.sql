@@ -13,6 +13,7 @@ CREATE TABLE `events` (
    `description` VARCHAR(2047) NOT NULL,
    `start_time` DATETIME NOT NULL,
    `end_time` DATETIME NOT NULL,
+   UNIQUE INDEX `unique_EventIndex` (`start_time` ASC, `end_time` ASC, `name` ASC, `description` ASC),
    PRIMARY KEY (`id`)
 );
 
