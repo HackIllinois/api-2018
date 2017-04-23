@@ -42,12 +42,10 @@ function createEvent (req, res, next) {
     services.EventService.createEvent(req.body)
         .then(function (result) {
             result.event = result.event.toJSON();
-            if(_.isNull(result.eventLocations)){
-                delete result.eventLocations;
-            } else {
-              for (var i = 0; i < result.eventLocations.length; i++) {
-                result.eventLocations[i] = result.eventLocations[i].toJSON();
-              }
+            if(!_.isNil(result.eventLocations)){
+              result.eventLocations.forEach(function (location) {
+                location = location.toJSON();
+              });
             }
 
             res.body = result;
@@ -61,8 +59,9 @@ function createEvent (req, res, next) {
         });
 }
 
-function getAllActiveEvents (req, res, next) {
-    services.EventService.getAllActiveEvents()
+function getEvents (req, res, next) {
+    var activeOnly = (req.query.active == '1');
+    services.EventService.getEvents(activeOnly)
         .then(function (result) {
             res.body = result.toJSON();
 
@@ -79,7 +78,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
-router.get('/active', getAllActiveEvents);
+router.get('/', getEvents);
 router.get('/location/all', middleware.permission(roles.ORGANIZERS), getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
 

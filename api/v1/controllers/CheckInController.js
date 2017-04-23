@@ -15,7 +15,7 @@ function updateCheckInByUserId (req, res, next) {
         .updateCheckIn(req.body)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            if(!_.isNull(response.credentials)){
+            if(!_.isNil(response.credentials)){
                 response.credentials = response.credentials.toJSON();
             }
             res.body = response;
@@ -31,7 +31,7 @@ function fetchCheckInByUserId (req, res, next) {
         .findCheckInByUserId(req.params.id)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            if(!_.isNull(response.credentials)){
+            if(!_.isNil(response.credentials)){
                 response.credentials = response.credentials.toJSON();
             }
             res.body = response;
@@ -47,7 +47,7 @@ function fetchCheckInByUser (req, res, next) {
         .findCheckInByUserId(req.user.id)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            if(!_.isNull(response.credentials)){
+            if(!_.isNil(response.credentials)){
                 response.credentials = response.credentials.toJSON();
             }
             res.body = response;
@@ -64,7 +64,7 @@ function createCheckIn (req, res, next) {
         .createCheckIn(req.body)
         .then(function (response){
             response.checkin = response.checkin.toJSON();
-            if(!_.isNull(response.credentials)){
+            if(!_.isNil(response.credentials)){
                 response.credentials = response.credentials.toJSON();
             }
             res.body = response;

@@ -38,11 +38,10 @@ module.exports.createRSVP = function (attendee, user, attributes) {
             var userRole = user.getRole(utils.roles.ATTENDEE);
             UserRole.setActive(userRole, true);
         })
-        .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
-              var message = "An RSVP already exists for the given attendee";
-              var source = "attendeeId";
-              throw new errors.InvalidParameterError(message, source);
-    		});
+        .catch(
+    			utils.errors.DuplicateEntryError,
+    			utils.errors.handleDuplicateEntryError("An RSVP already exists for the given attendee", "attendeeId")
+    		);
 };
 
 /**

@@ -29,11 +29,10 @@ module.exports.createProject = function (attributes) {
 		.then(function (validated) {
 			return project.save()
 		})
-		.catch((err) => err.code === errors.Constants.DupEntry, function (err) {
-					var message = "A project with the given name already exists";
-					var source = "name";
-					throw new errors.InvalidParameterError(message, source);
-		});
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("A project with the given name already exists", "name")
+		);
 }
 
 /**

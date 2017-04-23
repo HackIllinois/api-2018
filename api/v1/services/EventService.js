@@ -1,8 +1,7 @@
 var _ = require('lodash');
 var _Promise = require('bluebird');
 
-var Bookshelf = require('../../database').instance();
-var errors = require('../errors');
+var utils = require('../utils');
 var Location = require('../models/Location');
 var Event = require('../models/Event');
 var EventLocation = require('../models/EventLocation');
@@ -15,25 +14,28 @@ module.exports.createLocation = function (params) {
     var location = Location.forge(params);
 
     return location.save()
-    .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
-				var message = "A location with the given name already exists";
-				var source = "name";
-				throw new errors.InvalidParameterError(message, source);
-		});
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("A location with the given name already exists", "name")
+		);
 };
 
-module.exports.getAllActiveEvents = function () {
-    return Event.query(function(qb) {
-      qb.whereRaw('end_time > current_time()').andWhereRaw('start_time < current_time()');
-    })
-    .fetchAll({withRelated: ['locations']});
+module.exports.getEvents = function (getActive) {
+    if(getActive) {
+      return Event.query(function(qb) {
+        qb.whereRaw('end_time > current_time()').andWhereRaw('start_time < current_time()');
+      })
+      .fetchAll({withRelated: ['locations']});
+    } else {
+      return Event.fetchAll({withRelated: ['locations']});
+    }
 };
 
 module.exports.createEvent = function (params) {
     var event = params.event;
     var locations = params.eventLocations;
 
-    return Bookshelf.transaction(function (t) {
+    return Event.transaction(function (t) {
       return new Event(event)
           .save(null, {transacting: t})
           .then(function (result) {
@@ -50,15 +52,13 @@ module.exports.createEvent = function (params) {
               });
             } else {
               return {
-                  "event": result,
-                  "eventLocations": null
+                  "event": result
               };
             }
           });
     })
-    .catch((err) => err.code === errors.Constants.DupEntry, function (err) {
-        var message = "An event with the given name already exists";
-        var source = "name";
-        throw new errors.InvalidParameterError(message, source);
-  	});
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("An event with the given name already exists", "name")
+		);
 };

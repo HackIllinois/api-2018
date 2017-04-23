@@ -10,8 +10,4 @@ var Location = Model.extend({
     }
 });
 
-Location.findByName = function (name) {
-    return Location.where({ name:name }).fetch();
-};
-
 module.exports = Location;
