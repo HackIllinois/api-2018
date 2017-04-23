@@ -31,17 +31,19 @@ module.exports.createRSVP = function (attendee, user, attributes) {
     return rsvp
         .validate()
         .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function (validated) {
-            return rsvp.save();
-        })
-        .then(function (result) {
-            var userRole = user.getRole(utils.roles.ATTENDEE);
-            UserRole.setActive(userRole, true);
+        .then(function(validated) {
+          return RSVP.transaction(function (t) {
+              return rsvp.save(null, {transacting: t})
+                  .tap(function (result) {
+                      var userRole = user.getRole(utils.roles.ATTENDEE);
+                      return UserRole.setActive(userRole, true, t);
+                  });
+          });
         })
         .catch(
-    			utils.errors.DuplicateEntryError,
-    			utils.errors.handleDuplicateEntryError("An RSVP already exists for the given attendee", "attendeeId")
-    		);
+      			utils.errors.DuplicateEntryError,
+      			utils.errors.handleDuplicateEntryError("An RSVP already exists for the given attendee", "attendeeId")
+        );
 };
 
 /**

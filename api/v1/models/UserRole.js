@@ -50,13 +50,14 @@ UserRole.addRole = function (user, role, active, t) {
  * fields are the same, the role is returned unmodified
  * @param {UserRole} userRole	the role to modify
  * @param {Boolean} active		whether or not the role should be active
+ * @param {Transaction} t optional pending transaction
  * @returns {Promise<UserRole>} the updated role
  */
-UserRole.setActive = function (userRole, active) {
+UserRole.setActive = function (userRole, active, t) {
 	if (userRole.get('active') == active) {
 		return _Promise.resolve(userRole);
 	}
-	return userRole.set({ active: active }).save();
+	return userRole.set({ active: active }).save(null, { transacting: t });
 };
 
 UserRole.prototype.serialize = function () {

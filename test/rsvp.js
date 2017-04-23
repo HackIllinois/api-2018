@@ -139,7 +139,7 @@ describe('RSVPService',function(){
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             testUser.related('roles').add({ role: utils.roles.ATTENDEE });
             _attendeeRole = testUser.getRole(utils.roles.ATTENDEE);
-            UserRole.setActive(_attendeeRole, true);
+            UserRole.setActive(_attendeeRole, true, null);
 
             testRSVP = {
                 "id": 100,
