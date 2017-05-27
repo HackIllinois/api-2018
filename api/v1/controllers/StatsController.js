@@ -70,7 +70,7 @@ function getLiveEventStats(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.get('/', middleware.permission(roles.ORGANIZERS), getAllStats);
+router.get('/all', middleware.permission(roles.ORGANIZERS), getAllStats);
 router.get('/registration', middleware.permission(roles.ORGANIZERS), getRegStats);
 router.get('/rsvp', middleware.permission(roles.ORGANIZERS), getRSVPStats);
 router.get('/live', middleware.permission(roles.ORGANIZERS), getLiveEventStats);

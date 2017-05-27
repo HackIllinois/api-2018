@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var time = require('../utils/time');
 var events = require('../utils/events');
 
 var Model = require('./Model');
@@ -8,11 +9,9 @@ var Event = Model.extend({
     idAttribute: 'id',
     validations: {
         name: ['required', 'string', 'maxLength:255'],
-        shortName: ['required', 'string', 'maxLength:25'],
         description: ['required', 'string', 'maxLength:2047'],
-        tracking: ['required', 'boolean'],
-        startTime: ['required', events.verifyDate],
-        endTime: ['required', events.verifyDate],
+        startTime: ['required', time.verifyDate],
+        endTime: ['required', time.verifyDate],
         tag: ['required', 'string', events.verifyTag]
     },
     locations: function () {

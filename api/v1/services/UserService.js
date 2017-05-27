@@ -25,14 +25,6 @@ module.exports.createUser = function (email, password, role) {
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
 		.then(function (validated) {
-			return User.findByEmail(email);
-		})
-		.then(function (result) {
-			if (!_.isNull(result)) {
-				var message = "A user with the given email already exists";
-				var source = "email";
-				throw new errors.InvalidParameterError(message, source);
-			}
 			return User.create(email, storedPassword, role);
 		})
 		.then(function (result) {
@@ -42,7 +34,11 @@ module.exports.createUser = function (email, password, role) {
 			}
 
 			return _Promise.resolve(result);
-		});
+		})
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("A user with the given email already exists", "email")
+		);
 };
 
 /**

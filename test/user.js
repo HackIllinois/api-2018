@@ -2,6 +2,7 @@ var _Promise = require('bluebird');
 
 var chai = require('chai');
 var sinon = require('sinon');
+var _ = require('lodash');
 
 var errors = require('../api/v1/errors');
 var utils = require('../api/v1/utils');
@@ -10,42 +11,55 @@ var User = require('../api/v1/models/User.js');
 
 var assert = chai.assert;
 var expect = chai.expect;
+var tracker = require('mock-knex').getTracker();
 
 describe('UserService',function() {
 	describe('createUser', function() {
 		var _createUser;
 		var _findByEmail;
+		var testUser;
 
 		before(function (done) {
-			var testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.setPassword('password123').then(function () {
-				testUser.related('roles').add({ role: utils.roles.ATTENDEE });
+			testUser = { id: 1, email: 'new@example.com', password: 'password123' };
 
-				_createUser = sinon.stub(User, 'create');
-				_findByEmail = sinon.stub(User, 'findByEmail');
-
-				_createUser.withArgs(sinon.match.string, sinon.match.string, sinon.match.string).returns(_Promise.resolve(testUser));
-				_findByEmail.withArgs('existing@example.com').returns(_Promise.resolve(testUser));
-				_findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
-
+				_createUser = sinon.spy(User, 'create');
+				_findByEmail = sinon.spy(User, 'findByEmail');
 				done();
-			});
+		});
+		beforeEach(function (done) {
+				tracker.install();
+				done();
 		});
 		it('creates a new user', function (done) {
-			var user = UserService.createUser('new@example.com', 'password123', utils.roles.ATTENDEE);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1).then(function(){
-				expect(user).to.eventually.have.deep.property("attributes.email", 'new@example.com').then(function(){
-					user.tap(function (u) {
-						return expect(u.hasRole(utils.roles.ATTENDEE)).to.equal(true);
-					}).tap(function (u) {
-						return expect(u.hasPassword('password123')).to.eventually.equal(true);
-					}).then(function () { done(); }).catch(done);
-				});
+			var testUserClone = _.clone(testUser);
+
+			tracker.on('query', function (query) {
+					query.response(['1']);
 			});
+
+			var user = UserService.createUser(testUserClone.email, testUserClone.password, null);
+
+			user.bind(this).then(function() {
+
+					assert(_createUser.calledOnce, "User forge not called with right parameters");
+					return done();
+			}).catch(function (err) {
+					return done(err);
+			});
+
 		});
 		it('throws an error for an existing user', function (done) {
-			var user = UserService.createUser('existing@example.com', 'password123', utils.roles.ATTENDEE);
+			var testUserClone = _.clone(testUser);
+			tracker.on('query', function (query) {
+					query.reject(new errors.InvalidParameterError);
+			});
+
+			var user = UserService.createUser(testUserClone.email, testUserClone.password, null);
 			expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
+		});
+		afterEach(function (done) {
+				tracker.uninstall();
+				done();
 		});
 		after(function(done) {
 			_createUser.restore();
@@ -53,6 +67,7 @@ describe('UserService',function() {
 			done();
 		});
 	});
+
 	describe('findUserByEmail',function() {
 		var _findByEmail;
 

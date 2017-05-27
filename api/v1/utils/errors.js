@@ -1,4 +1,5 @@
 var InvalidParameterError = require('../errors/InvalidParameterError');
+var ErrorConstants = require('../errors/Constants');
 
 /**
  * Re-throws a Checkit validation error as an Invalid parameter error
@@ -18,4 +19,14 @@ module.exports.handleValidationError = function (error) {
 	}
 
 	throw new InvalidParameterError(errorDetail, errorSource);
+};
+
+module.exports.DuplicateEntryError = function (error) {
+	return error.code === ErrorConstants.DupEntry;
+};
+
+module.exports.handleDuplicateEntryError = function (message, source) {
+	return function (err) {
+		throw new InvalidParameterError(message, source);
+	}
 };

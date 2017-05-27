@@ -2,6 +2,7 @@ var _Promise = require('bluebird');
 var _ = require('lodash');
 
 var database = require('../../database');
+var knex = database.connection();
 
 var Attendee = require('../models/Attendee');
 var AttendeeRSVP = require('../models/AttendeeRSVP');
@@ -69,10 +70,14 @@ function _populateEcosystems(cb){
  */
 function _populateAttendingEcosystems(cb){
     return Attendee.query(function(qb){
-        qb.select('e.name').count('accepted_ecosystem_id as count').innerJoin('ecosystems as e', 'e.id', 'accepted_ecosystem_id')
-            .whereExists(function() {
-                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1).andWhere('type', 'CONTRIBUTE');
-            }).groupBy('accepted_ecosystem_id');
+        qb.select('e.name').count('a.accepted_ecosystem_id as count').from('attendees as a')
+          .innerJoin('ecosystems as e', function() {
+            this.on('e.id', '=' ,'a.accepted_ecosystem_id').andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
+          })
+          .innerJoin('attendee_rsvps as ar', function() {
+            this.on('ar.attendee_id', '=' ,'a.id').andOn('ar.is_attending', '=', knex.raw('?', ['1'])).andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
+          })
+          .groupBy('a.accepted_ecosystem_id');
     })
     .fetchAll()
     .then(cb);
@@ -80,16 +85,18 @@ function _populateAttendingEcosystems(cb){
 
 function _populateCheckedInEcosystems(cb){
     return Attendee.query(function(qb){
-        qb.select('e.name').count('accepted_ecosystem_id as count').innerJoin('ecosystems as e', 'e.id', 'accepted_ecosystem_id')
-            .whereExists(function() {
-                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1).andWhere('type', 'CONTRIBUTE')
-                    .whereExists(function() {
-                        this.select('*').from('checkins').whereRaw('attendees.user_id = checkins.user_id');
-                    });
-            }).groupBy('accepted_ecosystem_id');
+        qb.select('e.name').count('a.accepted_ecosystem_id as count').from('attendees as a')
+          .innerJoin('ecosystems as e', function() {
+            this.on('e.id', '=' ,'a.accepted_ecosystem_id').andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
+          })
+          .innerJoin('attendee_rsvps as ar', function() {
+            this.on('ar.attendee_id', '=' ,'a.id').andOn('ar.is_attending', '=', knex.raw('?', ['1'])).andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
+          })
+          .innerJoin('checkins as ci', 'a.user_id', 'ci.user_id')
+          .groupBy('a.accepted_ecosystem_id');
     })
-        .fetchAll()
-        .then(cb);
+    .fetchAll()
+    .then(cb);
 }
 
 function _populateCheckins(cb){
@@ -99,6 +106,7 @@ function _populateCheckins(cb){
         .fetch()
         .then(cb);
 }
+
 
 /**
  * Queries Attendee ecosystems interests and performs a callback on the results
@@ -150,9 +158,10 @@ function _populateAttendeeAttribute(attribute, cb){
  */
 function _populateAttendingAttendeeAttribute(attribute, cb){
     return Attendee.query(function(qb){
-        qb.select(attribute + ' as name').count(attribute + ' as count').where('status', 'ACCEPTED').whereExists(function() {
-            this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
-        }).groupBy(attribute);
+        qb.select(attribute + ' as name').count(attribute + ' as count').innerJoin('attendee_rsvps as ar', function() {
+          this.on('attendees.status', '=', knex.raw('?', ['ACCEPTED'])).andOn('ar.is_attending', '=', knex.raw('?', ['1']));
+        })
+        .groupBy(attribute);
     })
     .fetchAll()
     .then(cb);
@@ -165,7 +174,9 @@ function _populateAttendingAttendeeAttribute(attribute, cb){
  */
 function _populateAttendees(cb){
     return Attendee.query(function(qb){
-    qb.count('id as count');
+      qb.count('a.id as attending').from('attendees as a').innerJoin('attendee_rsvps as ar', function() {
+        this.on('a.status', '=', knex.raw('?', ['ACCEPTED'])).andOn('ar.is_attending', '=', knex.raw('?', ['1']));
+      });
     })
     .fetch()
     .then(cb);

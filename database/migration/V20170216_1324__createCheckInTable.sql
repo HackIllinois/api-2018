@@ -5,7 +5,7 @@ CREATE TABLE `checkins` (
     `location` ENUM('SIEBEL', 'ECEB', 'DCL') NOT NULL,
     `swag` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
-    INDEX `fk_checkins_user_id` (`user_id` ASC),
+    UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC),
     CONSTRAINT `fk_checkins_user_id`
         FOREIGN KEY (`user_id`)
         REFERENCES `users` (`id`)

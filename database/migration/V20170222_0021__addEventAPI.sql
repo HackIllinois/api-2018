@@ -1,23 +1,20 @@
 CREATE TABLE `locations` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `short_name` VARCHAR(25) NOT NULL,
   `longitude` DOUBLE NOT NULL,
   `latitude` DOUBLE NOT NULL,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC),
   PRIMARY KEY (`id`));
 
 
 CREATE TABLE `events` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `name` VARCHAR(255) NOT NULL,
-   `short_name` VARCHAR(25) NOT NULL,
-   `tracking` BOOLEAN NOT NULL,
    `description` VARCHAR(2047) NOT NULL,
-   `created` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-   `updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    `start_time` DATETIME NOT NULL,
    `end_time` DATETIME NOT NULL,
-   `tag` ENUM('HACKATHON', 'SCHEDULE') NOT NULL,
+   `tag` ENUM('PRE_EVENT', 'POST_EVENT') NOT NULL,
+   UNIQUE INDEX `unique_EventIndex` (`start_time` ASC, `end_time` ASC, `name` ASC, `description` ASC),
    PRIMARY KEY (`id`)
 );
 

@@ -1,5 +1,6 @@
 module.exports = {
 	ApiError: require('./ApiError.js'),
+	Constants: require('./Constants'),
 	EntityNotSupportedError: require('./EntityNotSupportedError.js'),
 	EntityTooLargeError: require('./EntityTooLargeError.js'),
 	ExistsError: require('./ExistsError.js'),

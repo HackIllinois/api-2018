@@ -1,8 +1,7 @@
 var _ = require('lodash');
 var _Promise = require('bluebird');
 
-var Bookshelf = require('../../database').instance();
-var errors = require('../errors');
+var utils = require('../utils');
 var Location = require('../models/Location');
 var Event = require('../models/Event');
 var EventLocation = require('../models/EventLocation');
@@ -12,53 +11,54 @@ module.exports.getAllLocations = function () {
 };
 
 module.exports.createLocation = function (params) {
-    params.name = params.name.toLowerCase();
     var location = Location.forge(params);
 
-    return Location
-        .findByName(params.name)
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "A location with the given name already exists";
-                var source = "name";
-                throw new errors.InvalidParameterError(message, source);
-            }
-
-            return location.save();
-        });
+    return location.save()
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("A location with the given name already exists", "name")
+		);
 };
 
-module.exports.getAllEvents = function () {
-    return Event.where('end_time', '>=', Date.now()).fetchAll({withRelated: ['locations']});
+module.exports.getEvents = function (getActive) {
+    if(getActive) {
+      return Event.query(function(qb) {
+        qb.whereRaw('end_time > current_time()').andWhereRaw('start_time < current_time()');
+      })
+      .fetchAll({withRelated: ['locations']});
+    } else {
+      return Event.fetchAll({withRelated: ['locations']});
+    }
 };
 
 module.exports.createEvent = function (params) {
     var event = params.event;
     var locations = params.eventLocations;
 
-    return Event.findByName(event.name)
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "An event with the given name already exists";
-                var source = "name";
-                throw new errors.InvalidParameterError(message, source);
+    return Event.transaction(function (t) {
+      return new Event(event)
+          .save(null, {transacting: t})
+          .then(function (result) {
+            if(locations) {
+              return _Promise.map(locations, function(location) {
+                  location.eventId = result.id;
+                  return new EventLocation(location).save(null, {transacting: t});
+              })
+              .then(function (locationResult) {
+                return {
+                    "event": result,
+                    "eventLocations": locationResult
+                };
+              });
+            } else {
+              return {
+                  "event": result
+              };
             }
-
-            return null;
-        })
-        .then(function () {
-            return Bookshelf.transaction(function (t) {
-                return new Event(event)
-                    .save(null, {transacting: t})
-                    .tap(function (result) {
-                        return _Promise.map(locations, function(location) {
-                            location.eventId = result.id;
-                            return new EventLocation(location).save(null, {transacting: t});
-                        });
-                    });
-            });
-        })
-        .then(function () {
-            return Event.findByName(event.name);
-        });
+          });
+    })
+		.catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("An event with the given name already exists", "name")
+		);
 };
