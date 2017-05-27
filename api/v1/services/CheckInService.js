@@ -64,50 +64,46 @@ module.exports.updateCheckIn = function (attributes){
  */
 module.exports.createCheckIn = function (attributes){
     var credentialsRequested =  attributes.credentialsRequested;
-    var checkin = CheckIn.forge(attributes);
+    delete attributes.credentialsRequested;
 
-    return checkin.validate()
-        .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function(validation) {
-          return CheckIn.transaction(function (t) {
-              return checkin
-              .save(null, {transacting: t})
-              .then(function(model){
-                  if(credentialsRequested){
-                      return NetworkCredential.findUnassigned();
-                  } else {
-                    return null;
-                  }
-              })
-              .then(function(credentials) {
-                if (credentialsRequested) {
-                  if (_.isNull(credentials)) {
-                      var message = "There are no remaining unassigned network credentials";
-                      var source = "NetworkCredential";
-                      throw new errors.UnprocessableRequestError(message, source);
-                  }
-
-                  var updates = {
-                      "userId": attributes.userId,
-                      "assigned": true
-                  };
-                  credentials.set(updates, {patch:true});
-
-                  return credentials.save(null, {transacting: t})
-                    .then(function (creds) {
-                      return {
-                          "checkin": checkin,
-                          "credentials": creds
-                      };
-                    });
-                } else {
-                  return { "checkin": checkin };
-                }
-              });
-          });
+    return CheckIn.transaction(function (t) {
+        return new CheckIn(attributes)
+        .save(null, {transacting: t})
+        .then(function(model){
+            if(credentialsRequested){
+                return NetworkCredential.findUnassigned();
+            } else {
+              return model;
+            }
         })
-        .catch(
-    			utils.errors.DuplicateEntryError,
-    			utils.errors.handleDuplicateEntryError("The user is already checked in", "userId")
-    		);
+        .then(function(model) {
+          if (credentialsRequested) {
+            if (_.isNull(model)) {
+                var message = "There are no remaining unassigned network credentials";
+                var source = "NetworkCredential";
+                throw new errors.UnprocessableRequestError(message, source);
+            }
+
+            var updates = {
+                "userId": attributes.userId,
+                "assigned": true
+            };
+            model.set(updates, {patch:true});
+
+            return model.save(null, {transacting: t})
+              .then(function (creds) {
+                return {
+                    "checkin": checkin,
+                    "credentials": creds
+                };
+              });
+          } else {
+            return { "checkin": model };
+          }
+        });
+    })
+    .catch(
+			utils.errors.DuplicateEntryError,
+			utils.errors.handleDuplicateEntryError("The user is already checked in", "userId")
+		);
 };

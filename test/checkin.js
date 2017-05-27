@@ -2,6 +2,7 @@ var _Promise = require('bluebird');
 
 var chai = require('chai');
 var sinon = require('sinon');
+var _ = require('lodash');
 
 var errors = require('../api/v1/errors');
 var utils = require('../api/v1/utils');
@@ -11,7 +12,10 @@ var NetworkCredential = require('../api/v1/models/NetworkCredential.js');
 var UserService = require('../api/v1/services/UserService');
 var User = require('../api/v1/models/User')
 
+var assert = chai.assert;
 var expect = chai.expect;
+var tracker = require('mock-knex').getTracker();
+
 
 describe("CheckInService", function () {
     describe("findCheckInByUserId", function () {
@@ -57,7 +61,8 @@ describe("CheckInService", function () {
             testCheckIn = {
                 "userId": 2342,
                 "location": "DCL",
-                "swag": false
+                "swag": true,
+                "credentialsRequested": false
             };
 
             _findByUserId = sinon.stub(CheckIn, 'findByUserId');
@@ -111,68 +116,56 @@ describe("CheckInService", function () {
     describe("createCheckIn", function() {
 
         var testCheckIn;
-        var _findByUserId;
-        var _findUserById;
-        var _findUnassigned;
-        var _save;
-        var _saveCreds;
+        var _saveCheckin;
 
         before(function(done) {
             testCheckIn = {
-                "userId": 3232,
-                "swag": true,
+                "userId": 1,
                 "location": "DCL",
-                "credentialsRequested": true
-            }
+                "swag": false,
+                "credentialsRequested": false
+            };
 
-            var unassignedNetworkCredential = NetworkCredential.forge({
-                "userId": null,
-                "account": "ACCOUNT",
-                "password": "PASSWORD",
-                "assigned": false
-            });
-
-            var existingCheckIn = CheckIn.forge({ id: 1,  user_id: 2342, location: "ECEB"})
-
-            _findByUserId = sinon.stub(CheckIn, 'findByUserId');
-            _findByUserId.withArgs(2342).returns(_Promise.resolve(existingCheckIn));
-            _findByUserId.withArgs(3232).returns(_Promise.resolve(null));
-
-            _findUserById = sinon.stub(UserService, 'findUserById');
-            _findUserById.withArgs(3232).returns(_Promise.resolve(User.forge({id: 1})));
-
-            _findUnassigned = sinon.stub(NetworkCredential, 'findUnassigned');
-            _findUnassigned.returns(_Promise.resolve(unassignedNetworkCredential));
-
-            _save = sinon.stub(CheckIn.prototype, 'save', function() {
-                return _Promise.resolve(this);
-            });
-
-            _saveCreds = sinon.stub(NetworkCredential.prototype, 'save', function() {
-                return _Promise.resolve(this);
-            });
+            _saveCheckin = sinon.spy(CheckIn.prototype, 'save');
 
             done();
         });
+    		beforeEach(function (done) {
+    				tracker.install();
+    				done();
+    		});
         it("creates a valid CheckIn", function(done) {
-            var newCheckIn = CheckInService.createCheckIn(testCheckIn);
-            expect(newCheckIn).to.eventually.have.deep.property("checkin.attributes.swag", true)
-            .then(function() {
-                expect(newCheckIn).to.eventually.have.deep.property("credentials.attributes.assigned", true)
-                .then(function(){
-                    expect(newCheckIn).to.eventually.have.deep.property("credentials.attributes.userId", 3232).and.notify(done);
-                })
-            });
+          var testCheckInClone = _.clone(testCheckIn);
+          tracker.on('query', function (query) {
+    					query.response([]);
+    			});
+
+    			var checkin = CheckInService.createCheckIn(testCheckInClone);
+
+    			checkin.bind(this).then(function() {
+    					assert(_saveCheckin.calledOnce, "Checkin forge not called");
+    					done();
+    			})
+          .catch(function (err) {
+    					done(err);
+    			});
         });
         it("fails when user already has CheckIn", function(done) {
-            testCheckIn.userId = 2342;
-            var newCheckIn = CheckInService.createCheckIn(testCheckIn);
-            expect(newCheckIn).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
+          var testCheckInClone = _.clone(testCheckIn);
+
+    			tracker.on('query', function (query) {
+    					query.reject(new errors.InvalidParameterError);
+    			});
+
+    			var checkin = CheckInService.createCheckIn(testCheckInClone);
+    			expect(checkin).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
         });
+    		afterEach(function (done) {
+    				tracker.uninstall();
+    				done();
+    		});
         after(function(done) {
-            _save.restore();
-            _findUserById.restore();
-            _findByUserId.restore();
+            _saveCheckin.restore();
             done();
         })
     });
