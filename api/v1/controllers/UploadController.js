@@ -6,8 +6,8 @@
 // after being merged
 
 var bodyParser = require('body-parser');
-var ExpressRouter = require('express').Router;
-var _Promise = require('bluebird');
+var ExpressRouter = require('express')
+  .Router;
 
 var errors = require('../errors');
 var middleware = require('../middleware');
@@ -16,110 +16,118 @@ var utils = require('../utils');
 
 var Upload = require('../models/Upload');
 var UploadRequest = require('../requests/UploadRequest');
-var User = require('../models/User');
 
-const UPLOAD_ALREADY_PRESENT = "An upload has already been associated with this user";
+const UPLOAD_ALREADY_PRESENT = 'An upload has already been associated with this user';
 
 const RESUME_UPLOAD_LIMIT = '2mb';
 const RESUME_UPLOAD_TYPE = 'application/pdf';
 const RESUME_BUCKET = utils.storage.buckets.resumes;
 
 function _findUpload(req, res, next) {
-	return services.StorageService.findUploadById(req.params.id)
-		.then(function (upload) {
-			req.upload = upload;
+    return services.StorageService.findUploadById(req.params.id)
+    .then(function(upload) {
+        req.upload = upload;
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-		});
+        next();
+        return null;
+    })
+    .catch(function(error) {
+        next(error);
+    });
 }
 
-function _isOwner (req) {
-	return req.upload.get('ownerId') === req.user.get('id');
+function _isOwner(req) {
+    return req.upload.get('ownerId') === req.user.get('id');
 }
 
-function _makeFileParams (req, type) {
-	return { content: req.body, type: req.header('content-type') };
+function _makeFileParams(req) {
+    return {
+        content: req.body,
+        type: req.header('content-type')
+    };
 }
 
-function createResumeUpload (req, res, next) {
-	var upload;
+function createResumeUpload(req, res, next) {
+    var upload;
 
-	var uploadOwner = req.user;
-	var uploadParams = { bucket: RESUME_BUCKET };
+    var uploadOwner = req.user;
+    var uploadParams = {
+        bucket: RESUME_BUCKET
+    };
 
-	Upload.findByOwner(uploadOwner, uploadParams.bucket)
-		.then(function (results) {
-			if (results.length) {
-				throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
-			}
+    Upload.findByOwner(uploadOwner, uploadParams.bucket)
+    .then(function(results) {
+        if (results.length) {
+            throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
+        }
 
-			return null;
-		})
-		.then(function () {
-			return services.StorageService.createUpload(uploadOwner, uploadParams);
-		})
-		.then(function (newUpload) {
-			upload = newUpload;
+        return null;
+    })
+    .then(function() {
+        return services.StorageService.createUpload(uploadOwner, uploadParams);
+    })
+    .then(function(newUpload) {
+        upload = newUpload;
 
-			var fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
-			return services.StorageService.persistUpload(upload, fileParams);
-		})
-		.then (function () {
-			res.body = upload.toJSON();
+        var fileParams = _makeFileParams(req);
+        return services.StorageService.persistUpload(upload, fileParams);
+    })
+    .then(function() {
+        res.body = upload.toJSON();
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-		});
+        next();
+        return null;
+    })
+    .catch(function(error) {
+        next(error);
+    });
 }
 
-function replaceResumeUpload (req, res, next) {
-	return req.upload.save()
-		.then(function (upload) {
-			var fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
-			return services.StorageService.persistUpload(upload, fileParams);
-		})
-		.then(function () {
-			res.body = req.upload.toJSON();
+function replaceResumeUpload(req, res, next) {
+    return req.upload.save()
+    .then(function(upload) {
+        var fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
+        return services.StorageService.persistUpload(upload, fileParams);
+    })
+    .then(function() {
+        res.body = req.upload.toJSON();
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-		});
+        next();
+        return null;
+    })
+    .catch(function(error) {
+        next(error);
+    });
 }
 
-function getUpload (req, res, next) {
-	return services.StorageService.getUpload(req.upload)
-		.then(function (result) {
-			res.set('Content-Length', result.content.length);
-			res.set('Content-Type', result.type);
+function getUpload(req, res, next) {
+    return services.StorageService.getUpload(req.upload)
+    .then(function(result) {
+        res.set('Content-Length', result.content.length);
+        res.set('Content-Type', result.type);
 
-			res.send(result.content);
+        res.send(result.content);
 
-			next();
-			return null;
-		}).catch(function (error) {
-			next(error);
-		});
+        next();
+        return null;
+    })
+    .catch(function(error) {
+        next(error);
+    });
 }
 
 // set up individual sub-routers to restrict upload size and type
 // note that the request middleware is added after the body-parser, else there will be no body
 var resumeRouter = ExpressRouter();
-resumeRouter.use(bodyParser.raw({ limit: RESUME_UPLOAD_LIMIT, type: RESUME_UPLOAD_TYPE }));
+resumeRouter.use(bodyParser.raw({
+    limit: RESUME_UPLOAD_LIMIT,
+    type: RESUME_UPLOAD_TYPE
+}));
 
 resumeRouter.post('/', middleware.request(UploadRequest), middleware.upload,
-	middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+  middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
 resumeRouter.put('/:id', middleware.request(UploadRequest), middleware.upload,
-	_findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
+  _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
 resumeRouter.get('/:id', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
 
 // set up the primary router with just the auth middleware since the sub-routers

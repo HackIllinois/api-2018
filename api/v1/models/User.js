@@ -11,19 +11,19 @@ var Model = require('./Model');
 var UserRole = require('./UserRole');
 var CheckIn = require('./CheckIn');
 var User = Model.extend({
-	tableName: 'users',
-	idAttribute: 'id',
-	hasTimestamps: ['created', 'updated'],
-	validations: {
-		email: ['required', 'email'],
-		password: ['required', 'string']
-	},
-	roles: function () {
-		return this.hasMany(UserRole);
-	},
-	checkIn: function () {
-		return this.hasOne(CheckIn);
-	}
+    tableName: 'users',
+    idAttribute: 'id',
+    hasTimestamps: ['created', 'updated'],
+    validations: {
+        email: ['required', 'email'],
+        password: ['required', 'string']
+    },
+    roles: function() {
+        return this.hasMany(UserRole);
+    },
+    checkIn: function() {
+        return this.hasOne(CheckIn);
+    }
 });
 
 /**
@@ -31,8 +31,13 @@ var User = Model.extend({
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
-User.findById = function (id) {
-	return User.where({ id: id }).fetch({ withRelated: ['roles'] });
+User.findById = function(id) {
+    return User.where({
+        id: id
+    })
+		.fetch({
+    withRelated: ['roles']
+});
 };
 
 /**
@@ -40,9 +45,14 @@ User.findById = function (id) {
  * @param  {String}                     email the email address
  * @return {Promise<User>}      the found user, or null
  */
-User.findByEmail = function (email) {
-	email = email.toLowerCase();
-	return User.where({ email: email }).fetch({ withRelated: ['roles']});
+User.findByEmail = function(email) {
+    email = email.toLowerCase();
+    return User.where({
+        email: email
+    })
+		.fetch({
+    withRelated: ['roles']
+});
 };
 
 /**
@@ -53,34 +63,51 @@ User.findByEmail = function (email) {
  * @param  {String}	role the string representation of a role from utils.roles (optional)
  * @return {Promise<User>}	 the User object with the related roles joined-in (if any)
  */
-User.create = function (email, password, role) {
-	var user = User.forge({ email: email });
-	var userRole = UserRole.forge({ role: role, active: true });
+User.create = function(email, password, role) {
+    var user = User.forge({
+        email: email
+    });
+    var userRole = UserRole.forge({
+        role: role,
+        active: true
+    });
 
-	if(!role){
+    if (!role) {
 		// No roles were provided, so create the User
-		return user.setPassword(password)
-			.then(function(result){
-				return result.save();
-			});
-	}
+        return user.setPassword(password)
+			.then(function(result) {
+    return result.save();
+});
+    }
 
-	return User
-		.transaction(function (t) {
-			return user.setPassword(password)
-				.then(function (result) {
-					return result.save(null, { transacting: t });
-				})
-				.then(function (result) {
-					user = result;
+    return User
+		.transaction(function(t) {
+    return user.setPassword(password)
+				.then(function(result) {
+    return result.save(null, {
+        transacting: t
+    });
+})
+				.then(function(result) {
+    user = result;
 
-					userRole.set({ userId: user.get('id') });
-					return userRole.save(null, { transacting: t });
-				})
-				.then(function (result) {
-					return User.where({ id: user.get('id') }).fetch({ withRelated: ['roles'], transacting: t });
-				});
-		});
+    userRole.set({
+        userId: user.get('id')
+    });
+    return userRole.save(null, {
+        transacting: t
+    });
+})
+				.then(function() {
+    return User.where({
+        id: user.get('id')
+    })
+						.fetch({
+    withRelated: ['roles'],
+    transacting: t
+});
+});
+});
 };
 
 /**
@@ -88,13 +115,15 @@ User.create = function (email, password, role) {
  * @param {String} password a secure password of up to fifty characters
  * @return {Promise<User>} a Promise resolving to the updated User model
  */
-User.prototype.setPassword = function (password) {
-	return bcrypt
+User.prototype.setPassword = function(password) {
+    return bcrypt
 		.hashAsync(password, SALT_ROUNDS)
 		.bind(this)
-		.then(function (p) {
-			return _Promise.resolve(this.set({ password: p }));
-		});
+		.then(function(p) {
+    return _Promise.resolve(this.set({
+        password: p
+    }));
+});
 };
 
 /**
@@ -102,10 +131,12 @@ User.prototype.setPassword = function (password) {
  * @param  {String}	role the string representation of a role from utils.roles
  * @return {UserRole}	 the desired role, or undefined
  */
-User.prototype.getRole = function (role) {
-	return _.find(this.related('roles').models, function (roleInUser) {
-		return roleInUser.get('role') === role;
-	});
+User.prototype.getRole = function(role) {
+    return _.find(this.related('roles')
+		.models,
+		function(roleInUser) {
+    return roleInUser.get('role') === role;
+});
 };
 
 /**
@@ -115,17 +146,20 @@ User.prototype.getRole = function (role) {
  * @return {Boolean}	  whether or not the user has the role
  * @throws {TypeError}	  when the user is missing its related roles key
  */
-User.prototype.hasRole = function (role, activeOnly) {
-	if (_.isUndefined(this.related('roles'))) {
-		throw new TypeError("The related roles were not fetched with this User");
-	}
+User.prototype.hasRole = function(role, activeOnly) {
+    if (_.isUndefined(this.related('roles'))) {
+        throw new TypeError('The related roles were not fetched with this User');
+    }
 
-	var roleMatch = { role: role };
-	if (_.isUndefined(activeOnly) || activeOnly) {
-		role.active = 1;
-	}
+    var roleMatch = {
+        role: role
+    };
+    if (_.isUndefined(activeOnly) || activeOnly) {
+        role.active = 1;
+    }
 
-	return _.some(this.related('roles').toJSON(), roleMatch);
+    return _.some(this.related('roles')
+		.toJSON(), roleMatch);
 };
 
 /**
@@ -135,13 +169,13 @@ User.prototype.hasRole = function (role, activeOnly) {
  * @return {Boolean}	  whether or not the user has any of the specified roles
  * @throws TypeError	  when the user is missing its related roles key
  */
-User.prototype.hasRoles = function (roles, activeOnly) {
-	var found = false;
-	_.forEach(roles, _.bind(function (role) {
-		found = found || this.hasRole(role, activeOnly);
-	}, this));
+User.prototype.hasRoles = function(roles, activeOnly) {
+    var found = false;
+    _.forEach(roles, _.bind(function(role) {
+        found = found || this.hasRole(role, activeOnly);
+    }, this));
 
-	return found;
+    return found;
 };
 
 /**
@@ -150,20 +184,20 @@ User.prototype.hasRoles = function (roles, activeOnly) {
  * @return {Promise} resolving to a Boolean representing the validity
  * of the provided password
  */
-User.prototype.hasPassword = function (password) {
-	return _Promise
+User.prototype.hasPassword = function(password) {
+    return _Promise
 		.bind(this)
 		.then(function() {
-			return bcrypt.compareAsync(password, this.get('password'));
-		});
+    return bcrypt.compareAsync(password, this.get('password'));
+});
 };
 
 /**
  * Serializes this User
  * @return {Object} the serialized form of this User
  */
-User.prototype.serialize = function () {
-	return _.omit(this.attributes, ['password']);
+User.prototype.serialize = function() {
+    return _.omit(this.attributes, ['password']);
 };
 
 module.exports = User;

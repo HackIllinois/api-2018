@@ -1,7 +1,4 @@
-var _ = require('lodash');
 var checkin = require('../utils/check_in');
-var CheckIt = require('checkit');
-
 
 var Model = require('./Model');
 var CheckIn =  Model.extend({
@@ -15,7 +12,7 @@ var CheckIn =  Model.extend({
     parse: function (attrs) {
         attrs = Model.prototype.parse(attrs);
         if (Number.isInteger(attrs.swag)) {
-            attrs.swag = !!attrs.swag
+            attrs.swag = !!attrs.swag;
         }
         return attrs;
     }
@@ -23,7 +20,7 @@ var CheckIn =  Model.extend({
 
 CheckIn.findByUserId = function (id) {
     return CheckIn.where({ user_id: id }).fetch();
-}
+};
 
 
 module.exports = CheckIn;

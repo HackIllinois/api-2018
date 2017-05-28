@@ -1,18 +1,14 @@
 var _Promise = require('bluebird');
-var Checkit = require('checkit');
 
 var jwt = require('jsonwebtoken');
 var _ = require('lodash');
 
-var utils = require('../utils');
 var config = require('../../config');
 var errors = require('../errors');
-var logger = require('../../logging');
-var Token = require('../models/Token');
 
 var JWT_SECRET = config.auth.secret;
 var JWT_CONFIG = {
-  expiresIn: config.auth.expiration
+    expiresIn: config.auth.expiration
 };
 
 /**
@@ -24,11 +20,11 @@ var JWT_CONFIG = {
  * @throws see JWT error documentation for possible errors
  */
 function _issue(payload, subject) {
-	var parameters = _.clone(JWT_CONFIG);
-	if (arguments.length > 1) {
-		parameters.subject = subject;
-	}
-	return jwt.sign(payload, JWT_SECRET, parameters);
+    var parameters = _.clone(JWT_CONFIG);
+    if (arguments.length > 1) {
+        parameters.subject = subject;
+    }
+    return jwt.sign(payload, JWT_SECRET, parameters);
 }
 
 /**
@@ -36,18 +32,20 @@ function _issue(payload, subject) {
  * @param  {User} user the User model holding the information to claim
  * @return {Promise} resolving to the auth token
  */
-module.exports.issueForUser = function (user) {
-	var subject = user.get('id').toString();
-	var payload = {
-		email: user.get('email'),
-		roles: user.related('roles').toJSON()
-	};
-	return _Promise
-		.try(function () {
+module.exports.issueForUser = function(user) {
+    var subject = user.get('id')
+		.toString();
+    var payload = {
+        email: user.get('email'),
+        roles: user.related('roles')
+			.toJSON()
+    };
+    return _Promise
+		.try(function() {
 			// the JWT library behind _issue may thrown any number
 			// of errors, which we do not want to propogate yet
-			return _Promise.resolve(_issue(payload, subject));
-		});
+    return _Promise.resolve(_issue(payload, subject));
+});
 };
 
 /**
@@ -57,12 +55,12 @@ module.exports.issueForUser = function (user) {
  * promise resolving to an UnprocessableRequestError
  */
 module.exports.verify = function(token) {
-	return _Promise
-		.try(function () {
-			return _Promise.resolve(jwt.verify(token, JWT_SECRET));
-		})
-		.catch(jwt.JsonWebTokenError, function (error) {
-			var message = error.message;
-			throw new errors.UnprocessableRequestError(message);
-		});
+    return _Promise
+		.try(function() {
+    return _Promise.resolve(jwt.verify(token, JWT_SECRET));
+})
+		.catch(jwt.JsonWebTokenError, function(error) {
+    var message = error.message;
+    throw new errors.UnprocessableRequestError(message);
+});
 };

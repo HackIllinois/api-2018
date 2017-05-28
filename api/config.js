@@ -1,4 +1,5 @@
 /* jshint esversion: 6 */
+/* eslint-disable no-process-exit, no-console */
 
 // NOTE: all durations are expressed using notation understood by the
 // `ms` NPM module. These durations must be converted before they are used.
@@ -8,16 +9,22 @@ const PRODUCTION_IDENTIFIER = 'production';
 const TEST_IDENTIFIER = 'test';
 
 var config = {};
-config.auth = { };
-config.aws = { defaults: {} };
+config.auth = {};
+config.aws = {
+    defaults: {}
+};
 config.database = {};
 config.redis = {};
-config.database.primary = { pool: {} };
+config.database.primary = {
+    pool: {}
+};
 config.mail = {};
 config.logs = {};
 config.storage = {};
 config.superuser = {};
-config.token = { expiration: {} };
+config.token = {
+    expiration: {}
+};
 
 config.environment = process.env.NODE_ENV;
 config.isProduction = (config.environment === PRODUCTION_IDENTIFIER);
@@ -33,9 +40,10 @@ config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
 
-var sharedAWSCreds = new (require('aws-sdk').SharedIniFileCredentials)();
+var sharedAWSCreds = new(require('aws-sdk')
+  .SharedIniFileCredentials)();
 config.aws.enabled = (process.env.AWS && !!parseInt(process.env.AWS));
-config.aws.defaults.credentials = (!!sharedAWSCreds.accessKeyId) ? sharedAWSCreds : undefined;
+config.aws.defaults.credentials = (sharedAWSCreds.accessKeyId) ? sharedAWSCreds : undefined;
 config.aws.defaults.region = 'us-east-1';
 config.aws.defaults.sslEnabled = true;
 
@@ -66,21 +74,21 @@ config.storage.bucketExtension = (!config.isProduction) ? '-development' : '-201
 
 var exit = true;
 if (!(config.isProduction || config.isDevelopment || config.isTest)) {
-	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
+    console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
 } else if (!config.superuser.email) {
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
+    console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
 } else if (!config.superuser.password) {
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
+    console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
 } else if (!config.secret) {
-	console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
+    console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
 } else if (config.isProduction && !config.mail.key) {
-	console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
+    console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
 } else {
-	exit = false;
+    exit = false;
 }
 if (exit) {
-	console.error("fatal: environment incomplete. shutting down...");
-	process.exit();
+    console.error('fatal: environment incomplete. shutting down...');
+    process.exit();
 }
 
 module.exports = config;

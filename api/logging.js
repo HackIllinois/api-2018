@@ -1,4 +1,4 @@
-var winston = require("winston");
+var winston = require('winston');
 
 var config = require('./config');
 
@@ -13,7 +13,9 @@ var consoleTransport = new winston.transports.Console({
 // add other transports as needed
 transports.push(consoleTransport);
 
-var logger = new winston.Logger({ transports: transports });
-logger.info("prepared environment for %s", config.environment);
+var logger = new winston.Logger({
+	transports: transports
+});
+logger.info('prepared environment for %s', config.environment);
 
 module.exports = logger;

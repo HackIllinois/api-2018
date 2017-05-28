@@ -1,0 +1,46 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true,
+		"node": true,
+		"mocha": true
+	},
+	"plugins": ["node"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:node/recommended"
+	],
+	"parserOptions": {
+		"sourceType": "module",
+		"ecmaVersion": 2016
+	},
+	"rules": {
+		"indent": [
+			"error",
+			4
+		],
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"single",
+			{
+			    "avoidEscape": true
+			}
+		],
+		"semi": [
+			"error",
+			"always"
+		],
+		"node/exports-style": [
+			"error",
+			"module.exports"
+		],
+		"node/no-unpublished-require": ["error", {
+            "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "redis-mock"],
+            "tryExtensions": [".js", ".json", ".node"]
+  			}]
+	}
+}

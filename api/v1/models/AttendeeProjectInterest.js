@@ -1,17 +1,16 @@
-var _ = require('lodash');
 var registration = require('../utils/registration');
 
 
 var Model = require('./Model');
 var AttendeeProjectInterest = Model.extend({
-	tableName: 'attendee_project_interests',
-	idAttribute: 'id',
-	validations: {
+    tableName: 'attendee_project_interests',
+    idAttribute: 'id',
+    validations: {
         attendeeId: ['required', 'integer'],
         type:       ['required', 'string', registration.verifyProjectInterestType],
         projectId:  ['required', 'integer'],
         attendeeProjectId: ['integer']
-	}
+    }
 });
 
 
@@ -21,7 +20,7 @@ var AttendeeProjectInterest = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeProjectInterest or null
 */
 AttendeeProjectInterest.findByAttendeeId = function (attendeeId) {
-	return AttendeeProjectInterest.where({ attendee_id: attendeeId }).fetch();
+    return AttendeeProjectInterest.where({ attendee_id: attendeeId }).fetch();
 };
 
 /**
@@ -30,7 +29,7 @@ AttendeeProjectInterest.findByAttendeeId = function (attendeeId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 AttendeeProjectInterest.findById = function (id) {
-	return AttendeeProjectInterest.where({ id: id }).fetch();
+    return AttendeeProjectInterest.where({ id: id }).fetch();
 };
 
 module.exports = AttendeeProjectInterest;

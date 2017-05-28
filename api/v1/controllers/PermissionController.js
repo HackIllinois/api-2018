@@ -1,44 +1,40 @@
 var bodyParser = require('body-parser');
 var middleware = require('../middleware');
 var router = require('express').Router();
-var _Promise = require('bluebird');
 
-var errors = require('../errors');
-var config = require('../../config');
-var requests = require('../requests');
 var roles = require('../utils/roles');
 
 var PermissionService = require('../services/PermissionService');
 
 
 function isOrganizer(req, res, next) {
-	var user = req.user;
-	PermissionService.isOrganizer(user)
+    var user = req.user;
+    PermissionService.isOrganizer(user)
 		.then(function (isOrganizer) {
-			res.body = {};
-			res.body.allowed = isOrganizer;
+    res.body = {};
+    res.body.allowed = isOrganizer;
 
-			next();
-			return null;
-		})
+    next();
+    return null;
+})
 		.catch(function (error) {
-			next(error);
-			return null;
-		});
+    next(error);
+    return null;
+});
 }
 
 function isHost(req, res, next) {
-	var user = req.user;
-	PermissionService.isHost(user)
+    var user = req.user;
+    PermissionService.isHost(user)
 		.then(function (isHost) {
-			res.body = {};
-			res.body.allowed = isHost;
+    res.body = {};
+    res.body.allowed = isHost;
 
-			return next();
-		})
+    return next();
+})
 		.catch(function (error) {
-			return next(error);
-		});
+    return next(error);
+});
 }
 
 router.use(bodyParser.json());

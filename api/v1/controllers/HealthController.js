@@ -3,8 +3,8 @@ var middleware = require('../middleware');
 var router = require('express').Router();
 
 function healthCheck(req, res, next) {
-	next();
-	return null;
+    next();
+    return null;
 }
 
 router.get('', healthCheck);

@@ -11,6 +11,8 @@ var router = require('express').Router();
 
 function updateCheckInByUserId (req, res, next) {
     req.body.userId = req.params.id;
+    delete req.body.credentialsRequested;
+
     services.CheckInService
         .updateCheckIn(req.body)
         .then(function (response){
@@ -72,16 +74,16 @@ function createCheckIn (req, res, next) {
         })
         .catch(function (error){
             return next(error);
-        })
+        });
 }
 
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('/user/:id(\\d+)', middleware.request(requests.CreateCheckInRequest),
+router.post('/user/:id(\\d+)', middleware.request(requests.CheckInRequest),
     middleware.permission(roles.HOSTS), createCheckIn);
-router.put('/user/:id(\\d+)', middleware.request(requests.UpdateCheckInRequest),
+router.put('/user/:id(\\d+)', middleware.request(requests.CheckInRequest),
     middleware.permission(roles.HOSTS), updateCheckInByUserId);
 router.get('/user/:id(\\d+)', middleware.permission(roles.HOSTS), fetchCheckInByUserId);
 router.get('/', fetchCheckInByUser);

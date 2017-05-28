@@ -1,69 +1,65 @@
 var bodyParser = require('body-parser');
 var middleware = require('../middleware');
 var router = require('express').Router();
-var _Promise = require('bluebird');
 
-var errors = require('../errors');
-var config = require('../../config');
-var requests = require('../requests');
 var roles = require('../utils/roles');
 
 var StatsService = require('../services/StatsService');
 
 function getAllStats(req, res, next) {
     StatsService.fetchAllStats()
-    	.then(function (stats) {
-    		res.body = stats;
+			.then(function (stats) {
+    res.body = stats;
 
-    		next();
-    		return null;
-    	})
-    	.catch(function (error) {
-    		next(error);
-    		return null;
-    	});
+    next();
+    return null;
+})
+			.catch(function (error) {
+    next(error);
+    return null;
+});
 }
 
 function getRegStats(req, res, next) {
-	StatsService.fetchRegistrationStats()
+    StatsService.fetchRegistrationStats()
 		.then(function (stats) {
-			res.body = stats;
+    res.body = stats;
 
-			next();
-			return null;
-		})
+    next();
+    return null;
+})
 		.catch(function (error) {
-			next(error);
-			return null;
-		});
+    next(error);
+    return null;
+});
 }
 
 function getRSVPStats(req, res, next) {
-	StatsService.fetchRSVPStats()
+    StatsService.fetchRSVPStats()
 		.then(function (stats) {
-			res.body = stats;
+    res.body = stats;
 
-			next();
-			return null;
-		})
+    next();
+    return null;
+})
 		.catch(function (error) {
-			next(error);
-			return null;
-		});
+    next(error);
+    return null;
+});
 }
 
 function getLiveEventStats(req, res, next) {
-	StatsService.fetchLiveEventStats()
+    StatsService.fetchLiveEventStats()
 		.then(function (stats) {
-			res.body = stats;
+    res.body = stats;
 
-			next();
-			return null;
-		})
+    next();
+    return null;
+})
 		.catch(function (error) {
-			next(error);
-			return null;
-		});
+    next(error);
+    return null;
+});
 }
 
 

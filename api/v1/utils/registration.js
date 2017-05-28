@@ -18,11 +18,11 @@ var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
  * @throws TypeError when the size is invalid
  */
 module.exports.verifyTshirtSize = function (size) {
-	if (!_.includes(TSHIRT_SIZES, size)) {
-		throw new TypeError(size + " is not a valid size");
-	}
+    if (!_.includes(TSHIRT_SIZES, size)) {
+        throw new TypeError(size + ' is not a valid size');
+    }
 
-	return true;
+    return true;
 };
 
 /**
@@ -33,12 +33,12 @@ module.exports.verifyTshirtSize = function (size) {
  * @throws TypeError when the diet is invalid
  */
 module.exports.verifyDiet = function(diet){
-	if (!_.includes(DIETS, diet)) {
-		throw new TypeError(diet + " is not a valid diet");
-	}
+    if (!_.includes(DIETS, diet)) {
+        throw new TypeError(diet + ' is not a valid diet');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided transportation option is in the list
@@ -48,12 +48,12 @@ module.exports.verifyDiet = function(diet){
  * @throws TypeError when the transportation option is invalid
  */
 module.exports.verifyTransportation = function(transportation){
-	if (!_.includes(TRANSPORTATION_OPTIONS, transportation)) {
-		throw new TypeError(transportation + " is not a valid transportation option");
-	}
+    if (!_.includes(TRANSPORTATION_OPTIONS, transportation)) {
+        throw new TypeError(transportation + ' is not a valid transportation option');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided gender is in the list
@@ -63,12 +63,12 @@ module.exports.verifyTransportation = function(transportation){
  * @throws TypeError when the gender option is invalid
  */
 module.exports.verifyGender = function(gender){
-	if (!_.includes(GENDERS, gender)) {
-		throw new TypeError(gender + " is not a valid gender option");
-	}
+    if (!_.includes(GENDERS, gender)) {
+        throw new TypeError(gender + ' is not a valid gender option');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided professional interest is in the list
@@ -78,12 +78,12 @@ module.exports.verifyGender = function(gender){
  * @throws TypeError when the professional interest option is invalid
  */
 module.exports.verifyProfessionalInterest = function(professionalInterest){
-	if (!_.includes(PROFESSIONAL_INTERESTS, professionalInterest)) {
-		throw new TypeError(professionalInterest + " is not a valid professional interest option");
-	}
+    if (!_.includes(PROFESSIONAL_INTERESTS, professionalInterest)) {
+        throw new TypeError(professionalInterest + ' is not a valid professional interest option');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided project interest type is in the list
@@ -93,12 +93,12 @@ module.exports.verifyProfessionalInterest = function(professionalInterest){
  * @throws TypeError when the project interest type option is invalid
  */
 module.exports.verifyProjectInterestType = function(projectInterestType){
-	if (!_.includes(PROJECT_INTEREST_TYPES, projectInterestType)) {
-		throw new TypeError(projectInterestType + " is not a valid project interest type");
-	}
+    if (!_.includes(PROJECT_INTEREST_TYPES, projectInterestType)) {
+        throw new TypeError(projectInterestType + ' is not a valid project interest type');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided project array only has one suggestion and one creation
@@ -107,12 +107,12 @@ module.exports.verifyProjectInterestType = function(projectInterestType){
  * @throws TypeError when the project array is invalid
  */
 module.exports.verifyProjectArray = function(projectArray){
-	if (_.filter(projectArray, ['isSuggestion', false]).length > 1){
-		throw new TypeError("The projects supplied are invalid. Attendees can only create 1 project at most.");
-	}
+    if (_.filter(projectArray, ['isSuggestion', false]).length > 1){
+        throw new TypeError('The projects supplied are invalid. Attendees can only create 1 project at most.');
+    }
 
-	return true;
-}
+    return true;
+};
 
 /**
  * Ensures that the provided status is in the list
@@ -122,11 +122,11 @@ module.exports.verifyProjectArray = function(projectArray){
  * @throws TypeError when the status is invalid
  */
 module.exports.verifyStatus = function (status) {
-	if (!_.includes(STATUSES, status)) {
-		throw new TypeError(status + " is not a valid status");
-	}
+    if (!_.includes(STATUSES, status)) {
+        throw new TypeError(status + ' is not a valid status');
+    }
 
-	return true;
+    return true;
 };
 
 /**
@@ -137,18 +137,18 @@ module.exports.verifyStatus = function (status) {
  * @throws TypeError when the category is invalid
  */
 module.exports.verifyCategory = function (category) {
-	if (!_.includes(CATEGORIES, category)) {
-		return false;
-	}
+    if (!_.includes(CATEGORIES, category)) {
+        return false;
+    }
 
-	return true;
+    return true;
 };
 
 
 module.exports.verifyAcceptanceType = function (type) {
-	if (type && !_.includes(ACCEPTANCE_TYPES, type)) {
-		throw new TypeError(type + " is not a valid acceptance type");
-	}
+    if (type && !_.includes(ACCEPTANCE_TYPES, type)) {
+        throw new TypeError(type + ' is not a valid acceptance type');
+    }
 
-	return true;
+    return true;
 };

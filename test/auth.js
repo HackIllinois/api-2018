@@ -1,83 +1,68 @@
-var _Promise = require('bluebird');
+let chai = require('chai');
 
-var chai = require('chai');
-var sinon = require('sinon');
+let errors = require('../api/v1/errors');
+let utils = require('../api/v1/utils');
+let User = require('../api/v1/models/User.js');
+let AuthService = require('../api/v1/services/AuthService.js');
 
-var errors = require('../api/v1/errors');
-var utils = require('../api/v1/utils');
-var User = require('../api/v1/models/User.js');
-var AuthService = require('../api/v1/services/AuthService.js');
+let jwt = require('jsonwebtoken');
 
-var config = require('../api/config');
-var JWT_SECRET = config.auth.secret;
-var jwt = require('jsonwebtoken');
+let expect = chai.expect;
 
-var assert = chai.assert;
-var expect = chai.expect;
+describe('AuthService', () => {
 
-describe('AuthService',function(){
+    describe('issueForUser', () =>{
+        var testUser;
 
-	describe('issueForUser',function(){
-		var testUser, subject, parameters;
-		
-		before(function(done){
-			testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.related('roles').add({ role: utils.roles.ATTENDEE });
+        before((done) => {
+            testUser = User.forge({ id: 1, email: 'new@example.com' });
+            testUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-			subject = {
-				email: 'new@example.com',
-				roles: [ { role: utils.roles.ATTENDEE } ]
-			};
-			parameters = {
-				expiresIn: config.auth.expiration,
-				subject: '1'
-			};
+            done();
+        });
+        it('issues a token for a valid user', (done) => {
+            var token = AuthService.issueForUser(testUser);
+            token.then(function(data){
+                var decoded = jwt.decode(data, {complete: true});
 
-			done();
-		});
-		it('issues a token for a valid user',function(done){
-			var token = AuthService.issueForUser(testUser);
-			token.then(function(data){
-				var decoded = jwt.decode(data, {complete: true})
+                expect(decoded.payload.email).to.equal('new@example.com');
+                expect(decoded.payload.roles[0].role).to.equal('ATTENDEE');
+                expect(decoded.payload.sub).to.equal('1');
 
-				expect(decoded.payload.email).to.equal("new@example.com");
-				expect(decoded.payload.roles[0].role).to.equal('ATTENDEE');
-				expect(decoded.payload.sub).to.equal("1");
+                done();
+            });
+        });
+        it('refuses a token for a blank user',function(done){
+            try{
+                AuthService.issueForUser(new User());
+            }catch(e){
+                expect(e).to.be.instanceof(TypeError);
+                done();
+            }
+        });
+    });
 
-				done();
-			});
-		});
-		it('refuses a token for a blank user',function(done){
-			try{
-				AuthService.issueForUser(new User());
-			}catch(e){
-				expect(e).to.be.instanceof(TypeError);
-				done();
-			}
-		});
-	});
-
-	describe('verify',function(){
-		var testUser;
-		before(function(done){
-			testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.related('roles').add({ role: utils.roles.ATTENDEE });
-			done();
-		});
-		it('verifies a valid auth token',function(done){
-			AuthService.issueForUser(testUser)
+    describe('verify',function(){
+        var testUser;
+        before(function(done){
+            testUser = User.forge({ id: 1, email: 'new@example.com' });
+            testUser.related('roles').add({ role: utils.roles.ATTENDEE });
+            done();
+        });
+        it('verifies a valid auth token',function(done){
+            AuthService.issueForUser(testUser)
 				.then(function(token){
-					var verification = AuthService.verify(token);
-					expect(verification).to.eventually.have.deep.property('email','new@example.com').then(function () {
-						expect(verification).to.eventually.have.deep.property('sub', '1').and.notify(done);
-					});
-				});
-		});
-		it('refuses a fake auth token',function(done){
-			var token = "FAKE TOKEN"
-			var verification = AuthService.verify(token);
-			expect(verification).to.eventually.be.rejectedWith(errors.UnprocessableRequestError).and.notify(done);
-		});
-	});
+    var verification = AuthService.verify(token);
+    expect(verification).to.eventually.have.deep.property('email','new@example.com').then(function () {
+        expect(verification).to.eventually.have.deep.property('sub', '1').and.notify(done);
+    });
+});
+        });
+        it('refuses a fake auth token',function(done){
+            var token = 'FAKE TOKEN';
+            var verification = AuthService.verify(token);
+            expect(verification).to.eventually.be.rejectedWith(errors.UnprocessableRequestError).and.notify(done);
+        });
+    });
 
 });

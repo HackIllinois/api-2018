@@ -13,7 +13,6 @@ var AttendeeProject = require('../api/v1/models/AttendeeProject.js');
 var AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
 var RegistrationService = require('../api/v1/services/RegistrationService.js');
 
-
 var assert = chai.assert;
 var expect = chai.expect;
 var tracker = require('mock-knex').getTracker();
@@ -34,49 +33,49 @@ describe('RegistrationService',function(){
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             testRegistration = {};
             testRegistration.attendee = {
-                "firstName": "John",
-                "lastName": "Doe",
-                "shirtSize": "M",
-                "diet": "NONE",
-                "age": 19,
-                "graduationYear": 2019,
-                "transportation": "NOT_NEEDED",
-                "school": "University of Illinois at Urbana-Champaign",
-                "major": "Computer Science",
-                "gender": "MALE",
-                "professionalInterest": "BOTH",
-                "github": "JDoe1234",
-                "linkedin": "JDoe1234",
-                "interests": "CS",
-                "finalized": false,
-                "isNovice": true,
-                "isPrivate": false,
-                        "hasLightningInterest": false,
-                "phoneNumber": "12345678910",
-                "wave": 0,
-                "priority": 0
+                'firstName': 'John',
+                'lastName': 'Doe',
+                'shirtSize': 'M',
+                'diet': 'NONE',
+                'age': 19,
+                'graduationYear': 2019,
+                'transportation': 'NOT_NEEDED',
+                'school': 'University of Illinois at Urbana-Champaign',
+                'major': 'Computer Science',
+                'gender': 'MALE',
+                'professionalInterest': 'BOTH',
+                'github': 'JDoe1234',
+                'linkedin': 'JDoe1234',
+                'interests': 'CS',
+                'finalized': false,
+                'isNovice': true,
+                'isPrivate': false,
+                'hasLightningInterest': false,
+                'phoneNumber': '12345678910',
+                'wave': 0,
+                'priority': 0
             };
             testRegistration.projects = [
-            	{
-            		"name": "Example",
-            		"description": "Example project.",
-            		"repo": "http://www.github.com/hackillinois/api-2017",
-            		"isSuggestion": true
-            	}
+                {
+                    'name': 'Example',
+                    'description': 'Example project.',
+                    'repo': 'http://www.github.com/hackillinois/api-2017',
+                    'isSuggestion': true
+                }
             ];
             testRegistration.extras = [
-            	{
-            		"info": "Example extra info"
-            	}
+                {
+                    'info': 'Example extra info'
+                }
             ];
             testRegistration.collaborators = [
-            	{
-            		"collaborator": "existing@example.com"
-            	}
+                {
+                    'collaborator': 'existing@example.com'
+                }
             ];
             testRegistration.ecosystemInterests = [
                 {
-                    "ecosystemId": 1
+                    'ecosystemId': 1
                 }
             ];
             _forgeAttendee = sinon.spy(Attendee, 'forge');
@@ -103,16 +102,16 @@ describe('RegistrationService',function(){
             attendee.then(function() {
                 attendeeParams.userId = testUser.id;
 
-                assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, "Attendee forge not called with right parameters");
-                assert(_saveAttendee.calledOnce, "Attendee save not called");
-                assert(_saveAttendeeProject.calledOnce, "AttendeeProject save not called");
-                assert(_saveAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
-                assert(_saveAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
-                assert(_saveAttendeeRequestedCollaborator.calledOnce, "AttendeeRequestedCollaborator save not called");
+                assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, 'Attendee forge not called with right parameters');
+                assert(_saveAttendee.calledOnce, 'Attendee save not called');
+                assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
+                assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
+                assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
+                assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
                 return done();
             }).catch(function (err) {
-				return done(err);
-			});
+                return done(err);
+            });
         });
         it('throws an error for a valid user with an attendee role',function(done){
             testUser.related('roles').add({ role: utils.roles.ATTENDEE });
@@ -125,15 +124,15 @@ describe('RegistrationService',function(){
             tracker.uninstall();
             done();
         });
-		after(function(done) {
-			_forgeAttendee.restore();
-			_saveAttendee.restore();
-			_saveAttendeeProject.restore();
-			_saveAttendeeExtraInfo.restore();
-			_saveAttendeeEcosystemInterest.restore();
-			_saveAttendeeRequestedCollaborator.restore();
-			done();
-		});
+        after(function(done) {
+            _forgeAttendee.restore();
+            _saveAttendee.restore();
+            _saveAttendeeProject.restore();
+            _saveAttendeeExtraInfo.restore();
+            _saveAttendeeEcosystemInterest.restore();
+            _saveAttendeeRequestedCollaborator.restore();
+            done();
+        });
     });
 
     describe('findAttendeeByUser', function () {
@@ -144,21 +143,21 @@ describe('RegistrationService',function(){
         before(function (done) {
             testUser = User.forge({ id: 1, email: 'new@example.com' });
             nonExistentUser = User.forge({id: 2, email: 'fake@example.com'});
-            var testAttendee = Attendee.forge({id: 100, firstName: "Example", lastName: "User"});
+            var testAttendee = Attendee.forge({id: 100, firstName: 'Example', lastName: 'User'});
 
-			_findByUserId = sinon.stub(Attendee,'findByUserId');
+            _findByUserId = sinon.stub(Attendee,'findByUserId');
 
-			_findByUserId.withArgs(testUser.get('id')).returns(_Promise.resolve(testAttendee));
-			_findByUserId.withArgs(sinon.match.number).returns(_Promise.resolve(null));
-			done();
-		});
+            _findByUserId.withArgs(testUser.get('id')).returns(_Promise.resolve(testAttendee));
+            _findByUserId.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+            done();
+        });
         it('finds existing user',function(done){
             var attendee = RegistrationService.findAttendeeByUser(testUser);
-            expect(attendee).to.eventually.have.deep.property("attributes.id", 100, "ID should be 100, the searched for ID")
-                .then(function(){
-                    expect(attendee).to.eventually.have.deep.property("attributes.firstName",
-                        'Example',"first name should be Example").notify(done);
-            })
+            expect(attendee).to.eventually.have.deep.property('attributes.id', 100, 'ID should be 100, the searched for ID')
+								.then(function(){
+    expect(attendee).to.eventually.have.deep.property('attributes.firstName',
+												'Example','first name should be Example').notify(done);
+});
         });
         it('throws exception after searching for non-existent user',function(done){
             var attendee = RegistrationService.findAttendeeByUser(nonExistentUser);
@@ -171,35 +170,35 @@ describe('RegistrationService',function(){
     });
 
     describe('findAttendeeById',function(){
-		var _findById;
+        var _findById;
 
-		before(function(done){
-            var testAttendee = Attendee.forge({id: 1, firstName: "Example", lastName: "User"});
+        before(function(done){
+            var testAttendee = Attendee.forge({id: 1, firstName: 'Example', lastName: 'User'});
 
-			_findById = sinon.stub(Attendee, 'findById');
+            _findById = sinon.stub(Attendee, 'findById');
 
-			_findById.withArgs(1).returns(_Promise.resolve(testAttendee));
-			_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+            _findById.withArgs(1).returns(_Promise.resolve(testAttendee));
+            _findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 
-			done();
-		});
-		it('finds existing attendee',function(done){
-			var attendee = RegistrationService.findAttendeeById(1);
-			expect(attendee).to.eventually.have.deep.property("attributes.id", 1,"ID should be 1, the searched for ID")
+            done();
+        });
+        it('finds existing attendee',function(done){
+            var attendee = RegistrationService.findAttendeeById(1);
+            expect(attendee).to.eventually.have.deep.property('attributes.id', 1,'ID should be 1, the searched for ID')
 				.then(function(){
-					expect(attendee).to.eventually.have.deep.property("attributes.firstName",
-						'Example',"first name should be Example").notify(done);
-			})
-		});
-		it('throws exception after searching for non-existent attendee',function(done){
-			var attendee = RegistrationService.findAttendeeById(2);
-			expect(attendee).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
-		});
-		after(function(done){
-			_findById.restore();
-			done();
-		});
-	});
+    expect(attendee).to.eventually.have.deep.property('attributes.firstName',
+						'Example','first name should be Example').notify(done);
+});
+        });
+        it('throws exception after searching for non-existent attendee',function(done){
+            var attendee = RegistrationService.findAttendeeById(2);
+            expect(attendee).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+        });
+        after(function(done){
+            _findById.restore();
+            done();
+        });
+    });
 
     describe('updateAttendee', function() {
         var testAttendee;
@@ -209,55 +208,55 @@ describe('RegistrationService',function(){
         before(function(done){
             testRegistration = {};
             testRegistration.attendee = {
-                "id": 1,
-                "firstName": "John",
-                "lastName": "Doe",
-                "shirtSize": "M",
-                "diet": "NONE",
-                "age": 19,
-                "graduationYear": 2019,
-                "transportation": "NOT_NEEDED",
-                "school": "University of Illinois at Urbana-Champaign",
-                "major": "Computer Science",
-                "gender": "MALE",
-                "professionalInterest": "BOTH",
-                "github": "JDoe1234",
-                "linkedin": "JDoe1234",
-                "interests": "CS",
-                "finalized": false,
-                "status": "ACCEPTED",
-                "isNovice": true,
-                "isPrivate": false,
-				"hasLightningInterest": false,
-                "phoneNumber": "12345678910",
-                "userId": 1,
-                "priority": 1,
-                "wave": 2
+                'id': 1,
+                'firstName': 'John',
+                'lastName': 'Doe',
+                'shirtSize': 'M',
+                'diet': 'NONE',
+                'age': 19,
+                'graduationYear': 2019,
+                'transportation': 'NOT_NEEDED',
+                'school': 'University of Illinois at Urbana-Champaign',
+                'major': 'Computer Science',
+                'gender': 'MALE',
+                'professionalInterest': 'BOTH',
+                'github': 'JDoe1234',
+                'linkedin': 'JDoe1234',
+                'interests': 'CS',
+                'finalized': false,
+                'status': 'ACCEPTED',
+                'isNovice': true,
+                'isPrivate': false,
+                'hasLightningInterest': false,
+                'phoneNumber': '12345678910',
+                'userId': 1,
+                'priority': 1,
+                'wave': 2
             };
             testRegistration.projects = [
-            	{
-            		"name": "Example",
-            		"description": "Example project.",
-            		"repo": "http://www.github.com/hackillinois/api-2017",
-            		"isSuggestion": true
-            	}
+                {
+                    'name': 'Example',
+                    'description': 'Example project.',
+                    'repo': 'http://www.github.com/hackillinois/api-2017',
+                    'isSuggestion': true
+                }
             ];
             testRegistration.extras = [
-            	{
-            		"info": "Example extra info"
-            	}
+                {
+                    'info': 'Example extra info'
+                }
             ];
             testRegistration.ecosystemInterests = [
                 {
-                    "ecosystemId": 1
+                    'ecosystemId': 1
                 }
             ];
             testAttendee = Attendee.forge(testRegistration.attendee);
 
-            testRegistration.attendee.firstName = "Jane";
+            testRegistration.attendee.firstName = 'Jane';
 
-            testRegistration.extras[0].info = "New example extra info";
-            testRegistration.projects[0].description = "New example project description";
+            testRegistration.extras[0].info = 'New example extra info';
+            testRegistration.projects[0].description = 'New example project description';
             testRegistration.ecosystemInterests[0].ecosystemId = 2;
 
             _setAttendee = sinon.spy(Attendee.prototype, 'set');
@@ -282,30 +281,30 @@ describe('RegistrationService',function(){
             });
             var attendee = RegistrationService.updateAttendee(testAttendee, testRegistrationClone);
             attendee.then(function() {
-                assert(_setAttendee.withArgs(attendeeParams).calledOnce, "Attendee update not called with right parameters");
-                assert(_saveAttendee.calledOnce, "Attendee save not called");
-                assert(_saveAttendeeProject.calledOnce, "AttendeeProject save not called");
-                assert(_saveAttendeeExtraInfo.calledOnce, "AttendeeExtraInfo save not called");
-                assert(_saveAttendeeEcosystemInterest.calledOnce, "AttendeeEcosystemInterest save not called");
-                assert(!_saveAttendeeRequestedCollaborator.called, "AttendeeRequestedCollaborator save called when not updated");
+                assert(_setAttendee.withArgs(attendeeParams).calledOnce, 'Attendee update not called with right parameters');
+                assert(_saveAttendee.calledOnce, 'Attendee save not called');
+                assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
+                assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
+                assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
+                assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
                 return done();
             }).catch(function (err) {
-				return done(err);
-			});
+                return done(err);
+            });
         });
         afterEach(function (done) {
             tracker.uninstall();
             done();
         });
-		after(function(done) {
-			_setAttendee.restore();
-			_saveAttendee.restore();
-			_saveAttendeeProject.restore();
-			_saveAttendeeExtraInfo.restore();
-			_saveAttendeeEcosystemInterest.restore();
-			_saveAttendeeRequestedCollaborator.restore();
-			done();
-		});
+        after(function(done) {
+            _setAttendee.restore();
+            _saveAttendee.restore();
+            _saveAttendeeProject.restore();
+            _saveAttendeeExtraInfo.restore();
+            _saveAttendeeEcosystemInterest.restore();
+            _saveAttendeeRequestedCollaborator.restore();
+            done();
+        });
     });
 
 });

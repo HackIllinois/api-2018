@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var time = require('../utils/time');
 var events = require('../utils/events');
 

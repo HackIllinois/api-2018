@@ -1,7 +1,6 @@
 var Request = require('./Request');
 var checkin = require('../utils/check_in');
 
-
 var bodyRequired = ['location', 'swag', 'credentialsRequested'];
 var bodyValidations = {
     location: ['required', 'string', checkin.verifyLocation],
@@ -9,16 +8,14 @@ var bodyValidations = {
     swag: ['required', 'boolean']
 };
 
-
-function CreateCheckInRequest(headers, body) {
+function CheckInRequest(headers, body) {
     Request.call(this, headers, body);
 
     this.bodyRequired = bodyRequired;
     this.bodyValidations = bodyValidations;
-};
+}
 
+CheckInRequest.prototype = Object.create(Request.prototype);
+CheckInRequest.prototype.constructor = CheckInRequest;
 
-CreateCheckInRequest.prototype = Object.create(Request.prototype);
-CreateCheckInRequest.prototype.constructor = CreateCheckInRequest;
-
-module.exports = CreateCheckInRequest;
+module.exports = CheckInRequest;

@@ -8,7 +8,7 @@ var eventLocationValidations = {
 };
 
 var bodyRequired = ['event'];
-var bodyAllowed = ['eventLocations']
+var bodyAllowed = ['eventLocations'];
 var bodyValidations = {
     'event': ['required', 'plainObject'],
     'event.name': ['required', 'string', 'maxLength:255'],
@@ -16,7 +16,7 @@ var bodyValidations = {
     'event.startTime': ['required', time.verifyDate],
     'event.endTime': ['required', time.verifyDate],
     'event.tag': ['required', 'string', events.verifyTag],
-    'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'), 'eventLocations')]
+    'eventLocations': ['array', validators.array(validators.nested(eventLocationValidations, 'eventLocations'))]
 };
 
 function EventCreationRequest(headers, body) {

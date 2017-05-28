@@ -6,6 +6,7 @@ module.exports.buckets = {};
 // automatically at the end of the exports
 module.exports.buckets.resumes = 'hackillinois-resumes';
 
-Object.keys(module.exports.buckets).forEach(function (key) {
-	module.exports.buckets[key] += config.storage.bucketExtension;
-});
+Object.keys(module.exports.buckets)
+  .forEach(function(key) {
+      module.exports.buckets[key] += config.storage.bucketExtension;
+  });

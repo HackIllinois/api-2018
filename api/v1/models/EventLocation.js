@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var Model = require('./Model');
 var EventLocation = Model.extend({
     tableName: 'event_locations',

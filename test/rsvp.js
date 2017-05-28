@@ -30,17 +30,17 @@ describe('RSVPService',function(){
             testUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
             testAttendee = Attendee.forge({
-                "id": 1,
-                "userId": 1,
-                "firstName": "John",
-                "lastName": "Doe"
+                'id': 1,
+                'userId': 1,
+                'firstName': 'John',
+                'lastName': 'Doe'
             });
 
             testRSVP =  {
-                "id": 1,
-                "attendeeId": 1,
-                "isAttending": true,
-                "type": "CREATE"
+                'id': 1,
+                'attendeeId': 1,
+                'isAttending': true,
+                'type': 'CREATE'
             };
 
             _forgeRSVP = sinon.spy(AttendeeRSVP, 'forge');
@@ -63,9 +63,9 @@ describe('RSVPService',function(){
             RSVP.bind(this).then(function() {
                 var _userRole = testUser.getRole(utils.roles.ATTENDEE);
 
-                assert(_forgeRSVP.called, "RSVP forge not called with right parameters");
-                assert(_saveRSVP.calledOnce, "RSVP save not called");
-                assert(_userRole.get('active'), "Attendee role not set to active");
+                assert(_forgeRSVP.called, 'RSVP forge not called with right parameters');
+                assert(_saveRSVP.calledOnce, 'RSVP save not called');
+                assert(_userRole.get('active'), 'Attendee role not set to active');
                 return done();
             }).catch(function (err) {
                 return done(err);
@@ -95,13 +95,13 @@ describe('RSVPService',function(){
         var nonExistentTestAttendee;
 
         before(function (done) {
-            testAttendee = Attendee.forge({id: 1, firstName: "Example", lastName: "User"});
-            nonExistentTestAttendee = Attendee.forge({id: 2, firstName: "Example", lastName: "User"});
+            testAttendee = Attendee.forge({id: 1, firstName: 'Example', lastName: 'User'});
+            nonExistentTestAttendee = Attendee.forge({id: 2, firstName: 'Example', lastName: 'User'});
             var testRSVP  = AttendeeRSVP.forge({
-                "id": 100,
-                "attendeeId": 1,
-                "isAttending": true,
-                "type": "CREATE"
+                'id': 100,
+                'attendeeId': 1,
+                'isAttending': true,
+                'type': 'CREATE'
             });
 
             _findByAttendeeId = sinon.stub(AttendeeRSVP,'findByAttendeeId');
@@ -112,10 +112,10 @@ describe('RSVPService',function(){
         });
         it('finds existing rsvp',function(done){
             var RSVP = RSVPService.findRSVPByAttendee(testAttendee);
-            expect(RSVP).to.eventually.have.deep.property("attributes.id", 100, "ID should be 100, the searched for ID")
+            expect(RSVP).to.eventually.have.deep.property('attributes.id', 100, 'ID should be 100, the searched for ID')
                 .then(function(){
-                    expect(RSVP).to.eventually.have.deep.property("attributes.isAttending",
-                        true,"isAttending should be true").notify(done);
+                    expect(RSVP).to.eventually.have.deep.property('attributes.isAttending',
+                        true,'isAttending should be true').notify(done);
                 });
         });
         it('throws exception after searching for non-existent attendee',function(done){
@@ -142,10 +142,10 @@ describe('RSVPService',function(){
             UserRole.setActive(_attendeeRole, true, null);
 
             testRSVP = {
-                "id": 100,
-                "attendeeId": 1,
-                "isAttending": true,
-                "type": "CREATE"
+                'id': 100,
+                'attendeeId': 1,
+                'isAttending': true,
+                'type': 'CREATE'
             };
             testAttendeeRSVP = AttendeeRSVP.forge();
 
@@ -170,12 +170,12 @@ describe('RSVPService',function(){
 
             var RSVP = RSVPService.updateRSVP(testUser, testAttendeeRSVP, testRSVPClone);
             RSVP.bind(this).then(function() {
-                assert(_setRSVP.calledOnce, "RSVP update not called with right parameters");
-                assert(_saveRSVP.calledOnce, "RSVP save not called");
+                assert(_setRSVP.calledOnce, 'RSVP update not called with right parameters');
+                assert(_saveRSVP.calledOnce, 'RSVP save not called');
 
                 _attendeeRole = testUser.getRole(utils.roles.ATTENDEE);
-                assert(!_attendeeRole.get('active'), "Role is not unset when attendance is revoked");
-                assert(!this.type, "Type is not removed when attendance is revoked");
+                assert(!_attendeeRole.get('active'), 'Role is not unset when attendance is revoked');
+                assert(!this.type, 'Type is not removed when attendance is revoked');
 
                 return done();
             }).catch(function (err) {
