@@ -25,12 +25,12 @@ const STATS_REG_HEADER = 'registration';
  * @return {Function} The generated function
  */
 function _populateStats(key, stats) {
-    return function(result) {
-        stats[key] = {};
-        _.forEach(result.models, function(model) {
-            stats[key][model.attributes.name] = model.attributes.count;
-        });
-    };
+	return function(result) {
+		stats[key] = {};
+		_.forEach(result.models, function(model) {
+			stats[key][model.attributes.name] = model.attributes.count;
+		});
+	};
 }
 
 /**
@@ -41,9 +41,9 @@ function _populateStats(key, stats) {
  * @return {Function} The generated function
  */
 function _populateStatsField(key, stats) {
-    return function(result) {
-        stats[key] = result.attributes.count;
-    };
+	return function(result) {
+		stats[key] = result.attributes.count;
+	};
 }
 
 /**
@@ -52,13 +52,13 @@ function _populateStatsField(key, stats) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateEcosystems(cb) {
-    return AttendeeEcosystemInterest.query(function(qb) {
-        qb.select('e.name')
+	return AttendeeEcosystemInterest.query(function(qb) {
+		qb.select('e.name')
         .count('ecosystem_id as count')
         .from('attendee_ecosystem_interests as aei')
         .innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
         .groupBy('aei.ecosystem_id');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -70,50 +70,50 @@ function _populateEcosystems(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingEcosystems(cb) {
-    return Attendee.query(function(qb) {
-        qb.select('e.name')
+	return Attendee.query(function(qb) {
+		qb.select('e.name')
         .count('a.accepted_ecosystem_id as count')
         .from('attendees as a')
         .innerJoin('ecosystems as e', function() {
-            this.on('e.id', '=', 'a.accepted_ecosystem_id')
+	this.on('e.id', '=', 'a.accepted_ecosystem_id')
             .andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
-        })
+})
         .innerJoin('attendee_rsvps as ar', function() {
-            this.on('ar.attendee_id', '=', 'a.id')
+	this.on('ar.attendee_id', '=', 'a.id')
             .andOn('ar.is_attending', '=', knex.raw('?', ['1']))
             .andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
-        })
+})
         .groupBy('a.accepted_ecosystem_id');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
 
 function _populateCheckedInEcosystems(cb) {
-    return Attendee.query(function(qb) {
-        qb.select('e.name')
+	return Attendee.query(function(qb) {
+		qb.select('e.name')
         .count('a.accepted_ecosystem_id as count')
         .from('attendees as a')
         .innerJoin('ecosystems as e', function() {
-            this.on('e.id', '=', 'a.accepted_ecosystem_id')
+	this.on('e.id', '=', 'a.accepted_ecosystem_id')
             .andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
-        })
+})
         .innerJoin('attendee_rsvps as ar', function() {
-            this.on('ar.attendee_id', '=', 'a.id')
+	this.on('ar.attendee_id', '=', 'a.id')
             .andOn('ar.is_attending', '=', knex.raw('?', ['1']))
             .andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
-        })
+})
         .innerJoin('checkins as ci', 'a.user_id', 'ci.user_id')
         .groupBy('a.accepted_ecosystem_id');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
 
 function _populateCheckins(cb) {
-    return CheckIn.query(function(qb) {
-        qb.count('id as count');
-    })
+	return CheckIn.query(function(qb) {
+		qb.count('id as count');
+	})
     .fetch()
     .then(cb);
 }
@@ -125,12 +125,12 @@ function _populateCheckins(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateRSVPs(cb) {
-    return AttendeeRSVP.query(function(qb) {
-        qb.select('is_attending as name')
+	return AttendeeRSVP.query(function(qb) {
+		qb.select('is_attending as name')
         .count('is_attending as count')
         .from('attendee_rsvps')
         .groupBy('is_attending');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -142,12 +142,12 @@ function _populateRSVPs(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateRSVPTypes(cb) {
-    return AttendeeRSVP.query(function(qb) {
-        qb.select('type as name')
+	return AttendeeRSVP.query(function(qb) {
+		qb.select('type as name')
         .count('is_attending as count')
         .from('attendee_rsvps')
         .groupBy('type');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -159,12 +159,12 @@ function _populateRSVPTypes(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendeeAttribute(attribute, cb) {
-    return Attendee.query(function(qb) {
-        qb.select(attribute + ' as name')
+	return Attendee.query(function(qb) {
+		qb.select(attribute + ' as name')
         .count(attribute + ' as count')
         .from('attendees')
         .groupBy(attribute);
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -177,15 +177,15 @@ function _populateAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingAttendeeAttribute(attribute, cb) {
-    return Attendee.query(function(qb) {
-        qb.select(attribute + ' as name')
+	return Attendee.query(function(qb) {
+		qb.select(attribute + ' as name')
         .count(attribute + ' as count')
         .innerJoin('attendee_rsvps as ar', function() {
-            this.on('attendees.status', '=', knex.raw('?', ['ACCEPTED']))
+	this.on('attendees.status', '=', knex.raw('?', ['ACCEPTED']))
             .andOn('ar.is_attending', '=', knex.raw('?', ['1']));
-        })
+})
         .groupBy(attribute);
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -196,14 +196,14 @@ function _populateAttendingAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendees(cb) {
-    return Attendee.query(function(qb) {
-        qb.count('a.id as attending')
+	return Attendee.query(function(qb) {
+		qb.count('a.id as attending')
         .from('attendees as a')
         .innerJoin('attendee_rsvps as ar', function() {
-            this.on('a.status', '=', knex.raw('?', ['ACCEPTED']))
+	this.on('a.status', '=', knex.raw('?', ['ACCEPTED']))
             .andOn('ar.is_attending', '=', knex.raw('?', ['1']));
-        });
-    })
+});
+	})
     .fetch()
     .then(cb);
 }
@@ -214,10 +214,10 @@ function _populateAttendees(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateTrackedEvents(cb) {
-    return TrackedEvent.query(function(qb) {
-        qb.select('name', 'count')
+	return TrackedEvent.query(function(qb) {
+		qb.select('name', 'count')
         .groupBy('name');
-    })
+	})
     .fetchAll()
     .then(cb);
 }
@@ -227,178 +227,178 @@ function _populateTrackedEvents(cb) {
  * @return {Promise<Object>}	resolving to key-value pairs of stats
  */
 module.exports.fetchAllStats = function() {
-    var stats = {};
-    stats.registrationStats = {};
-    stats.rsvpStats = {};
-    stats.liveEventStats = {};
+	var stats = {};
+	stats.registrationStats = {};
+	stats.rsvpStats = {};
+	stats.liveEventStats = {};
 
-    return module.exports.fetchRegistrationStats()
+	return module.exports.fetchRegistrationStats()
     .then(function(regstats) {
-        stats.registrationStats = regstats;
-        return module.exports.fetchRSVPStats();
-    })
+	stats.registrationStats = regstats;
+	return module.exports.fetchRSVPStats();
+})
     .then(function(rsvpstats) {
-        stats.rsvpStats = rsvpstats;
-        return module.exports.fetchLiveEventStats();
-    })
+	stats.rsvpStats = rsvpstats;
+	return module.exports.fetchLiveEventStats();
+})
     .then(function(livestats) {
-        stats.liveEventStats = livestats;
-        return stats;
-    });
+	stats.liveEventStats = livestats;
+	return stats;
+});
 };
 
 module.exports.fetchRegistrationStats = function() {
-    return cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
+	return cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
     .then(function(hasKey) {
-        if (hasKey) {
-            return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
+	if (hasKey) {
+		return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
           .then(function(object) {
-              return JSON.parse(object);
-          });
-        } else {
-            var stats = {};
-            var queries = [];
+	return JSON.parse(object);
+});
+	} else {
+		var stats = {};
+		var queries = [];
 
-            var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
-            queries.push(ecosystemsQuery);
+		var ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
+		queries.push(ecosystemsQuery);
 
-            var schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
-            queries.push(schoolQuery);
+		var schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
+		queries.push(schoolQuery);
 
-            var transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
-            queries.push(transportationQuery);
+		var transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
+		queries.push(transportationQuery);
 
-            var dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
-            queries.push(dietQuery);
+		var dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
+		queries.push(dietQuery);
 
-            var shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-            queries.push(shirtSizeQuery);
+		var shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
+		queries.push(shirtSizeQuery);
 
-            var genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
-            queries.push(genderQuery);
+		var genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
+		queries.push(genderQuery);
 
-            var graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-            queries.push(graduationYearQuery);
+		var graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
+		queries.push(graduationYearQuery);
 
-            var majorQuery = _populateAttendeeAttribute('major', _populateStats('major', stats));
-            queries.push(majorQuery);
+		var majorQuery = _populateAttendeeAttribute('major', _populateStats('major', stats));
+		queries.push(majorQuery);
 
-            var isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-            queries.push(isNoviceQuery);
+		var isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
+		queries.push(isNoviceQuery);
 
-            var attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
-            queries.push(attendeeQuery);
+		var attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
+		queries.push(attendeeQuery);
 
-            var statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
-            queries.push(statusQuery);
+		var statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
+		queries.push(statusQuery);
 
-            return _Promise.all(queries)
+		return _Promise.all(queries)
           .then(function() {
-              return cache.storeString(STATS_REG_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+	return cache.storeString(STATS_REG_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(function() {
-                  var tenMinutesFromNow = (10 * 60);
-                  return cache.expireKey(STATS_REG_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
+	var tenMinutesFromNow = (10 * 60);
+	return cache.expireKey(STATS_REG_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
                   .then(function() {
-                      return stats;
-                  });
-              });
-          });
-        }
-    });
+	return stats;
+});
+});
+});
+	}
+});
 };
 
 module.exports.fetchRSVPStats = function() {
-    return cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
+	return cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
     .then(function(hasKey) {
-        if (hasKey) {
-            return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
+	if (hasKey) {
+		return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
           .then(function(object) {
-              return JSON.parse(object);
-          });
-        } else {
-            var stats = {};
-            var queries = [];
+	return JSON.parse(object);
+});
+	} else {
+		var stats = {};
+		var queries = [];
 
-            var attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats));
-            queries.push(attendingEcosystemsQuery);
+		var attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats));
+		queries.push(attendingEcosystemsQuery);
 
-            var attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
-            queries.push(attendingSchoolQuery);
+		var attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
+		queries.push(attendingSchoolQuery);
 
-            var attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats));
-            queries.push(attendingTransportationQuery);
+		var attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats));
+		queries.push(attendingTransportationQuery);
 
-            var attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats));
-            queries.push(attendingDietQuery);
+		var attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats));
+		queries.push(attendingDietQuery);
 
-            var attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-            queries.push(attendingShirtSizeQuery);
+		var attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
+		queries.push(attendingShirtSizeQuery);
 
-            var attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats));
-            queries.push(attendingGenderQuery);
+		var attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats));
+		queries.push(attendingGenderQuery);
 
-            var attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-            queries.push(attendingGraduationYearQuery);
+		var attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
+		queries.push(attendingGraduationYearQuery);
 
-            var attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats));
-            queries.push(attendingMajorQuery);
+		var attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats));
+		queries.push(attendingMajorQuery);
 
-            var attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-            queries.push(attendingIsNoviceQuery);
+		var attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
+		queries.push(attendingIsNoviceQuery);
 
-            var RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
-            queries.push(RSVPsQuery);
+		var RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
+		queries.push(RSVPsQuery);
 
-            var RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
-            queries.push(RSVPTypesQuery);
+		var RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
+		queries.push(RSVPTypesQuery);
 
-            return _Promise.all(queries)
+		return _Promise.all(queries)
           .then(function() {
-              return cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+	return cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(function() {
-                  var tenMinutesFromNow = (10 * 60);
-                  return cache.expireKey(STATS_RSVP_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
+	var tenMinutesFromNow = (10 * 60);
+	return cache.expireKey(STATS_RSVP_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
                   .then(function() {
-                      return stats;
-                  });
-              });
-          });
-        }
-    });
+	return stats;
+});
+});
+});
+	}
+});
 };
 
 module.exports.fetchLiveEventStats = function() {
-    return cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
+	return cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
     .then(function(hasKey) {
-        if (hasKey) {
-            return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
+	if (hasKey) {
+		return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
           .then(function(object) {
-              return JSON.parse(object);
-          });
-        } else {
-            var stats = {};
-            var queries = [];
+	return JSON.parse(object);
+});
+	} else {
+		var stats = {};
+		var queries = [];
 
-            var checkIns = _populateCheckins(_populateStatsField('checkins', stats));
-            queries.push(checkIns);
+		var checkIns = _populateCheckins(_populateStatsField('checkins', stats));
+		queries.push(checkIns);
 
-            var checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats));
-            queries.push(checkedInEcosystemsQuery);
+		var checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats));
+		queries.push(checkedInEcosystemsQuery);
 
-            var trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
-            queries.push(trackedEventQuery);
+		var trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
+		queries.push(trackedEventQuery);
 
-            return _Promise.all(queries)
+		return _Promise.all(queries)
           .then(function() {
-              return cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+	return cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(function() {
-                  var oneMinuteFromNow = 60;
-                  return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
+	var oneMinuteFromNow = 60;
+	return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
                   .then(function() {
-                      return stats;
-                  });
-              });
-          });
-        }
-    });
+	return stats;
+});
+});
+});
+	}
+});
 };

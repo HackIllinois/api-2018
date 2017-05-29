@@ -1,53 +1,48 @@
-var _ = require('lodash');
-var bodyParser = require('body-parser');
-var _Promise = require('bluebird');
+const _ = require('lodash');
+const bodyParser = require('body-parser');
+const _Promise = require('bluebird');
 
-var services = require('../services');
-var middleware = require('../middleware');
-var requests = require('../requests');
-var roles = require('../utils/roles');
-var mail = require('../utils/mail');
+const services = require('../services');
+const middleware = require('../middleware');
+const requests = require('../requests');
+const roles = require('../utils/roles');
+const mail = require('../utils/mail');
 
-var router = require('express').Router();
+const router = require('express').Router();
 
-
-var acceptanceLists = ['wave1', 'wave2', 'wave3', 'wave4', 'wave5'];
-
+const ACCEPTANCE_LISTS = ['wave1', 'wave2', 'wave3', 'wave4', 'wave5'];
 
 function sendMailinglist(req, res, next) {
-    var listName = req.body.listName;
-    var mailList = mail.lists[listName];
-    var template = req.body.template;
+	const listName = req.body.listName;
+	const mailList = mail.lists[listName];
+	const template = req.body.template;
 
-    services.MailService.checkIfSent(mailList)
-		.then(function () {
-    return services.MailService.sendToList(mailList, template);
-})
-		.then(function () {
-    if(_.includes(acceptanceLists, listName)){
-        return services.MailService.markAsSent(mailList);
-    }
-    return _Promise.resolve(true);
-})
-		.then(function () {
-    res.body = {};
-    res.body.sent = true;
+	services.MailService.checkIfSent(mailList)
+		.then(() => {
+			return services.MailService.sendToList(mailList, template);
+		})
+		.then(() => {
+			if (_.includes(ACCEPTANCE_LISTS, listName)) {
+				return services.MailService.markAsSent(mailList);
+			}
+			return _Promise.resolve(true);
+		})
+		.then(() => {
+			res.body = {};
+			res.body.sent = true;
 
-    next();
-    return null;
-})
-		.catch(function (error) {
-    next(error);
-    return null;
-});
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.put('/send', middleware.request(requests.SendListRequest),
-	middleware.permission(roles.ORGANIZERS), sendMailinglist);
+router.put('/send', middleware.request(requests.SendListRequest), middleware.permission(roles.ORGANIZERS), sendMailinglist);
 
 router.use(middleware.response);
 router.use(middleware.errors);

@@ -2,24 +2,24 @@ var checkin = require('../utils/check_in');
 
 var Model = require('./Model');
 var CheckIn =  Model.extend({
-    tableName: 'checkins',
-    idAttribute: 'id',
-    validations: {
-        userId: ['required', 'integer'],
-        location: ['required', 'string', checkin.verifyLocation],
-        swag: ['required', 'boolean']
-    },
-    parse: function (attrs) {
-        attrs = Model.prototype.parse(attrs);
-        if (Number.isInteger(attrs.swag)) {
-            attrs.swag = !!attrs.swag;
-        }
-        return attrs;
-    }
+	tableName: 'checkins',
+	idAttribute: 'id',
+	validations: {
+		userId: ['required', 'integer'],
+		location: ['required', 'string', checkin.verifyLocation],
+		swag: ['required', 'boolean']
+	},
+	parse: function (attrs) {
+		attrs = Model.prototype.parse(attrs);
+		if (Number.isInteger(attrs.swag)) {
+			attrs.swag = !!attrs.swag;
+		}
+		return attrs;
+	}
 });
 
 CheckIn.findByUserId = function (id) {
-    return CheckIn.where({ user_id: id }).fetch();
+	return CheckIn.where({ user_id: id }).fetch();
 };
 
 

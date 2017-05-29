@@ -1,25 +1,24 @@
-var CheckitError = require('checkit').Error;
+const CheckitError = require('checkit')
+	.Error;
 
-var errorUtils = require('../utils/errors');
+const errorUtils = require('../utils/errors');
 
 module.exports = function(Request) {
-    return function(req, res, next) {
-        if (!Request) {
-            return next();
-        }
+	return (req, res, next) => {
+		if (!Request) {
+			return next();
+		}
 
-        var request = new Request(req.headers, req.body);
-        request.validate()
-			.then(function() {
-    req.body = request.body();
+		const request = new Request(req.headers, req.body);
+		request.validate()
+			.then(() => {
+				req.body = request.body();
 
-    next();
-    return null;
-})
+				return next();
+			})
 			.catch(CheckitError, errorUtils.handleValidationError)
-			.catch(function(error) {
-    next(error);
-    return null;
-});
-    };
+			.catch((error) => {
+				return next(error);
+			});
+	};
 };

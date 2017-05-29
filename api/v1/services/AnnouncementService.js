@@ -11,7 +11,7 @@ var Announcement = require('../models/Announcement');
  * @return {Promise<Collection>} a promise resolving to a collection of Announcements
  */
 module.exports.getAllAnnouncements = function (before, after, limit) {
-    return Announcement.findAll(before, after, limit);
+	return Announcement.findAll(before, after, limit);
 };
 
 /**
@@ -20,7 +20,7 @@ module.exports.getAllAnnouncements = function (before, after, limit) {
  * @return {Promise<Announcement>} a promise resolving to a new Announcement
  */
 module.exports.createAnnouncement = function (parameters) {
-    return Announcement.forge(parameters).save();
+	return Announcement.forge(parameters).save();
 };
 
 /**
@@ -30,15 +30,15 @@ module.exports.createAnnouncement = function (parameters) {
  * @throws {InvalidParameterError} when no Announcement can be found
  */
 module.exports.findById = function (id) {
-    return Announcement.findById(id).then(function (result) {
-        if (_.isNil(result)) {
-            var message = 'An Announcement with the given id does not exist';
-            var source = 'id';
-            throw new InvalidParameterError(message, source);
-        }
+	return Announcement.findById(id).then(function (result) {
+		if (_.isNil(result)) {
+			var message = 'An Announcement with the given id does not exist';
+			var source = 'id';
+			throw new InvalidParameterError(message, source);
+		}
 
-        return result;
-    });
+		return result;
+	});
 };
 
 /**
@@ -48,8 +48,8 @@ module.exports.findById = function (id) {
  * @return {Promise<Announcement>} a promise resolving to the updated announcement
  */
 module.exports.updateAnnouncement = function (announcement, parameters) {
-    announcement.set(parameters);
-    return announcement.save();
+	announcement.set(parameters);
+	return announcement.save();
 };
 
 /**
@@ -58,5 +58,5 @@ module.exports.updateAnnouncement = function (announcement, parameters) {
  * @return {Promise<>} an empty-resolving promise
  */
 module.exports.deleteAnnouncement = function (announcement) {
-    return announcement.destroy();
+	return announcement.destroy();
 };

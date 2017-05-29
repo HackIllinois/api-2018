@@ -1,12 +1,12 @@
-module.exports = function (req, res, next) {
-    if (res.headersSent) {
-        return next();
-    }
-	
-    var response = {
-        meta: (res.meta) ? res.meta : null,
-        data: (res.body) ? res.body : {}
-    };
+module.exports = (req, res, next) => {
+	if (res.headersSent) {
+		return next();
+	}
 
-    return res.json(response);
+	const response = {
+		meta: (res.meta) ? res.meta : null,
+		data: (res.body) ? res.body : {}
+	};
+
+	return res.json(response);
 };

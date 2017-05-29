@@ -14,7 +14,7 @@ var utils = require('../utils');
  * @returns {Promise} the resolved rsvp
  */
 module.exports.getRSVPById = function(id) {
-    return RSVP.findById(id);
+	return RSVP.findById(id);
 };
 
 /**
@@ -26,23 +26,23 @@ module.exports.getRSVPById = function(id) {
  * @throws {InvalidParameterError} thrown when an attendee already has an rsvp
  */
 module.exports.createRSVP = function(attendee, user, attributes) {
-    attributes.attendeeId = attendee.get('id');
-    var rsvp = RSVP.forge(attributes);
+	attributes.attendeeId = attendee.get('id');
+	var rsvp = RSVP.forge(attributes);
 
-    return rsvp
+	return rsvp
     .validate()
     .catch(CheckitError, utils.errors.handleValidationError)
     .then(function() {
-        return RSVP.transaction(function(t) {
-            return rsvp.save(null, {
-                transacting: t
-            })
+	return RSVP.transaction(function(t) {
+		return rsvp.save(null, {
+			transacting: t
+		})
           .tap(function() {
-              var userRole = user.getRole(utils.roles.ATTENDEE);
-              return UserRole.setActive(userRole, true, t);
-          });
-        });
-    })
+	var userRole = user.getRole(utils.roles.ATTENDEE);
+	return UserRole.setActive(userRole, true, t);
+});
+	});
+})
     .catch(
       utils.errors.DuplicateEntryError,
       utils.errors.handleDuplicateEntryError('An RSVP already exists for the given attendee', 'attendeeId')
@@ -56,17 +56,17 @@ module.exports.createRSVP = function(attendee, user, attributes) {
  * @throws {NotFoundError} when the attendee has no RSVP
  */
 module.exports.findRSVPByAttendee = function(attendee) {
-    return RSVP
+	return RSVP
     .findByAttendeeId(attendee.get('id'))
     .then(function(result) {
-        if (_.isNull(result)) {
-            var message = 'An RSVP cannot be found for the given attendee';
-            var source = 'attendeeId';
-            throw new errors.NotFoundError(message, source);
-        }
+	if (_.isNull(result)) {
+		var message = 'An RSVP cannot be found for the given attendee';
+		var source = 'attendeeId';
+		throw new errors.NotFoundError(message, source);
+	}
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -76,18 +76,18 @@ module.exports.findRSVPByAttendee = function(attendee) {
  * @returns {Promise} the resolved RSVP
  */
 module.exports.updateRSVP = function(user, rsvp, attributes) {
-    rsvp.set({
-        'type': null
-    });
-    rsvp.set(attributes);
+	rsvp.set({
+		'type': null
+	});
+	rsvp.set(attributes);
 
-    return rsvp
+	return rsvp
     .validate()
     .catch(CheckitError, utils.errors.handleValidationError)
     .then(function() {
-        var userRole = user.getRole(utils.roles.ATTENDEE);
-        rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false);
+	var userRole = user.getRole(utils.roles.ATTENDEE);
+	rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false);
 
-        return rsvp.save();
-    });
+	return rsvp.save();
+});
 };

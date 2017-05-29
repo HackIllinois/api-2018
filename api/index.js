@@ -12,11 +12,11 @@ var utils = require('./v1/utils/');
 
 User.findByEmail(config.superuser.email)
 	.then(function (result) {
-    if (!result) {
-        return User.create(config.superuser.email, config.superuser.password, utils.roles.SUPERUSER);
-    }
+		if (!result) {
+			return User.create(config.superuser.email, config.superuser.password, utils.roles.SUPERUSER);
+		}
 
-    return null;
-});
+		return null;
+	});
 
 module.exports = { v1: v1 };

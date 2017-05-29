@@ -16,95 +16,95 @@ var remote = new client.S3();
 const CLIENT_NAME = 'AWS_S3';
 
 function _handleDisabledUpload(upload, file) {
-    if (!config.isDevelopment) {
+	if (!config.isDevelopment) {
     // something went wrong and we made it into production without
     // an enabled client, so do not expose the instance's file system
-        throw new errors.ApiError();
-    }
+		throw new errors.ApiError();
+	}
 
-    var params = {};
-    params.bucket = upload.get('bucket');
-    params.key = upload.get('key');
-    params.type = file.type;
+	var params = {};
+	params.bucket = upload.get('bucket');
+	params.key = upload.get('key');
+	params.type = file.type;
 
-    return files.writeFile(file.content, params);
+	return files.writeFile(file.content, params);
 }
 
 function _handleUpload(upload, file) {
-    var params = {};
-    params.Body = file.content;
-    params.Bucket = upload.get('bucket');
-    params.Key = upload.get('key');
-    params.ContentLength = file.content.length;
-    params.ContentType = file.type;
+	var params = {};
+	params.Body = file.content;
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
+	params.ContentLength = file.content.length;
+	params.ContentType = file.type;
 
-    return remote.putObject(params)
+	return remote.putObject(params)
     .promise()
     .catch(function(error) {
-        var message = 'the storage client received an error on upload';
-        message += ' (' + error.message + ')';
+	var message = 'the storage client received an error on upload';
+	message += ' (' + error.message + ')';
 
-        throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    });
+	throw new errors.ExternalProviderError(message, CLIENT_NAME);
+});
 }
 
 function _handleDisabledRetrieval(upload) {
-    return files.getFile(upload.get('key'), upload.get('bucket'))
+	return files.getFile(upload.get('key'), upload.get('bucket'))
     .then(function(file) {
-        var result = {};
-        result.content = file.content;
-        result.type = file.type;
+	var result = {};
+	result.content = file.content;
+	result.type = file.type;
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 }
 
 function _handleRetrieval(upload) {
-    var params = {};
-    params.Bucket = upload.get('bucket');
-    params.Key = upload.get('key');
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
 
-    return remote.getObject(params)
+	return remote.getObject(params)
     .promise()
     .then(function(data) {
-        var result = {};
-        result.content = data.Body;
-        result.type = data.ContentType;
+	var result = {};
+	result.content = data.Body;
+	result.type = data.ContentType;
 
-        return result;
-    })
+	return result;
+})
     .catch(function(error) {
-        var message = 'the storage client received an error on retrieval';
-        message += ' (' + error.message + ')';
+	var message = 'the storage client received an error on retrieval';
+	message += ' (' + error.message + ')';
 
-        throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    });
+	throw new errors.ExternalProviderError(message, CLIENT_NAME);
+});
 }
 
 function _handleDisabledRemoval(upload) {
-    return files
+	return files
     .removeFile(upload.get('key'), upload.get('bucket'))
     .then(function() {
-        return upload.destroy();
-    });
+	return upload.destroy();
+});
 }
 
 function _handleRemoval(upload) {
-    var params = {};
-    params.Bucket = upload.get('bucket');
-    params.Key = upload.get('key');
+	var params = {};
+	params.Bucket = upload.get('bucket');
+	params.Key = upload.get('key');
 
-    return remote.deleteObject(params)
+	return remote.deleteObject(params)
     .promise()
     .catch(function(error) {
-        var message = 'the storage client received an error on removal';
-        message += ' (' + error.message + ')';
+	var message = 'the storage client received an error on removal';
+	message += ' (' + error.message + ')';
 
-        throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    })
+	throw new errors.ExternalProviderError(message, CLIENT_NAME);
+})
     .then(function() {
-        return upload.destory();
-    });
+	return upload.destory();
+});
 }
 
 /**
@@ -114,17 +114,17 @@ function _handleRemoval(upload) {
  * @throws {NotFoundError}	when the upload does not exist
  */
 module.exports.findUploadById = function(id) {
-    return Upload
+	return Upload
     .findById(id)
     .then(function(result) {
-        if (_.isNull(result)) {
-            var message = 'An upload with the given ID cannot be found';
-            var source = 'id';
-            throw new errors.NotFoundError(message, source);
-        }
+	if (_.isNull(result)) {
+		var message = 'An upload with the given ID cannot be found';
+		var source = 'id';
+		throw new errors.NotFoundError(message, source);
+	}
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -135,16 +135,16 @@ module.exports.findUploadById = function(id) {
  * @throws {NotFoundError} when the upload does not exist
  */
 module.exports.findUploadByKey = function(key, bucket) {
-    return Upload
+	return Upload
     .findByKey(key, bucket)
     .then(function(result) {
-        if (_.isNull(result)) {
-            var message = 'An upload with the given key does not exist in the provided bucket';
-            throw new errors.NotFoundError(message);
-        }
+	if (_.isNull(result)) {
+		var message = 'An upload with the given key does not exist in the provided bucket';
+		throw new errors.NotFoundError(message);
+	}
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -158,12 +158,12 @@ module.exports.findUploadByKey = function(key, bucket) {
  *
  */
 module.exports.createUpload = function(owner, params) {
-    var uploadParams = {};
-    uploadParams.ownerId = owner.get('id');
-    uploadParams.key = params.key || uuid.v4();
-    uploadParams.bucket = params.bucket;
+	var uploadParams = {};
+	uploadParams.ownerId = owner.get('id');
+	uploadParams.key = params.key || uuid.v4();
+	uploadParams.bucket = params.bucket;
 
-    return Upload.forge(uploadParams)
+	return Upload.forge(uploadParams)
     .save();
 };
 
@@ -177,10 +177,10 @@ module.exports.createUpload = function(owner, params) {
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
 module.exports.persistUpload = function(upload, file) {
-    if (!config.aws.enabled) {
-        return _handleDisabledUpload(upload, file);
-    }
-    return _handleUpload(upload, file);
+	if (!config.aws.enabled) {
+		return _handleDisabledUpload(upload, file);
+	}
+	return _handleUpload(upload, file);
 };
 
 /**
@@ -192,10 +192,10 @@ module.exports.persistUpload = function(upload, file) {
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.getUpload = function(upload) {
-    if (!config.aws.enabled) {
-        return _handleDisabledRetrieval(upload);
-    }
-    return _handleRetrieval(upload);
+	if (!config.aws.enabled) {
+		return _handleDisabledRetrieval(upload);
+	}
+	return _handleRetrieval(upload);
 };
 
 /**
@@ -207,8 +207,8 @@ module.exports.getUpload = function(upload) {
  * @throws {ExternalProviderError}	when the client throws an error
  */
 module.exports.removeUpload = function(upload) {
-    if (!config.aws.enabled) {
-        return _handleDisabledRemoval(upload);
-    }
-    return _handleRemoval(upload);
+	if (!config.aws.enabled) {
+		return _handleDisabledRemoval(upload);
+	}
+	return _handleRemoval(upload);
 };

@@ -163,3 +163,5 @@ Environment variables should be set in `test.config`. With these values set, run
 ``` shell
 npm test
 ```
+
+which will output the test results, as well as any linter errors that may occur 

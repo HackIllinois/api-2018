@@ -1,11 +1,11 @@
 var Model = require('./Model');
 var AttendeeExtraInfo = Model.extend({
-    tableName: 'attendee_extra_infos',
-    idAttribute: 'id',
-    validations: {
-        attendeeId: ['required', 'integer'],
-        info:       ['required', 'string', 'maxLength:255']
-    }
+	tableName: 'attendee_extra_infos',
+	idAttribute: 'id',
+	validations: {
+		attendeeId: ['required', 'integer'],
+		info:       ['required', 'string', 'maxLength:255']
+	}
 });
 
 
@@ -15,7 +15,7 @@ var AttendeeExtraInfo = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeExtraInfo or null
 */
 AttendeeExtraInfo.findByAttendeeId = function (attendeeId) {
-    return AttendeeExtraInfo.where({ attendee_id: attendeeId }).fetch();
+	return AttendeeExtraInfo.where({ attendee_id: attendeeId }).fetch();
 };
 
 /**
@@ -24,7 +24,7 @@ AttendeeExtraInfo.findByAttendeeId = function (attendeeId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 AttendeeExtraInfo.findById = function (id) {
-    return AttendeeExtraInfo.where({ id: id }).fetch();
+	return AttendeeExtraInfo.where({ id: id }).fetch();
 };
 
 module.exports = AttendeeExtraInfo;

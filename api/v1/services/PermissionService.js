@@ -12,18 +12,18 @@ var roles = require('../utils/roles');
  * @throws {UnauthorizedError}  when the provided role is not authorized (rejected promise)
  */
 module.exports.canCreateUser = function (creator, userRole) {
-    if (creator.hasRole(roles.SUPERUSER)) {
+	if (creator.hasRole(roles.SUPERUSER)) {
 		// the superuser can create anyone
-        return _Promise.resolve(true);
-    }
-    if (roles.isIn(roles.COMMON, userRole) && creator.hasRoles(roles.ORGANIZERS)) {
+		return _Promise.resolve(true);
+	}
+	if (roles.isIn(roles.COMMON, userRole) && creator.hasRoles(roles.ORGANIZERS)) {
 		// the organizers must be able to create any of the
 		// common roles
-        return _Promise.resolve(true);
-    }
+		return _Promise.resolve(true);
+	}
 
-    var message = 'The requested user cannot be created with the provided credentials';
-    return _Promise.reject(new errors.UnauthorizedError(message));
+	var message = 'The requested user cannot be created with the provided credentials';
+	return _Promise.reject(new errors.UnauthorizedError(message));
 };
 
 
@@ -34,12 +34,12 @@ module.exports.canCreateUser = function (creator, userRole) {
  * @throws InvalidParameterError when a user does not have correct permissions
  */
 module.exports.canCreateProject = function (creator) {
-    if(creator.hasRole(roles.SUPERUSER) || creator.hasRole(roles.ORGANIZERS)){
-        return _Promise.resolve(true);
-    }
+	if(creator.hasRole(roles.SUPERUSER) || creator.hasRole(roles.ORGANIZERS)){
+		return _Promise.resolve(true);
+	}
 
-    var message = 'A project cannot be created with the provided credentials';
-    return _Promise.reject(new errors.UnauthorizedError(message));
+	var message = 'A project cannot be created with the provided credentials';
+	return _Promise.reject(new errors.UnauthorizedError(message));
 };
 
 
@@ -49,16 +49,16 @@ module.exports.canCreateProject = function (creator) {
  * @return {Promise} resolving to true if the user is an organizer, false otherwise
  */
 module.exports.isOrganizer = function (user){
-    if (user.hasRole(roles.SUPERUSER)) {
+	if (user.hasRole(roles.SUPERUSER)) {
 		// the superuser is allowed
-        return _Promise.resolve(true);
-    }
-    if (user.hasRoles(roles.ORGANIZERS)) {
+		return _Promise.resolve(true);
+	}
+	if (user.hasRoles(roles.ORGANIZERS)) {
 		// the user is an organizer
-        return _Promise.resolve(true);
-    }
+		return _Promise.resolve(true);
+	}
 	// return false
-    return _Promise.resolve(false);
+	return _Promise.resolve(false);
 
 };
 
@@ -68,12 +68,12 @@ module.exports.isOrganizer = function (user){
  * @return {Promise} resolving to true if the user is a host, false otherwise
  */
 module.exports.isOrganizer = function (user){
-    if (user.hasRole(roles.SUPERUSER)) {
-        return _Promise.resolve(true);
-    }
-    if (user.hasRoles(roles.HOSTS)) {
-        return _Promise.resolve(true);
-    }
-    return _Promise.resolve(false);
+	if (user.hasRole(roles.SUPERUSER)) {
+		return _Promise.resolve(true);
+	}
+	if (user.hasRoles(roles.HOSTS)) {
+		return _Promise.resolve(true);
+	}
+	return _Promise.resolve(false);
 
 };

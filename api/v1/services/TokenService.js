@@ -20,26 +20,26 @@ const TOKEN_SCOPE_INVALID_ERROR = 'An invalid or non-existent scope was supplied
  * @throws {TypeError} when the scope was not found
  */
 module.exports.findTokenByValue = function(value, scope) {
-    if (!(scope in config.token.expiration)) {
-        return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
-    }
+	if (!(scope in config.token.expiration)) {
+		return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
+	}
 
-    return Token
+	return Token
     .findByValue(value)
     .then(function(result) {
-        if (!result) {
-            throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
-        }
+	if (!result) {
+		throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
+	}
 
-        var expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
-        var tokenExpiration = Date.parse(result.get('created')) + expiration;
-        if (tokenExpiration < Date.now()) {
-            result.destroy();
-            throw new errors.TokenExpirationError();
-        }
+	var expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
+	var tokenExpiration = Date.parse(result.get('created')) + expiration;
+	if (tokenExpiration < Date.now()) {
+		result.destroy();
+		throw new errors.TokenExpirationError();
+	}
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -51,27 +51,27 @@ module.exports.findTokenByValue = function(value, scope) {
  *                         true on a successful token creation.
  */
 module.exports.generateToken = function(user, scope) {
-    var tokenVal = utils.crypto.generateResetToken();
-    var userId = user.get('id');
+	var tokenVal = utils.crypto.generateResetToken();
+	var userId = user.get('id');
 
-    return Token
+	return Token
     .where({
-        user_id: userId,
-        type: scope
-    })
+	user_id: userId,
+	type: scope
+})
     .fetchAll()
     .then(function(tokens) {
-        return tokens.invokeThen('destroy')
+	return tokens.invokeThen('destroy')
         .then(function() {
-            var token = Token.forge({
-                type: scope,
-                value: tokenVal,
-                user_id: userId
-            });
-            return token.save()
+	var token = Token.forge({
+		type: scope,
+		value: tokenVal,
+		user_id: userId
+	});
+	return token.save()
             .then(function() {
-                return tokenVal;
-            });
-        });
-    });
+	return tokenVal;
+});
+});
+});
 };

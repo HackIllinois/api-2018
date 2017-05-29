@@ -1,37 +1,34 @@
-var AuthService = require('../services/AuthService');
-var User = require('../models/User');
-var config = require('../../config');
-var errors = require('../errors');
+const AuthService = require('../services/AuthService');
+const User = require('../models/User');
+const config = require('../../config');
+const errors = require('../errors');
 
-var AUTH_HEADER = config.auth.header;
+const AUTH_HEADER = config.auth.header;
 
-module.exports = function (req, res, next) {
-    var auth = req.header(AUTH_HEADER);
+module.exports = function(req, res, next) {
+	const auth = req.header(AUTH_HEADER);
 
-    if (!auth) {
-        return next();
-    }
+	if (!auth) {
+		return next();
+	}
 
-    return AuthService.verify(auth)
-		.then(function (decoded) {
+	return AuthService.verify(auth)
+		.then((decoded) => {
 			// specifies that request supplied a valid auth token
 			// (but not necessarily that the associated user data has been retrieved)
-    req.auth = true;
+			req.auth = true;
 
-    return User.findById(decoded.sub);
-})
-		.then(function (user) {
-    req.user = user;
+			return User.findById(decoded.sub);
+		})
+		.then((user) => {
+			req.user = user;
 
-    next();
-    return null;
-})
-		.catch(errors.UnprocessableRequestError, function (error) {
-    var message = 'The provided token was invalid (' +
-				error.message + ')';
-    var source = AUTH_HEADER;
+			return next();
+		})
+		.catch(errors.UnprocessableRequestError, (error) => {
+			const message = 'The provided token was invalid (' + error.message + ')';
+			const source = AUTH_HEADER;
 
-    next(new errors.InvalidHeaderError(message, source));
-    return null;
-});
+			return next(new errors.InvalidHeaderError(message, source));
+		});
 };

@@ -5,25 +5,25 @@ var roles = require('../utils/roles');
 
 var Model = require('./Model');
 var UserRole = Model.extend({
-    tableName: 'user_roles',
-    idAttribute: 'id',
-    validations: {
-        role: ['required', 'string', roles.verifyRole]
-    }
+	tableName: 'user_roles',
+	idAttribute: 'id',
+	validations: {
+		role: ['required', 'string', roles.verifyRole]
+	}
 });
 /**
  * Saves a forged user role using the passed transaction
  */
 function _addRole (userRole, active, t) {
-    return userRole
+	return userRole
 		.fetch({ transacting: t })
 		.then(function (result) {
-    if (result) {
-        return _Promise.resolve(result);
-    }
-    userRole.set({ active: (_.isUndefined(active) || active) });
-    return userRole.save(null, { transacting: t });
-});
+			if (result) {
+				return _Promise.resolve(result);
+			}
+			userRole.set({ active: (_.isUndefined(active) || active) });
+			return userRole.save(null, { transacting: t });
+		});
 }
 
 /**
@@ -36,13 +36,13 @@ function _addRole (userRole, active, t) {
  * @returns {Promise<UserRole>} the result of the addititon
  */
 UserRole.addRole = function (user, role, active, t) {
-    var userRole = UserRole.forge({ user_id: user.id, role: role });
-    if (t) {
-        return _addRole(userRole, active, t);
-    }
-    return UserRole.transaction(function(t){
-        return _addRole(userRole, active, t);
-    });
+	var userRole = UserRole.forge({ user_id: user.id, role: role });
+	if (t) {
+		return _addRole(userRole, active, t);
+	}
+	return UserRole.transaction(function(t){
+		return _addRole(userRole, active, t);
+	});
 };
 
 /**
@@ -54,14 +54,14 @@ UserRole.addRole = function (user, role, active, t) {
  * @returns {Promise<UserRole>} the updated role
  */
 UserRole.setActive = function (userRole, active, t) {
-    if (userRole.get('active') == active) {
-        return _Promise.resolve(userRole);
-    }
-    return userRole.set({ active: active }).save(null, { transacting: t });
+	if (userRole.get('active') == active) {
+		return _Promise.resolve(userRole);
+	}
+	return userRole.set({ active: active }).save(null, { transacting: t });
 };
 
 UserRole.prototype.serialize = function () {
-    return _.omit(this.attributes, ['id', 'userId']);
+	return _.omit(this.attributes, ['id', 'userId']);
 };
 
 module.exports = UserRole;

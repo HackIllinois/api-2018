@@ -2,9 +2,9 @@
 
 var _Promise = require('bluebird');
 var fs = _Promise.promisifyAll(require('fs'), {
-    filter: function(n, f, t, d) {
-        return d && !n.includes('Sync');
-    }
+	filter: function(n, f, t, d) {
+		return d && !n.includes('Sync');
+	}
 });
 var mkdirp = require('mkdirp');
 var _ = require('lodash');
@@ -28,8 +28,8 @@ const LOG_FILENAME = 'api.log';
  * @return {String}		the path to the log file
  */
 module.exports.initializeLogfile = function() {
-    mkdirp.sync(LOG_DIRECTORY);
-    return LOG_DIRECTORY + LOG_FILENAME;
+	mkdirp.sync(LOG_DIRECTORY);
+	return LOG_DIRECTORY + LOG_FILENAME;
 };
 
 /**
@@ -41,30 +41,30 @@ module.exports.initializeLogfile = function() {
  * @return {Promise<>}		a resolved promise
  */
 module.exports.writeMail = function(recipients, template, substitutions) {
-    if (!config.isDevelopment) {
-        return _Promise.resolve(null);
-    }
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
 
-    var fileName = template + '-' + time.unix() + '.txt';
-    var filePath = MAIL_DIRECTORY + fileName;
+	var fileName = template + '-' + time.unix() + '.txt';
+	var filePath = MAIL_DIRECTORY + fileName;
 
-    var fileContent = 'A transmission was prepared for ';
-    fileContent += (_.isArray(recipients)) ? _.join(recipients, ', ') : recipients;
-    fileContent += ". The requested template was \'" + template + "\'.\n\n";
+	var fileContent = 'A transmission was prepared for ';
+	fileContent += (_.isArray(recipients)) ? _.join(recipients, ', ') : recipients;
+	fileContent += ". The requested template was \'" + template + "\'.\n\n";
 
-    if (_.isUndefined(substitutions) || _.isEmpty(substitutions)) {
-        fileContent += 'There were no substitutions provided for injection.';
-    } else {
-        fileContent += 'The following substitutions were provided for injection: \n';
-        _.forOwn(substitutions, function(value, key) {
-            fileContent += key + ': ' + value + '\n';
-        });
-    }
+	if (_.isUndefined(substitutions) || _.isEmpty(substitutions)) {
+		fileContent += 'There were no substitutions provided for injection.';
+	} else {
+		fileContent += 'The following substitutions were provided for injection: \n';
+		_.forOwn(substitutions, function(value, key) {
+			fileContent += key + ': ' + value + '\n';
+		});
+	}
 
   // the target directory is created here (if it doesn't already exist)
   // to ensure we don't have any temp directories written in production
-    mkdirp.sync(MAIL_DIRECTORY);
-    return fs.writeFileAsync(filePath, fileContent);
+	mkdirp.sync(MAIL_DIRECTORY);
+	return fs.writeFileAsync(filePath, fileContent);
 };
 
 /**
@@ -78,24 +78,24 @@ module.exports.writeMail = function(recipients, template, substitutions) {
  * @return {Promise<>}			a resolved promise
  */
 module.exports.writeFile = function(content, params) {
-    if (!config.isDevelopment) {
-        return _Promise.resolve(null);
-    }
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
 
-    var filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
-    var metaFilePath = filePath + META_EXTENSION;
+	var filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
+	var metaFilePath = filePath + META_EXTENSION;
 
   // we only store the type for now, but adding to this array
   // would allow us to store more
-    var metaContent = [params.type].join(META_SEPARATOR);
+	var metaContent = [params.type].join(META_SEPARATOR);
 
-    mkdirp.sync(STORAGE_DIRECTORY + params.bucket);
-    return _Promise.join(
+	mkdirp.sync(STORAGE_DIRECTORY + params.bucket);
+	return _Promise.join(
     fs.writeFileAsync(filePath, content),
     fs.writeFileAsync(metaFilePath, Buffer.from(metaContent)),
     function() {
-        return _Promise.resolve(null);
-    });
+	return _Promise.resolve(null);
+});
 };
 
 /**
@@ -108,26 +108,26 @@ module.exports.writeFile = function(content, params) {
  *                              {type} type the MIME type of the original file
  */
 module.exports.getFile = function(key, bucket) {
-    if (!config.isDevelopment) {
-        return _Promise.resolve(null);
-    }
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
 
-    var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
-    var metaFilePath = filePath + META_EXTENSION;
+	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
+	var metaFilePath = filePath + META_EXTENSION;
 
-    return _Promise.join(
+	return _Promise.join(
     fs.readFileAsync(filePath),
     fs.readFileAsync(metaFilePath),
     function(file, meta) {
-        meta = meta.toString();
-        meta = meta.split(META_SEPARATOR);
+	meta = meta.toString();
+	meta = meta.split(META_SEPARATOR);
 
-        var result = {};
-        result.content = file;
-        result.type = meta[0];
+	var result = {};
+	result.content = file;
+	result.type = meta[0];
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -137,17 +137,17 @@ module.exports.getFile = function(key, bucket) {
  * @return {Promise<>}		a resolved promise
  */
 module.exports.removeFile = function(key, bucket) {
-    if (!config.isDevelopment) {
-        return _Promise.resolve(null);
-    }
+	if (!config.isDevelopment) {
+		return _Promise.resolve(null);
+	}
 
-    var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
-    var metaFilePath = filePath + META_EXTENSION;
+	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
+	var metaFilePath = filePath + META_EXTENSION;
 
-    return _Promise.join(
+	return _Promise.join(
     fs.unlinkAsync(filePath),
     fs.unlinkAsync(metaFilePath),
     function() {
-        return _Promise.resolve(null);
-    });
+	return _Promise.resolve(null);
+});
 };

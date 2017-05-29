@@ -1,60 +1,49 @@
-var bodyParser = require('body-parser');
-var middleware = require('../middleware');
-var router = require('express').Router();
+const bodyParser = require('body-parser');
+const middleware = require('../middleware');
+const router = require('express').Router();
 
-var requests = require('../requests');
-var roles = require('../utils/roles');
+const requests = require('../requests');
+const roles = require('../utils/roles');
 
-var EcosystemService = require('../services/EcosystemService');
+const EcosystemService = require('../services/EcosystemService');
 
+function createEcosystem(req, res, next) {
+	EcosystemService
+		.createEcosystem(req.body.name)
+		.then((newEcosystem) => {
+			res.body = newEcosystem.toJSON();
 
-function createEcosystem (req, res, next) {
-    var name = req.body.name;
-
-    EcosystemService
-		.createEcosystem(name)
-		.then(function (newEcosystem) {
-    res.body = newEcosystem.toJSON();
-
-    next();
-    return null;
-})
-		.catch(function (error){
-    next(error);
-    return null;
-});
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
-function getAllEcosystems (req, res, next) {
-    EcosystemService
+function getAllEcosystems(req, res, next) {
+	EcosystemService
 		.getAllEcosystems()
-		.then(function (results) {
-    res.body = results.toJSON();
+		.then((results) => {
+			res.body = results.toJSON();
 
-    next();
-    return null;
-})
-		.catch(function (error){
-    next(error);
-    return null;
-});
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
-function deleteEcosystem (req, res, next) {
-    var name = req.body.name;
+function deleteEcosystem(req, res, next) {
+	EcosystemService
+		.deleteEcosystem(req.body.name)
+		.then(() => {
+			res.body = {};
 
-    EcosystemService
-		.deleteEcosystem(name)
-		.then(function () {
-    res.body = {};
-
-    next();
-    return null;
-})
-		.catch(function (error){
-    next(error);
-    return null;
-});
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 

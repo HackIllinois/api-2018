@@ -5,11 +5,11 @@ var User = require('./User');
 var MailingListUser = require('./MailingListUser');
 
 var MailingList = Model.extend({
-    tableName: 'mailing_lists',
-    idAttribute: 'id',
-    validations: {
-        sent: ['boolean']
-    }
+	tableName: 'mailing_lists',
+	idAttribute: 'id',
+	validations: {
+		sent: ['boolean']
+	}
 });
 
 /**
@@ -18,7 +18,7 @@ var MailingList = Model.extend({
  * @return {Promise<MailingList>} 	the desired mailing list, or null
  */
 MailingList.findByName = function (name) {
-    return this.collection().query({ where: { name: name } }).fetchOne();
+	return this.collection().query({ where: { name: name } }).fetchOne();
 };
 
 /**
@@ -27,18 +27,18 @@ MailingList.findByName = function (name) {
  * @returns {Promise<MailingListUser>}	an promise with the save result
  */
 MailingList.prototype.addUser = function (user) {
-    var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: this.attributes.id });
-    return MailingListUser
+	var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: this.attributes.id });
+	return MailingListUser
 		.transaction(function (t) {
-    return mailingListUser
+			return mailingListUser
 				.fetch({ transacting: t })
 				.then(function (result) {
-    if (result) {
-        return _Promise.resolve(result);
-    }
-    return mailingListUser.save(null, { transacting: t });
-});
-});
+					if (result) {
+						return _Promise.resolve(result);
+					}
+					return mailingListUser.save(null, { transacting: t });
+				});
+		});
 };
 
 /**
@@ -47,7 +47,7 @@ MailingList.prototype.addUser = function (user) {
  * @return {Promise<MailingListUser>}	a promise with the deleted result
  */
 MailingList.prototype.removeUser = function (user) {
-    return MailingListUser
+	return MailingListUser
 		.where({ user_id: user.id, mailing_list_id: this.attributes.id })
 		.destroy();
 };
@@ -57,7 +57,7 @@ MailingList.prototype.removeUser = function (user) {
  * @return {Promise<Collection>} the Users that are on this list
  */
 MailingList.prototype.members = function () {
-    return this.belongsToMany(User).through(MailingListUser).fetch();
+	return this.belongsToMany(User).through(MailingListUser).fetch();
 };
 
 module.exports = MailingList;

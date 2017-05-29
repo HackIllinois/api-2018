@@ -11,59 +11,59 @@ var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 var AttendeeRSVP = require('./AttendeeRSVP');
 var Attendee = Model.extend({
-    tableName: 'attendees',
-    idAttribute: 'id',
-    validations: {
-        userId: ['required', 'integer'],
-        firstName: ['required', 'string', 'maxLength:255'],
-        lastName: ['required', 'string', 'maxLength:255'],
-        shirtSize: ['required', 'string', registration.verifyTshirtSize],
-        diet: ['required', 'string', registration.verifyDiet],
-        age: ['required', 'integer', 'min:13', 'max:115'],
-        graduationYear: ['required', 'integer', 'min:2017', 'max:2024'],
-        transportation: ['required', 'string', registration.verifyTransportation],
-        school: ['required', 'string', 'maxLength:255'],
-        major: ['required', 'string', 'maxLength:255'],
-        gender: ['required', 'string', registration.verifyGender],
-        professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
-        github: ['required', 'string', 'maxLength:50'],
-        linkedin: ['required', 'string', 'maxLength:50'],
-        interests: ['required', 'string', 'maxLength:255'],
-        priority: ['integer', 'max:10'],
-        status: ['string', registration.verifyStatus],
-        wave: ['integer', 'max:5'],
-        reviewer: ['string'],
-        reviewTime: ['date'],
-        isNovice: ['required', 'boolean'],
-        isPrivate: ['required', 'boolean'],
-        phoneNumber: ['string', 'maxLength:15'],
-        acceptanceType: ['string', registration.verifyAcceptanceType],
-        acceptedEcosystemId: ['integer']
-    },
-    interests: function() {
-        return this.hasMany(AttendeeProjectInterest);
-    },
-    projects: function() {
-        return this.hasMany(AttendeeProject);
-    },
-    ecosystemInterests: function() {
-        return this.hasMany(AttendeeEcosystemInterest);
-    },
-    extras: function() {
-        return this.hasMany(AttendeeExtraInfo);
-    },
-    collaborators: function() {
-        return this.hasMany(AttendeeRequestedCollaborator);
-    },
-    rsvp: function() {
-        return this.hasOne(AttendeeRSVP);
-    },
-    parse: function(attrs) {
-        attrs = Model.prototype.parse(attrs);
-        attrs.isNovice = !!attrs.isNovice;
-        attrs.isPrivate = !!attrs.isPrivate;
-        return attrs;
-    }
+	tableName: 'attendees',
+	idAttribute: 'id',
+	validations: {
+		userId: ['required', 'integer'],
+		firstName: ['required', 'string', 'maxLength:255'],
+		lastName: ['required', 'string', 'maxLength:255'],
+		shirtSize: ['required', 'string', registration.verifyTshirtSize],
+		diet: ['required', 'string', registration.verifyDiet],
+		age: ['required', 'integer', 'min:13', 'max:115'],
+		graduationYear: ['required', 'integer', 'min:2017', 'max:2024'],
+		transportation: ['required', 'string', registration.verifyTransportation],
+		school: ['required', 'string', 'maxLength:255'],
+		major: ['required', 'string', 'maxLength:255'],
+		gender: ['required', 'string', registration.verifyGender],
+		professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
+		github: ['required', 'string', 'maxLength:50'],
+		linkedin: ['required', 'string', 'maxLength:50'],
+		interests: ['required', 'string', 'maxLength:255'],
+		priority: ['integer', 'max:10'],
+		status: ['string', registration.verifyStatus],
+		wave: ['integer', 'max:5'],
+		reviewer: ['string'],
+		reviewTime: ['date'],
+		isNovice: ['required', 'boolean'],
+		isPrivate: ['required', 'boolean'],
+		phoneNumber: ['string', 'maxLength:15'],
+		acceptanceType: ['string', registration.verifyAcceptanceType],
+		acceptedEcosystemId: ['integer']
+	},
+	interests: function() {
+		return this.hasMany(AttendeeProjectInterest);
+	},
+	projects: function() {
+		return this.hasMany(AttendeeProject);
+	},
+	ecosystemInterests: function() {
+		return this.hasMany(AttendeeEcosystemInterest);
+	},
+	extras: function() {
+		return this.hasMany(AttendeeExtraInfo);
+	},
+	collaborators: function() {
+		return this.hasMany(AttendeeRequestedCollaborator);
+	},
+	rsvp: function() {
+		return this.hasOne(AttendeeRSVP);
+	},
+	parse: function(attrs) {
+		attrs = Model.prototype.parse(attrs);
+		attrs.isNovice = !!attrs.isNovice;
+		attrs.isPrivate = !!attrs.isPrivate;
+		return attrs;
+	}
 });
 
 
@@ -73,12 +73,12 @@ var Attendee = Model.extend({
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
 Attendee.findByUserId = function(userId) {
-    return Attendee.where({
-        user_id: userId
-    })
+	return Attendee.where({
+		user_id: userId
+	})
     .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-    });
+	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+});
 };
 
 
@@ -88,35 +88,35 @@ Attendee.findByUserId = function(userId) {
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
 Attendee.fetchWithResumeByUserId = function(userId) {
-    return Attendee.transaction(function(t) {
-        var attendee;
-        return Attendee.where({
-            user_id: userId
-        })
+	return Attendee.transaction(function(t) {
+		var attendee;
+		return Attendee.where({
+			user_id: userId
+		})
       .fetch({
-          withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-          transacting: t
-      })
+	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+	transacting: t
+})
       .then(function(a) {
-          attendee = a;
-          if (_.isNull(a)) {
-              return null;
-          }
-          return Upload.where({
-              owner_id: userId,
-              bucket: utils.storage.buckets.resumes
-          })
+	attendee = a;
+	if (_.isNull(a)) {
+		return null;
+	}
+	return Upload.where({
+		owner_id: userId,
+		bucket: utils.storage.buckets.resumes
+	})
           .fetch({
-              transacting: t
-          });
-      })
+	transacting: t
+});
+})
       .then(function(u) {
-          if (!_.isNull(u)) {
-              attendee.set('resume', (u !== null) ? u.attributes : u);
-          }
-          return attendee;
-      });
-    });
+	if (!_.isNull(u)) {
+		attendee.set('resume', (u !== null) ? u.attributes : u);
+	}
+	return attendee;
+});
+	});
 };
 
 /**
@@ -125,12 +125,12 @@ Attendee.fetchWithResumeByUserId = function(userId) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 Attendee.findById = function(id) {
-    return Attendee.where({
-        id: id
-    })
+	return Attendee.where({
+		id: id
+	})
     .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-    });
+	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+});
 };
 
 /**
@@ -139,35 +139,35 @@ Attendee.findById = function(id) {
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
 Attendee.fetchWithResumeById = function(id) {
-    return Attendee.transaction(function(t) {
-        var attendee;
-        return Attendee.where({
-            id: id
-        })
+	return Attendee.transaction(function(t) {
+		var attendee;
+		return Attendee.where({
+			id: id
+		})
       .fetch({
-          withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-          transacting: t
-      })
+	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+	transacting: t
+})
       .then(function(a) {
-          attendee = a;
-          if (_.isNull(a)) {
-              return null;
-          }
-          return Upload.where({
-              owner_id: a.get('userId'),
-              bucket: utils.storage.buckets.resumes
-          })
+	attendee = a;
+	if (_.isNull(a)) {
+		return null;
+	}
+	return Upload.where({
+		owner_id: a.get('userId'),
+		bucket: utils.storage.buckets.resumes
+	})
           .fetch({
-              transacting: t
-          });
-      })
+	transacting: t
+});
+})
       .then(function(u) {
-          if (!_.isNull(u)) {
-              attendee.set('resume', (u !== null) ? u.attributes : u);
-          }
-          return attendee;
-      });
-    });
+	if (!_.isNull(u)) {
+		attendee.set('resume', (u !== null) ? u.attributes : u);
+	}
+	return attendee;
+});
+	});
 };
 
 module.exports = Attendee;

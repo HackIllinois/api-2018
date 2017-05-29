@@ -17,26 +17,26 @@ var utils = require('../utils');
  */
 module.exports.createUser = function(email, password, role) {
 
-    email = email.toLowerCase();
-    var storedPassword = (password) ? password : utils.crypto.generatePassword();
-    var user = User.forge({
-        email: email,
-        password: storedPassword
-    });
-    return user
+	email = email.toLowerCase();
+	var storedPassword = (password) ? password : utils.crypto.generatePassword();
+	var user = User.forge({
+		email: email,
+		password: storedPassword
+	});
+	return user
     .validate()
     .catch(Checkit.Error, utils.errors.handleValidationError)
     .then(function() {
-        return User.create(email, storedPassword, role);
-    })
+	return User.create(email, storedPassword, role);
+})
     .then(function(result) {
-        if (_.isUndefined(password) || _.isNull(password)) {
+	if (_.isUndefined(password) || _.isNull(password)) {
         // TODO: send user an email requiring a password reset when
         // the password is automatically generated
-        }
+	}
 
-        return _Promise.resolve(result);
-    })
+	return _Promise.resolve(result);
+})
     .catch(
       utils.errors.DuplicateEntryError,
       utils.errors.handleDuplicateEntryError('A user with the given email already exists', 'email')
@@ -50,17 +50,17 @@ module.exports.createUser = function(email, password, role) {
  * @throws {NotFoundError} when the requested user cannot be found
  */
 module.exports.findUserById = function(id) {
-    return User
+	return User
     .findById(id)
     .then(function(result) {
-        if (_.isNull(result)) {
-            var message = 'A user with the given ID cannot be found';
-            var source = 'id';
-            throw new errors.NotFoundError(message, source);
-        }
+	if (_.isNull(result)) {
+		var message = 'A user with the given ID cannot be found';
+		var source = 'id';
+		throw new errors.NotFoundError(message, source);
+	}
 
-        return _Promise.resolve(result);
-    });
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -70,16 +70,16 @@ module.exports.findUserById = function(id) {
  * @throws {NotFoundError} when the requested user cannot be found
  */
 module.exports.findUserByEmail = function(email) {
-    return User
+	return User
     .findByEmail(email)
     .then(function(result) {
-        if (_.isNull(result)) {
-            var message = 'A user with the given email cannot be found';
-            var source = 'email';
-            throw new errors.NotFoundError(message, source);
-        }
-        return _Promise.resolve(result);
-    });
+	if (_.isNull(result)) {
+		var message = 'A user with the given email cannot be found';
+		var source = 'email';
+		throw new errors.NotFoundError(message, source);
+	}
+	return _Promise.resolve(result);
+});
 };
 
 /**
@@ -90,17 +90,17 @@ module.exports.findUserByEmail = function(email) {
  * @throws {InvalidParameterError} when the password is invalid
  */
 module.exports.verifyPassword = function(user, password) {
-    return user
+	return user
     .hasPassword(password)
     .then(function(result) {
-        if (!result) {
-            var message = 'The provided password is incorrect';
-            var source = 'password';
-            throw new errors.InvalidParameterError(message, source);
-        }
+	if (!result) {
+		var message = 'The provided password is incorrect';
+		var source = 'password';
+		throw new errors.InvalidParameterError(message, source);
+	}
 
-        return _Promise.resolve(true);
-    });
+	return _Promise.resolve(true);
+});
 };
 
 /**
@@ -110,9 +110,9 @@ module.exports.verifyPassword = function(user, password) {
  * @return {Promise} resolving to the new User model
  */
 module.exports.resetPassword = function(user, password) {
-    return user
+	return user
     .setPassword(password)
     .then(function(updated) {
-        return updated.save();
-    });
+	return updated.save();
+});
 };

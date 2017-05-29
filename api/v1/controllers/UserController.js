@@ -1,16 +1,15 @@
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
-var services = require('../services');
-var config = require('../../config');
+const services = require('../services');
+const config = require('../../config');
 
-var middleware = require('../middleware');
-var requests = require('../requests');
-var scopes = require('../utils/scopes');
-var mail = require('../utils/mail');
-var roles = require('../utils/roles');
+const middleware = require('../middleware');
+const requests = require('../requests');
+const scopes = require('../utils/scopes');
+const mail = require('../utils/mail');
+const roles = require('../utils/roles');
 
-var router = require('express')
-  .Router();
+const router = require('express').Router();
 
 /**
  * Determines whether or not the requester is requesting its own
@@ -19,103 +18,89 @@ var router = require('express')
  * @return {Boolean} whether or not the requester is requesting itself
  */
 function isRequester(req) {
-    return req.user.get('id') == req.params.id;
+	return req.user.get('id') == req.params.id;
 }
 
 function createUser(req, res, next) {
-    services.UserService
-    .createUser(req.body.email, req.body.password)
-    .then(function(user) {
-        return services.AuthService.issueForUser(user);
-    })
-    .then(function(auth) {
-        res.body = {};
-        res.body.auth = auth;
+	services.UserService
+		.createUser(req.body.email, req.body.password)
+		.then((user) => {
+			return services.AuthService.issueForUser(user);
+		})
+		.then((auth) => {
+			res.body = {};
+			res.body.auth = auth;
 
-        next();
-        return null;
-    })
-    .catch(function(error) {
-        next(error);
-        return null;
-    });
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 function createAccreditedUser(req, res, next) {
-    services.PermissionService
-    .canCreateUser(req.user, req.body.role)
-    .then(function() {
-        return services.UserService
-        .createUser(req.body.email, req.body.password, req.body.role);
-    })
-    .then(function(user) {
-        res.body = user.toJSON();
+	services.PermissionService
+		.canCreateUser(req.user, req.body.role)
+		.then(() => {
+			return services.UserService
+				.createUser(req.body.email, req.body.password, req.body.role);
+		})
+		.then((user) => {
+			res.body = user.toJSON();
 
-        next();
-        return null;
-    })
-    .catch(function(error) {
-        next(error);
-        return null;
-    });
+			return next();
+		})
+		.catch(function(error) {
+			return next(error);
+		});
 }
 
 function getUser(req, res, next) {
-    var id = req.params.id;
+	services.UserService
+		.findUserById(req.params.id)
+		.then((user) => {
+			res.body = user.toJSON();
 
-    services.UserService
-    .findUserById(id)
-    .then(function(user) {
-        res.body = user.toJSON();
-
-        next();
-        return null;
-    })
-    .catch(function(error) {
-        next(error);
-        return null;
-    });
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 function getUserByEmail(req, res, next) {
-    var email = req.params.email;
+	services.UserService
+		.findUserByEmail(req.params.email)
+		.then((user) => {
+			res.body = user.toJSON();
 
-    services.UserService
-    .findUserByEmail(email)
-    .then(function(user) {
-        res.body = user.toJSON();
-
-        return next();
-    })
-    .catch(function(error) {
-        return next(error);
-    });
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 function requestPasswordReset(req, res, next) {
-    var userEmail = req.body.email;
-
-    services.UserService
-    .findUserByEmail(userEmail)
-    .then(function(user) {
-        return services.TokenService.generateToken(user, scopes.AUTH);
-    })
-    .then(function(tokenVal) {
-        var substitutions = {
-            token: tokenVal,
-            isDevelopment: config.isDevelopment
-        };
-        return services.MailService.send(userEmail, mail.templates.passwordReset, substitutions);
-    })
-    .then(function() {
-        res.body = {};
-        next();
-        return null;
-    })
-    .catch(function(error) {
-        next(error);
-        return null;
-    });
+	services.UserService
+		.findUserByEmail(req.body.email)
+		.then((user) => {
+			return services.TokenService.generateToken(user, scopes.AUTH);
+		})
+		.then((tokenVal) => {
+			const substitutions = {
+				token: tokenVal,
+				isDevelopment: config.isDevelopment
+			};
+			return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
+		})
+		.then(() => {
+			res.body = {};
+			return next();
+		})
+		.catch((error) => {
+			return next(error);
+		});
 }
 
 router.use(bodyParser.json());
@@ -123,9 +108,9 @@ router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
-  middleware.permission(roles.ORGANIZERS), createAccreditedUser);
+	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
-router.get('/:id', middleware.permission(roles.HOSTS, isRequester), getUser);
+router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
 
 router.use(middleware.response);

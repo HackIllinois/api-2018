@@ -3,22 +3,22 @@ var registration = require('../utils/registration');
 var Model = require('./Model');
 var MentorProjectIdea = require('./MentorProjectIdea');
 var Mentor = Model.extend({
-    tableName: 'mentors',
-    idAttribute: 'id',
-    validations: {
-        firstName: ['required', 'string', 'maxLength:255'],
-        lastName:  ['required', 'string', 'maxLength:255'],
-        shirtSize: ['required', 'string', registration.verifyTshirtSize],
-        status: ['string', registration.verifyStatus],
-        github:     ['string', 'maxLength:50'],
-        location:    ['required', 'string', 'maxLength:255'],
-        summary:    ['required', 'string', 'maxLength:255'],
-        occupation: ['required', 'string', 'maxLength:255'],
-        userId:    ['required', 'integer']
-    },
-    ideas: function () {
-        return this.hasMany(MentorProjectIdea);
-    }
+	tableName: 'mentors',
+	idAttribute: 'id',
+	validations: {
+		firstName: ['required', 'string', 'maxLength:255'],
+		lastName:  ['required', 'string', 'maxLength:255'],
+		shirtSize: ['required', 'string', registration.verifyTshirtSize],
+		status: ['string', registration.verifyStatus],
+		github:     ['string', 'maxLength:50'],
+		location:    ['required', 'string', 'maxLength:255'],
+		summary:    ['required', 'string', 'maxLength:255'],
+		occupation: ['required', 'string', 'maxLength:255'],
+		userId:    ['required', 'integer']
+	},
+	ideas: function () {
+		return this.hasMany(MentorProjectIdea);
+	}
 });
 
 
@@ -28,7 +28,7 @@ var Mentor = Model.extend({
 * @return {Promise<Model>}	a Promise resolving to the resulting mentor or null
 */
 Mentor.findByUserId = function (userId) {
-    return Mentor.where({ user_id: userId }).fetch({ withRelated: ['ideas'] });
+	return Mentor.where({ user_id: userId }).fetch({ withRelated: ['ideas'] });
 };
 
 /**
@@ -37,7 +37,7 @@ Mentor.findByUserId = function (userId) {
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
 Mentor.findById = function (id) {
-    return Mentor.where({ id: id }).fetch({ withRelated: ['ideas'] });
+	return Mentor.where({ id: id }).fetch({ withRelated: ['ideas'] });
 };
 
 module.exports = Mentor;

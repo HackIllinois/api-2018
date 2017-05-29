@@ -1,14 +1,14 @@
 var Model = require('./Model');
 var AttendeeProject = Model.extend({
-    tableName: 'attendee_projects',
-    idAttribute: 'id',
-    validations: {
-        attendeeId: ['required', 'integer'],
-        name: ['required', 'string', 'maxLength:100'],
-        description: ['required', 'string', 'maxLength:255'],
-        repo: ['required', 'string', 'maxLength:150'],
-        isSuggestion: ['required', 'boolean']
-    }
+	tableName: 'attendee_projects',
+	idAttribute: 'id',
+	validations: {
+		attendeeId: ['required', 'integer'],
+		name: ['required', 'string', 'maxLength:100'],
+		description: ['required', 'string', 'maxLength:255'],
+		repo: ['required', 'string', 'maxLength:150'],
+		isSuggestion: ['required', 'boolean']
+	}
 });
 
 
@@ -18,9 +18,9 @@ var AttendeeProject = Model.extend({
  * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeProject or null
  */
 AttendeeProject.findByAttendeeId = function(attendeeId) {
-    return AttendeeProject.where({
-        attendee_id: attendeeId
-    })
+	return AttendeeProject.where({
+		attendee_id: attendeeId
+	})
     .fetch();
 };
 
@@ -30,9 +30,9 @@ AttendeeProject.findByAttendeeId = function(attendeeId) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 AttendeeProject.findById = function(id) {
-    return AttendeeProject.where({
-        id: id
-    })
+	return AttendeeProject.where({
+		id: id
+	})
     .fetch();
 };
 

@@ -1,8 +1,8 @@
 var Model = require('./Model');
 var Upload = Model.extend({
-    tableName: 'uploads',
-    idAttribute: 'id',
-    hasTimestamps: ['created', 'updated']
+	tableName: 'uploads',
+	idAttribute: 'id',
+	hasTimestamps: ['created', 'updated']
 });
 
 /**
@@ -12,12 +12,12 @@ var Upload = Model.extend({
  * @return {Promise<Collection<Upload>>} all of the uploads belonging to the owner
  */
 Upload.findByOwner = function (owner, bucket) {
-    var queryParams = { where : {} };
+	var queryParams = { where : {} };
 
-    queryParams.where.owner_id = owner.get('id');
-    if (bucket) { queryParams.where.bucket = bucket; }
+	queryParams.where.owner_id = owner.get('id');
+	if (bucket) { queryParams.where.bucket = bucket; }
 
-    return Upload.collection().query(queryParams).fetch();
+	return Upload.collection().query(queryParams).fetch();
 };
 
 /**
@@ -27,7 +27,7 @@ Upload.findByOwner = function (owner, bucket) {
  * @return {Promise<Upload>} the requested upload, if it exists
  */
 Upload.findByKey = function (key, bucket) {
-    return Upload.collection().query({ where: { key: key, bucket: bucket } }).fetchOne();
+	return Upload.collection().query({ where: { key: key, bucket: bucket } }).fetchOne();
 };
 
 module.exports = Upload;
