@@ -32,18 +32,16 @@ describe("CheckInService", function () {
             noCheckinTestUser = User.forge({id: 2, email: 'nullTest@exmple.com' });
             noCheckinTestUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-            testCheckIn = CheckIn.forge({ id: 1, user_id: testUser.id, location: "ECEB", swag: false})
+            testCheckIn = CheckIn.forge({ id: 1, user_id: testUser.id, location: "ECEB", swag: false});
+
+            _findByUserId = sinon.spy(CheckIn, 'findByUserId');
 
             done();
         });
 
         beforeEach(function(done) {
             tracker.install();
-            _findByUserId = sinon.spy(CheckIn, 'findByUserId');
-            done();
-        })
 
-        it('finds a CheckIn using valid user id', function (done) {
             tracker.on('query', function(query) {
                 if (query.bindings[0] == testUser.id) {
                     query.response([testCheckIn]);
@@ -52,6 +50,10 @@ describe("CheckInService", function () {
                 }
             });
 
+            done();
+        })
+
+        it('finds a CheckIn using valid user id', function (done) {
             var checkin = CheckInService.findCheckInByUserId(testUser.id);
             checkin.then(function(response) {
                 expect(response).to.have.deep.property("checkin.attributes.id", testCheckIn.id);
@@ -61,27 +63,22 @@ describe("CheckInService", function () {
         });
 
         it('throws error for requesting a CheckIn for non-existent user', function (done) {
-            tracker.on('query', function(query) {
-                if (query.bindings[0] != testUser.id) {
-                    query.reject(new errors.NotFoundError);
-                }
-            });
-
             var checkin = CheckInService.findCheckInByUserId(noCheckinTestUser.id);
             checkin.catch(function(error) {
                     expect(error).to.be.an.instanceof(errors.NotFoundError);
                     assert(_findByUserId.calledOnce, "CheckIn findByUserId not called once");
                     done();
-                });
+            });
         });
 
         afterEach(function(done) {
             tracker.uninstall();
-            _findByUserId.restore();
+            _findByUserId.reset();
             done();
         });
 
         after(function (done) {
+            _findByUserId.restore();
             done();
         });
     });
