@@ -20,31 +20,68 @@ var tracker = require('mock-knex').getTracker();
 describe("CheckInService", function () {
     describe("findCheckInByUserId", function () {
 
+        var testUser;
+        var noCheckinTestUser;
+        var testCheckIn;
         var _findByUserId;
 
         before(function (done) {
-            var testCheckIn = CheckIn.forge({ id: 1, user_id: 2342, location: "ECEB"})
+            testUser = User.forge({id: 1, email: 'test@exmple.com' });
+            testUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-            _findByUserId = sinon.stub(CheckIn, 'findByUserId');
+            noCheckinTestUser = User.forge({id: 2, email: 'nullTest@exmple.com' });
+            noCheckinTestUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-            _findByUserId.withArgs(2342).returns(_Promise.resolve(testCheckIn));
-            _findByUserId.withArgs(3232).returns(_Promise.resolve(null));
+            testCheckIn = CheckIn.forge({ id: 1, user_id: testUser.id, location: "ECEB", swag: false})
 
             done();
         });
 
+        beforeEach(function(done) {
+            tracker.install();
+            _findByUserId = sinon.spy(CheckIn, 'findByUserId');
+            done();
+        })
+
         it('finds a CheckIn using valid user id', function (done) {
-            var checkin = CheckInService.findCheckInByUserId(2342);
-            expect(checkin).to.eventually.have.deep.property("checkin.attributes.id", 1).and.notify(done);
+            tracker.on('query', function(query) {
+                if (query.bindings[0] == testUser.id) {
+                    query.response([testCheckIn]);
+                } else {
+                    query.response([]);
+                }
+            });
+
+            var checkin = CheckInService.findCheckInByUserId(testUser.id);
+            checkin.then(function(response) {
+                expect(response).to.have.deep.property("checkin.attributes.id", testCheckIn.id);
+                assert(_findByUserId.calledOnce, "CheckIn findByUserId not called once");
+                done();
+            });
         });
 
         it('throws error for requesting a CheckIn for non-existent user', function (done) {
-            var checkin = CheckInService.findCheckInByUserId(3232);
-            expect(checkin).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+            tracker.on('query', function(query) {
+                if (query.bindings[0] != testUser.id) {
+                    query.reject(new errors.NotFoundError);
+                }
+            });
+
+            var checkin = CheckInService.findCheckInByUserId(noCheckinTestUser.id);
+            checkin.catch(function(error) {
+                    expect(error).to.be.an.instanceof(errors.NotFoundError);
+                    assert(_findByUserId.calledOnce, "CheckIn findByUserId not called once");
+                    done();
+                });
+        });
+
+        afterEach(function(done) {
+            tracker.uninstall();
+            _findByUserId.restore();
+            done();
         });
 
         after(function (done) {
-            _findByUserId.restore();
             done();
         });
     });
