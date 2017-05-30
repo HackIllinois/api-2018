@@ -36,10 +36,6 @@ describe("CheckInService", function () {
 
             _findByUserId = sinon.spy(CheckIn, 'findByUserId');
 
-            done();
-        });
-
-        beforeEach(function(done) {
             tracker.install();
 
             tracker.on('query', function(query) {
@@ -51,7 +47,7 @@ describe("CheckInService", function () {
             });
 
             done();
-        })
+        });
 
         it('finds a CheckIn using valid user id', function (done) {
             var checkin = CheckInService.findCheckInByUserId(testUser.id);
@@ -72,12 +68,12 @@ describe("CheckInService", function () {
         });
 
         afterEach(function(done) {
-            tracker.uninstall();
             _findByUserId.reset();
             done();
         });
 
         after(function (done) {
+            tracker.uninstall();
             _findByUserId.restore();
             done();
         });
