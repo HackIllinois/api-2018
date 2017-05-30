@@ -1,9 +1,9 @@
-var Request = require('./Request');
-var rsvp = require('../utils/rsvp');
+const Request = require('./Request');
+const rsvp = require('../utils/rsvp');
 
-var bodyRequired = ['isAttending'];
-var bodyAllowed = ['type'];
-var bodyValidations = {
+const bodyRequired = ['isAttending'];
+const bodyAllowed = ['type'];
+const bodyValidations = {
 	'isAttending': ['required', 'boolean'],
 	'type': ['string', rsvp.verifyAttendanceReply]
 };

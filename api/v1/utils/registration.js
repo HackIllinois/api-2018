@@ -1,14 +1,14 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
-var STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
-var DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
-var PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
-var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
-var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
-var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
-var CATEGORIES = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
-var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
+const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
+const STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
+const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
+const PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
+const GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
+const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
+const PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
+const CATEGORIES = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
+const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 /**
  * Ensures that the provided tshirt-size is in the list

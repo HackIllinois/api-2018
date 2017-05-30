@@ -1,8 +1,8 @@
-var registration = require('../utils/registration');
+const registration = require('../utils/registration');
 
-var Model = require('./Model');
-var MentorProjectIdea = require('./MentorProjectIdea');
-var Mentor = Model.extend({
+const Model = require('./Model');
+const MentorProjectIdea = require('./MentorProjectIdea');
+const Mentor = Model.extend({
 	tableName: 'mentors',
 	idAttribute: 'id',
 	validations: {

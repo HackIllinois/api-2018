@@ -1,9 +1,9 @@
-var chai = require('chai');
+const chai = require('chai');
 chai.use(require('chai-as-promised'));
 
-var mockery = require('mockery');
-var mockknex = require('mock-knex');
-var bookshelf = require('bookshelf');
+const mockery = require('mockery');
+const mockknex = require('mock-knex');
+const bookshelf = require('bookshelf');
 function bookshelfMock (knex) {
 	mockknex.mock(knex);
 	return bookshelf(knex);

@@ -1,16 +1,16 @@
 /* jshint esversion: 6 */
 
-var _Promise = require('bluebird');
-var bcrypt = _Promise.promisifyAll(require('bcrypt'));
-var _ = require('lodash');
+const _Promise = require('bluebird');
+const bcrypt = _Promise.promisifyAll(require('bcrypt'));
+const _ = require('lodash');
 
 const SALT_ROUNDS = 12;
 
-var Model = require('./Model');
+const Model = require('./Model');
 
-var UserRole = require('./UserRole');
-var CheckIn = require('./CheckIn');
-var User = Model.extend({
+const UserRole = require('./UserRole');
+const CheckIn = require('./CheckIn');
+const User = Model.extend({
 	tableName: 'users',
 	idAttribute: 'id',
 	hasTimestamps: ['created', 'updated'],
@@ -64,10 +64,10 @@ User.findByEmail = function(email) {
  * @return {Promise<User>}	 the User object with the related roles joined-in (if any)
  */
 User.create = function(email, password, role) {
-	var user = User.forge({
+	let user = User.forge({
 		email: email
 	});
-	var userRole = UserRole.forge({
+	const userRole = UserRole.forge({
 		role: role,
 		active: true
 	});
@@ -75,20 +75,20 @@ User.create = function(email, password, role) {
 	if (!role) {
 		// No roles were provided, so create the User
 		return user.setPassword(password)
-			.then(function(result) {
+			.then((result) => {
 				return result.save();
 			});
 	}
 
 	return User
-		.transaction(function(t) {
+		.transaction((t) => {
 			return user.setPassword(password)
-				.then(function(result) {
+				.then((result) => {
 					return result.save(null, {
 						transacting: t
 					});
 				})
-				.then(function(result) {
+				.then((result) => {
 					user = result;
 
 					userRole.set({
@@ -98,7 +98,7 @@ User.create = function(email, password, role) {
 						transacting: t
 					});
 				})
-				.then(function() {
+				.then(() => {
 					return User.where({
 						id: user.get('id')
 					})
@@ -134,7 +134,7 @@ User.prototype.setPassword = function(password) {
 User.prototype.getRole = function(role) {
 	return _.find(this.related('roles')
 		.models,
-		function(roleInUser) {
+		(roleInUser) => {
 			return roleInUser.get('role') === role;
 		});
 };
@@ -151,7 +151,7 @@ User.prototype.hasRole = function(role, activeOnly) {
 		throw new TypeError('The related roles were not fetched with this User');
 	}
 
-	var roleMatch = {
+	const roleMatch = {
 		role: role
 	};
 	if (_.isUndefined(activeOnly) || activeOnly) {
@@ -170,7 +170,7 @@ User.prototype.hasRole = function(role, activeOnly) {
  * @throws TypeError	  when the user is missing its related roles key
  */
 User.prototype.hasRoles = function(roles, activeOnly) {
-	var found = false;
+	let found = false;
 	_.forEach(roles, _.bind(function(role) {
 		found = found || this.hasRole(role, activeOnly);
 	}, this));

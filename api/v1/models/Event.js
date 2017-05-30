@@ -1,9 +1,9 @@
-var time = require('../utils/time');
-var events = require('../utils/events');
+const time = require('../utils/time');
+const events = require('../utils/events');
 
-var Model = require('./Model');
-var EventLocation = require('./EventLocation');
-var Event = Model.extend({
+const Model = require('./Model');
+const EventLocation = require('./EventLocation');
+const Event = Model.extend({
 	tableName: 'events',
 	idAttribute: 'id',
 	validations: {

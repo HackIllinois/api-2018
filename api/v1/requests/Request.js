@@ -1,16 +1,16 @@
-var checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var errors = require('../errors');
+const errors = require('../errors');
 
-var headerValidations = { };
-var bodyValidations = { };
+const headerValidations = { };
+const bodyValidations = { };
 
-var headerRequired = [];
-var bodyRequired = [];
+const headerRequired = [];
+const bodyRequired = [];
 
-var bodyAllowed = [];
+const bodyAllowed = [];
 
 // base request class
 function Request(headers, body) {
@@ -48,8 +48,8 @@ Request.prototype.body = function () {
  * @throws MissingHeaderError when the request is missing a header
  */
 Request.prototype.audit = function () {
-	var missingHeaders = [];
-	var missingParameters = [];
+	const missingHeaders = [];
+	const missingParameters = [];
 
 	_.forEach(this.headerRequired, _.bind(function (requiredHeader) {
 		if (!_.has(this._headers, requiredHeader.toLowerCase())) {
@@ -62,7 +62,7 @@ Request.prototype.audit = function () {
 	}
 
 	if (_.isUndefined(this._body) || _.isNull(this._body)) {
-		var errorDetail = 'The request body could not be parsed';
+		const errorDetail = 'The request body could not be parsed';
 		throw new errors.UnprocessableRequestError(errorDetail, null);
 	}
 

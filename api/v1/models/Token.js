@@ -1,7 +1,7 @@
-var Model = require('./Model');
-var User = require('./User');
+const Model = require('./Model');
+const User = require('./User');
 
-var Token = Model.extend({
+const Token = Model.extend({
 	tableName: 'tokens',
 	idAttribute: 'id',
 	hasTimestamps: ['created'],

@@ -1,8 +1,8 @@
-var Request = require('./Request');
-var validators = require('../utils/validators');
-var registration = require('../utils/registration');
+const Request = require('./Request');
+const validators = require('../utils/validators');
+const registration = require('../utils/registration');
 
-var mentorValidations = {
+const mentorValidations = {
 	firstName: ['required', 'string', 'maxLength:255'],
 	lastName:  ['required', 'string', 'maxLength:255'],
 	shirtSize: ['required', 'string', registration.verifyTshirtSize],
@@ -12,13 +12,13 @@ var mentorValidations = {
 	summary:    ['required', 'string', 'maxLength:255'],
 	occupation: ['required', 'string', 'maxLength:255'],
 };
-var ideaValidations = {
+const ideaValidations = {
 	link:           ['required', 'url', 'maxLength:255'],
 	contributions:  ['required', 'string', 'maxLength:255'],
 	ideas:          ['required', 'string', 'maxLength:255']
 };
-var bodyRequired = ['mentor', 'ideas'];
-var bodyValidations = {
+const bodyRequired = ['mentor', 'ideas'];
+const bodyValidations = {
 	'mentor': ['required', 'plainObject', validators.nested(mentorValidations, 'mentor')],
 	'ideas': ['required', 'array', 'minLength:1', 'maxLength:5', validators.array(validators.nested(ideaValidations, 'ideas'))]
 };

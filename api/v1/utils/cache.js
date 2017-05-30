@@ -1,5 +1,5 @@
-let client = require('../../cache').instance();
-let errors = require('../errors');
+const client = require('../../cache').instance();
+const errors = require('../errors');
 
 module.exports.hasKey = function (key) {
 	return client.existsAsync(key);
@@ -7,37 +7,37 @@ module.exports.hasKey = function (key) {
 
 module.exports.expireKey = function (key, duration) {
 	return client.existsAsync(key)
-		.then(function(reply){
+		.then((reply) => {
 			if(reply != 1){
 				throw new errors.RedisError();
 			}
 		})
-		.then(function(){
+		.then(() => {
 			return client.expireAsync(key, duration);
 		})
-		.then(function(reply){
+		.then((reply) => {
 			return reply;
 		});
 };
 
 module.exports.getString = function (key) {
 	return client.existsAsync(key)
-		.then(function(reply){
+		.then((reply) => {
 			if(reply != 1){
 				throw new errors.RedisError();
 			}
 			return null;
 		})
-		.then(function(){
+		.then(() => {
 			return client.getAsync(key);
 		})
-		.then(function(res){
+		.then((res) => {
 			return res;
 		});
 };
 
 module.exports.storeString = function (key, value) {
-	return client.setAsync(key, value).then(function(reply){
+	return client.setAsync(key, value).then((reply) => {
 		return reply;
 	});
 };

@@ -1,13 +1,13 @@
-var CheckitError = require('checkit')
+const CheckitError = require('checkit')
   .Error;
-var _ = require('lodash');
-var _Promise = require('bluebird');
+const _ = require('lodash');
+const _Promise = require('bluebird');
 
-var cache = require('../../cache')
+const cache = require('../../cache')
   .instance();
-var TrackingItem = require('../models/TrackingEvent');
-var errors = require('../errors');
-var utils = require('../utils');
+const TrackingItem = require('../models/TrackingEvent');
+const errors = require('../errors');
+const utils = require('../utils');
 
 const TRACKING_NAMESPACE = 'utracking_';
 const TRACKED_EVENT = 'trackedEvent';
@@ -20,28 +20,28 @@ const TRACKED_EVENT = 'trackedEvent';
  * @throws {InvalidTrackingStateError} when an active event is already occurring
  */
 module.exports.createTrackingEvent = function(attributes) {
-	var trackingItem = TrackingItem.forge(attributes);
+	const trackingItem = TrackingItem.forge(attributes);
 
 	return trackingItem
     .validate()
     .catch(CheckitError, utils.errors.handleValidationError)
-    .then(function() {
+    .then(() => {
 	return cache.getAsync(TRACKED_EVENT);
 })
-    .then(function(result) {
+    .then((result) => {
 	if (!_.isNil(result)) {
 		return cache.ttlAsync(TRACKED_EVENT)
-          .then(function(ttl) {
-	var message = 'An event is currently being tracked. The current event, ' + result +
+          .then((ttl) => {
+	const message = 'An event is currently being tracked. The current event, ' + result +
               ', ends in: ' + utils.time.secondsToHHMMSS(ttl);
-	var source = trackingItem.get('name');
+	const source = trackingItem.get('name');
 	return _Promise.reject(new errors.InvalidTrackingStateError(message, source));
 });
 	}
 
 	return trackingItem.save();
 })
-    .tap(function() {
+    .tap(() => {
 	return cache.multi()
         .set(TRACKED_EVENT, trackingItem.get('name'))
         .expire(TRACKED_EVENT, trackingItem.get('duration'))
@@ -60,12 +60,12 @@ module.exports.createTrackingEvent = function(attributes) {
  * @throws {InvalidParameterError} when an attendee has already participated in an event
  */
 module.exports.addEventParticipant = function(participantId) {
-	var currentEvent;
+	let currentEvent;
 	return cache.getAsync(TRACKED_EVENT)
-    .then(function(result) {
+    .then((result) => {
 	if (_.isNil(result)) {
-		var message = 'No event is currently being tracked';
-		var source = 'EventTracking';
+		const message = 'No event is currently being tracked';
+		const source = 'EventTracking';
 		throw new errors.InvalidTrackingStateError(message, source);
 	}
 
@@ -73,22 +73,22 @@ module.exports.addEventParticipant = function(participantId) {
 
 	return cache.getAsync(TRACKING_NAMESPACE + participantId);
 })
-    .then(function(result) {
+    .then((result) => {
 	if (!_.isNil(result)) {
-		var message = 'This attendee has already participated in ' + currentEvent + '!';
-		var source = participantId;
+		const message = 'This attendee has already participated in ' + currentEvent + '!';
+		const source = participantId;
 		throw new errors.InvalidParameterError(message, source);
 	}
 
 	return cache.ttlAsync(TRACKED_EVENT);
 })
-    .then(function(ttl) {
+    .then((ttl) => {
 	return cache.multi()
         .set(TRACKING_NAMESPACE + participantId, true)
         .expire(TRACKING_NAMESPACE + participantId, ttl)
         .execAsync();
 })
-    .then(function() {
+    .then(() => {
 	return TrackingItem.query()
         .where('name', currentEvent)
         .increment('count', 1);

@@ -1,5 +1,5 @@
-var InvalidParameterError = require('../errors/InvalidParameterError');
-var ErrorConstants = require('../errors/Constants');
+const InvalidParameterError = require('../errors/InvalidParameterError');
+const ErrorConstants = require('../errors/Constants');
 
 /**
  * Re-throws a Checkit validation error as an Invalid parameter error
@@ -7,11 +7,11 @@ var ErrorConstants = require('../errors/Constants');
  * @throws {InvalidParameterError} the re-thrown error
  */
 module.exports.handleValidationError = function(error) {
-	var errorKey = error.keys()[0];
-	var specificError = error.errors[errorKey];
+	const errorKey = error.keys()[0];
+	let specificError = error.errors[errorKey];
 
-	var errorDetail = specificError.message;
-	var errorSource;
+	const errorDetail = specificError.message;
+	let errorSource;
 	while (specificError.key) {
     // find the most-complete error source in the error stack
 		errorSource = specificError.key;

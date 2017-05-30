@@ -1,9 +1,9 @@
-var registration = require('../utils/registration');
-var Request = require('./Request');
+const registration = require('../utils/registration');
+const Request = require('./Request');
 
-var bodyRequired = ['priority', 'wave', 'status'];
-var bodyAllowed = ['acceptanceType', 'acceptedEcosystemId'];
-var bodyValidations = {
+const bodyRequired = ['priority', 'wave', 'status'];
+const bodyAllowed = ['acceptanceType', 'acceptedEcosystemId'];
+const bodyValidations = {
 	'priority':  ['required', 'integer', 'max:10'],
 	'wave': 	 ['required', 'integer', 'max:5'],
 	'status':    ['required', 'string', registration.verifyStatus],

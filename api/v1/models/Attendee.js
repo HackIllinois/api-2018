@@ -1,16 +1,16 @@
-var _ = require('lodash');
-var registration = require('../utils/registration');
-var utils = require('../utils');
+const _ = require('lodash');
+const registration = require('../utils/registration');
+const utils = require('../utils');
 
-var Model = require('./Model');
-var Upload = require('./Upload');
-var AttendeeProjectInterest = require('./AttendeeProjectInterest');
-var AttendeeProject = require('./AttendeeProject');
-var AttendeeExtraInfo = require('./AttendeeExtraInfo');
-var AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
-var AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
-var AttendeeRSVP = require('./AttendeeRSVP');
-var Attendee = Model.extend({
+const Model = require('./Model');
+const Upload = require('./Upload');
+const AttendeeProjectInterest = require('./AttendeeProjectInterest');
+const AttendeeProject = require('./AttendeeProject');
+const AttendeeExtraInfo = require('./AttendeeExtraInfo');
+const AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
+const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
+const AttendeeRSVP = require('./AttendeeRSVP');
+const Attendee = Model.extend({
 	tableName: 'attendees',
 	idAttribute: 'id',
 	validations: {
@@ -74,11 +74,11 @@ var Attendee = Model.extend({
  */
 Attendee.findByUserId = function(userId) {
 	return Attendee.where({
-		user_id: userId
-	})
-    .fetch({
-	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-});
+			user_id: userId
+		})
+		.fetch({
+			withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+		});
 };
 
 
@@ -88,34 +88,34 @@ Attendee.findByUserId = function(userId) {
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
 Attendee.fetchWithResumeByUserId = function(userId) {
-	return Attendee.transaction(function(t) {
-		var attendee;
+	return Attendee.transaction((t) => {
+		let attendee;
 		return Attendee.where({
-			user_id: userId
-		})
-      .fetch({
-	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-	transacting: t
-})
-      .then(function(a) {
-	attendee = a;
-	if (_.isNull(a)) {
-		return null;
-	}
-	return Upload.where({
-		owner_id: userId,
-		bucket: utils.storage.buckets.resumes
-	})
-          .fetch({
-	transacting: t
-});
-})
-      .then(function(u) {
-	if (!_.isNull(u)) {
-		attendee.set('resume', (u !== null) ? u.attributes : u);
-	}
-	return attendee;
-});
+				user_id: userId
+			})
+			.fetch({
+				withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+				transacting: t
+			})
+			.then((a) => {
+				attendee = a;
+				if (_.isNull(a)) {
+					return null;
+				}
+				return Upload.where({
+						owner_id: userId,
+						bucket: utils.storage.buckets.resumes
+					})
+					.fetch({
+						transacting: t
+					});
+			})
+			.then((u) => {
+				if (!_.isNull(u)) {
+					attendee.set('resume', (u !== null) ? u.attributes : u);
+				}
+				return attendee;
+			});
 	});
 };
 
@@ -126,11 +126,11 @@ Attendee.fetchWithResumeByUserId = function(userId) {
  */
 Attendee.findById = function(id) {
 	return Attendee.where({
-		id: id
-	})
-    .fetch({
-	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-});
+			id: id
+		})
+		.fetch({
+			withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+		});
 };
 
 /**
@@ -139,34 +139,34 @@ Attendee.findById = function(id) {
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
 Attendee.fetchWithResumeById = function(id) {
-	return Attendee.transaction(function(t) {
-		var attendee;
+	return Attendee.transaction((t) => {
+		let attendee;
 		return Attendee.where({
-			id: id
-		})
-      .fetch({
-	withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-	transacting: t
-})
-      .then(function(a) {
-	attendee = a;
-	if (_.isNull(a)) {
-		return null;
-	}
-	return Upload.where({
-		owner_id: a.get('userId'),
-		bucket: utils.storage.buckets.resumes
-	})
-          .fetch({
-	transacting: t
-});
-})
-      .then(function(u) {
-	if (!_.isNull(u)) {
-		attendee.set('resume', (u !== null) ? u.attributes : u);
-	}
-	return attendee;
-});
+				id: id
+			})
+			.fetch({
+				withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+				transacting: t
+			})
+			.then((a) => {
+				attendee = a;
+				if (_.isNull(a)) {
+					return null;
+				}
+				return Upload.where({
+						owner_id: a.get('userId'),
+						bucket: utils.storage.buckets.resumes
+					})
+					.fetch({
+						transacting: t
+					});
+			})
+			.then((u) => {
+				if (!_.isNull(u)) {
+					attendee.set('resume', (u !== null) ? u.attributes : u);
+				}
+				return attendee;
+			});
 	});
 };
 

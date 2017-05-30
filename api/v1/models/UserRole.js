@@ -1,10 +1,10 @@
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var roles = require('../utils/roles');
+const roles = require('../utils/roles');
 
-var Model = require('./Model');
-var UserRole = Model.extend({
+const Model = require('./Model');
+const UserRole = Model.extend({
 	tableName: 'user_roles',
 	idAttribute: 'id',
 	validations: {
@@ -17,7 +17,7 @@ var UserRole = Model.extend({
 function _addRole (userRole, active, t) {
 	return userRole
 		.fetch({ transacting: t })
-		.then(function (result) {
+		.then((result) => {
 			if (result) {
 				return _Promise.resolve(result);
 			}
@@ -36,11 +36,11 @@ function _addRole (userRole, active, t) {
  * @returns {Promise<UserRole>} the result of the addititon
  */
 UserRole.addRole = function (user, role, active, t) {
-	var userRole = UserRole.forge({ user_id: user.id, role: role });
+	const userRole = UserRole.forge({ user_id: user.id, role: role });
 	if (t) {
 		return _addRole(userRole, active, t);
 	}
-	return UserRole.transaction(function(t){
+	return UserRole.transaction((t) => {
 		return _addRole(userRole, active, t);
 	});
 };

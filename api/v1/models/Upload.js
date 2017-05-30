@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var Upload = Model.extend({
+const Model = require('./Model');
+const Upload = Model.extend({
 	tableName: 'uploads',
 	idAttribute: 'id',
 	hasTimestamps: ['created', 'updated']
@@ -12,7 +12,7 @@ var Upload = Model.extend({
  * @return {Promise<Collection<Upload>>} all of the uploads belonging to the owner
  */
 Upload.findByOwner = function (owner, bucket) {
-	var queryParams = { where : {} };
+	const queryParams = { where : {} };
 
 	queryParams.where.owner_id = owner.get('id');
 	if (bucket) { queryParams.where.bucket = bucket; }

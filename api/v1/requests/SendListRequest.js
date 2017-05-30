@@ -1,9 +1,9 @@
-var Request = require('./Request');
-var mail = require('../utils/mail');
-var _ = require('lodash');
+const Request = require('./Request');
+const mail = require('../utils/mail');
+const _ = require('lodash');
 
-var bodyRequired = ['listName', 'template'];
-var bodyValidations = {
+const bodyRequired = ['listName', 'template'];
+const bodyValidations = {
 	'listName':  ['required', 'string', checkValidMailName],
 	'template': ['required', 'string', checkValidTemplateName]
 };

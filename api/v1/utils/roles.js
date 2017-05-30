@@ -1,8 +1,8 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
+const ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
 
-_.forEach(ALL_ROLES, function (role) {
+_.forEach(ALL_ROLES, (role) => {
 	module.exports[role] = role;
 });
 

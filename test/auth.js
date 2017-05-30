@@ -1,18 +1,18 @@
-let chai = require('chai');
+const chai = require('chai');
 
-let errors = require('../api/v1/errors');
-let utils = require('../api/v1/utils');
-let User = require('../api/v1/models/User.js');
-let AuthService = require('../api/v1/services/AuthService.js');
+const errors = require('../api/v1/errors');
+const utils = require('../api/v1/utils');
+const User = require('../api/v1/models/User.js');
+const AuthService = require('../api/v1/services/AuthService.js');
 
-let jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
-let expect = chai.expect;
+const expect = chai.expect;
 
 describe('AuthService', () => {
 
 	describe('issueForUser', () =>{
-		var testUser;
+		let testUser;
 
 		before((done) => {
 			testUser = User.forge({ id: 1, email: 'new@example.com' });
@@ -21,9 +21,9 @@ describe('AuthService', () => {
 			done();
 		});
 		it('issues a token for a valid user', (done) => {
-			var token = AuthService.issueForUser(testUser);
-			token.then(function(data){
-				var decoded = jwt.decode(data, {complete: true});
+			const token = AuthService.issueForUser(testUser);
+			token.then((data) => {
+				const decoded = jwt.decode(data, {complete: true});
 
 				expect(decoded.payload.email).to.equal('new@example.com');
 				expect(decoded.payload.roles[0].role).to.equal('ATTENDEE');
@@ -32,7 +32,7 @@ describe('AuthService', () => {
 				done();
 			});
 		});
-		it('refuses a token for a blank user',function(done){
+		it('refuses a token for a blank user',(done) => {
 			try{
 				AuthService.issueForUser(new User());
 			}catch(e){
@@ -42,25 +42,25 @@ describe('AuthService', () => {
 		});
 	});
 
-	describe('verify',function(){
-		var testUser;
-		before(function(done){
+	describe('verify',() => {
+		let testUser;
+		before((done) => {
 			testUser = User.forge({ id: 1, email: 'new@example.com' });
 			testUser.related('roles').add({ role: utils.roles.ATTENDEE });
 			done();
 		});
-		it('verifies a valid auth token',function(done){
+		it('verifies a valid auth token',(done) => {
 			AuthService.issueForUser(testUser)
-				.then(function(token){
-					var verification = AuthService.verify(token);
-					expect(verification).to.eventually.have.deep.property('email','new@example.com').then(function () {
+				.then((token) => {
+					const verification = AuthService.verify(token);
+					expect(verification).to.eventually.have.deep.property('email','new@example.com').then(() => {
 						expect(verification).to.eventually.have.deep.property('sub', '1').and.notify(done);
 					});
 				});
 		});
-		it('refuses a fake auth token',function(done){
-			var token = 'FAKE TOKEN';
-			var verification = AuthService.verify(token);
+		it('refuses a fake auth token',(done) => {
+			const token = 'FAKE TOKEN';
+			const verification = AuthService.verify(token);
 			expect(verification).to.eventually.be.rejectedWith(errors.UnprocessableRequestError).and.notify(done);
 		});
 	});

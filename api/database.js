@@ -1,9 +1,9 @@
-var config = require('./config');
-var logger = require('./logging');
+const config = require('./config');
+const logger = require('./logging');
 
-var milliseconds = require('ms');
+const milliseconds = require('ms');
 
-var KNEX_CONFIG = {
+const KNEX_CONFIG = {
 	client: 'mysql',
 	connection: {
 		host: config.database.primary.host,

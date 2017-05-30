@@ -1,5 +1,5 @@
-var _ = require('lodash');
-var ALL_TAGS = ['PRE_EVENT', 'POST_EVENT'];
+const _ = require('lodash');
+const ALL_TAGS = ['PRE_EVENT', 'POST_EVENT'];
 
 module.exports.verifyTag = function(tag){
 	if (!_.includes(ALL_TAGS, tag)) {

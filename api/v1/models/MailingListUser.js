@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var MailingListUser = Model.extend({
+const Model = require('./Model');
+const MailingListUser = Model.extend({
 	tableName: 'mailing_lists_users',
 	idAttribute: 'id'
 });

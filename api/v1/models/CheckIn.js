@@ -1,7 +1,7 @@
-var checkin = require('../utils/check_in');
+const checkin = require('../utils/check_in');
 
-var Model = require('./Model');
-var CheckIn =  Model.extend({
+const Model = require('./Model');
+const CheckIn =  Model.extend({
 	tableName: 'checkins',
 	idAttribute: 'id',
 	validations: {

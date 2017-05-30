@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var AttendeeRequestedCollaborator = Model.extend({
+const Model = require('./Model');
+const AttendeeRequestedCollaborator = Model.extend({
 	tableName: 'attendee_requested_collaborators',
 	idAttribute: 'id',
 	validations: {

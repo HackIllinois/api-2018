@@ -1,10 +1,10 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var Model = require('./Model');
-var User = require('./User');
-var MailingListUser = require('./MailingListUser');
+const Model = require('./Model');
+const User = require('./User');
+const MailingListUser = require('./MailingListUser');
 
-var MailingList = Model.extend({
+const MailingList = Model.extend({
 	tableName: 'mailing_lists',
 	idAttribute: 'id',
 	validations: {
@@ -27,12 +27,12 @@ MailingList.findByName = function (name) {
  * @returns {Promise<MailingListUser>}	an promise with the save result
  */
 MailingList.prototype.addUser = function (user) {
-	var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: this.attributes.id });
+	const mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: this.attributes.id });
 	return MailingListUser
-		.transaction(function (t) {
+		.transaction((t) => {
 			return mailingListUser
 				.fetch({ transacting: t })
-				.then(function (result) {
+				.then((result) => {
 					if (result) {
 						return _Promise.resolve(result);
 					}

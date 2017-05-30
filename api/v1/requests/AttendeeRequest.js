@@ -1,30 +1,30 @@
-var Request = require('./Request');
-var validators = require('../utils/validators');
-var registration = require('../utils/registration');
+const Request = require('./Request');
+const validators = require('../utils/validators');
+const registration = require('../utils/registration');
 
-var extraInfoValidations = {
+const extraInfoValidations = {
 	info:       ['string', 'maxLength:255']
 };
 
 // NOTE: these are currently not supported
-var projectValidations = {
+const projectValidations = {
 	name:       ['required', 'string', 'maxLength:100'],
 	description:['required', 'string', 'maxLength:255'],
 	repo:       ['required', 'string', 'maxLength:150'],
 	isSuggestion: ['required', 'boolean']
 };
 
-var ecosystemInterestValidations = {
+const ecosystemInterestValidations = {
 	ecosystemId:  ['required', 'integer']
 };
 
-var requestedCollaboratorValidations = {
+const requestedCollaboratorValidations = {
 	collaborator: ['required', 'string', 'maxLength:255']
 };
 
-var bodyRequired = ['attendee'];
-var bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'collaborators'];
-var bodyValidations = {
+const bodyRequired = ['attendee'];
+const bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'collaborators'];
+const bodyValidations = {
 	'attendee': ['required', 'plainObject'],
 	'attendee.firstName': ['required', 'string', 'maxLength:255'],
 	'attendee.lastName': ['required', 'string', 'maxLength:255'],

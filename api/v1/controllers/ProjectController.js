@@ -125,7 +125,7 @@ function deleteProjectMentor(req, res, next) {
 
 			return next();
 		})
-		.catch(function(error) {
+		.catch((error) => {
 			return next(error);
 		});
 }

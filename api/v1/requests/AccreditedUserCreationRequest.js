@@ -1,8 +1,8 @@
-var roles = require('../utils/roles');
-var Request = require('./Request');
+const roles = require('../utils/roles');
+const Request = require('./Request');
 
-var bodyRequired = ['email', 'role'];
-var bodyValidations = {
+const bodyRequired = ['email', 'role'];
+const bodyValidations = {
 	'email': ['email'],
 	'role': ['string', roles.verifyRole]
 };

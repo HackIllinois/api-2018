@@ -1,7 +1,7 @@
-var Request = require('./Request');
+const Request = require('./Request');
 
-var bodyRequired = ['name', 'latitude', 'longitude'];
-var bodyValidations = {
+const bodyRequired = ['name', 'latitude', 'longitude'];
+const bodyValidations = {
 	'name': ['required', 'string', 'maxLength:255'],
 	'latitude': ['required', 'number'],
 	'longitude': ['required', 'number']

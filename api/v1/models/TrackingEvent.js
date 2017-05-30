@@ -1,6 +1,6 @@
-var Model = require('./Model');
+const Model = require('./Model');
 
-var TrackingEvent = Model.extend({
+const TrackingEvent = Model.extend({
 	tableName: 'tracking_events',
 	idAttribute: 'id',
 	hasTimestamps: ['created'],

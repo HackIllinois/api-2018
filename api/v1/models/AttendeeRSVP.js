@@ -1,8 +1,8 @@
-var CheckIt = require('checkit');
+const CheckIt = require('checkit');
 
-var rsvp = require('../utils/rsvp');
-var Model = require('./Model');
-var AttendeeRSVP = Model.extend({
+const rsvp = require('../utils/rsvp');
+const Model = require('./Model');
+const AttendeeRSVP = Model.extend({
 	tableName: 'attendee_rsvps',
 	idAttribute: 'id',
 	validations: {
@@ -16,8 +16,8 @@ AttendeeRSVP.findByAttendeeId = function (attendeeId) {
 };
 
 AttendeeRSVP.prototype.validate = function () {
-	var checkit = CheckIt(this.validations);
-	checkit.maybe({type:  ['required', 'string', rsvp.verifyAttendanceReply]}, function(input) {
+	const checkit = CheckIt(this.validations);
+	checkit.maybe({type:  ['required', 'string', rsvp.verifyAttendanceReply]}, (input) => {
 		return input.isAttending;
 	});
 

@@ -1,8 +1,8 @@
-var Model = require('./Model');
-var Project = require('./Project');
-var Mentor = require('./Mentor');
+const Model = require('./Model');
+const Project = require('./Project');
+const Mentor = require('./Mentor');
 
-var ProjectMentor = Model.extend({
+const ProjectMentor = Model.extend({
 	tableName: 'project_mentors',
 	idAttribute: 'id',
 	project: function() {

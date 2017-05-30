@@ -1,35 +1,35 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var chai = require('chai');
-var sinon = require('sinon');
+const chai = require('chai');
+const sinon = require('sinon');
 
-var errors = require('../api/v1/errors');
-var utils = require('../api/v1/utils');
-var User = require('../api/v1/models/User.js');
-var Attendee = require('../api/v1/models/Attendee.js');
-var AttendeeEcosystemInterest = require('../api/v1/models/AttendeeEcosystemInterest.js');
-var AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
-var AttendeeProject = require('../api/v1/models/AttendeeProject.js');
-var AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
-var RegistrationService = require('../api/v1/services/RegistrationService.js');
+const errors = require('../api/v1/errors');
+const utils = require('../api/v1/utils');
+const User = require('../api/v1/models/User.js');
+const Attendee = require('../api/v1/models/Attendee.js');
+const AttendeeEcosystemInterest = require('../api/v1/models/AttendeeEcosystemInterest.js');
+const AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
+const AttendeeProject = require('../api/v1/models/AttendeeProject.js');
+const AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
+const RegistrationService = require('../api/v1/services/RegistrationService.js');
 
-var assert = chai.assert;
-var expect = chai.expect;
-var tracker = require('mock-knex').getTracker();
+const assert = chai.assert;
+const expect = chai.expect;
+const tracker = require('mock-knex').getTracker();
 
-describe('RegistrationService',function(){
-	var _saveAttendee;
-	var _saveAttendeeEcosystemInterest;
-	var _saveAttendeeExtraInfo;
-	var _saveAttendeeProject;
-	var _saveAttendeeRequestedCollaborator;
+describe('RegistrationService',() => {
+	let _saveAttendee;
+	let _saveAttendeeEcosystemInterest;
+	let _saveAttendeeExtraInfo;
+	let _saveAttendeeProject;
+	let _saveAttendeeRequestedCollaborator;
 
-	describe('createAttendee', function () {
-		var testUser;
-		var testRegistration;
-		var _forgeAttendee;
+	describe('createAttendee', () => {
+		let testUser;
+		let testRegistration;
+		let _forgeAttendee;
 
-		before(function(done){
+		before((done) => {
 			testUser = User.forge({ id: 1, email: 'new@example.com' });
 			testRegistration = {};
 			testRegistration.attendee = {
@@ -87,19 +87,19 @@ describe('RegistrationService',function(){
 
 			done();
 		});
-		beforeEach(function (done) {
+		beforeEach((done) => {
 			tracker.install();
 			done();
 		});
-		it('creates an attendee for a valid user without an attendee role',function(done){
-			var testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
-			var attendeeParams = testRegistrationClone.attendee;
+		it('creates an attendee for a valid user without an attendee role',(done) => {
+			const testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
+			const attendeeParams = testRegistrationClone.attendee;
 
-			tracker.on('query', function (query) {
+			tracker.on('query', (query) => {
 				query.response([1]);
 			});
-			var attendee = RegistrationService.createAttendee(testUser, testRegistrationClone);
-			attendee.then(function() {
+			const attendee = RegistrationService.createAttendee(testUser, testRegistrationClone);
+			attendee.then(() => {
 				attendeeParams.userId = testUser.id;
 
 				assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, 'Attendee forge not called with right parameters');
@@ -109,22 +109,22 @@ describe('RegistrationService',function(){
 				assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
 				assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
 				return done();
-			}).catch(function (err) {
+			}).catch((err) => {
 				return done(err);
 			});
 		});
-		it('throws an error for a valid user with an attendee role',function(done){
+		it('throws an error for a valid user with an attendee role',(done) => {
 			testUser.related('roles').add({ role: utils.roles.ATTENDEE });
-			var testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
+			const testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
 
-			var attendee = RegistrationService.createAttendee(testUser, testRegistrationClone);
+			const attendee = RegistrationService.createAttendee(testUser, testRegistrationClone);
 			expect(attendee).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
 		});
-		afterEach(function (done) {
+		afterEach((done) => {
 			tracker.uninstall();
 			done();
 		});
-		after(function(done) {
+		after((done) => {
 			_forgeAttendee.restore();
 			_saveAttendee.restore();
 			_saveAttendeeProject.restore();
@@ -135,15 +135,15 @@ describe('RegistrationService',function(){
 		});
 	});
 
-	describe('findAttendeeByUser', function () {
-		var _findByUserId;
-		var testUser;
-		var nonExistentUser;
+	describe('findAttendeeByUser', () => {
+		let _findByUserId;
+		let testUser;
+		let nonExistentUser;
 
-		before(function (done) {
+		before((done) => {
 			testUser = User.forge({ id: 1, email: 'new@example.com' });
 			nonExistentUser = User.forge({id: 2, email: 'fake@example.com'});
-			var testAttendee = Attendee.forge({id: 100, firstName: 'Example', lastName: 'User'});
+			const testAttendee = Attendee.forge({id: 100, firstName: 'Example', lastName: 'User'});
 
 			_findByUserId = sinon.stub(Attendee,'findByUserId');
 
@@ -151,29 +151,29 @@ describe('RegistrationService',function(){
 			_findByUserId.withArgs(sinon.match.number).returns(_Promise.resolve(null));
 			done();
 		});
-		it('finds existing user',function(done){
-			var attendee = RegistrationService.findAttendeeByUser(testUser);
+		it('finds existing user',(done) => {
+			const attendee = RegistrationService.findAttendeeByUser(testUser);
 			expect(attendee).to.eventually.have.deep.property('attributes.id', 100, 'ID should be 100, the searched for ID')
-								.then(function(){
+								.then(() => {
 									expect(attendee).to.eventually.have.deep.property('attributes.firstName',
 												'Example','first name should be Example').notify(done);
 								});
 		});
-		it('throws exception after searching for non-existent user',function(done){
-			var attendee = RegistrationService.findAttendeeByUser(nonExistentUser);
+		it('throws exception after searching for non-existent user',(done) => {
+			const attendee = RegistrationService.findAttendeeByUser(nonExistentUser);
 			expect(attendee).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
 		});
-		after(function(done){
+		after((done) => {
 			_findByUserId.restore();
 			done();
 		});
 	});
 
-	describe('findAttendeeById',function(){
-		var _findById;
+	describe('findAttendeeById',() => {
+		let _findById;
 
-		before(function(done){
-			var testAttendee = Attendee.forge({id: 1, firstName: 'Example', lastName: 'User'});
+		before((done) => {
+			const testAttendee = Attendee.forge({id: 1, firstName: 'Example', lastName: 'User'});
 
 			_findById = sinon.stub(Attendee, 'findById');
 
@@ -182,30 +182,30 @@ describe('RegistrationService',function(){
 
 			done();
 		});
-		it('finds existing attendee',function(done){
-			var attendee = RegistrationService.findAttendeeById(1);
+		it('finds existing attendee',(done) => {
+			const attendee = RegistrationService.findAttendeeById(1);
 			expect(attendee).to.eventually.have.deep.property('attributes.id', 1,'ID should be 1, the searched for ID')
-				.then(function(){
+				.then(() => {
 					expect(attendee).to.eventually.have.deep.property('attributes.firstName',
 						'Example','first name should be Example').notify(done);
 				});
 		});
-		it('throws exception after searching for non-existent attendee',function(done){
-			var attendee = RegistrationService.findAttendeeById(2);
+		it('throws exception after searching for non-existent attendee',(done) => {
+			const attendee = RegistrationService.findAttendeeById(2);
 			expect(attendee).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
 		});
-		after(function(done){
+		after((done) => {
 			_findById.restore();
 			done();
 		});
 	});
 
-	describe('updateAttendee', function() {
-		var testAttendee;
-		var testRegistration;
-		var _setAttendee;
+	describe('updateAttendee', () => {
+		let testAttendee;
+		let testRegistration;
+		let _setAttendee;
 
-		before(function(done){
+		before((done) => {
 			testRegistration = {};
 			testRegistration.attendee = {
 				'id': 1,
@@ -268,19 +268,19 @@ describe('RegistrationService',function(){
 
 			done();
 		});
-		beforeEach(function (done) {
+		beforeEach((done) => {
 			tracker.install();
 			done();
 		});
-		it('updates an attendee',function(done){
-			var testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
-			var attendeeParams = testRegistrationClone.attendee;
+		it('updates an attendee',(done) => {
+			const testRegistrationClone = JSON.parse(JSON.stringify(testRegistration));
+			const attendeeParams = testRegistrationClone.attendee;
 
-			tracker.on('query', function (query) {
+			tracker.on('query', (query) => {
 				query.response([1]);
 			});
-			var attendee = RegistrationService.updateAttendee(testAttendee, testRegistrationClone);
-			attendee.then(function() {
+			const attendee = RegistrationService.updateAttendee(testAttendee, testRegistrationClone);
+			attendee.then(() => {
 				assert(_setAttendee.withArgs(attendeeParams).calledOnce, 'Attendee update not called with right parameters');
 				assert(_saveAttendee.calledOnce, 'Attendee save not called');
 				assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
@@ -288,15 +288,15 @@ describe('RegistrationService',function(){
 				assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
 				assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
 				return done();
-			}).catch(function (err) {
+			}).catch((err) => {
 				return done(err);
 			});
 		});
-		afterEach(function (done) {
+		afterEach((done) => {
 			tracker.uninstall();
 			done();
 		});
-		after(function(done) {
+		after((done) => {
 			_setAttendee.restore();
 			_saveAttendee.restore();
 			_saveAttendeeProject.restore();

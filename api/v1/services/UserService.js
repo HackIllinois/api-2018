@@ -1,10 +1,10 @@
-var Checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const Checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var User = require('../models/User');
-var errors = require('../errors');
-var utils = require('../utils');
+const User = require('../models/User');
+const errors = require('../errors');
+const utils = require('../utils');
 
 /**
  * Creates a user of the specified role. When a password is not specified, a
@@ -18,18 +18,18 @@ var utils = require('../utils');
 module.exports.createUser = function(email, password, role) {
 
 	email = email.toLowerCase();
-	var storedPassword = (password) ? password : utils.crypto.generatePassword();
-	var user = User.forge({
+	const storedPassword = (password) ? password : utils.crypto.generatePassword();
+	const user = User.forge({
 		email: email,
 		password: storedPassword
 	});
 	return user
     .validate()
     .catch(Checkit.Error, utils.errors.handleValidationError)
-    .then(function() {
+    .then(() => {
 	return User.create(email, storedPassword, role);
 })
-    .then(function(result) {
+    .then((result) => {
 	if (_.isUndefined(password) || _.isNull(password)) {
         // TODO: send user an email requiring a password reset when
         // the password is automatically generated
@@ -52,10 +52,10 @@ module.exports.createUser = function(email, password, role) {
 module.exports.findUserById = function(id) {
 	return User
     .findById(id)
-    .then(function(result) {
+    .then((result) => {
 	if (_.isNull(result)) {
-		var message = 'A user with the given ID cannot be found';
-		var source = 'id';
+		const message = 'A user with the given ID cannot be found';
+		const source = 'id';
 		throw new errors.NotFoundError(message, source);
 	}
 
@@ -72,10 +72,10 @@ module.exports.findUserById = function(id) {
 module.exports.findUserByEmail = function(email) {
 	return User
     .findByEmail(email)
-    .then(function(result) {
+    .then((result) => {
 	if (_.isNull(result)) {
-		var message = 'A user with the given email cannot be found';
-		var source = 'email';
+		const message = 'A user with the given email cannot be found';
+		const source = 'email';
 		throw new errors.NotFoundError(message, source);
 	}
 	return _Promise.resolve(result);
@@ -92,10 +92,10 @@ module.exports.findUserByEmail = function(email) {
 module.exports.verifyPassword = function(user, password) {
 	return user
     .hasPassword(password)
-    .then(function(result) {
+    .then((result) => {
 	if (!result) {
-		var message = 'The provided password is incorrect';
-		var source = 'password';
+		const message = 'The provided password is incorrect';
+		const source = 'password';
 		throw new errors.InvalidParameterError(message, source);
 	}
 
@@ -112,7 +112,7 @@ module.exports.verifyPassword = function(user, password) {
 module.exports.resetPassword = function(user, password) {
 	return user
     .setPassword(password)
-    .then(function(updated) {
+    .then((updated) => {
 	return updated.save();
 });
 };

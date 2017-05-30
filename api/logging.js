@@ -1,9 +1,9 @@
-var winston = require('winston');
+const winston = require('winston');
 
-var config = require('./config');
+const config = require('./config');
 
-var transports = [];
-var consoleTransport = new winston.transports.Console({
+const transports = [];
+const consoleTransport = new winston.transports.Console({
 	colorize: !config.isProduction,
 	prettyPrint: !config.isProduction,
 	stringify: config.isProduction,
@@ -13,7 +13,7 @@ var consoleTransport = new winston.transports.Console({
 // add other transports as needed
 transports.push(consoleTransport);
 
-var logger = new winston.Logger({
+const logger = new winston.Logger({
 	transports: transports
 });
 logger.info('prepared environment for %s', config.environment);

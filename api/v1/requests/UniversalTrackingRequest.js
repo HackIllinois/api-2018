@@ -1,7 +1,7 @@
-var Request = require('./Request');
+const Request = require('./Request');
 
-var bodyRequired = ['name', 'duration'];
-var bodyValidations = {
+const bodyRequired = ['name', 'duration'];
+const bodyValidations = {
 	'name': ['required', 'string', 'maxLength:255'],
 	'duration': ['required', 'naturalNonZero']
 };

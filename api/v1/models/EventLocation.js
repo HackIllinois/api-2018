@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var EventLocation = Model.extend({
+const Model = require('./Model');
+const EventLocation = Model.extend({
 	tableName: 'event_locations',
 	idAttribute: 'id',
 	validations: {

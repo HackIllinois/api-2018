@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var AttendeeExtraInfo = Model.extend({
+const Model = require('./Model');
+const AttendeeExtraInfo = Model.extend({
 	tableName: 'attendee_extra_infos',
 	idAttribute: 'id',
 	validations: {
@@ -8,13 +8,12 @@ var AttendeeExtraInfo = Model.extend({
 	}
 });
 
-
 /**
 * Finds an attendee's extra information by its relational attendee's id
 * @param  {Number|String} id	the ID of the attendee with the appropriate type
 * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeExtraInfo or null
 */
-AttendeeExtraInfo.findByAttendeeId = function (attendeeId) {
+AttendeeExtraInfo.findByAttendeeId = (attendeeId) => {
 	return AttendeeExtraInfo.where({ attendee_id: attendeeId }).fetch();
 };
 
@@ -23,7 +22,7 @@ AttendeeExtraInfo.findByAttendeeId = function (attendeeId) {
 * @param  {Number|String} id	the ID of the model with the appropriate type
 * @return {Promise<Model>}		a Promise resolving to the resulting model or null
 */
-AttendeeExtraInfo.findById = function (id) {
+AttendeeExtraInfo.findById = (id) => {
 	return AttendeeExtraInfo.where({ id: id }).fetch();
 };
 

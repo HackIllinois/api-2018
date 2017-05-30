@@ -1,16 +1,16 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var utils = require('../utils');
-var Location = require('../models/Location');
-var Event = require('../models/Event');
-var EventLocation = require('../models/EventLocation');
+const utils = require('../utils');
+const Location = require('../models/Location');
+const Event = require('../models/Event');
+const EventLocation = require('../models/EventLocation');
 
 module.exports.getAllLocations = function() {
 	return Location.fetchAll();
 };
 
 module.exports.createLocation = function(params) {
-	var location = Location.forge(params);
+	const location = Location.forge(params);
 
 	return location.save()
 		.catch(
@@ -21,7 +21,7 @@ module.exports.createLocation = function(params) {
 
 module.exports.getEvents = function(getActive) {
 	if (getActive) {
-		return Event.query(function(qb) {
+		return Event.query((qb) => {
 			qb.whereRaw('end_time > current_time()')
 					.andWhereRaw('start_time < current_time()');
 		})
@@ -36,24 +36,24 @@ module.exports.getEvents = function(getActive) {
 };
 
 module.exports.createEvent = function(params) {
-	var event = params.event;
-	var locations = params.eventLocations;
+	const event = params.event;
+	const locations = params.eventLocations;
 
-	return Event.transaction(function(t) {
+	return Event.transaction((t) => {
 		return new Event(event)
 				.save(null, {
 					transacting: t
 				})
-				.then(function(result) {
+				.then((result) => {
 					if (locations) {
-						return _Promise.map(locations, function(location) {
+						return _Promise.map(locations, (location) => {
 							location.eventId = result.id;
 							return new EventLocation(location)
 									.save(null, {
 										transacting: t
 									});
 						})
-							.then(function(locationResult) {
+							.then((locationResult) => {
 								return {
 									'event': result,
 									'eventLocations': locationResult

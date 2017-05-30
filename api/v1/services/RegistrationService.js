@@ -27,11 +27,11 @@ function _saveWithRelated(model, related, t) {
 		require: false,
 		transacting: t
 	})
-		.then(function(model) {
+		.then((model) => {
 			const relatedPromises = [];
 
-			_.forIn(related, function(instances, relatedName) {
-				_.forEach(instances, function(attributes) {
+			_.forIn(related, (instances, relatedName) => {
+				_.forEach(instances, (attributes) => {
 					relatedPromises.push(
 						model.related(relatedName)
 						.create(attributes, {
@@ -58,17 +58,17 @@ function _saveWithRelated(model, related, t) {
  *                          updated objects
  */
 function _extractRelatedObjects(model, fkName, related) {
-	var result = {};
+	const result = {};
 
-	_.forIn(related, function(instances, relatedName) {
+	_.forIn(related, (instances, relatedName) => {
 		result[relatedName] = {
 			new: [],
 			updated: [],
 			updatedIds: []
 		};
 
-		_.forEach(instances, function(attributes) {
-			var MESSAGE, SOURCE;
+		_.forEach(instances, (attributes) => {
+			let MESSAGE, SOURCE;
 			if (!_.has(attributes, 'id')) {
 				result[relatedName].new.push(attributes);
 			} else if (_.isUndefined(model.related(relatedName)
@@ -106,23 +106,23 @@ function _extractRelatedObjects(model, fkName, related) {
  * @return {Promise<>}				a promise indicating all changes have been added to the transaction
  */
 function _adjustRelatedObjects(model, parentKey, adjustments, t) {
-	var relatedPromises = [];
+	const relatedPromises = [];
 
-	_.forIn(adjustments, function(adjustment, relatedName) {
-		var promise = model.related(relatedName)
+	_.forIn(adjustments, (adjustment, relatedName) => {
+		const promise = model.related(relatedName)
 			.query()
 			.transacting(t)
 			.whereNotIn('id', adjustment.updatedIds)
 			.where(parentKey, model.get('id'))
 			.delete()
-			.catch(Model.NoRowsDeletedError, function() {
+			.catch(Model.NoRowsDeletedError, () => {
 				return null;
 			})
-			.then(function() {
+			.then(() => {
 				model.related(relatedName)
 					.reset();
 
-				return _Promise.map(adjustment.updated, function(updated) {
+				return _Promise.map(adjustment.updated, (updated) => {
 					model.related(relatedName)
 						.add(updated);
 					return updated.save(null, {
@@ -150,10 +150,10 @@ function _addToMailingList(attendee, decision) {
 		return;
 	}
 
-	var user = User.forge({
+	const user = User.forge({
 		id: attendee.userId
 	});
-	var promises;
+	let promises;
 
 	// if the status of the user has just been finalized - this is the initial decision
 	if (attendee.status === 'PENDING' && decision.status !== 'PENDING') {
@@ -176,8 +176,8 @@ function _addToMailingList(attendee, decision) {
 	}
 	// applicant's wave was changed
 	else if (attendee.wave != decision.wave && attendee.status === decision.status && decision.status === 'ACCEPTED') {
-		var oldListName = 'wave' + attendee.wave;
-		var newListName = 'wave' + decision.wave;
+		const oldListName = 'wave' + attendee.wave;
+		const newListName = 'wave' + decision.wave;
 
 		promises = [];
 		promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
@@ -186,8 +186,8 @@ function _addToMailingList(attendee, decision) {
 	}
 	// applicant accepted off of waitlist (or removed from rejected)
 	else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
-		var waveListName = 'wave' + decision.wave;
-		var outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+		const waveListName = 'wave' + decision.wave;
+		const outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
 
 		promises = [];
 		promises.push(MailService.removeFromList(user, outgoingList));
@@ -206,8 +206,8 @@ function _addToMailingList(attendee, decision) {
 	}
 	// move applicant from accepted to rejected or waitlisted
 	else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
-		var oldWaveName = 'wave' + attendee.wave;
-		var incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+		const oldWaveName = 'wave' + attendee.wave;
+		const incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
 
 		promises = [];
 		promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
@@ -241,25 +241,25 @@ function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
  * @throws {InvalidParameterError} when a mentor exists for the specified user
  */
 module.exports.createMentor = function(user, attributes) {
-	var mentorAttributes = attributes.mentor;
+	const mentorAttributes = attributes.mentor;
 	delete attributes.mentor;
 
 	mentorAttributes.userId = user.get('id');
-	var mentor = Mentor.forge(mentorAttributes);
+	const mentor = Mentor.forge(mentorAttributes);
 
 	return mentor.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			if (user.hasRole(utils.roles.MENTOR, false)) {
-				var message = 'The given user has already registered as a mentor';
-				var source = 'userId';
+				const message = 'The given user has already registered as a mentor';
+				const source = 'userId';
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return Mentor.transaction(function(t) {
+			return Mentor.transaction((t) => {
 				return UserRole
 					.addRole(user, utils.roles.MENTOR, false, t)
-					.then(function() {
+					.then(() => {
 						return _saveWithRelated(mentor, attributes);
 					});
 			});
@@ -274,10 +274,10 @@ module.exports.createMentor = function(user, attributes) {
  */
 module.exports.findMentorByUser = function(user) {
 	return Mentor.findByUserId(user.get('id'))
-		.tap(function(result) {
+		.tap((result) => {
 			if (_.isNull(result)) {
-				var message = 'A mentor with the given user ID cannot be found';
-				var source = 'userId';
+				const message = 'A mentor with the given user ID cannot be found';
+				const source = 'userId';
 				throw new errors.NotFoundError(message, source);
 			}
 		});
@@ -291,10 +291,10 @@ module.exports.findMentorByUser = function(user) {
  */
 module.exports.findMentorById = function(id) {
 	return Mentor.findById(id)
-		.tap(function(result) {
+		.tap((result) => {
 			if (_.isNull(result)) {
-				var message = 'A mentor with the given ID cannot be found';
-				var source = 'id';
+				const message = 'A mentor with the given ID cannot be found';
+				const source = 'id';
 				throw new errors.NotFoundError(message, source);
 			}
 		});
@@ -308,20 +308,20 @@ module.exports.findMentorById = function(id) {
  * @throws {InvalidParameterError} when a mentor doesn't exist for the specified user
  */
 module.exports.updateMentor = function(mentor, attributes) {
-	var mentorAttributes = attributes.mentor;
+	const mentorAttributes = attributes.mentor;
 	delete attributes.mentor;
 
 	mentor.set(mentorAttributes);
 
 	return mentor.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			return _extractRelatedObjects(mentor, 'mentorId', attributes);
 		})
-		.then(function(adjustments) {
-			return Mentor.transaction(function(t) {
+		.then((adjustments) => {
+			return Mentor.transaction((t) => {
 				return _adjustRelatedObjects(mentor, 'mentor_id', adjustments, t)
-					.then(function() {
+					.then(() => {
 						return _saveWithRelated(mentor, {
 							'ideas': adjustments.ideas.new
 						}, t);
@@ -339,30 +339,30 @@ module.exports.updateMentor = function(mentor, attributes) {
  */
 module.exports.createAttendee = function(user, attributes) {
 	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-		var message = 'One project or ecosystem interest must be provided';
-		var source = ['projects', 'ecosystemInterests'];
+		const message = 'One project or ecosystem interest must be provided';
+		const source = ['projects', 'ecosystemInterests'];
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 
-	var attendeeAttrs = attributes.attendee;
+	const attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
 
 	attendeeAttrs.userId = user.get('id');
-	var attendee = Attendee.forge(attendeeAttrs);
+	const attendee = Attendee.forge(attendeeAttrs);
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			if (user.hasRole(utils.roles.ATTENDEE, false)) {
-				var message = 'The given user has already registered as an attendee';
-				var source = 'userId';
+				const message = 'The given user has already registered as an attendee';
+				const source = 'userId';
 				throw new errors.InvalidParameterError(message, source);
 			}
 
-			return Attendee.transaction(function(t) {
+			return Attendee.transaction((t) => {
 				return UserRole
 					.addRole(user, utils.roles.ATTENDEE, false, t)
-					.then(function() {
+					.then(() => {
 						return _saveWithRelated(attendee, attributes, t);
 					});
 			});
@@ -377,17 +377,17 @@ module.exports.createAttendee = function(user, attributes) {
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
 module.exports.findAttendeeByUser = function(user, withResume) {
-	var findFunction;
+	let findFunction;
 	if (withResume)
 		findFunction = Attendee.fetchWithResumeByUserId;
 	else
 		findFunction = Attendee.findByUserId;
 
 	return findFunction(user.get('id'))
-		.tap(function(result) {
+		.tap((result) => {
 			if (_.isNull(result)) {
-				var message = 'A attendee with the given user ID cannot be found';
-				var source = 'userId';
+				const message = 'A attendee with the given user ID cannot be found';
+				const source = 'userId';
 				throw new errors.NotFoundError(message, source);
 			}
 		});
@@ -401,17 +401,17 @@ module.exports.findAttendeeByUser = function(user, withResume) {
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
 module.exports.findAttendeeById = function(id, withResume) {
-	var findFunction;
+	let findFunction;
 	if (withResume)
 		findFunction = Attendee.fetchWithResumeById;
 	else
 		findFunction = Attendee.findById;
 
 	return findFunction(id)
-		.tap(function(result) {
+		.tap((result) => {
 			if (_.isNull(result)) {
-				var message = 'A attendee with the given ID cannot be found';
-				var source = 'id';
+				const message = 'A attendee with the given ID cannot be found';
+				const source = 'id';
 				throw new errors.NotFoundError(message, source);
 			}
 		});
@@ -436,15 +436,15 @@ module.exports.updateAttendee = function(attendee, attributes) {
 	});
 
 	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-		var message = 'One project or ecosystem interest must be provided';
-		var source = ['projects', 'ecosystemInterests'];
+		const message = 'One project or ecosystem interest must be provided';
+		const source = ['projects', 'ecosystemInterests'];
 		return _Promise.reject(new errors.InvalidParameterError(message, source));
 	}
 
-	var attendeeAttrs = attributes.attendee;
+	const attendeeAttrs = attributes.attendee;
 	delete attributes.attendee;
 
-	var user = User.forge({
+	const user = User.forge({
 		id: attendee.get('userId')
 	});
 	if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
@@ -462,14 +462,14 @@ module.exports.updateAttendee = function(attendee, attributes) {
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			return _extractRelatedObjects(attendee, 'attendeeId', attributes);
 		})
-		.then(function(adjustments) {
-			return Attendee.transaction(function(t) {
+		.then((adjustments) => {
+			return Attendee.transaction((t) => {
 				return _adjustRelatedObjects(attendee, 'attendee_id', adjustments, t)
-					.then(function() {
-						var newRelated = _.mapValues(adjustments, function(adjustment) {
+					.then(() => {
+						const newRelated = _.mapValues(adjustments, (adjustment) => {
 							return adjustment.new;
 						});
 						return _saveWithRelated(attendee, newRelated, t);
@@ -480,17 +480,17 @@ module.exports.updateAttendee = function(attendee, attributes) {
 
 
 module.exports.applyDecision = function(attendee, decisionAttrs) {
-	var prevAttendeeAttrs = _.clone(attendee.attributes);
+	const prevAttendeeAttrs = _.clone(attendee.attributes);
 
 	return attendee.validate()
 		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			return attendee.save(decisionAttrs, {
 				patch: true,
 				require: false
 			});
 		})
-		.then(function(model) {
+		.then((model) => {
 			_addToMailingList(prevAttendeeAttrs, decisionAttrs);
 			return model;
 		});
@@ -505,15 +505,15 @@ module.exports.applyDecision = function(attendee, decisionAttrs) {
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
-	var ordering = (ascending ? '' : '-') + utils.database.format(category);
+	const ordering = (ascending ? '' : '-') + utils.database.format(category);
 	return Attendee.forge()
 		.orderBy(ordering)
 		.fetchPage({
 			pageSize: count,
 			page: page
 		})
-		.then(function(results) {
-			var attendees = _.map(results.models, 'attributes');
+		.then((results) => {
+			const attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
 };
@@ -528,9 +528,9 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
-	var ordering = (ascending ? '' : '-') + utils.database.format(category);
+	const ordering = (ascending ? '' : '-') + utils.database.format(category);
 	return Attendee
-		.query(function(qb) {
+		.query((qb) => {
 			qb.where('first_name', 'LIKE', searchTerm)
 				.orWhere('last_name', 'LIKE', searchTerm);
 		})
@@ -539,8 +539,8 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
 			pageSize: count,
 			page: page
 		})
-		.then(function(results) {
-			var attendees = _.map(results.models, 'attributes');
+		.then((results) => {
+			const attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
 };
@@ -556,10 +556,10 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
-	var ordering = (ascending ? '' : '-') + utils.database.format(category);
+	const ordering = (ascending ? '' : '-') + utils.database.format(category);
 	filterCategory = utils.database.format(filterCategory);
 	return Attendee
-		.query(function(qb) {
+		.query((qb) => {
 			qb.where(filterCategory, '=', filterVal);
 		})
 		.orderBy(ordering)
@@ -567,8 +567,8 @@ module.exports.filterAttendees = function(page, count, category, ascending, filt
 			pageSize: count,
 			page: page
 		})
-		.then(function(results) {
-			var attendees = _.map(results.models, 'attributes');
+		.then((results) => {
+			const attendees = _.map(results.models, 'attributes');
 			return attendees;
 		});
 };

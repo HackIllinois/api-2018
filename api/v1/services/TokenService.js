@@ -1,11 +1,11 @@
 /* jshint esversion: 6 */
 
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var Token = require('../models/Token');
-var config = require('../../config');
-var errors = require('../errors');
-var utils = require('../utils');
+const Token = require('../models/Token');
+const config = require('../../config');
+const errors = require('../errors');
+const utils = require('../utils');
 
 const TOKEN_NOT_FOUND_ERROR = 'The supplied token does not exist';
 const TOKEN_SCOPE_INVALID_ERROR = 'An invalid or non-existent scope was supplied';
@@ -26,13 +26,13 @@ module.exports.findTokenByValue = function(value, scope) {
 
 	return Token
     .findByValue(value)
-    .then(function(result) {
+    .then((result) => {
 	if (!result) {
 		throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
 	}
 
-	var expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
-	var tokenExpiration = Date.parse(result.get('created')) + expiration;
+	const expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
+	const tokenExpiration = Date.parse(result.get('created')) + expiration;
 	if (tokenExpiration < Date.now()) {
 		result.destroy();
 		throw new errors.TokenExpirationError();
@@ -51,8 +51,8 @@ module.exports.findTokenByValue = function(value, scope) {
  *                         true on a successful token creation.
  */
 module.exports.generateToken = function(user, scope) {
-	var tokenVal = utils.crypto.generateResetToken();
-	var userId = user.get('id');
+	const tokenVal = utils.crypto.generateResetToken();
+	const userId = user.get('id');
 
 	return Token
     .where({
@@ -60,16 +60,16 @@ module.exports.generateToken = function(user, scope) {
 	type: scope
 })
     .fetchAll()
-    .then(function(tokens) {
+    .then((tokens) => {
 	return tokens.invokeThen('destroy')
-        .then(function() {
-	var token = Token.forge({
+        .then(() => {
+	const token = Token.forge({
 		type: scope,
 		value: tokenVal,
 		user_id: userId
 	});
 	return token.save()
-            .then(function() {
+            .then(() => {
 	return tokenVal;
 });
 });

@@ -1,12 +1,12 @@
-var CheckitError = require('checkit')
+const CheckitError = require('checkit')
   .Error;
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var RSVP = require('../models/AttendeeRSVP');
-var UserRole = require('../models/UserRole');
-var errors = require('../errors');
-var utils = require('../utils');
+const RSVP = require('../models/AttendeeRSVP');
+const UserRole = require('../models/UserRole');
+const errors = require('../errors');
+const utils = require('../utils');
 
 /**
  * Gets an rsvp by its id
@@ -27,18 +27,18 @@ module.exports.getRSVPById = function(id) {
  */
 module.exports.createRSVP = function(attendee, user, attributes) {
 	attributes.attendeeId = attendee.get('id');
-	var rsvp = RSVP.forge(attributes);
+	const rsvp = RSVP.forge(attributes);
 
 	return rsvp
     .validate()
     .catch(CheckitError, utils.errors.handleValidationError)
-    .then(function() {
-	return RSVP.transaction(function(t) {
+    .then(() => {
+	return RSVP.transaction((t) => {
 		return rsvp.save(null, {
 			transacting: t
 		})
-          .tap(function() {
-	var userRole = user.getRole(utils.roles.ATTENDEE);
+          .tap(() => {
+	const userRole = user.getRole(utils.roles.ATTENDEE);
 	return UserRole.setActive(userRole, true, t);
 });
 	});
@@ -58,10 +58,10 @@ module.exports.createRSVP = function(attendee, user, attributes) {
 module.exports.findRSVPByAttendee = function(attendee) {
 	return RSVP
     .findByAttendeeId(attendee.get('id'))
-    .then(function(result) {
+    .then((result) => {
 	if (_.isNull(result)) {
-		var message = 'An RSVP cannot be found for the given attendee';
-		var source = 'attendeeId';
+		const message = 'An RSVP cannot be found for the given attendee';
+		const source = 'attendeeId';
 		throw new errors.NotFoundError(message, source);
 	}
 
@@ -84,8 +84,8 @@ module.exports.updateRSVP = function(user, rsvp, attributes) {
 	return rsvp
     .validate()
     .catch(CheckitError, utils.errors.handleValidationError)
-    .then(function() {
-	var userRole = user.getRole(utils.roles.ATTENDEE);
+    .then(() => {
+	const userRole = user.getRole(utils.roles.ATTENDEE);
 	rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false);
 
 	return rsvp.save();

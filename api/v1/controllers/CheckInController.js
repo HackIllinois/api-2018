@@ -38,7 +38,7 @@ function fetchCheckInByUserId(req, res, next) {
 			res.body = response;
 			return next();
 		})
-		.catch(function(error) {
+		.catch((error) => {
 			return next(error);
 		});
 }

@@ -1,7 +1,7 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var InvalidParameterError = require('../errors/InvalidParameterError');
-var Announcement = require('../models/Announcement');
+const InvalidParameterError = require('../errors/InvalidParameterError');
+const Announcement = require('../models/Announcement');
 
 /**
  * Retrieves all announcements within the given bounds in order descending from creation
@@ -30,10 +30,10 @@ module.exports.createAnnouncement = function (parameters) {
  * @throws {InvalidParameterError} when no Announcement can be found
  */
 module.exports.findById = function (id) {
-	return Announcement.findById(id).then(function (result) {
+	return Announcement.findById(id).then((result) => {
 		if (_.isNil(result)) {
-			var message = 'An Announcement with the given id does not exist';
-			var source = 'id';
+			const message = 'An Announcement with the given id does not exist';
+			const source = 'id';
 			throw new InvalidParameterError(message, source);
 		}
 

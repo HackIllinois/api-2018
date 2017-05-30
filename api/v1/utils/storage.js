@@ -1,4 +1,4 @@
-var config = require('../../config');
+const config = require('../../config');
 
 module.exports.buckets = {};
 
@@ -7,6 +7,6 @@ module.exports.buckets = {};
 module.exports.buckets.resumes = 'hackillinois-resumes';
 
 Object.keys(module.exports.buckets)
-  .forEach(function(key) {
+  .forEach((key) => {
 	module.exports.buckets[key] += config.storage.bucketExtension;
 });

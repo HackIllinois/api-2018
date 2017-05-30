@@ -1,13 +1,13 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var jwt = require('jsonwebtoken');
-var _ = require('lodash');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
-var config = require('../../config');
-var errors = require('../errors');
+const config = require('../../config');
+const errors = require('../errors');
 
-var JWT_SECRET = config.auth.secret;
-var JWT_CONFIG = {
+const JWT_SECRET = config.auth.secret;
+const JWT_CONFIG = {
 	expiresIn: config.auth.expiration
 };
 
@@ -20,7 +20,7 @@ var JWT_CONFIG = {
  * @throws see JWT error documentation for possible errors
  */
 function _issue(payload, subject) {
-	var parameters = _.clone(JWT_CONFIG);
+	const parameters = _.clone(JWT_CONFIG);
 	if (arguments.length > 1) {
 		parameters.subject = subject;
 	}
@@ -33,15 +33,15 @@ function _issue(payload, subject) {
  * @return {Promise} resolving to the auth token
  */
 module.exports.issueForUser = function(user) {
-	var subject = user.get('id')
+	const subject = user.get('id')
 		.toString();
-	var payload = {
+	const payload = {
 		email: user.get('email'),
 		roles: user.related('roles')
 			.toJSON()
 	};
 	return _Promise
-		.try(function() {
+		.try(() => {
 			// the JWT library behind _issue may thrown any number
 			// of errors, which we do not want to propogate yet
 			return _Promise.resolve(_issue(payload, subject));
@@ -56,11 +56,11 @@ module.exports.issueForUser = function(user) {
  */
 module.exports.verify = function(token) {
 	return _Promise
-		.try(function() {
+		.try(() => {
 			return _Promise.resolve(jwt.verify(token, JWT_SECRET));
 		})
-		.catch(jwt.JsonWebTokenError, function(error) {
-			var message = error.message;
+		.catch(jwt.JsonWebTokenError, (error) => {
+			const message = error.message;
 			throw new errors.UnprocessableRequestError(message);
 		});
 };

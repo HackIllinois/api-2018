@@ -8,7 +8,7 @@ const DEVELOPMENT_IDENTIFIER = 'development';
 const PRODUCTION_IDENTIFIER = 'production';
 const TEST_IDENTIFIER = 'test';
 
-var config = {};
+const config = {};
 config.auth = {};
 config.aws = {
 	defaults: {}
@@ -40,7 +40,7 @@ config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
 
-var sharedAWSCreds = new(require('aws-sdk')
+const sharedAWSCreds = new(require('aws-sdk')
   .SharedIniFileCredentials)();
 config.aws.enabled = (process.env.AWS && !!parseInt(process.env.AWS));
 config.aws.defaults.credentials = (sharedAWSCreds.accessKeyId) ? sharedAWSCreds : undefined;
@@ -72,7 +72,7 @@ config.logs.groupName = (!config.isProduction) ? 'api-dev' : 'api';
 
 config.storage.bucketExtension = (!config.isProduction) ? '-development' : '-2017';
 
-var exit = true;
+let exit = true;
 if (!(config.isProduction || config.isDevelopment || config.isTest)) {
 	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
 } else if (!config.superuser.email) {

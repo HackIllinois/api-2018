@@ -1,6 +1,6 @@
-var Model = require('./Model');
+const Model = require('./Model');
 
-var Location = Model.extend({
+const Location = Model.extend({
 	tableName: 'locations',
 	idAttribute: 'id',
 	validations: {

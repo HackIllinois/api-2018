@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var AttendeeEcosystemInterest = Model.extend({
+const Model = require('./Model');
+const AttendeeEcosystemInterest = Model.extend({
 	tableName: 'attendee_ecosystem_interests',
 	idAttribute: 'id',
 	validations: {
@@ -8,17 +8,17 @@ var AttendeeEcosystemInterest = Model.extend({
 	}
 });
 
-AttendeeEcosystemInterest.findByAttendeeId = function(attendeeId) {
+AttendeeEcosystemInterest.findByAttendeeId = (attendeeId) => {
 	return AttendeeEcosystemInterest.where({
-		attendee_id: attendeeId
-	})
+			attendee_id: attendeeId
+		})
 		.fetch();
 };
 
-AttendeeEcosystemInterest.findById = function(id) {
+AttendeeEcosystemInterest.findById = (id) => {
 	return AttendeeEcosystemInterest.where({
-		id: id
-	})
+			id: id
+		})
 		.fetch();
 };
 

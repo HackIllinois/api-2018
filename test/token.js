@@ -1,24 +1,24 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var chai = require('chai');
-var sinon = require('sinon');
+const chai = require('chai');
+const sinon = require('sinon');
 
-var errors = require('../api/v1/errors');
-var utils = require('../api/v1/utils');
-var TokenService = require('../api/v1/services/TokenService.js');
-var Token = require('../api/v1/models/Token.js');
-var User = require('../api/v1/models/User.js');
+const errors = require('../api/v1/errors');
+const utils = require('../api/v1/utils');
+const TokenService = require('../api/v1/services/TokenService.js');
+const Token = require('../api/v1/models/Token.js');
+const User = require('../api/v1/models/User.js');
 
-var expect = chai.expect;
+const expect = chai.expect;
 
-describe('TokenService',function(){
-	var tokenVal;
-	var testToken;
+describe('TokenService',() => {
+	let tokenVal;
+	let testToken;
 
-	describe('findTokenByValue',function(){
-		var _findByValue;
+	describe('findTokenByValue',() => {
+		let _findByValue;
 
-		before(function(done){
+		before((done) => {
 			tokenVal = utils.crypto.generateResetToken();
 			testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
 
@@ -29,56 +29,56 @@ describe('TokenService',function(){
 			done();
 		});
 
-		it('finds valid token',function(done){
-			var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
+		it('finds valid token',(done) => {
+			const found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
 			expect(found).to.eventually.have.deep.property('attributes.user_id', 1,'user ID should be 1')
-				.then(function(){
+				.then(() => {
 					expect(found).to.eventually.have.deep.property('attributes.value', tokenVal,'token value sould be '+tokenVal)
 						.and.notify(done);
 				});
 		});
-		it('throws error for invalid scope',function(done){
+		it('throws error for invalid scope',(done) => {
 			TokenService.findTokenByValue(tokenVal, 'INVALID')
-				.then(function(){
+				.then(() => {
 					return done('Error was not thrown for INVALID token scope');
 				})
-				.catch(function(err){
+				.catch((err) => {
 					expect(err).to.be.instanceof(TypeError);
 					return done();
 				});
 		});
-		it('throws error with expired token and calls delete on token',function(done){
-			var _get = sinon.stub(Token.prototype,'get');
+		it('throws error with expired token and calls delete on token',(done) => {
+			const _get = sinon.stub(Token.prototype,'get');
 			_get.withArgs('created').returns(0);
-			var _destroy = sinon.stub(Token.prototype,'destroy');
-			var found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
+			const _destroy = sinon.stub(Token.prototype,'destroy');
+			const found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
 			expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
-				.then(function(){
+				.then(() => {
 					expect(_destroy.neverCalledWith()).to.equal(false);
 					_get.restore();
 					_destroy.restore();
 					done();
 				});
 		});
-		it('throws error if invalid token',function(done){
-			var found = TokenService.findTokenByValue('invalid','DEFAULT');
+		it('throws error if invalid token',(done) => {
+			const found = TokenService.findTokenByValue('invalid','DEFAULT');
 			expect(found).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
 		});
 
-		after(function(done){
+		after((done) => {
 			_findByValue.restore();
 			done();
 		});
 	});
 
-	describe('generateToken',function(){
+	describe('generateToken',() => {
 
-		var testUser;
+		let testUser;
 
-		var _mockedTokens, _mockedWhere;
-		var _where, _save;
+		let _mockedTokens, _mockedWhere;
+		let _where, _save;
 
-		before(function(done){
+		before((done) => {
 
 			_mockedTokens = {
 				invokeThen : function(){
@@ -110,12 +110,12 @@ describe('TokenService',function(){
 
 		});
 
-		it('generates a new token',function(done){
+		it('generates a new token',(done) => {
 
-			var token = TokenService.generateToken(testUser,'7d');
+			const token = TokenService.generateToken(testUser,'7d');
 
 			expect(token).to.eventually.be.a('string')
-				.then(function(data){
+				.then((data) => {
 					expect(data.length).to.equal(36);
 					done();
 				});

@@ -1,16 +1,16 @@
 /* jshint esversion: 6 */
 
-var _Promise = require('bluebird');
-var fs = _Promise.promisifyAll(require('fs'), {
+const _Promise = require('bluebird');
+const fs = _Promise.promisifyAll(require('fs'), {
 	filter: function(n, f, t, d) {
 		return d && !n.includes('Sync');
 	}
 });
-var mkdirp = require('mkdirp');
-var _ = require('lodash');
+const mkdirp = require('mkdirp');
+const _ = require('lodash');
 
-var config = require('./config');
-var time = require('./v1/utils/time');
+const config = require('./config');
+const time = require('./v1/utils/time');
 
 // NOTE all paths are relative to the root of the project directory
 const DIRECTORY_SEPARATOR = '/';
@@ -45,10 +45,10 @@ module.exports.writeMail = function(recipients, template, substitutions) {
 		return _Promise.resolve(null);
 	}
 
-	var fileName = template + '-' + time.unix() + '.txt';
-	var filePath = MAIL_DIRECTORY + fileName;
+	const fileName = template + '-' + time.unix() + '.txt';
+	const filePath = MAIL_DIRECTORY + fileName;
 
-	var fileContent = 'A transmission was prepared for ';
+	let fileContent = 'A transmission was prepared for ';
 	fileContent += (_.isArray(recipients)) ? _.join(recipients, ', ') : recipients;
 	fileContent += ". The requested template was \'" + template + "\'.\n\n";
 
@@ -56,7 +56,7 @@ module.exports.writeMail = function(recipients, template, substitutions) {
 		fileContent += 'There were no substitutions provided for injection.';
 	} else {
 		fileContent += 'The following substitutions were provided for injection: \n';
-		_.forOwn(substitutions, function(value, key) {
+		_.forOwn(substitutions, (value, key) => {
 			fileContent += key + ': ' + value + '\n';
 		});
 	}
@@ -82,18 +82,18 @@ module.exports.writeFile = function(content, params) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
-	var metaFilePath = filePath + META_EXTENSION;
+	const filePath = STORAGE_DIRECTORY + params.bucket + DIRECTORY_SEPARATOR + params.key;
+	const metaFilePath = filePath + META_EXTENSION;
 
   // we only store the type for now, but adding to this array
   // would allow us to store more
-	var metaContent = [params.type].join(META_SEPARATOR);
+	const metaContent = [params.type].join(META_SEPARATOR);
 
 	mkdirp.sync(STORAGE_DIRECTORY + params.bucket);
 	return _Promise.join(
     fs.writeFileAsync(filePath, content),
     fs.writeFileAsync(metaFilePath, Buffer.from(metaContent)),
-    function() {
+    () => {
 	return _Promise.resolve(null);
 });
 };
@@ -112,17 +112,17 @@ module.exports.getFile = function(key, bucket) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
-	var metaFilePath = filePath + META_EXTENSION;
+	const filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
+	const metaFilePath = filePath + META_EXTENSION;
 
 	return _Promise.join(
     fs.readFileAsync(filePath),
     fs.readFileAsync(metaFilePath),
-    function(file, meta) {
+    (file, meta) => {
 	meta = meta.toString();
 	meta = meta.split(META_SEPARATOR);
 
-	var result = {};
+	const result = {};
 	result.content = file;
 	result.type = meta[0];
 
@@ -141,13 +141,13 @@ module.exports.removeFile = function(key, bucket) {
 		return _Promise.resolve(null);
 	}
 
-	var filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
-	var metaFilePath = filePath + META_EXTENSION;
+	const filePath = STORAGE_DIRECTORY + bucket + DIRECTORY_SEPARATOR + key;
+	const metaFilePath = filePath + META_EXTENSION;
 
 	return _Promise.join(
     fs.unlinkAsync(filePath),
     fs.unlinkAsync(metaFilePath),
-    function() {
+    () => {
 	return _Promise.resolve(null);
 });
 };

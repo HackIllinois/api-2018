@@ -1,7 +1,7 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var errors = require('../errors');
-var roles = require('../utils/roles');
+const errors = require('../errors');
+const roles = require('../utils/roles');
 
 /**
  * Determines whether the provided creator can create a user
@@ -22,7 +22,7 @@ module.exports.canCreateUser = function (creator, userRole) {
 		return _Promise.resolve(true);
 	}
 
-	var message = 'The requested user cannot be created with the provided credentials';
+	const message = 'The requested user cannot be created with the provided credentials';
 	return _Promise.reject(new errors.UnauthorizedError(message));
 };
 
@@ -38,7 +38,7 @@ module.exports.canCreateProject = function (creator) {
 		return _Promise.resolve(true);
 	}
 
-	var message = 'A project cannot be created with the provided credentials';
+	const message = 'A project cannot be created with the provided credentials';
 	return _Promise.reject(new errors.UnauthorizedError(message));
 };
 

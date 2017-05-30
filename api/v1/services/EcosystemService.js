@@ -1,8 +1,8 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var utils = require('../utils');
-var errors = require('../errors');
-var Ecosystem = require('../models/Ecosystem');
+const utils = require('../utils');
+const errors = require('../errors');
+const Ecosystem = require('../models/Ecosystem');
 
 
 module.exports.getAllEcosystems = function () {
@@ -10,7 +10,7 @@ module.exports.getAllEcosystems = function () {
 };
 
 module.exports.createEcosystem = function (name) {
-	var ecosystem = Ecosystem.forge({name: name.toLowerCase()});
+	const ecosystem = Ecosystem.forge({name: name.toLowerCase()});
 
 	return ecosystem.save()
 		.catch(
@@ -22,10 +22,10 @@ module.exports.createEcosystem = function (name) {
 module.exports.deleteEcosystem = function (name) {
 	return Ecosystem
 		.findByName(name)
-		.then(function (result) {
+		.then((result) => {
 			if (_.isNull(result)) {
-				var message = 'An ecosystem with the given name does not exist';
-				var source = 'name';
+				const message = 'An ecosystem with the given name does not exist';
+				const source = 'name';
 				throw new errors.InvalidParameterError(message, source);
 			}
 

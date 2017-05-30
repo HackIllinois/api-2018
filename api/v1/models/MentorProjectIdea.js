@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var MentorProjectIdea = Model.extend({
+const Model = require('./Model');
+const MentorProjectIdea = Model.extend({
 	tableName: 'mentor_project_ideas',
 	idAttribute: 'id',
 	validations: {

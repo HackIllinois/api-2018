@@ -19,13 +19,18 @@ const Announcement = Model.extend({
  * @return {Function} a bookshelf query-builder handler
  */
 function _buildFindAllQuery(before, after, limit) {
-	return  (qb) => {
+	return (qb) => {
 		if (!_.isNil(before)) {
 			qb.where('created', '<', before);
-		} if (!_.isNil(after)) {
-			if (!_.isNil(before)) { qb.andWhere('created', '>', after); }
-			else { qb.where('created', '>', after); }
-		} if (!_.isNil(limit)) {
+		}
+		if (!_.isNil(after)) {
+			if (!_.isNil(before)) {
+				qb.andWhere('created', '>', after);
+			} else {
+				qb.where('created', '>', after);
+			}
+		}
+		if (!_.isNil(limit)) {
 			qb.limit(limit);
 		}
 	};
@@ -39,7 +44,9 @@ function _buildFindAllQuery(before, after, limit) {
  * @return {Promise<Collection>} a promise resolving to the resulting collection
  */
 Announcement.findAll = (before, after, limit) => {
-	return Announcement.query(_buildFindAllQuery(before, after, limit)).orderBy('created', 'DESC').fetchAll();
+	return Announcement.query(_buildFindAllQuery(before, after, limit))
+		.orderBy('created', 'DESC')
+		.fetchAll();
 };
 
 module.exports = Announcement;

@@ -1,8 +1,8 @@
-var Request = require('./Request');
-var checkin = require('../utils/check_in');
+const Request = require('./Request');
+const checkin = require('../utils/check_in');
 
-var bodyRequired = ['location', 'swag', 'credentialsRequested'];
-var bodyValidations = {
+const bodyRequired = ['location', 'swag', 'credentialsRequested'];
+const bodyValidations = {
 	location: ['required', 'string', checkin.verifyLocation],
 	credentialsRequested: ['required', 'boolean'],
 	swag: ['required', 'boolean']

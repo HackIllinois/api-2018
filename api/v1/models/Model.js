@@ -1,8 +1,8 @@
-var checkit = require('checkit');
+const checkit = require('checkit');
 
-var database = require('../../database');
-var databaseUtils = require('../utils/database');
-var bookshelf = database.instance();
+const database = require('../../database');
+const databaseUtils = require('../utils/database');
+const bookshelf = database.instance();
 
 /**
  * Produces datastore transaction
@@ -19,14 +19,14 @@ function _transaction (callback) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 function _findById (id) {
-	var _model = new this();
+	const _model = new this();
 
-	var queryParams = {};
+	const queryParams = {};
 	queryParams[_model.idAttribute] = id;
 	return _model.query({ where: queryParams }).fetch();
 }
 
-var Model = bookshelf.Model.extend({
+const Model = bookshelf.Model.extend({
 	// the default model has no validations, but more can be
 	// added as desired
 	validations: {}

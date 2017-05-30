@@ -1,6 +1,6 @@
-var Model = require('./Model');
+const Model = require('./Model');
 
-var Ecosystem = Model.extend({
+const Ecosystem = Model.extend({
 	tableName: 'ecosystems',
 	idAttribute: 'id',
 	validations: {

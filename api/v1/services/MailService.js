@@ -5,21 +5,21 @@
 // NOTE: the sink is active during development! use whitelisted domains to avoid
 // wasting messages on emails that lack a whitelisted domain (and other frustrations)
 
-var _Promise = require('bluebird');
-var SparkPost = require('sparkpost');
-var _ = require('lodash');
+const _Promise = require('bluebird');
+const SparkPost = require('sparkpost');
+const _ = require('lodash');
 
-var config = require('../../config');
-var logger = require('../../logging');
-var files = require('../../files');
-var errors = require('../errors');
+const config = require('../../config');
+const logger = require('../../logging');
+const files = require('../../files');
+const errors = require('../errors');
 
-var ExternalProviderError = require('../errors/ExternalProviderError');
-var MailingList = require('../models/MailingList');
+const ExternalProviderError = require('../errors/ExternalProviderError');
+const MailingList = require('../models/MailingList');
 
-var client = new SparkPost(config.mail.key || 'NONE');
-var transmissionsAsync = _Promise.promisifyAll(client.transmissions);
-var recipientsAsync = _Promise.promisifyAll(client.recipientLists);
+const client = new SparkPost(config.mail.key || 'NONE');
+const transmissionsAsync = _Promise.promisifyAll(client.transmissions);
+const recipientsAsync = _Promise.promisifyAll(client.recipientLists);
 client.isEnabled = !!config.mail.key;
 
 const CLIENT_NAME = 'SparkPost';
@@ -40,7 +40,7 @@ function handleOperationUnsuccessful(template, recipients, substitutions, reason
 
 function _hasWhitelistedDomain(recipient) {
 	recipient = recipient.toLowerCase();
-	for (var i = 0; i < config.mail.whitelistedDomains.length; i++) {
+	for (let i = 0; i < config.mail.whitelistedDomains.length; i++) {
 		if (_.endsWith(recipient, config.mail.whitelistedDomains[i])) {
 			return true;
 		}
@@ -50,7 +50,7 @@ function _hasWhitelistedDomain(recipient) {
 }
 
 function _isWhitelistedList(list) {
-	for (var i = 0; i < config.mail.whitelistedLists.length; i++) {
+	for (let i = 0; i < config.mail.whitelistedLists.length; i++) {
 		if (list === config.mail.whitelistedLists[i]) {
 			return true;
 		}
@@ -64,7 +64,7 @@ function _formatRecipients(recipients, useWhitelist) {
 		recipients = [recipients];
 	}
 
-	return _.map(recipients, function(recipient) {
+	return _.map(recipients, (recipient) => {
 		if (useWhitelist && !_hasWhitelistedDomain(recipient)) {
 			recipient += config.mail.sinkhole;
 		}
@@ -78,11 +78,11 @@ function _formatRecipients(recipients, useWhitelist) {
 
 function _formatRecipientsList(list) {
 	return MailingList.findByName(list)
-		.then(function(mailingList) {
+		.then((mailingList) => {
 			return mailingList.members();
 		})
-		.then(function(memberCollection) {
-			return memberCollection.map(function(member) {
+		.then((memberCollection) => {
+			return memberCollection.map((member) => {
 				return {
 					address: {
 						email: member.attributes.email
@@ -93,8 +93,8 @@ function _formatRecipientsList(list) {
 }
 
 function _handleClientError(error) {
-	var responseError = error.errors[0];
-	var message;
+	const responseError = error.errors[0];
+	let message;
 	if (_.has(responseError, 'description')) {
 		message = responseError.description;
 	} else {
@@ -114,7 +114,7 @@ function _handleClientError(error) {
  * @throws {ExternalProviderError} 		when the mail client returns an error
  */
 function send(recipients, template, substitutions) {
-	var transmission = {
+	const transmission = {
 		content: {
 			template_id: template
 		},
@@ -131,7 +131,7 @@ function send(recipients, template, substitutions) {
 		.sendAsync({
 			transmissionBody: transmission
 		})
-		.then(function() {
+		.then(() => {
 			// get rid of the transmission response
 			return true;
 		})
@@ -152,11 +152,11 @@ function sendToList(list, template, substitutions) {
 		return _Promise.resolve(true);
 	}
 
-	var recipientList = {
+	const recipientList = {
 		id: list.id,
 		recipients: [] // unknown until we gather the recipients from the datastore
 	};
-	var transmission = {
+	const transmission = {
 		content: {
 			template_id: template
 		},
@@ -167,7 +167,7 @@ function sendToList(list, template, substitutions) {
 	};
 
 	return _formatRecipientsList(list.name)
-		.then(function(recipients) {
+		.then((recipients) => {
 			recipientList.recipients = recipients;
 			if (recipients.length >= 1) {
 				// we cannot update a list with any less than 1 member
@@ -176,7 +176,7 @@ function sendToList(list, template, substitutions) {
 
 			return true;
 		})
-		.then(function() {
+		.then(() => {
 			if (recipientList.recipients.length === 0) {
 				handleOperationUnsuccessful(template, list.name, substitutions, LIST_EMPTY_REASON);
 				return true;
@@ -184,14 +184,14 @@ function sendToList(list, template, substitutions) {
 			if (recipientList.recipients.length === 1) {
 				handleOperationUnsuccessful(template, list.name, substitutions, LIST_SINGULAR_REASON, true);
 
-				var recipient = recipientList.recipients[0].address.email;
+				const recipient = recipientList.recipients[0].address.email;
 				return send(recipient, template, substitutions);
 			}
 			return transmissionsAsync.sendAsync({
 				transmissionBody: transmission
 			});
 		})
-		.then(function() {
+		.then(() => {
 			// get rid of the transmission response, if there is one
 			return true;
 		})
@@ -208,7 +208,7 @@ function sendToList(list, template, substitutions) {
 function addToList(user, list) {
 	return MailingList
 		.findByName(list.name)
-		.then(function(mailingList) {
+		.then((mailingList) => {
 			return mailingList.addUser(user);
 		});
 }
@@ -222,7 +222,7 @@ function addToList(user, list) {
 function removeFromList(user, list) {
 	return MailingList
 		.findByName(list.name)
-		.then(function(mailingList) {
+		.then((mailingList) => {
 			return mailingList.removeUser(user);
 		});
 }
@@ -241,10 +241,10 @@ function sendDisabled(recipients, template, substitutions) {
 function checkIfSent(list) {
 	return MailingList
 		.findByName(list.name)
-		.then(function(mailingList) {
+		.then((mailingList) => {
 			if (_.isNull(mailingList) || mailingList.attributes.sent) {
-				var message = 'List was already sent';
-				var source = 'listName';
+				const message = 'List was already sent';
+				const source = 'listName';
 				return _Promise.reject(new errors.InvalidParameterError(message, source));
 			}
 			return _Promise.resolve(true);
@@ -253,7 +253,7 @@ function checkIfSent(list) {
 
 function markAsSent(list) {
 	return MailingList.findByName(list.name)
-		.then(function(mailingList) {
+		.then((mailingList) => {
 			mailingList.set({
 				sent: true
 			})

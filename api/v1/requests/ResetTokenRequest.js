@@ -1,7 +1,7 @@
-var Request = require('./Request');
+const Request = require('./Request');
 
-var bodyRequired = ['email'];
-var bodyValidations = {
+const bodyRequired = ['email'];
+const bodyValidations = {
 	'email': ['email']
 };
 

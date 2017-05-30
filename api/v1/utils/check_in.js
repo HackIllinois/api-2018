@@ -1,6 +1,6 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
+const LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
 
 /**
  * Ensures that location upon check in is valid

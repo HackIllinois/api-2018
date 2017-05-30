@@ -1,5 +1,5 @@
-var Model = require('./Model');
-var NetworkCredential = Model.extend({
+const Model = require('./Model');
+const NetworkCredential = Model.extend({
 	tableName: 'network_credentials',
 	idAttribute: 'id',
 	validations: {

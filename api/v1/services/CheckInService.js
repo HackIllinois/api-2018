@@ -1,9 +1,9 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var CheckIn = require('../models/CheckIn');
-var NetworkCredential = require('../models/NetworkCredential');
-var errors = require('../errors');
-var utils = require('../utils');
+const CheckIn = require('../models/CheckIn');
+const NetworkCredential = require('../models/NetworkCredential');
+const errors = require('../errors');
+const utils = require('../utils');
 
 
 /**
@@ -15,14 +15,14 @@ var utils = require('../utils');
 module.exports.findCheckInByUserId = function(userId) {
 	return CheckIn
     .findByUserId(userId)
-    .then(function(checkin) {
+    .then((checkin) => {
 	if (_.isNull(checkin)) {
-		var message = 'A check in record cannot be found for the given user';
-		var source = 'userId';
+		const message = 'A check in record cannot be found for the given user';
+		const source = 'userId';
 		throw new errors.NotFoundError(message, source);
 	}
 	return NetworkCredential.findByUserId(userId)
-        .then(function(credentials) {
+        .then((credentials) => {
 	return {
 		'checkin': checkin,
 		'credentials': credentials
@@ -39,9 +39,9 @@ module.exports.findCheckInByUserId = function(userId) {
 module.exports.updateCheckIn = function(attributes) {
 	return module.exports.findCheckInByUserId(attributes.userId)
 
-    .then(function(checkin) {
+    .then((checkin) => {
 	checkin = checkin.checkin;
-	var updates = {
+	const updates = {
 		'swag': attributes.swag || checkin.get('swag'),
 		'location': attributes.location || checkin.get('location')
 	};
@@ -49,9 +49,9 @@ module.exports.updateCheckIn = function(attributes) {
 		patch: true
 	});
 	return checkin.save()
-        .then(function(model) {
+        .then((model) => {
 	return NetworkCredential.findByUserId(attributes.userId)
-            .then(function(credentials) {
+            .then((credentials) => {
 	return {
 		'checkin': model,
 		'credentials': credentials
@@ -68,30 +68,30 @@ module.exports.updateCheckIn = function(attributes) {
  * @throws {InvalidParameterError} when the user has already checked in
  */
 module.exports.createCheckIn = function(attributes) {
-	var credentialsRequested = attributes.credentialsRequested;
+	const credentialsRequested = attributes.credentialsRequested;
 	delete attributes.credentialsRequested;
 
-	return CheckIn.transaction(function(t) {
+	return CheckIn.transaction((t) => {
 		return new CheckIn(attributes)
         .save(null, {
 	transacting: t
 })
-        .then(function(model) {
+        .then((model) => {
 	if (credentialsRequested) {
 		return NetworkCredential.findUnassigned();
 	} else {
 		return model;
 	}
 })
-        .then(function(model) {
+        .then((model) => {
 	if (credentialsRequested) {
 		if (_.isNull(model)) {
-			var message = 'There are no remaining unassigned network credentials';
-			var source = 'NetworkCredential';
+			const message = 'There are no remaining unassigned network credentials';
+			const source = 'NetworkCredential';
 			throw new errors.UnprocessableRequestError(message, source);
 		}
 
-		var updates = {
+		const updates = {
 			'userId': attributes.userId,
 			'assigned': true
 		};
@@ -102,7 +102,7 @@ module.exports.createCheckIn = function(attributes) {
 		return model.save(null, {
 			transacting: t
 		})
-              .then(function(creds) {
+              .then((creds) => {
 	return {
 		'checkin': model,
 		'credentials': creds

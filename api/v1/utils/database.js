@@ -1,7 +1,7 @@
 /* jshint esversion: 6 */
 
-var inflection = require('inflection');
-var _ = require('lodash');
+const inflection = require('inflection');
+const _ = require('lodash');
 
 module.exports.format = function (target) {
 	if (_.isObject(target)) {

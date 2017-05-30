@@ -1,13 +1,13 @@
-var Checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const Checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var Mentor = require('../models/Mentor');
-var Project = require('../models/Project');
-var ProjectMentor = require('../models/ProjectMentor');
+const Mentor = require('../models/Mentor');
+const Project = require('../models/Project');
+const ProjectMentor = require('../models/ProjectMentor');
 
-var errors = require('../errors');
-var utils = require('../utils');
+const errors = require('../errors');
+const utils = require('../utils');
 
 
 /**
@@ -21,11 +21,11 @@ module.exports.createProject = function(attributes) {
 		attributes.isPublished = false;
 	}
 
-	var project = Project.forge(attributes);
+	const project = Project.forge(attributes);
 	return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			return project.save();
 		})
 		.catch(
@@ -43,10 +43,10 @@ module.exports.createProject = function(attributes) {
 module.exports.findProjectById = function(id) {
 	return Project
 		.findById(id)
-		.then(function(result) {
+		.then((result) => {
 			if (_.isNull(result)) {
-				var message = 'A project with the given ID cannot be found';
-				var source = 'id';
+				const message = 'A project with the given ID cannot be found';
+				const source = 'id';
 				throw new errors.NotFoundError(message, source);
 			}
 
@@ -67,7 +67,7 @@ module.exports.updateProject = function(project, attributes) {
 	return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function() {
+		.then(() => {
 			return project.save();
 		});
 };
@@ -82,18 +82,18 @@ module.exports.updateProject = function(project, attributes) {
 function _isProjectMentorValid(project_id, mentor_id) {
 	return Project
 		.findById(project_id)
-		.then(function(result) {
+		.then((result) => {
 			if (_.isNull(result)) {
-				var message = 'The project id is invalid';
-				var source = 'project_id';
+				const message = 'The project id is invalid';
+				const source = 'project_id';
 				throw new errors.InvalidParameterError(message, source);
 			}
 			return Mentor.findById(mentor_id);
 		})
-		.then(function(mentor) {
+		.then((mentor) => {
 			if (_.isNull(mentor)) {
-				var message = 'The mentor id is invalid';
-				var source = 'mentor_id';
+				const message = 'The mentor id is invalid';
+				const source = 'mentor_id';
 				throw new errors.InvalidParameterError(message, source);
 			}
 			return _Promise.resolve(false);
@@ -110,10 +110,10 @@ function _isProjectMentorValid(project_id, mentor_id) {
 function _deleteProjectMentor(project_id, mentor_id) {
 	return ProjectMentor
 		.findByProjectAndMentorId(project_id, mentor_id)
-		.then(function(oldProjectMentor) {
+		.then((oldProjectMentor) => {
 			if (_.isNull(oldProjectMentor)) {
-				var message = 'A project-mentor relationship with the given IDs cannot be found';
-				var source = 'project_id/mentor_id';
+				const message = 'A project-mentor relationship with the given IDs cannot be found';
+				const source = 'project_id/mentor_id';
 				throw new errors.NotFoundError(message, source);
 			}
 			return oldProjectMentor.destroy();
@@ -129,16 +129,16 @@ function _deleteProjectMentor(project_id, mentor_id) {
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
 module.exports.addProjectMentor = function(project_id, mentor_id) {
-	var projectMentor = ProjectMentor.forge({
+	const projectMentor = ProjectMentor.forge({
 		project_id: project_id,
 		mentor_id: mentor_id
 	});
 
 	return _isProjectMentorValid(project_id, mentor_id)
-		.then(function() {
+		.then(() => {
 			return ProjectMentor.findByProjectAndMentorId(project_id, mentor_id);
 		})
-		.then(function(result) {
+		.then((result) => {
 			if (!_.isNull(result)) {
 				//The project mentor relationship already exists
 				return _Promise.resolve(result);
@@ -168,7 +168,7 @@ module.exports.deleteProjectMentor = function(project_id, mentor_id) {
  */
 module.exports.getAllProjects = function(page, count, isPublished) {
 	return Project
-		.query(function(qb) {
+		.query((qb) => {
 			qb.groupBy('projects.id');
 			qb.where('is_published', '=', isPublished);
 		})
@@ -177,8 +177,8 @@ module.exports.getAllProjects = function(page, count, isPublished) {
 			pageSize: count,
 			page: page
 		})
-		.then(function(results) {
-			var projects = _.map(results.models, 'attributes');
+		.then((results) => {
+			const projects = _.map(results.models, 'attributes');
 			return projects;
 		});
 };

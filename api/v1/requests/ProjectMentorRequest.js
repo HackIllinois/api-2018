@@ -1,7 +1,7 @@
-var Request = require('./Request');
+const Request = require('./Request');
 
-var bodyRequired = ['project_id', 'mentor_id'];
-var bodyValidations = {
+const bodyRequired = ['project_id', 'mentor_id'];
+const bodyValidations = {
 	'project_id': ['integer', 'required'],
 	'mentor_id': ['integer', 'required'],
 };
