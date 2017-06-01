@@ -11,12 +11,14 @@ const User = require('./v1/models/User');
 const utils = require('./v1/utils/');
 
 User.findByEmail(config.superuser.email)
-	.then((result) => {
-		if (!result) {
-			return User.create(config.superuser.email, config.superuser.password, utils.roles.SUPERUSER);
-		}
+  .then((result) => {
+    if (!result) {
+      return User.create(config.superuser.email, config.superuser.password, utils.roles.SUPERUSER);
+    }
 
-		return null;
-	});
+    return null;
+  });
 
-module.exports = { v1: v1 };
+module.exports = {
+  v1: v1
+};

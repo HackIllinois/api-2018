@@ -7,26 +7,26 @@ const ErrorConstants = require('../errors/Constants');
  * @throws {InvalidParameterError} the re-thrown error
  */
 module.exports.handleValidationError = function(error) {
-	const errorKey = error.keys()[0];
-	let specificError = error.errors[errorKey];
+  const errorKey = error.keys()[0];
+  let specificError = error.errors[errorKey];
 
-	const errorDetail = specificError.message;
-	let errorSource;
-	while (specificError.key) {
+  const errorDetail = specificError.message;
+  let errorSource;
+  while (specificError.key) {
     // find the most-complete error source in the error stack
-		errorSource = specificError.key;
-		specificError = (specificError.errors) ? specificError.errors[0] : undefined;
-	}
+    errorSource = specificError.key;
+    specificError = (specificError.errors) ? specificError.errors[0] : undefined;
+  }
 
-	throw new InvalidParameterError(errorDetail, errorSource);
+  throw new InvalidParameterError(errorDetail, errorSource);
 };
 
 module.exports.DuplicateEntryError = function(error) {
-	return error.code === ErrorConstants.DupEntry;
+  return error.code === ErrorConstants.DupEntry;
 };
 
 module.exports.handleDuplicateEntryError = function(message, source) {
-	return function() {
-		throw new InvalidParameterError(message, source);
-	};
+  return function() {
+    throw new InvalidParameterError(message, source);
+  };
 };

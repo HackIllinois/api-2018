@@ -10,7 +10,7 @@ const bookshelf = database.instance();
  * @return {Promise} 			the result of the callback
  */
 function _transaction (callback) {
-	return bookshelf.transaction(callback);
+  return bookshelf.transaction(callback);
 }
 
 /**
@@ -19,27 +19,27 @@ function _transaction (callback) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 function _findById (id) {
-	const _model = new this();
+  const _model = new this();
 
-	const queryParams = {};
-	queryParams[_model.idAttribute] = id;
-	return _model.query({ where: queryParams }).fetch();
+  const queryParams = {};
+  queryParams[_model.idAttribute] = id;
+  return _model.query({ where: queryParams }).fetch();
 }
 
 const Model = bookshelf.Model.extend({
 	// the default model has no validations, but more can be
 	// added as desired
-	validations: {}
+  validations: {}
 }, {
-	transaction: _transaction,
-	findById: _findById
+  transaction: _transaction,
+  findById: _findById
 });
 
 /**
  * Initializes the model by setting up all event handlers
  */
 Model.prototype.initialize = function () {
-	this.on('saving', this.validate);
+  this.on('saving', this.validate);
 };
 
 /**
@@ -48,7 +48,7 @@ Model.prototype.initialize = function () {
  * @return {Object}       the transformed attributes (underscored)
  */
 Model.prototype.format = function (attrs) {
-	return databaseUtils.format(attrs);
+  return databaseUtils.format(attrs);
 };
 
 /**
@@ -57,7 +57,7 @@ Model.prototype.format = function (attrs) {
  * @return {Object}       the transformed attributes (camel-cased)
  */
 Model.prototype.parse = function (attrs) {
-	return databaseUtils.parse(attrs);
+  return databaseUtils.parse(attrs);
 };
 
 /**
@@ -66,7 +66,7 @@ Model.prototype.parse = function (attrs) {
  * the Checkit library
  */
 Model.prototype.validate = function () {
-	return checkit(this.validations).run(this.attributes);
+  return checkit(this.validations).run(this.attributes);
 };
 
 module.exports = Model;

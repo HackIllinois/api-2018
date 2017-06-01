@@ -20,26 +20,26 @@ const TOKEN_SCOPE_INVALID_ERROR = 'An invalid or non-existent scope was supplied
  * @throws {TypeError} when the scope was not found
  */
 module.exports.findTokenByValue = function(value, scope) {
-	if (!(scope in config.token.expiration)) {
-		return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
-	}
+  if (!(scope in config.token.expiration)) {
+    return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
+  }
 
-	return Token
+  return Token
     .findByValue(value)
     .then((result) => {
-	if (!result) {
-		throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
-	}
+      if (!result) {
+        throw new errors.NotFoundError(TOKEN_NOT_FOUND_ERROR);
+      }
 
-	const expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
-	const tokenExpiration = Date.parse(result.get('created')) + expiration;
-	if (tokenExpiration < Date.now()) {
-		result.destroy();
-		throw new errors.TokenExpirationError();
-	}
+      const expiration = utils.time.toMilliseconds(config.token.expiration[scope]);
+      const tokenExpiration = Date.parse(result.get('created')) + expiration;
+      if (tokenExpiration < Date.now()) {
+        result.destroy();
+        throw new errors.TokenExpirationError();
+      }
 
-	return _Promise.resolve(result);
-});
+      return _Promise.resolve(result);
+    });
 };
 
 /**
@@ -51,27 +51,23 @@ module.exports.findTokenByValue = function(value, scope) {
  *                         true on a successful token creation.
  */
 module.exports.generateToken = function(user, scope) {
-	const tokenVal = utils.crypto.generateResetToken();
-	const userId = user.get('id');
+  const tokenVal = utils.crypto.generateResetToken();
+  const userId = user.get('id');
 
-	return Token
+  return Token
     .where({
-	user_id: userId,
-	type: scope
-})
+      user_id: userId,
+      type: scope
+    })
     .fetchAll()
-    .then((tokens) => {
-	return tokens.invokeThen('destroy')
+    .then((tokens) => tokens.invokeThen('destroy')
         .then(() => {
-	const token = Token.forge({
-		type: scope,
-		value: tokenVal,
-		user_id: userId
-	});
-	return token.save()
-            .then(() => {
-	return tokenVal;
-});
-});
-});
+          const token = Token.forge({
+            type: scope,
+            value: tokenVal,
+            user_id: userId
+          });
+          return token.save()
+            .then(() => tokenVal);
+        }));
 };

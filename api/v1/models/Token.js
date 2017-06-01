@@ -2,15 +2,15 @@ const Model = require('./Model');
 const User = require('./User');
 
 const Token = Model.extend({
-	tableName: 'tokens',
-	idAttribute: 'id',
-	hasTimestamps: ['created'],
-	user: function(){
-		return this.belongsTo(User, 'user_id');
-	},
-	validations: {
-		value: ['required', 'string']
-	}
+  tableName: 'tokens',
+  idAttribute: 'id',
+  hasTimestamps: [ 'created' ],
+  user: function(){
+    return this.belongsTo(User, 'user_id');
+  },
+  validations: {
+    value: ['required', 'string']
+  }
 });
 
 /**
@@ -19,7 +19,7 @@ const Token = Model.extend({
  * @return {Promise} resolving to the associated Token Model
  */
 Token.findByValue = function(value) {
-	return this.collection().query({ where: { value: value }}).fetchOne({ withRelated: ['user'] } );
+  return this.collection().query({ where: { value: value }}).fetchOne({ withRelated: [ 'user' ] } );
 };
 
 module.exports = Token;

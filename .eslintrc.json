@@ -15,9 +15,10 @@
     "ecmaVersion": 2016
   },
   "rules": {
+    "strict": ["error", "global"],
     "indent": [
       "error",
-      "tab"
+      2
     ],
     "linebreak-style": [
       "error",
@@ -42,14 +43,53 @@
       "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "redis-mock"],
       "tryExtensions": [".js", ".json", ".node"]
     }],
-		"prefer-const": [
-			"error"
-		],
-		"no-var": [
-			"error"
-		],
-		"prefer-arrow-callback": [
-			"error"
-		]
+    "prefer-const": "error",
+    "no-var": "error",
+    "prefer-arrow-callback": "error",
+    "no-template-curly-in-string": "error",
+    "array-callback-return": "error",
+    "default-case": "error",
+    "curly": "error",
+    "guard-for-in": "error",
+    "no-else-return": "error",
+    "no-empty-function": "error",
+    "no-extra-bind": "error",
+    "no-labels": "error",
+    "no-lone-blocks": "error",
+    "no-loop-func": "error",
+    "no-multi-spaces": "error",
+    "no-new": "error",
+    "no-new-func": "error",
+    "no-new-wrappers": "error",
+    "no-return-assign": ["error", "except-parens"],
+    "no-return-await": "error",
+    "no-script-url": "error",
+    "no-self-compare": "error",
+    "no-throw-literal": "error",
+    "no-unmodified-loop-condition": "error",
+    "no-unused-expressions": "error",
+    "no-useless-call": "error",
+    "no-useless-concat": "error",
+    "no-useless-escape": "error",
+    "no-useless-return": "error",
+    "no-void": "error",
+    "yoda": ["error", "never"],
+    "no-catch-shadow": "error",
+    "array-bracket-spacing": ["error", "never", {
+      "singleValue": true,
+      "objectsInArrays": true,
+      "arraysInArrays": true
+    }],
+    "block-spacing": "error",
+    "brace-style": "error",
+    "comma-dangle": ["error", "never"],
+    "comma-spacing": "error",
+    "comma-style": "error",
+    "computed-property-spacing": "error",
+    "func-call-spacing": "error",
+    "key-spacing": "error",
+    "arrow-body-style": "error",
+    "arrow-parens": "error",
+    "arrow-spacing": "error"
   }
 }

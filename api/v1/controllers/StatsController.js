@@ -7,51 +7,43 @@ const roles = require('../utils/roles');
 const StatsService = require('../services/StatsService');
 
 function getAllStats(req, res, next) {
-	StatsService.fetchAllStats()
+  StatsService.fetchAllStats()
 		.then((stats) => {
-			res.body = stats;
+  res.body = stats;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function getRegStats(req, res, next) {
-	StatsService.fetchRegistrationStats()
+  StatsService.fetchRegistrationStats()
 		.then((stats) => {
-			res.body = stats;
+  res.body = stats;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function getRSVPStats(req, res, next) {
-	StatsService.fetchRSVPStats()
+  StatsService.fetchRSVPStats()
 		.then((stats) => {
-			res.body = stats;
+  res.body = stats;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function getLiveEventStats(req, res, next) {
-	StatsService.fetchLiveEventStats()
+  StatsService.fetchLiveEventStats()
 		.then((stats) => {
-			res.body = stats;
+  res.body = stats;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 

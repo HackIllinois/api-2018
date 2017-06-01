@@ -3,7 +3,7 @@ const middleware = require('../middleware');
 const router = require('express').Router();
 
 function healthCheck(req, res, next) {
-	return next();
+  return next();
 }
 
 router.get('', healthCheck);

@@ -25,12 +25,12 @@ const STATS_REG_HEADER = 'registration';
  * @return {Function} The generated function
  */
 function _populateStats(key, stats) {
-	return function(result) {
-		stats[key] = {};
-		_.forEach(result.models, (model) => {
-			stats[key][model.attributes.name] = model.attributes.count;
-		});
-	};
+  return function(result) {
+    stats[key] = {};
+    _.forEach(result.models, (model) => {
+      stats[key][model.attributes.name] = model.attributes.count;
+    });
+  };
 }
 
 /**
@@ -41,9 +41,9 @@ function _populateStats(key, stats) {
  * @return {Function} The generated function
  */
 function _populateStatsField(key, stats) {
-	return function(result) {
-		stats[key] = result.attributes.count;
-	};
+  return function(result) {
+    stats[key] = result.attributes.count;
+  };
 }
 
 /**
@@ -52,13 +52,13 @@ function _populateStatsField(key, stats) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateEcosystems(cb) {
-	return AttendeeEcosystemInterest.query((qb) => {
-		qb.select('e.name')
+  return AttendeeEcosystemInterest.query((qb) => {
+    qb.select('e.name')
         .count('ecosystem_id as count')
         .from('attendee_ecosystem_interests as aei')
         .innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
         .groupBy('aei.ecosystem_id');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -70,50 +70,50 @@ function _populateEcosystems(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingEcosystems(cb) {
-	return Attendee.query((qb) => {
-		qb.select('e.name')
+  return Attendee.query((qb) => {
+    qb.select('e.name')
         .count('a.accepted_ecosystem_id as count')
         .from('attendees as a')
         .innerJoin('ecosystems as e', function() {
-	this.on('e.id', '=', 'a.accepted_ecosystem_id')
-            .andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
-})
+          this.on('e.id', '=', 'a.accepted_ecosystem_id')
+            .andOn('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]));
+        })
         .innerJoin('attendee_rsvps as ar', function() {
-	this.on('ar.attendee_id', '=', 'a.id')
-            .andOn('ar.is_attending', '=', knex.raw('?', ['1']))
-            .andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
-})
+          this.on('ar.attendee_id', '=', 'a.id')
+            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]))
+            .andOn('ar.type', '=', knex.raw('?', [ 'CONTRIBUTE' ]));
+        })
         .groupBy('a.accepted_ecosystem_id');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
 
 function _populateCheckedInEcosystems(cb) {
-	return Attendee.query((qb) => {
-		qb.select('e.name')
+  return Attendee.query((qb) => {
+    qb.select('e.name')
         .count('a.accepted_ecosystem_id as count')
         .from('attendees as a')
         .innerJoin('ecosystems as e', function() {
-	this.on('e.id', '=', 'a.accepted_ecosystem_id')
-            .andOn('a.status', '=', knex.raw('?', ['ACCEPTED']));
-})
+          this.on('e.id', '=', 'a.accepted_ecosystem_id')
+            .andOn('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]));
+        })
         .innerJoin('attendee_rsvps as ar', function() {
-	this.on('ar.attendee_id', '=', 'a.id')
-            .andOn('ar.is_attending', '=', knex.raw('?', ['1']))
-            .andOn('ar.type', '=', knex.raw('?', ['CONTRIBUTE']));
-})
+          this.on('ar.attendee_id', '=', 'a.id')
+            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]))
+            .andOn('ar.type', '=', knex.raw('?', [ 'CONTRIBUTE' ]));
+        })
         .innerJoin('checkins as ci', 'a.user_id', 'ci.user_id')
         .groupBy('a.accepted_ecosystem_id');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
 
 function _populateCheckins(cb) {
-	return CheckIn.query((qb) => {
-		qb.count('id as count');
-	})
+  return CheckIn.query((qb) => {
+    qb.count('id as count');
+  })
     .fetch()
     .then(cb);
 }
@@ -125,12 +125,12 @@ function _populateCheckins(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateRSVPs(cb) {
-	return AttendeeRSVP.query((qb) => {
-		qb.select('is_attending as name')
+  return AttendeeRSVP.query((qb) => {
+    qb.select('is_attending as name')
         .count('is_attending as count')
         .from('attendee_rsvps')
         .groupBy('is_attending');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -142,12 +142,12 @@ function _populateRSVPs(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateRSVPTypes(cb) {
-	return AttendeeRSVP.query((qb) => {
-		qb.select('type as name')
+  return AttendeeRSVP.query((qb) => {
+    qb.select('type as name')
         .count('is_attending as count')
         .from('attendee_rsvps')
         .groupBy('type');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -159,12 +159,12 @@ function _populateRSVPTypes(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendeeAttribute(attribute, cb) {
-	return Attendee.query((qb) => {
-		qb.select(attribute + ' as name')
+  return Attendee.query((qb) => {
+    qb.select(attribute + ' as name')
         .count(attribute + ' as count')
         .from('attendees')
         .groupBy(attribute);
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -177,15 +177,15 @@ function _populateAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingAttendeeAttribute(attribute, cb) {
-	return Attendee.query((qb) => {
-		qb.select(attribute + ' as name')
+  return Attendee.query((qb) => {
+    qb.select(attribute + ' as name')
         .count(attribute + ' as count')
         .innerJoin('attendee_rsvps as ar', function() {
-	this.on('attendees.status', '=', knex.raw('?', ['ACCEPTED']))
-            .andOn('ar.is_attending', '=', knex.raw('?', ['1']));
-})
+          this.on('attendees.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
+            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
+        })
         .groupBy(attribute);
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -196,14 +196,14 @@ function _populateAttendingAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendees(cb) {
-	return Attendee.query((qb) => {
-		qb.count('a.id as attending')
+  return Attendee.query((qb) => {
+    qb.count('a.id as attending')
         .from('attendees as a')
         .innerJoin('attendee_rsvps as ar', function() {
-	this.on('a.status', '=', knex.raw('?', ['ACCEPTED']))
-            .andOn('ar.is_attending', '=', knex.raw('?', ['1']));
-});
-	})
+          this.on('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
+            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
+        });
+  })
     .fetch()
     .then(cb);
 }
@@ -214,10 +214,10 @@ function _populateAttendees(cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateTrackedEvents(cb) {
-	return TrackedEvent.query((qb) => {
-		qb.select('name', 'count')
+  return TrackedEvent.query((qb) => {
+    qb.select('name', 'count')
         .groupBy('name');
-	})
+  })
     .fetchAll()
     .then(cb);
 }
@@ -227,178 +227,160 @@ function _populateTrackedEvents(cb) {
  * @return {Promise<Object>}	resolving to key-value pairs of stats
  */
 module.exports.fetchAllStats = function() {
-	const stats = {};
-	stats.registrationStats = {};
-	stats.rsvpStats = {};
-	stats.liveEventStats = {};
+  const stats = {};
+  stats.registrationStats = {};
+  stats.rsvpStats = {};
+  stats.liveEventStats = {};
 
-	return module.exports.fetchRegistrationStats()
+  return module.exports.fetchRegistrationStats()
     .then((regstats) => {
-	stats.registrationStats = regstats;
-	return module.exports.fetchRSVPStats();
-})
+      stats.registrationStats = regstats;
+      return module.exports.fetchRSVPStats();
+    })
     .then((rsvpstats) => {
-	stats.rsvpStats = rsvpstats;
-	return module.exports.fetchLiveEventStats();
-})
+      stats.rsvpStats = rsvpstats;
+      return module.exports.fetchLiveEventStats();
+    })
     .then((livestats) => {
-	stats.liveEventStats = livestats;
-	return stats;
-});
+      stats.liveEventStats = livestats;
+      return stats;
+    });
 };
 
 module.exports.fetchRegistrationStats = function() {
-	return cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
+  return cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
-	if (hasKey) {
-		return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
-          .then((object) => {
-	return JSON.parse(object);
-});
-	} else {
-		const stats = {};
-		const queries = [];
+      if (hasKey) {
+        return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
+          .then((object) => JSON.parse(object));
+      }
+      const stats = {};
+      const queries = [];
 
-		const ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
-		queries.push(ecosystemsQuery);
+      const ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
+      queries.push(ecosystemsQuery);
 
-		const schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
-		queries.push(schoolQuery);
+      const schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
+      queries.push(schoolQuery);
 
-		const transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
-		queries.push(transportationQuery);
+      const transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
+      queries.push(transportationQuery);
 
-		const dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
-		queries.push(dietQuery);
+      const dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
+      queries.push(dietQuery);
 
-		const shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-		queries.push(shirtSizeQuery);
+      const shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
+      queries.push(shirtSizeQuery);
 
-		const genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
-		queries.push(genderQuery);
+      const genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
+      queries.push(genderQuery);
 
-		const graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-		queries.push(graduationYearQuery);
+      const graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
+      queries.push(graduationYearQuery);
 
-		const majorQuery = _populateAttendeeAttribute('major', _populateStats('major', stats));
-		queries.push(majorQuery);
+      const majorQuery = _populateAttendeeAttribute('major', _populateStats('major', stats));
+      queries.push(majorQuery);
 
-		const isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-		queries.push(isNoviceQuery);
+      const isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
+      queries.push(isNoviceQuery);
 
-		const attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
-		queries.push(attendeeQuery);
+      const attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
+      queries.push(attendeeQuery);
 
-		const statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
-		queries.push(statusQuery);
+      const statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
+      queries.push(statusQuery);
 
-		return _Promise.all(queries)
-          .then(() => {
-	return cache.storeString(STATS_REG_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+      return _Promise.all(queries)
+          .then(() => cache.storeString(STATS_REG_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(() => {
-	const tenMinutesFromNow = (10 * 60);
-	return cache.expireKey(STATS_REG_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
-                  .then(() => {
-	return stats;
-});
-});
-});
-	}
-});
+                const tenMinutesFromNow = (10 * 60);
+                return cache.expireKey(STATS_REG_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
+                  .then(() => stats);
+              }));
+
+    });
 };
 
 module.exports.fetchRSVPStats = function() {
-	return cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
+  return cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
-	if (hasKey) {
-		return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
-          .then((object) => {
-	return JSON.parse(object);
-});
-	} else {
-		const stats = {};
-		const queries = [];
+      if (hasKey) {
+        return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
+          .then((object) => JSON.parse(object));
+      }
+      const stats = {};
+      const queries = [];
 
-		const attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats));
-		queries.push(attendingEcosystemsQuery);
+      const attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats));
+      queries.push(attendingEcosystemsQuery);
 
-		const attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
-		queries.push(attendingSchoolQuery);
+      const attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
+      queries.push(attendingSchoolQuery);
 
-		const attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats));
-		queries.push(attendingTransportationQuery);
+      const attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats));
+      queries.push(attendingTransportationQuery);
 
-		const attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats));
-		queries.push(attendingDietQuery);
+      const attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats));
+      queries.push(attendingDietQuery);
 
-		const attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-		queries.push(attendingShirtSizeQuery);
+      const attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
+      queries.push(attendingShirtSizeQuery);
 
-		const attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats));
-		queries.push(attendingGenderQuery);
+      const attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats));
+      queries.push(attendingGenderQuery);
 
-		const attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-		queries.push(attendingGraduationYearQuery);
+      const attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
+      queries.push(attendingGraduationYearQuery);
 
-		const attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats));
-		queries.push(attendingMajorQuery);
+      const attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats));
+      queries.push(attendingMajorQuery);
 
-		const attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-		queries.push(attendingIsNoviceQuery);
+      const attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
+      queries.push(attendingIsNoviceQuery);
 
-		const RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
-		queries.push(RSVPsQuery);
+      const RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
+      queries.push(RSVPsQuery);
 
-		const RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
-		queries.push(RSVPTypesQuery);
+      const RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
+      queries.push(RSVPTypesQuery);
 
-		return _Promise.all(queries)
-          .then(() => {
-	return cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+      return _Promise.all(queries)
+          .then(() => cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(() => {
-	const tenMinutesFromNow = (10 * 60);
-	return cache.expireKey(STATS_RSVP_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
-                  .then(() => {
-	return stats;
-});
-});
-});
-	}
-});
+                const tenMinutesFromNow = (10 * 60);
+                return cache.expireKey(STATS_RSVP_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
+                  .then(() => stats);
+              }));
+
+    });
 };
 
 module.exports.fetchLiveEventStats = function() {
-	return cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
+  return cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
-	if (hasKey) {
-		return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
-          .then((object) => {
-	return JSON.parse(object);
-});
-	} else {
-		const stats = {};
-		const queries = [];
+      if (hasKey) {
+        return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
+          .then((object) => JSON.parse(object));
+      }
+      const stats = {};
+      const queries = [];
 
-		const checkIns = _populateCheckins(_populateStatsField('checkins', stats));
-		queries.push(checkIns);
+      const checkIns = _populateCheckins(_populateStatsField('checkins', stats));
+      queries.push(checkIns);
 
-		const checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats));
-		queries.push(checkedInEcosystemsQuery);
+      const checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats));
+      queries.push(checkedInEcosystemsQuery);
 
-		const trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
-		queries.push(trackedEventQuery);
+      const trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
+      queries.push(trackedEventQuery);
 
-		return _Promise.all(queries)
-          .then(() => {
-	return cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
+      return _Promise.all(queries)
+          .then(() => cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(() => {
-	const oneMinuteFromNow = 60;
-	return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
-                  .then(() => {
-	return stats;
-});
-});
-});
-	}
-});
+                const oneMinuteFromNow = 60;
+                return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
+                  .then(() => stats);
+              }));
+
+    });
 };

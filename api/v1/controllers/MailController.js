@@ -13,29 +13,25 @@ const router = require('express').Router();
 const ACCEPTANCE_LISTS = ['wave1', 'wave2', 'wave3', 'wave4', 'wave5'];
 
 function sendMailinglist(req, res, next) {
-	const listName = req.body.listName;
-	const mailList = mail.lists[listName];
-	const template = req.body.template;
+  const listName = req.body.listName;
+  const mailList = mail.lists[listName];
+  const template = req.body.template;
 
-	services.MailService.checkIfSent(mailList)
+  services.MailService.checkIfSent(mailList)
+		.then(() => services.MailService.sendToList(mailList, template))
 		.then(() => {
-			return services.MailService.sendToList(mailList, template);
-		})
+  if (_.includes(ACCEPTANCE_LISTS, listName)) {
+    return services.MailService.markAsSent(mailList);
+  }
+  return _Promise.resolve(true);
+})
 		.then(() => {
-			if (_.includes(ACCEPTANCE_LISTS, listName)) {
-				return services.MailService.markAsSent(mailList);
-			}
-			return _Promise.resolve(true);
-		})
-		.then(() => {
-			res.body = {};
-			res.body.sent = true;
+  res.body = {};
+  res.body.sent = true;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 

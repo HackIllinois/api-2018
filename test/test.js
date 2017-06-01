@@ -5,8 +5,8 @@ const mockery = require('mockery');
 const mockknex = require('mock-knex');
 const bookshelf = require('bookshelf');
 function bookshelfMock (knex) {
-	mockknex.mock(knex);
-	return bookshelf(knex);
+  mockknex.mock(knex);
+  return bookshelf(knex);
 }
 
 mockery.registerMock('bookshelf', bookshelfMock);

@@ -9,108 +9,97 @@ const mail = require('../utils/mail');
 const router = require('express').Router();
 
 function _isAuthenticated(req) {
-	return req.auth && (req.user !== undefined);
+  return req.auth && (req.user !== undefined);
 }
 
 function _removeFromList(rsvpCurrent, rsvpNew) {
-	return rsvpCurrent.get('isAttending') && !rsvpNew.isAttending;
+  return rsvpCurrent.get('isAttending') && !rsvpNew.isAttending;
 }
 
 function _addToList(rsvpCurrent, rsvpNew) {
-	return !rsvpCurrent.get('isAttending') && rsvpNew.isAttending;
+  return !rsvpCurrent.get('isAttending') && rsvpNew.isAttending;
 }
 
 function createRSVP(req, res, next) {
-	if (!req.body.isAttending)
-		delete req.body.type;
+  if (!req.body.isAttending) {
+    delete req.body.type;
+  }
 
-	services.RegistrationService
+  services.RegistrationService
 		.findAttendeeByUser(req.user)
-		.then((attendee) => {
-			return services.RSVPService
-				.createRSVP(attendee, req.user, req.body);
-		})
+		.then((attendee) => services.RSVPService
+				.createRSVP(attendee, req.user, req.body))
 		.then((rsvp) => {
-			if (rsvp.get('isAttending'))
-				services.MailService.addToList(req.user, mail.lists.attendees);
-			res.body = rsvp.toJSON();
+  if (rsvp.get('isAttending')) {
+    services.MailService.addToList(req.user, mail.lists.attendees);
+  }
+  res.body = rsvp.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function fetchRSVPByUser(req, res, next) {
-	services.RegistrationService
+  services.RegistrationService
 		.findAttendeeByUser(req.user)
-		.then((attendee) => {
-			return services.RSVPService
-				.findRSVPByAttendee(attendee);
-		})
+		.then((attendee) => services.RSVPService
+				.findRSVPByAttendee(attendee))
 		.then((rsvp) => {
-			res.body = rsvp.toJSON();
-			if (!res.body.type) {
-				delete res.body.type;
-			}
+  res.body = rsvp.toJSON();
+  if (!res.body.type) {
+    delete res.body.type;
+  }
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function fetchRSVPById(req, res, next) {
-	services.RSVPService
+  services.RSVPService
 		.getRSVPById(req.params.id)
 		.then((rsvp) => {
-			res.body = rsvp.toJSON();
-			if (!res.body.type) {
-				delete res.body.type;
-			}
+  res.body = rsvp.toJSON();
+  if (!res.body.type) {
+    delete res.body.type;
+  }
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function updateRSVPByUser(req, res, next) {
-	if (!req.body.isAttending)
-		delete req.body.type;
+  if (!req.body.isAttending) {
+    delete req.body.type;
+  }
 
-	services.RegistrationService
+  services.RegistrationService
 		.findAttendeeByUser(req.user)
-		.then((attendee) => {
-			return _updateRSVPByAttendee(req.user, attendee, req.body);
-		})
+		.then((attendee) => _updateRSVPByAttendee(req.user, attendee, req.body))
 		.then((rsvp) => {
-			res.body = rsvp.toJSON();
+  res.body = rsvp.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function _updateRSVPByAttendee(user, attendee, newRSVP) {
-	return services.RSVPService
+  return services.RSVPService
 		.findRSVPByAttendee(attendee)
-		.then((rsvp) => {
-			return services.RSVPService.updateRSVP(user, rsvp, newRSVP)
+		.then((rsvp) => services.RSVPService.updateRSVP(user, rsvp, newRSVP)
 				.then((updatedRSVP) => {
-					if (_addToList(rsvp, newRSVP))
-						services.MailService.addToList(user, mail.lists.attendees);
-					if (_removeFromList(rsvp, newRSVP))
-						services.MailService.removeFromList(user, mail.lists.attendees);
+  if (_addToList(rsvp, newRSVP)) {
+    services.MailService.addToList(user, mail.lists.attendees);
+  }
+  if (_removeFromList(rsvp, newRSVP)) {
+    services.MailService.removeFromList(user, mail.lists.attendees);
+  }
 
-					return updatedRSVP;
-				});
-		});
+  return updatedRSVP;
+}));
 }
 
 router.use(bodyParser.json());

@@ -9,9 +9,9 @@ const LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
  * @throws TypeError when the location is invalid
  */
 module.exports.verifyLocation = function (location) {
-	if (!_.includes(LOCATIONS, location)) {
-		throw new TypeError(location + ' is not a valid check in location');
-	}
+  if (!_.includes(LOCATIONS, location)) {
+    throw new TypeError(location + ' is not a valid check in location');
+  }
 
-	return true;
+  return true;
 };

@@ -2,13 +2,13 @@ const _ = require('lodash');
 
 const Model = require('./Model');
 const Announcement = Model.extend({
-	tableName: 'announcements',
-	idAttribute: 'id',
-	hasTimestamps: ['created'],
-	validations: {
-		'title': ['required', 'string', 'maxLength:255'],
-		'description': ['required', 'string', 'maxLength:1000']
-	}
+  tableName: 'announcements',
+  idAttribute: 'id',
+  hasTimestamps: [ 'created' ],
+  validations: {
+    'title': ['required', 'string', 'maxLength:255'],
+    'description': ['required', 'string', 'maxLength:1000']
+  }
 });
 
 /**
@@ -19,21 +19,21 @@ const Announcement = Model.extend({
  * @return {Function} a bookshelf query-builder handler
  */
 function _buildFindAllQuery(before, after, limit) {
-	return (qb) => {
-		if (!_.isNil(before)) {
-			qb.where('created', '<', before);
-		}
-		if (!_.isNil(after)) {
-			if (!_.isNil(before)) {
-				qb.andWhere('created', '>', after);
-			} else {
-				qb.where('created', '>', after);
-			}
-		}
-		if (!_.isNil(limit)) {
-			qb.limit(limit);
-		}
-	};
+  return (qb) => {
+    if (!_.isNil(before)) {
+      qb.where('created', '<', before);
+    }
+    if (!_.isNil(after)) {
+      if (!_.isNil(before)) {
+        qb.andWhere('created', '>', after);
+      } else {
+        qb.where('created', '>', after);
+      }
+    }
+    if (!_.isNil(limit)) {
+      qb.limit(limit);
+    }
+  };
 }
 
 /**
@@ -43,10 +43,8 @@ function _buildFindAllQuery(before, after, limit) {
  * @param  {Number} limit the maximum number of results to return (optional)
  * @return {Promise<Collection>} a promise resolving to the resulting collection
  */
-Announcement.findAll = (before, after, limit) => {
-	return Announcement.query(_buildFindAllQuery(before, after, limit))
+Announcement.findAll = (before, after, limit) => Announcement.query(_buildFindAllQuery(before, after, limit))
 		.orderBy('created', 'DESC')
 		.fetchAll();
-};
 
 module.exports = Announcement;

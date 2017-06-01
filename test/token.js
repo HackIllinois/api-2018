@@ -11,115 +11,113 @@ const User = require('../api/v1/models/User.js');
 
 const expect = chai.expect;
 
-describe('TokenService',() => {
-	let tokenVal;
-	let testToken;
+describe('TokenService', () => {
+  let tokenVal;
+  let testToken;
 
-	describe('findTokenByValue',() => {
-		let _findByValue;
+  describe('findTokenByValue', () => {
+    let _findByValue;
 
-		before((done) => {
-			tokenVal = utils.crypto.generateResetToken();
-			testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
+    before((done) => {
+      tokenVal = utils.crypto.generateResetToken();
+      testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
 
-			_findByValue = sinon.stub(Token,'findByValue');
-			_findByValue.withArgs(tokenVal).returns(_Promise.resolve(testToken));
-			_findByValue.withArgs(sinon.match.string).returns(_Promise.resolve(null));
+      _findByValue = sinon.stub(Token, 'findByValue');
+      _findByValue.withArgs(tokenVal).returns(_Promise.resolve(testToken));
+      _findByValue.withArgs(sinon.match.string).returns(_Promise.resolve(null));
 
-			done();
-		});
+      done();
+    });
 
-		it('finds valid token',(done) => {
-			const found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
-			expect(found).to.eventually.have.deep.property('attributes.user_id', 1,'user ID should be 1')
+    it('finds valid token', (done) => {
+      const found = TokenService.findTokenByValue(tokenVal, 'DEFAULT');
+      expect(found).to.eventually.have.deep.property('attributes.user_id', 1, 'user ID should be 1')
 				.then(() => {
-					expect(found).to.eventually.have.deep.property('attributes.value', tokenVal,'token value sould be '+tokenVal)
+  expect(found).to.eventually.have.deep.property('attributes.value', tokenVal, 'token value sould be '+tokenVal)
 						.and.notify(done);
-				});
-		});
-		it('throws error for invalid scope',(done) => {
-			TokenService.findTokenByValue(tokenVal, 'INVALID')
-				.then(() => {
-					return done('Error was not thrown for INVALID token scope');
-				})
+});
+    });
+    it('throws error for invalid scope', (done) => {
+      TokenService.findTokenByValue(tokenVal, 'INVALID')
+				.then(() => done('Error was not thrown for INVALID token scope'))
 				.catch((err) => {
-					expect(err).to.be.instanceof(TypeError);
-					return done();
-				});
-		});
-		it('throws error with expired token and calls delete on token',(done) => {
-			const _get = sinon.stub(Token.prototype,'get');
-			_get.withArgs('created').returns(0);
-			const _destroy = sinon.stub(Token.prototype,'destroy');
-			const found = TokenService.findTokenByValue(tokenVal,'DEFAULT');
-			expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
+  expect(err).to.be.instanceof(TypeError);
+  return done();
+});
+    });
+    it('throws error with expired token and calls delete on token', (done) => {
+      const _get = sinon.stub(Token.prototype, 'get');
+      _get.withArgs('created').returns(0);
+      const _destroy = sinon.stub(Token.prototype, 'destroy');
+      const found = TokenService.findTokenByValue(tokenVal, 'DEFAULT');
+      expect(found).to.eventually.be.rejectedWith(errors.TokenExpirationError)
 				.then(() => {
-					expect(_destroy.neverCalledWith()).to.equal(false);
-					_get.restore();
-					_destroy.restore();
-					done();
-				});
-		});
-		it('throws error if invalid token',(done) => {
-			const found = TokenService.findTokenByValue('invalid','DEFAULT');
-			expect(found).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
-		});
+  expect(_destroy.neverCalledWith()).to.equal(false);
+  _get.restore();
+  _destroy.restore();
+  done();
+});
+    });
+    it('throws error if invalid token', (done) => {
+      const found = TokenService.findTokenByValue('invalid', 'DEFAULT');
+      expect(found).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+    });
 
-		after((done) => {
-			_findByValue.restore();
-			done();
-		});
-	});
+    after((done) => {
+      _findByValue.restore();
+      done();
+    });
+  });
 
-	describe('generateToken',() => {
+  describe('generateToken', () => {
 
-		let testUser;
+    let testUser;
 
-		let _mockedTokens, _mockedWhere;
-		let _where, _save;
+    let _mockedTokens, _mockedWhere;
+    let _where, _save;
 
-		before((done) => {
+    before((done) => {
 
-			_mockedTokens = {
-				invokeThen : function(){
-					return _Promise.resolve(null);
-				}
-			};
-			_mockedWhere = {
-				fetchAll : function(){
-					return _Promise.resolve(_mockedTokens);
-				}
-			};
+      _mockedTokens = {
+        invokeThen: function(){
+          return _Promise.resolve(null);
+        }
+      };
+      _mockedWhere = {
+        fetchAll: function(){
+          return _Promise.resolve(_mockedTokens);
+        }
+      };
 
-			testUser = User.forge({ id: 1, email: 'new@example.com' });
+      testUser = User.forge({ id: 1, email: 'new@example.com' });
 
-			testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
-
-
-
-			_where = sinon.stub(Token,'where');
-
-			_where.returns(_mockedWhere);
-
-			_save = sinon.stub(Token.prototype,'save');
-
-			_save.returns(_Promise.resolve(null));
+      testToken = Token.forge({type: 'DEFAULT', value: tokenVal, user_id: 1});
 
 
-			done();
 
-		});
+      _where = sinon.stub(Token, 'where');
 
-		it('generates a new token',(done) => {
+      _where.returns(_mockedWhere);
 
-			const token = TokenService.generateToken(testUser,'7d');
+      _save = sinon.stub(Token.prototype, 'save');
 
-			expect(token).to.eventually.be.a('string')
+      _save.returns(_Promise.resolve(null));
+
+
+      done();
+
+    });
+
+    it('generates a new token', (done) => {
+
+      const token = TokenService.generateToken(testUser, '7d');
+
+      expect(token).to.eventually.be.a('string')
 				.then((data) => {
-					expect(data.length).to.equal(36);
-					done();
-				});
-		});
+  expect(data.length).to.equal(36);
+  done();
+});
+    });
 
-	});
+  });
 });

@@ -8,13 +8,13 @@ const DEFAULT_MESSAGE = 'The requested resource cannot be accessed with the ' +
 const STATUS_CODE = 401;
 
 function UnauthorizedError(message, source) {
-	ApiError.call(this, message, source);
+  ApiError.call(this, message, source);
 
-	this.type = ERROR_TYPE;
-	this.status = STATUS_CODE;
-	this.title = ERROR_TITLE;
-	this.message = (message) ? message : DEFAULT_MESSAGE;
-	this.source = (source) ? source : null;
+  this.type = ERROR_TYPE;
+  this.status = STATUS_CODE;
+  this.title = ERROR_TITLE;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
+  this.source = (source) ? source : null;
 }
 
 UnauthorizedError.prototype = Object.create(ApiError.prototype);

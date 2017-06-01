@@ -23,95 +23,85 @@ const RESUME_UPLOAD_TYPE = 'application/pdf';
 const RESUME_BUCKET = utils.storage.buckets.resumes;
 
 function _findUpload(req, res, next) {
-	return services.StorageService.findUploadById(req.params.id)
+  return services.StorageService.findUploadById(req.params.id)
 		.then((upload) => {
-			req.upload = upload;
+  req.upload = upload;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function _isOwner(req) {
-	return req.upload.get('ownerId') === req.user.get('id');
+  return req.upload.get('ownerId') === req.user.get('id');
 }
 
 function _makeFileParams(req) {
-	return {
-		content: req.body,
-		type: req.header('content-type')
-	};
+  return {
+    content: req.body,
+    type: req.header('content-type')
+  };
 }
 
 function createResumeUpload(req, res, next) {
-	const uploadOwner = req.user;
-	const uploadParams = {
-		bucket: RESUME_BUCKET
-	};
+  const uploadOwner = req.user;
+  const uploadParams = {
+    bucket: RESUME_BUCKET
+  };
 
-	Upload.findByOwner(uploadOwner, uploadParams.bucket)
+  Upload.findByOwner(uploadOwner, uploadParams.bucket)
 		.then((results) => {
-			if (results.length) {
-				throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
-			}
+  if (results.length) {
+    throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
+  }
 
-			return;
-		})
-		.then(() => {
-			return services.StorageService.createUpload(uploadOwner, uploadParams);
-		})
+
+})
+		.then(() => services.StorageService.createUpload(uploadOwner, uploadParams))
 		.tap((newUpload) => {
-			const fileParams = _makeFileParams(req);
-			return services.StorageService.persistUpload(newUpload, fileParams);
-		})
+  const fileParams = _makeFileParams(req);
+  return services.StorageService.persistUpload(newUpload, fileParams);
+})
 		.then((newUpload) => {
-			res.body = newUpload.toJSON();
+  res.body = newUpload.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function replaceResumeUpload(req, res, next) {
-	return req.upload.save()
+  return req.upload.save()
 		.then((upload) => {
-			const fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
-			return services.StorageService.persistUpload(upload, fileParams);
-		})
+  const fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
+  return services.StorageService.persistUpload(upload, fileParams);
+})
 		.then(() => {
-			res.body = req.upload.toJSON();
+  res.body = req.upload.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function getUpload(req, res, next) {
-	return services.StorageService.getUpload(req.upload)
+  return services.StorageService.getUpload(req.upload)
 		.then((result) => {
-			res.set('Content-Length', result.content.length);
-			res.set('Content-Type', result.type);
+  res.set('Content-Length', result.content.length);
+  res.set('Content-Type', result.type);
 
-			res.send(result.content);
+  res.send(result.content);
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 router.use(middleware.auth);
 
 router.use(bodyParser.raw({
-	limit: RESUME_UPLOAD_LIMIT,
-	type: RESUME_UPLOAD_TYPE
+  limit: RESUME_UPLOAD_LIMIT,
+  type: RESUME_UPLOAD_TYPE
 }));
 
 router.post('/resume/', middleware.request(UploadRequest), middleware.upload,

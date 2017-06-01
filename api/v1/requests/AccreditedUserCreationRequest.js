@@ -3,15 +3,15 @@ const Request = require('./Request');
 
 const bodyRequired = ['email', 'role'];
 const bodyValidations = {
-	'email': ['email'],
-	'role': ['string', roles.verifyRole]
+  'email': [ 'email' ],
+  'role': ['string', roles.verifyRole]
 };
 
 function AccreditedUserCreationRequest(headers, body) {
-	Request.call(this, headers, body);
+  Request.call(this, headers, body);
 
-	this.bodyRequired = bodyRequired;
-	this.bodyValidations = bodyValidations;
+  this.bodyRequired = bodyRequired;
+  this.bodyValidations = bodyValidations;
 }
 
 AccreditedUserCreationRequest.prototype = Object.create(Request.prototype);

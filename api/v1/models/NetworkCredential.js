@@ -1,13 +1,13 @@
 const Model = require('./Model');
 const NetworkCredential = Model.extend({
-	tableName: 'network_credentials',
-	idAttribute: 'id',
-	validations: {
-		userId: ['integer'],
-		account: ['required', 'string', 'maxLength:25'],
-		password: ['required', 'string', 'maxLength:25'],
-		assigned: ['required', 'boolean']
-	}
+  tableName: 'network_credentials',
+  idAttribute: 'id',
+  validations: {
+    userId: [ 'integer' ],
+    account: ['required', 'string', 'maxLength:25'],
+    password: ['required', 'string', 'maxLength:25'],
+    assigned: ['required', 'boolean']
+  }
 });
 
 
@@ -17,9 +17,9 @@ const NetworkCredential = Model.extend({
  * @return {Promise<Model>}	a Promise resolving to the resulting NetworkCredential or null
  */
 NetworkCredential.findByUserId = function(userId) {
-	return NetworkCredential.where({
-		user_id: userId
-	})
+  return NetworkCredential.where({
+    user_id: userId
+  })
 		.fetch();
 };
 /**
@@ -28,9 +28,9 @@ NetworkCredential.findByUserId = function(userId) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 NetworkCredential.findById = function(id) {
-	return NetworkCredential.where({
-		id: id
-	})
+  return NetworkCredential.where({
+    id: id
+  })
 		.fetch();
 };
 
@@ -40,9 +40,9 @@ NetworkCredential.findById = function(id) {
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
 NetworkCredential.findUnassigned = function() {
-	return NetworkCredential.where({
-		assigned: 0
-	})
+  return NetworkCredential.where({
+    assigned: 0
+  })
 		.fetch();
 };
 

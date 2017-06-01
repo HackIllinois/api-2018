@@ -1,5 +1,6 @@
-const CheckitError = require('checkit')
-	.Error;
+/* eslint-disable brace-style */
+
+const CheckitError = require('checkit').Error;
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
@@ -23,27 +24,27 @@ const utils = require('../utils');
  * @return {Promise<Model>} the model with its related models
  */
 function _saveWithRelated(model, related, t) {
-	return model.save(null, {
-		require: false,
-		transacting: t
-	})
-		.then((model) => {
-			const relatedPromises = [];
+  return model.save(null, {
+    require: false,
+    transacting: t
+  })
+    .then((model) => {
+      const relatedPromises = [];
 
-			_.forIn(related, (instances, relatedName) => {
-				_.forEach(instances, (attributes) => {
-					relatedPromises.push(
-						model.related(relatedName)
-						.create(attributes, {
-							transacting: t
-						})
-					);
-				});
-			});
+      _.forIn(related, (instances, relatedName) => {
+        _.forEach(instances, (attributes) => {
+          relatedPromises.push(
+            model.related(relatedName)
+            .create(attributes, {
+              transacting: t
+            })
+          );
+        });
+      });
 
-			return _Promise.all(relatedPromises)
-				.return(model);
-		});
+      return _Promise.all(relatedPromises)
+        .return(model);
+    });
 }
 
 /**
@@ -58,43 +59,43 @@ function _saveWithRelated(model, related, t) {
  *                          updated objects
  */
 function _extractRelatedObjects(model, fkName, related) {
-	const result = {};
+  const result = {};
 
-	_.forIn(related, (instances, relatedName) => {
-		result[relatedName] = {
-			new: [],
-			updated: [],
-			updatedIds: []
-		};
+  _.forIn(related, (instances, relatedName) => {
+    result[relatedName] = {
+      new: [],
+      updated: [],
+      updatedIds: []
+    };
 
-		_.forEach(instances, (attributes) => {
-			let MESSAGE, SOURCE;
-			if (!_.has(attributes, 'id')) {
-				result[relatedName].new.push(attributes);
-			} else if (_.isUndefined(model.related(relatedName)
-					.get(attributes.id))) {
-				MESSAGE = 'A related ' + relatedName + ' object with the given ID does not exist';
-				SOURCE = relatedName + '.id';
-				throw new errors.NotFoundError(MESSAGE, SOURCE);
-			} else if (model.related(relatedName)
-				.get(attributes.id)
-				.get(fkName) !== model.get('id')) {
-				MESSAGE = 'A ' + relatedName + ' object that does not belong to this resource cannot be updated here';
-				throw new errors.UnauthorizedError(MESSAGE);
-			} else {
-				// TODO remove this once Request validator can marshal recursively
-				// (prevents unauthorized reassignment of related object to another model)
-				attributes[fkName] = model.get('id');
+    _.forEach(instances, (attributes) => {
+      let MESSAGE, SOURCE;
+      if (!_.has(attributes, 'id')) {
+        result[relatedName].new.push(attributes);
+      } else if (_.isUndefined(model.related(relatedName)
+          .get(attributes.id))) {
+        MESSAGE = 'A related ' + relatedName + ' object with the given ID does not exist';
+        SOURCE = relatedName + '.id';
+        throw new errors.NotFoundError(MESSAGE, SOURCE);
+      } else if (model.related(relatedName)
+        .get(attributes.id)
+        .get(fkName) !== model.get('id')) {
+        MESSAGE = 'A ' + relatedName + ' object that does not belong to this resource cannot be updated here';
+        throw new errors.UnauthorizedError(MESSAGE);
+      } else {
+        // TODO remove this once Request validator can marshal recursively
+        // (prevents unauthorized reassignment of related object to another model)
+        attributes[fkName] = model.get('id');
 
-				result[relatedName].updated.push(model.related(relatedName)
-					.get(attributes.id)
-					.set(attributes));
-				result[relatedName].updatedIds.push(attributes.id);
-			}
-		});
-	});
+        result[relatedName].updated.push(model.related(relatedName)
+          .get(attributes.id)
+          .set(attributes));
+        result[relatedName].updatedIds.push(attributes.id);
+      }
+    });
+  });
 
-	return _Promise.resolve(result);
+  return _Promise.resolve(result);
 }
 
 /**
@@ -106,36 +107,34 @@ function _extractRelatedObjects(model, fkName, related) {
  * @return {Promise<>}				a promise indicating all changes have been added to the transaction
  */
 function _adjustRelatedObjects(model, parentKey, adjustments, t) {
-	const relatedPromises = [];
+  const relatedPromises = [];
 
-	_.forIn(adjustments, (adjustment, relatedName) => {
-		const promise = model.related(relatedName)
-			.query()
-			.transacting(t)
-			.whereNotIn('id', adjustment.updatedIds)
-			.where(parentKey, model.get('id'))
-			.delete()
-			.catch(Model.NoRowsDeletedError, () => {
-				return null;
-			})
-			.then(() => {
-				model.related(relatedName)
-					.reset();
+  _.forIn(adjustments, (adjustment, relatedName) => {
+    const promise = model.related(relatedName)
+      .query()
+      .transacting(t)
+      .whereNotIn('id', adjustment.updatedIds)
+      .where(parentKey, model.get('id'))
+      .delete()
+      .catch(Model.NoRowsDeletedError, () => null)
+      .then(() => {
+        model.related(relatedName)
+          .reset();
 
-				return _Promise.map(adjustment.updated, (updated) => {
-					model.related(relatedName)
-						.add(updated);
-					return updated.save(null, {
-						transacting: t,
-						require: false
-					});
-				});
-			});
+        return _Promise.map(adjustment.updated, (updated) => {
+          model.related(relatedName)
+            .add(updated);
+          return updated.save(null, {
+            transacting: t,
+            require: false
+          });
+        });
+      });
 
-		relatedPromises.push(promise);
-	});
+    relatedPromises.push(promise);
+  });
 
-	return _Promise.all(relatedPromises);
+  return _Promise.all(relatedPromises);
 }
 
 /**
@@ -145,81 +144,81 @@ function _adjustRelatedObjects(model, parentKey, adjustments, t) {
  * @return {Promise<MailingListUser>}	a promise with the save result
  */
 function _addToMailingList(attendee, decision) {
-	// status not finalized or nothing has changed, don't add to any list
-	if (!decision.status || decision.status === 'PENDING') {
-		return;
-	}
+  // status not finalized or nothing has changed, don't add to any list
+  if (!decision.status || decision.status === 'PENDING') {
+    return;
+  }
 
-	const user = User.forge({
-		id: attendee.userId
-	});
-	let promises;
+  const user = User.forge({
+    id: attendee.userId
+  });
+  let promises;
 
-	// if the status of the user has just been finalized - this is the initial decision
-	if (attendee.status === 'PENDING' && decision.status !== 'PENDING') {
-		let listName;
-		if (decision.status == 'ACCEPTED') {
-			listName = 'wave' + decision.wave;
-		} else if (decision.status == 'REJECTED') {
-			listName = 'rejected';
-		} else {
-			listName = 'waitlisted';
-		}
+  // if the status of the user has just been finalized - this is the initial decision
+  if (attendee.status === 'PENDING' && decision.status !== 'PENDING') {
+    let listName;
+    if (decision.status == 'ACCEPTED') {
+      listName = 'wave' + decision.wave;
+    } else if (decision.status == 'REJECTED') {
+      listName = 'rejected';
+    } else {
+      listName = 'waitlisted';
+    }
 
-		promises = [];
-		promises.push(MailService.addToList(user, utils.mail.lists[listName]));
-		if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
-			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
-		}
+    promises = [];
+    promises.push(MailService.addToList(user, utils.mail.lists[listName]));
+    if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
+      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+    }
 
-		return _Promise.all(promises);
-	}
-	// applicant's wave was changed
-	else if (attendee.wave != decision.wave && attendee.status === decision.status && decision.status === 'ACCEPTED') {
-		const oldListName = 'wave' + attendee.wave;
-		const newListName = 'wave' + decision.wave;
+    return _Promise.all(promises);
+  }
+  // applicant's wave was changed
+  else if (attendee.wave != decision.wave && attendee.status === decision.status && decision.status === 'ACCEPTED') {
+    const oldListName = 'wave' + attendee.wave;
+    const newListName = 'wave' + decision.wave;
 
-		promises = [];
-		promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
-		promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
-		return _Promise.all(promises);
-	}
-	// applicant accepted off of waitlist (or removed from rejected)
-	else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
-		const waveListName = 'wave' + decision.wave;
-		const outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    promises = [];
+    promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
+    promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
+    return _Promise.all(promises);
+  }
+  // applicant accepted off of waitlist (or removed from rejected)
+  else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
+    const waveListName = 'wave' + decision.wave;
+    const outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
 
-		promises = [];
-		promises.push(MailService.removeFromList(user, outgoingList));
-		promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
-		if (attendee.hasLightningInterest) {
-			promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
-		}
-		return _Promise.all(promises);
-	}
-	// applicant rejected off of waitlist
-	else if (attendee.status === 'WAITLISTED' && decision.status === 'REJECTED') {
-		promises = [];
-		promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
-		promises.push(MailService.addToList(user, utils.mail.lists.rejected));
-		return _Promise.all(promises);
-	}
-	// move applicant from accepted to rejected or waitlisted
-	else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
-		const oldWaveName = 'wave' + attendee.wave;
-		const incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    promises = [];
+    promises.push(MailService.removeFromList(user, outgoingList));
+    promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
+    if (attendee.hasLightningInterest) {
+      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+    }
+    return _Promise.all(promises);
+  }
+  // applicant rejected off of waitlist
+  else if (attendee.status === 'WAITLISTED' && decision.status === 'REJECTED') {
+    promises = [];
+    promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
+    promises.push(MailService.addToList(user, utils.mail.lists.rejected));
+    return _Promise.all(promises);
+  }
+  // move applicant from accepted to rejected or waitlisted
+  else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
+    const oldWaveName = 'wave' + attendee.wave;
+    const incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
 
-		promises = [];
-		promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
-		promises.push(MailService.addToList(user, incomingList));
-		if (attendee.hasLightningInterest) {
-			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
-		}
+    promises = [];
+    promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
+    promises.push(MailService.addToList(user, incomingList));
+    if (attendee.hasLightningInterest) {
+      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+    }
 
-		return _Promise.all(promises);
-	}
+    return _Promise.all(promises);
+  }
 
-	return _Promise.resolve();
+  return _Promise.resolve();
 }
 
 /**
@@ -230,7 +229,7 @@ function _addToMailingList(attendee, decision) {
  * @return {Boolean} whether or not the pairing is valid
  */
 function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
-	return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
+  return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
 }
 
 /**
@@ -241,29 +240,25 @@ function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
  * @throws {InvalidParameterError} when a mentor exists for the specified user
  */
 module.exports.createMentor = function(user, attributes) {
-	const mentorAttributes = attributes.mentor;
-	delete attributes.mentor;
+  const mentorAttributes = attributes.mentor;
+  delete attributes.mentor;
 
-	mentorAttributes.userId = user.get('id');
-	const mentor = Mentor.forge(mentorAttributes);
+  mentorAttributes.userId = user.get('id');
+  const mentor = Mentor.forge(mentorAttributes);
 
-	return mentor.validate()
-		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(() => {
-			if (user.hasRole(utils.roles.MENTOR, false)) {
-				const message = 'The given user has already registered as a mentor';
-				const source = 'userId';
-				throw new errors.InvalidParameterError(message, source);
-			}
+  return mentor.validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => {
+      if (user.hasRole(utils.roles.MENTOR, false)) {
+        const message = 'The given user has already registered as a mentor';
+        const source = 'userId';
+        throw new errors.InvalidParameterError(message, source);
+      }
 
-			return Mentor.transaction((t) => {
-				return UserRole
-					.addRole(user, utils.roles.MENTOR, false, t)
-					.then(() => {
-						return _saveWithRelated(mentor, attributes);
-					});
-			});
-		});
+      return Mentor.transaction((t) => UserRole
+        .addRole(user, utils.roles.MENTOR, false, t)
+        .then(() => _saveWithRelated(mentor, attributes)));
+    });
 };
 
 /**
@@ -273,14 +268,14 @@ module.exports.createMentor = function(user, attributes) {
  * @throws {NotFoundError} when the requested mentor cannot be found
  */
 module.exports.findMentorByUser = function(user) {
-	return Mentor.findByUserId(user.get('id'))
-		.tap((result) => {
-			if (_.isNull(result)) {
-				const message = 'A mentor with the given user ID cannot be found';
-				const source = 'userId';
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+  return Mentor.findByUserId(user.get('id'))
+    .tap((result) => {
+      if (_.isNull(result)) {
+        const message = 'A mentor with the given user ID cannot be found';
+        const source = 'userId';
+        throw new errors.NotFoundError(message, source);
+      }
+    });
 };
 
 /**
@@ -290,14 +285,14 @@ module.exports.findMentorByUser = function(user) {
  * @throws {NotFoundError} when the requested mentor cannot be found
  */
 module.exports.findMentorById = function(id) {
-	return Mentor.findById(id)
-		.tap((result) => {
-			if (_.isNull(result)) {
-				const message = 'A mentor with the given ID cannot be found';
-				const source = 'id';
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+  return Mentor.findById(id)
+    .tap((result) => {
+      if (_.isNull(result)) {
+        const message = 'A mentor with the given ID cannot be found';
+        const source = 'id';
+        throw new errors.NotFoundError(message, source);
+      }
+    });
 };
 
 /**
@@ -308,26 +303,18 @@ module.exports.findMentorById = function(id) {
  * @throws {InvalidParameterError} when a mentor doesn't exist for the specified user
  */
 module.exports.updateMentor = function(mentor, attributes) {
-	const mentorAttributes = attributes.mentor;
-	delete attributes.mentor;
+  const mentorAttributes = attributes.mentor;
+  delete attributes.mentor;
 
-	mentor.set(mentorAttributes);
+  mentor.set(mentorAttributes);
 
-	return mentor.validate()
-		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(() => {
-			return _extractRelatedObjects(mentor, 'mentorId', attributes);
-		})
-		.then((adjustments) => {
-			return Mentor.transaction((t) => {
-				return _adjustRelatedObjects(mentor, 'mentor_id', adjustments, t)
-					.then(() => {
-						return _saveWithRelated(mentor, {
-							'ideas': adjustments.ideas.new
-						}, t);
-					});
-			});
-		});
+  return mentor.validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => _extractRelatedObjects(mentor, 'mentorId', attributes))
+    .then((adjustments) => Mentor.transaction((t) => _adjustRelatedObjects(mentor, 'mentor_id', adjustments, t)
+      .then(() => _saveWithRelated(mentor, {
+        'ideas': adjustments.ideas.new
+      }, t))));
 };
 
 /**
@@ -338,35 +325,31 @@ module.exports.updateMentor = function(mentor, attributes) {
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
 module.exports.createAttendee = function(user, attributes) {
-	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-		const message = 'One project or ecosystem interest must be provided';
-		const source = ['projects', 'ecosystemInterests'];
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
+  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
+    const message = 'One project or ecosystem interest must be provided';
+    const source = ['projects', 'ecosystemInterests'];
+    return _Promise.reject(new errors.InvalidParameterError(message, source));
+  }
 
-	const attendeeAttrs = attributes.attendee;
-	delete attributes.attendee;
+  const attendeeAttrs = attributes.attendee;
+  delete attributes.attendee;
 
-	attendeeAttrs.userId = user.get('id');
-	const attendee = Attendee.forge(attendeeAttrs);
+  attendeeAttrs.userId = user.get('id');
+  const attendee = Attendee.forge(attendeeAttrs);
 
-	return attendee.validate()
-		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(() => {
-			if (user.hasRole(utils.roles.ATTENDEE, false)) {
-				const message = 'The given user has already registered as an attendee';
-				const source = 'userId';
-				throw new errors.InvalidParameterError(message, source);
-			}
+  return attendee.validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => {
+      if (user.hasRole(utils.roles.ATTENDEE, false)) {
+        const message = 'The given user has already registered as an attendee';
+        const source = 'userId';
+        throw new errors.InvalidParameterError(message, source);
+      }
 
-			return Attendee.transaction((t) => {
-				return UserRole
-					.addRole(user, utils.roles.ATTENDEE, false, t)
-					.then(() => {
-						return _saveWithRelated(attendee, attributes, t);
-					});
-			});
-		});
+      return Attendee.transaction((t) => UserRole
+        .addRole(user, utils.roles.ATTENDEE, false, t)
+        .then(() => _saveWithRelated(attendee, attributes, t)));
+    });
 };
 
 /**
@@ -377,20 +360,21 @@ module.exports.createAttendee = function(user, attributes) {
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
 module.exports.findAttendeeByUser = function(user, withResume) {
-	let findFunction;
-	if (withResume)
-		findFunction = Attendee.fetchWithResumeByUserId;
-	else
-		findFunction = Attendee.findByUserId;
+  let findFunction;
+  if (withResume) {
+    findFunction = Attendee.fetchWithResumeByUserId;
+  } else {
+    findFunction = Attendee.findByUserId;
+  }
 
-	return findFunction(user.get('id'))
-		.tap((result) => {
-			if (_.isNull(result)) {
-				const message = 'A attendee with the given user ID cannot be found';
-				const source = 'userId';
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+  return findFunction(user.get('id'))
+    .tap((result) => {
+      if (_.isNull(result)) {
+        const message = 'A attendee with the given user ID cannot be found';
+        const source = 'userId';
+        throw new errors.NotFoundError(message, source);
+      }
+    });
 };
 
 /**
@@ -401,20 +385,21 @@ module.exports.findAttendeeByUser = function(user, withResume) {
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
 module.exports.findAttendeeById = function(id, withResume) {
-	let findFunction;
-	if (withResume)
-		findFunction = Attendee.fetchWithResumeById;
-	else
-		findFunction = Attendee.findById;
+  let findFunction;
+  if (withResume) {
+    findFunction = Attendee.fetchWithResumeById;
+  } else {
+    findFunction = Attendee.findById;
+  }
 
-	return findFunction(id)
-		.tap((result) => {
-			if (_.isNull(result)) {
-				const message = 'A attendee with the given ID cannot be found';
-				const source = 'id';
-				throw new errors.NotFoundError(message, source);
-			}
-		});
+  return findFunction(id)
+    .tap((result) => {
+      if (_.isNull(result)) {
+        const message = 'A attendee with the given ID cannot be found';
+        const source = 'id';
+        throw new errors.NotFoundError(message, source);
+      }
+    });
 };
 
 
@@ -426,74 +411,64 @@ module.exports.findAttendeeById = function(id, withResume) {
  * @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
  */
 module.exports.updateAttendee = function(attendee, attributes) {
-	// some attendee registration attributes are optional, but we need to
-	// be sure that they are at least considered for removal during adjustment
-	attributes = _.merge(attributes, {
-		'ecosystemInterests': [],
-		'projects': [],
-		'extras': [],
-		'collaborators': []
-	});
+  // some attendee registration attributes are optional, but we need to
+  // be sure that they are at least considered for removal during adjustment
+  attributes = _.merge(attributes, {
+    'ecosystemInterests': [],
+    'projects': [],
+    'extras': [],
+    'collaborators': []
+  });
 
-	if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-		const message = 'One project or ecosystem interest must be provided';
-		const source = ['projects', 'ecosystemInterests'];
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
+  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
+    const message = 'One project or ecosystem interest must be provided';
+    const source = ['projects', 'ecosystemInterests'];
+    return _Promise.reject(new errors.InvalidParameterError(message, source));
+  }
 
-	const attendeeAttrs = attributes.attendee;
-	delete attributes.attendee;
+  const attendeeAttrs = attributes.attendee;
+  delete attributes.attendee;
 
-	const user = User.forge({
-		id: attendee.get('userId')
-	});
-	if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
-		// preferences were changed
-		if (attendee.get('status') !== 'ACCEPTED') {
-			// we do not add attendees to this list until they have been accepted
-		} else if (attendeeAttrs.hasLightningInterest) {
-			MailService.addToList(user, utils.mail.lists.lightningTalks);
-		} else {
-			MailService.removeFromList(user, utils.mail.lists.lightningTalks);
-		}
-	}
+  const user = User.forge({
+    id: attendee.get('userId')
+  });
+  if ((!!attendee.get('hasLightningInterest')) !== attendeeAttrs.hasLightningInterest) {
+    // preferences were changed
+    if (attendee.get('status') !== 'ACCEPTED') {
+      // we do not add attendees to this list until they have been accepted
+    } else if (attendeeAttrs.hasLightningInterest) {
+      MailService.addToList(user, utils.mail.lists.lightningTalks);
+    } else {
+      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+    }
+  }
 
-	attendee.set(attendeeAttrs);
+  attendee.set(attendeeAttrs);
 
-	return attendee.validate()
-		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(() => {
-			return _extractRelatedObjects(attendee, 'attendeeId', attributes);
-		})
-		.then((adjustments) => {
-			return Attendee.transaction((t) => {
-				return _adjustRelatedObjects(attendee, 'attendee_id', adjustments, t)
-					.then(() => {
-						const newRelated = _.mapValues(adjustments, (adjustment) => {
-							return adjustment.new;
-						});
-						return _saveWithRelated(attendee, newRelated, t);
-					});
-			});
-		});
+  return attendee.validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => _extractRelatedObjects(attendee, 'attendeeId', attributes))
+    .then((adjustments) => Attendee.transaction((t) => _adjustRelatedObjects(attendee, 'attendee_id', adjustments, t)
+      .then(() => {
+        const newRelated = _.mapValues(adjustments, (adjustment) => adjustment.new);
+        return _saveWithRelated(attendee, newRelated, t);
+      })));
 };
 
 
 module.exports.applyDecision = function(attendee, decisionAttrs) {
-	const prevAttendeeAttrs = _.clone(attendee.attributes);
+  const prevAttendeeAttrs = _.clone(attendee.attributes);
 
-	return attendee.validate()
-		.catch(CheckitError, utils.errors.handleValidationError)
-		.then(() => {
-			return attendee.save(decisionAttrs, {
-				patch: true,
-				require: false
-			});
-		})
-		.then((model) => {
-			_addToMailingList(prevAttendeeAttrs, decisionAttrs);
-			return model;
-		});
+  return attendee.validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => attendee.save(decisionAttrs, {
+      patch: true,
+      require: false
+    }))
+    .then((model) => {
+      _addToMailingList(prevAttendeeAttrs, decisionAttrs);
+      return model;
+    });
 };
 
 /**
@@ -505,17 +480,17 @@ module.exports.applyDecision = function(attendee, decisionAttrs) {
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.fetchAllAttendees = function(page, count, category, ascending) {
-	const ordering = (ascending ? '' : '-') + utils.database.format(category);
-	return Attendee.forge()
-		.orderBy(ordering)
-		.fetchPage({
-			pageSize: count,
-			page: page
-		})
-		.then((results) => {
-			const attendees = _.map(results.models, 'attributes');
-			return attendees;
-		});
+  const ordering = (ascending ? '' : '-') + utils.database.format(category);
+  return Attendee.forge()
+    .orderBy(ordering)
+    .fetchPage({
+      pageSize: count,
+      page: page
+    })
+    .then((results) => {
+      const attendees = _.map(results.models, 'attributes');
+      return attendees;
+    });
 };
 
 /**
@@ -528,21 +503,21 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
-	const ordering = (ascending ? '' : '-') + utils.database.format(category);
-	return Attendee
-		.query((qb) => {
-			qb.where('first_name', 'LIKE', searchTerm)
-				.orWhere('last_name', 'LIKE', searchTerm);
-		})
-		.orderBy(ordering)
-		.fetchPage({
-			pageSize: count,
-			page: page
-		})
-		.then((results) => {
-			const attendees = _.map(results.models, 'attributes');
-			return attendees;
-		});
+  const ordering = (ascending ? '' : '-') + utils.database.format(category);
+  return Attendee
+    .query((qb) => {
+      qb.where('first_name', 'LIKE', searchTerm)
+        .orWhere('last_name', 'LIKE', searchTerm);
+    })
+    .orderBy(ordering)
+    .fetchPage({
+      pageSize: count,
+      page: page
+    })
+    .then((results) => {
+      const attendees = _.map(results.models, 'attributes');
+      return attendees;
+    });
 };
 
 /**
@@ -556,19 +531,19 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
  * @return {Promise} resolving to a the list of attendees
  */
 module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
-	const ordering = (ascending ? '' : '-') + utils.database.format(category);
-	filterCategory = utils.database.format(filterCategory);
-	return Attendee
-		.query((qb) => {
-			qb.where(filterCategory, '=', filterVal);
-		})
-		.orderBy(ordering)
-		.fetchPage({
-			pageSize: count,
-			page: page
-		})
-		.then((results) => {
-			const attendees = _.map(results.models, 'attributes');
-			return attendees;
-		});
+  const ordering = (ascending ? '' : '-') + utils.database.format(category);
+  filterCategory = utils.database.format(filterCategory);
+  return Attendee
+    .query((qb) => {
+      qb.where(filterCategory, '=', filterVal);
+    })
+    .orderBy(ordering)
+    .fetchPage({
+      pageSize: count,
+      page: page
+    })
+    .then((results) => {
+      const attendees = _.map(results.models, 'attributes');
+      return attendees;
+    });
 };

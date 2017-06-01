@@ -8,28 +8,21 @@ const roles = require('../utils/roles');
 const router = require('express').Router();
 
 function createTrackedEvent(req, res, next) {
-	services.TrackingService
+  services.TrackingService
 		.createTrackingEvent(req.body)
 		.then((result) => {
-			res.body = result.toJSON();
+  res.body = result.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function addTrackedEventParticipant(req, res, next) {
-	services.TrackingService
+  services.TrackingService
 		.addEventParticipant(req.params.participantId)
-		.then(() => {
-
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+		.then(() => next())
+		.catch((error) => next(error));
 }
 
 router.use(bodyParser.json());

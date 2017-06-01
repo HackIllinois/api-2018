@@ -11,19 +11,19 @@ const TEST_IDENTIFIER = 'test';
 const config = {};
 config.auth = {};
 config.aws = {
-	defaults: {}
+  defaults: {}
 };
 config.database = {};
 config.redis = {};
 config.database.primary = {
-	pool: {}
+  pool: {}
 };
 config.mail = {};
 config.logs = {};
 config.storage = {};
 config.superuser = {};
 config.token = {
-	expiration: {}
+  expiration: {}
 };
 
 config.environment = process.env.NODE_ENV;
@@ -64,8 +64,8 @@ config.redis.port = process.env.REDIS_PORT;
 
 config.mail.key = process.env.HACKILLINOIS_MAIL_KEY;
 config.mail.sinkhole = '.sink.sparkpostmail.com';
-config.mail.whitelistedDomains = ['@hackillinois.org'];
-config.mail.whitelistedLists = ['test'];
+config.mail.whitelistedDomains = [ '@hackillinois.org' ];
+config.mail.whitelistedLists = [ 'test' ];
 
 config.logs.streamPrefix = 'instances';
 config.logs.groupName = (!config.isProduction) ? 'api-dev' : 'api';
@@ -74,21 +74,21 @@ config.storage.bucketExtension = (!config.isProduction) ? '-development' : '-201
 
 let exit = true;
 if (!(config.isProduction || config.isDevelopment || config.isTest)) {
-	console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
+  console.error("error: set NODE_ENV to '%s', '%s', or '%s'", PRODUCTION_IDENTIFIER, DEVELOPMENT_IDENTIFIER, TEST_IDENTIFIER);
 } else if (!config.superuser.email) {
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
+  console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_EMAIL' to the desired admin email");
 } else if (!config.superuser.password) {
-	console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
+  console.error("error: set configuration key 'HACKILLINOIS_SUPERUSER_PASSWORD' to a secure, random string");
 } else if (!config.secret) {
-	console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
+  console.error("error: set configuration key 'HACKILLINOIS_SECRET' to a secure, random string");
 } else if (config.isProduction && !config.mail.key) {
-	console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
+  console.error("error: set configuration key 'HACKILLINOIS_MAIL_KEY' to the mailing provider's API key");
 } else {
-	exit = false;
+  exit = false;
 }
 if (exit) {
-	console.error('fatal: environment incomplete. shutting down...');
-	process.exit();
+  console.error('fatal: environment incomplete. shutting down...');
+  process.exit();
 }
 
 module.exports = config;

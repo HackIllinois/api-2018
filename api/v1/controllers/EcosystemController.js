@@ -8,42 +8,36 @@ const roles = require('../utils/roles');
 const EcosystemService = require('../services/EcosystemService');
 
 function createEcosystem(req, res, next) {
-	EcosystemService
+  EcosystemService
 		.createEcosystem(req.body.name)
 		.then((newEcosystem) => {
-			res.body = newEcosystem.toJSON();
+  res.body = newEcosystem.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function getAllEcosystems(req, res, next) {
-	EcosystemService
+  EcosystemService
 		.getAllEcosystems()
 		.then((results) => {
-			res.body = results.toJSON();
+  res.body = results.toJSON();
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function deleteEcosystem(req, res, next) {
-	EcosystemService
+  EcosystemService
 		.deleteEcosystem(req.body.name)
 		.then(() => {
-			res.body = {};
+  res.body = {};
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 

@@ -22,75 +22,67 @@ const router = require('express').Router();
  * @throws {InvalidParameterError} when the provided password is incorrect
  */
 function _issueByEmail(email, password) {
-	return UserService
+  return UserService
 		.findUserByEmail(email)
 		.then((user) => {
-			if (!password) {
-				return AuthService.issueForUser(user);
-			}
+  if (!password) {
+    return AuthService.issueForUser(user);
+  }
 
-			return UserService
+  return UserService
 				.verifyPassword(user, password)
-				.then(() => {
-					return AuthService.issueForUser(user);
-				});
-		});
+				.then(() => AuthService.issueForUser(user));
+});
 }
 
 function createToken(req, res, next) {
 	// the requester must have a valid password to receive a new token
-	_issueByEmail(req.body.email, req.body.password)
+  _issueByEmail(req.body.email, req.body.password)
 		.then((auth) => {
-			res.body = {};
-			res.body.auth = auth;
+  res.body = {};
+  res.body.auth = auth;
 
-			next();
-			return null;
-		})
+  next();
+  return null;
+})
 		.catch((error) => {
-			next(error);
-			return null;
-		});
+  next(error);
+  return null;
+});
 }
 
 function refreshToken(req, res, next) {
-	if (!req.auth) {
-		const message = 'A refresh token cannot be issued without a valid token';
-		return next(new errors.InvalidHeaderError(message));
-	}
+  if (!req.auth) {
+    const message = 'A refresh token cannot be issued without a valid token';
+    return next(new errors.InvalidHeaderError(message));
+  }
 
 	// the requester's token must be valid and present, so we can re-issue
 	// without requiring a password
-	_issueByEmail(req.user.email)
+  _issueByEmail(req.user.email)
 		.then((auth) => {
-			res.body = {};
-			res.body.auth = auth;
+  res.body = {};
+  res.body.auth = auth;
 
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 function passwordReset(req, res, next) {
-	TokenService
+  TokenService
 		.findTokenByValue(req.body.token, utils.scopes.AUTH)
 		.then((token) => {
-			token.destroy();
-			return UserService.resetPassword(token.related('user'), req.body.password);
-		})
-		.then((user) => {
-			return AuthService.issueForUser(user);
-		})
+  token.destroy();
+  return UserService.resetPassword(token.related('user'), req.body.password);
+})
+		.then((user) => AuthService.issueForUser(user))
 		.then((auth) => {
-			res.body = {};
-			res.body.auth = auth;
-			return next();
-		})
-		.catch((error) => {
-			return next(error);
-		});
+  res.body = {};
+  res.body.auth = auth;
+  return next();
+})
+		.catch((error) => next(error));
 }
 
 router.use(bodyParser.json());

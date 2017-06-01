@@ -7,13 +7,13 @@ const ERROR_STATUS = 415;
 const DEFAULT_MESSAGE = 'The provided entity cannot be handled by this resource';
 
 function EntityNotSupportedError(message, source) {
-	UnprocessableRequestError.call(this, message, source);
+  UnprocessableRequestError.call(this, message, source);
 
-	this.type = ERROR_TYPE;
-	this.title = ERROR_TITLE;
-	this.status = ERROR_STATUS;
-	this.message = (message) ? message : DEFAULT_MESSAGE;
-	this.source = (source) ? source : null;
+  this.type = ERROR_TYPE;
+  this.title = ERROR_TITLE;
+  this.status = ERROR_STATUS;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
+  this.source = (source) ? source : null;
 }
 
 EntityNotSupportedError.prototype = Object.create(UnprocessableRequestError.prototype);

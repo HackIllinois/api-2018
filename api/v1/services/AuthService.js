@@ -8,7 +8,7 @@ const errors = require('../errors');
 
 const JWT_SECRET = config.auth.secret;
 const JWT_CONFIG = {
-	expiresIn: config.auth.expiration
+  expiresIn: config.auth.expiration
 };
 
 /**
@@ -20,11 +20,11 @@ const JWT_CONFIG = {
  * @throws see JWT error documentation for possible errors
  */
 function _issue(payload, subject) {
-	const parameters = _.clone(JWT_CONFIG);
-	if (arguments.length > 1) {
-		parameters.subject = subject;
-	}
-	return jwt.sign(payload, JWT_SECRET, parameters);
+  const parameters = _.clone(JWT_CONFIG);
+  if (arguments.length > 1) {
+    parameters.subject = subject;
+  }
+  return jwt.sign(payload, JWT_SECRET, parameters);
 }
 
 /**
@@ -33,19 +33,18 @@ function _issue(payload, subject) {
  * @return {Promise} resolving to the auth token
  */
 module.exports.issueForUser = function(user) {
-	const subject = user.get('id')
+  const subject = user.get('id')
 		.toString();
-	const payload = {
-		email: user.get('email'),
-		roles: user.related('roles')
+  const payload = {
+    email: user.get('email'),
+    roles: user.related('roles')
 			.toJSON()
-	};
-	return _Promise
-		.try(() => {
+  };
+  return _Promise
+		.try(() =>
 			// the JWT library behind _issue may thrown any number
 			// of errors, which we do not want to propogate yet
-			return _Promise.resolve(_issue(payload, subject));
-		});
+     _Promise.resolve(_issue(payload, subject)));
 };
 
 /**
@@ -55,12 +54,10 @@ module.exports.issueForUser = function(user) {
  * promise resolving to an UnprocessableRequestError
  */
 module.exports.verify = function(token) {
-	return _Promise
-		.try(() => {
-			return _Promise.resolve(jwt.verify(token, JWT_SECRET));
-		})
+  return _Promise
+		.try(() => _Promise.resolve(jwt.verify(token, JWT_SECRET)))
 		.catch(jwt.JsonWebTokenError, (error) => {
-			const message = error.message;
-			throw new errors.UnprocessableRequestError(message);
-		});
+  const message = error.message;
+  throw new errors.UnprocessableRequestError(message);
+});
 };

@@ -17,17 +17,15 @@ const utils = require('../utils');
  * @throws InvalidParameterError when a project exists with the specified name
  */
 module.exports.createProject = function(attributes) {
-	if (_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)) {
-		attributes.isPublished = false;
-	}
+  if (_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)) {
+    attributes.isPublished = false;
+  }
 
-	const project = Project.forge(attributes);
-	return project
+  const project = Project.forge(attributes);
+  return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(() => {
-			return project.save();
-		})
+		.then(() => project.save())
 		.catch(
 			utils.errors.DuplicateEntryError,
 			utils.errors.handleDuplicateEntryError('A project with the given name already exists', 'name')
@@ -41,17 +39,17 @@ module.exports.createProject = function(attributes) {
  * @throws InvalidParameterError when a project doesn't exist with the specified ID
  */
 module.exports.findProjectById = function(id) {
-	return Project
+  return Project
 		.findById(id)
 		.then((result) => {
-			if (_.isNull(result)) {
-				const message = 'A project with the given ID cannot be found';
-				const source = 'id';
-				throw new errors.NotFoundError(message, source);
-			}
+  if (_.isNull(result)) {
+    const message = 'A project with the given ID cannot be found';
+    const source = 'id';
+    throw new errors.NotFoundError(message, source);
+  }
 
-			return _Promise.resolve(result);
-		});
+  return _Promise.resolve(result);
+});
 };
 
 /**
@@ -62,14 +60,12 @@ module.exports.findProjectById = function(id) {
  * @throws InvalidParameterError when the key is not valid
  */
 module.exports.updateProject = function(project, attributes) {
-	project.set(attributes);
+  project.set(attributes);
 
-	return project
+  return project
 		.validate()
 		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(() => {
-			return project.save();
-		});
+		.then(() => project.save());
 };
 
 /**
@@ -80,24 +76,24 @@ module.exports.updateProject = function(project, attributes) {
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
 function _isProjectMentorValid(project_id, mentor_id) {
-	return Project
+  return Project
 		.findById(project_id)
 		.then((result) => {
-			if (_.isNull(result)) {
-				const message = 'The project id is invalid';
-				const source = 'project_id';
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return Mentor.findById(mentor_id);
-		})
+  if (_.isNull(result)) {
+    const message = 'The project id is invalid';
+    const source = 'project_id';
+    throw new errors.InvalidParameterError(message, source);
+  }
+  return Mentor.findById(mentor_id);
+})
 		.then((mentor) => {
-			if (_.isNull(mentor)) {
-				const message = 'The mentor id is invalid';
-				const source = 'mentor_id';
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return _Promise.resolve(false);
-		});
+  if (_.isNull(mentor)) {
+    const message = 'The mentor id is invalid';
+    const source = 'mentor_id';
+    throw new errors.InvalidParameterError(message, source);
+  }
+  return _Promise.resolve(false);
+});
 }
 
 /**
@@ -108,16 +104,16 @@ function _isProjectMentorValid(project_id, mentor_id) {
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
 function _deleteProjectMentor(project_id, mentor_id) {
-	return ProjectMentor
+  return ProjectMentor
 		.findByProjectAndMentorId(project_id, mentor_id)
 		.then((oldProjectMentor) => {
-			if (_.isNull(oldProjectMentor)) {
-				const message = 'A project-mentor relationship with the given IDs cannot be found';
-				const source = 'project_id/mentor_id';
-				throw new errors.NotFoundError(message, source);
-			}
-			return oldProjectMentor.destroy();
-		});
+  if (_.isNull(oldProjectMentor)) {
+    const message = 'A project-mentor relationship with the given IDs cannot be found';
+    const source = 'project_id/mentor_id';
+    throw new errors.NotFoundError(message, source);
+  }
+  return oldProjectMentor.destroy();
+});
 }
 
 
@@ -129,22 +125,20 @@ function _deleteProjectMentor(project_id, mentor_id) {
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
 module.exports.addProjectMentor = function(project_id, mentor_id) {
-	const projectMentor = ProjectMentor.forge({
-		project_id: project_id,
-		mentor_id: mentor_id
-	});
+  const projectMentor = ProjectMentor.forge({
+    project_id: project_id,
+    mentor_id: mentor_id
+  });
 
-	return _isProjectMentorValid(project_id, mentor_id)
-		.then(() => {
-			return ProjectMentor.findByProjectAndMentorId(project_id, mentor_id);
-		})
+  return _isProjectMentorValid(project_id, mentor_id)
+		.then(() => ProjectMentor.findByProjectAndMentorId(project_id, mentor_id))
 		.then((result) => {
-			if (!_.isNull(result)) {
+  if (!_.isNull(result)) {
 				//The project mentor relationship already exists
-				return _Promise.resolve(result);
-			}
-			return projectMentor.save();
-		});
+    return _Promise.resolve(result);
+  }
+  return projectMentor.save();
+});
 };
 
 /**
@@ -155,7 +149,7 @@ module.exports.addProjectMentor = function(project_id, mentor_id) {
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
 module.exports.deleteProjectMentor = function(project_id, mentor_id) {
-	return _deleteProjectMentor(project_id, mentor_id);
+  return _deleteProjectMentor(project_id, mentor_id);
 };
 
 
@@ -167,18 +161,18 @@ module.exports.deleteProjectMentor = function(project_id, mentor_id) {
  * @return {Promise} resolving to an array of project objects
  */
 module.exports.getAllProjects = function(page, count, isPublished) {
-	return Project
+  return Project
 		.query((qb) => {
-			qb.groupBy('projects.id');
-			qb.where('is_published', '=', isPublished);
-		})
+  qb.groupBy('projects.id');
+  qb.where('is_published', '=', isPublished);
+})
 		.orderBy('-name')
 		.fetchPage({
-			pageSize: count,
-			page: page
-		})
+  pageSize: count,
+  page: page
+})
 		.then((results) => {
-			const projects = _.map(results.models, 'attributes');
-			return projects;
-		});
+  const projects = _.map(results.models, 'attributes');
+  return projects;
+});
 };
