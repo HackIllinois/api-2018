@@ -19,4 +19,5 @@ temp
 *.config
 .env
 
+.vagrant
 .eslintcache
