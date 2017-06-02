@@ -1,14 +1,14 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
-var STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
-var DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
-var PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
-var GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
-var TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
-var PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
-var CATEGORIES = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
-var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
+const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
+const STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
+const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
+const PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
+const GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
+const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
+const PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
+const CATEGORIES = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
+const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 /**
  * Ensures that the provided tshirt-size is in the list
@@ -17,12 +17,12 @@ var ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
  * @return {Boolean} true when the size is valid
  * @throws TypeError when the size is invalid
  */
-module.exports.verifyTshirtSize = function (size) {
-	if (!_.includes(TSHIRT_SIZES, size)) {
-		throw new TypeError(size + " is not a valid size");
-	}
+module.exports.verifyTshirtSize = (size) => {
+  if (!_.includes(TSHIRT_SIZES, size)) {
+    throw new TypeError(size + ' is not a valid size');
+  }
 
-	return true;
+  return true;
 };
 
 /**
@@ -32,13 +32,13 @@ module.exports.verifyTshirtSize = function (size) {
  * @return {Boolean} true when the diet is valid
  * @throws TypeError when the diet is invalid
  */
-module.exports.verifyDiet = function(diet){
-	if (!_.includes(DIETS, diet)) {
-		throw new TypeError(diet + " is not a valid diet");
-	}
+module.exports.verifyDiet = (diet) => {
+  if (!_.includes(DIETS, diet)) {
+    throw new TypeError(diet + ' is not a valid diet');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided transportation option is in the list
@@ -47,13 +47,13 @@ module.exports.verifyDiet = function(diet){
  * @return {Boolean} true when the transportation option is valid
  * @throws TypeError when the transportation option is invalid
  */
-module.exports.verifyTransportation = function(transportation){
-	if (!_.includes(TRANSPORTATION_OPTIONS, transportation)) {
-		throw new TypeError(transportation + " is not a valid transportation option");
-	}
+module.exports.verifyTransportation = (transportation) => {
+  if (!_.includes(TRANSPORTATION_OPTIONS, transportation)) {
+    throw new TypeError(transportation + ' is not a valid transportation option');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided gender is in the list
@@ -62,13 +62,13 @@ module.exports.verifyTransportation = function(transportation){
  * @return {Boolean} true when the gender option is valid
  * @throws TypeError when the gender option is invalid
  */
-module.exports.verifyGender = function(gender){
-	if (!_.includes(GENDERS, gender)) {
-		throw new TypeError(gender + " is not a valid gender option");
-	}
+module.exports.verifyGender = (gender) => {
+  if (!_.includes(GENDERS, gender)) {
+    throw new TypeError(gender + ' is not a valid gender option');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided professional interest is in the list
@@ -77,13 +77,13 @@ module.exports.verifyGender = function(gender){
  * @return {Boolean} true when the professional interest option is valid
  * @throws TypeError when the professional interest option is invalid
  */
-module.exports.verifyProfessionalInterest = function(professionalInterest){
-	if (!_.includes(PROFESSIONAL_INTERESTS, professionalInterest)) {
-		throw new TypeError(professionalInterest + " is not a valid professional interest option");
-	}
+module.exports.verifyProfessionalInterest = (professionalInterest) => {
+  if (!_.includes(PROFESSIONAL_INTERESTS, professionalInterest)) {
+    throw new TypeError(professionalInterest + ' is not a valid professional interest option');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided project interest type is in the list
@@ -92,13 +92,13 @@ module.exports.verifyProfessionalInterest = function(professionalInterest){
  * @return {Boolean} true when the project interest type option is valid
  * @throws TypeError when the project interest type option is invalid
  */
-module.exports.verifyProjectInterestType = function(projectInterestType){
-	if (!_.includes(PROJECT_INTEREST_TYPES, projectInterestType)) {
-		throw new TypeError(projectInterestType + " is not a valid project interest type");
-	}
+module.exports.verifyProjectInterestType = (projectInterestType) => {
+  if (!_.includes(PROJECT_INTEREST_TYPES, projectInterestType)) {
+    throw new TypeError(projectInterestType + ' is not a valid project interest type');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided project array only has one suggestion and one creation
@@ -106,13 +106,14 @@ module.exports.verifyProjectInterestType = function(projectInterestType){
  * @return {Boolean} true when the project array is valid
  * @throws TypeError when the project array is invalid
  */
-module.exports.verifyProjectArray = function(projectArray){
-	if (_.filter(projectArray, ['isSuggestion', false]).length > 1){
-		throw new TypeError("The projects supplied are invalid. Attendees can only create 1 project at most.");
-	}
+module.exports.verifyProjectArray = (projectArray) => {
+  if (_.filter(projectArray, ['isSuggestion', false])
+    .length > 1) {
+    throw new TypeError('The projects supplied are invalid. Attendees can only create 1 project at most.');
+  }
 
-	return true;
-}
+  return true;
+};
 
 /**
  * Ensures that the provided status is in the list
@@ -121,12 +122,12 @@ module.exports.verifyProjectArray = function(projectArray){
  * @return {Boolean} true when the status is valid
  * @throws TypeError when the status is invalid
  */
-module.exports.verifyStatus = function (status) {
-	if (!_.includes(STATUSES, status)) {
-		throw new TypeError(status + " is not a valid status");
-	}
+module.exports.verifyStatus = (status) => {
+  if (!_.includes(STATUSES, status)) {
+    throw new TypeError(status + ' is not a valid status');
+  }
 
-	return true;
+  return true;
 };
 
 /**
@@ -136,19 +137,19 @@ module.exports.verifyStatus = function (status) {
  * @return {Boolean} true when the category is valid
  * @throws TypeError when the category is invalid
  */
-module.exports.verifyCategory = function (category) {
-	if (!_.includes(CATEGORIES, category)) {
-		return false;
-	}
+module.exports.verifyCategory = (category) => {
+  if (!_.includes(CATEGORIES, category)) {
+    return false;
+  }
 
-	return true;
+  return true;
 };
 
 
-module.exports.verifyAcceptanceType = function (type) {
-	if (type && !_.includes(ACCEPTANCE_TYPES, type)) {
-		throw new TypeError(type + " is not a valid acceptance type");
-	}
+module.exports.verifyAcceptanceType = (type) => {
+  if (type && !_.includes(ACCEPTANCE_TYPES, type)) {
+    throw new TypeError(type + ' is not a valid acceptance type');
+  }
 
-	return true;
+  return true;
 };

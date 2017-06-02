@@ -1,62 +1,48 @@
-var bodyParser = require('body-parser');
-var router = require('express').Router();
-var _Promise = require('bluebird');
+const bodyParser = require('body-parser');
+const router = require('express').Router();
 
-var AnnouncementRequest = require('../requests/AnnouncementRequest');
-var AnnouncementService = require('../services/AnnouncementService');
-var middleware = require('../middleware');
-var roles = require('../utils/roles');
+const AnnouncementRequest = require('../requests/AnnouncementRequest');
+const AnnouncementService = require('../services/AnnouncementService');
+const middleware = require('../middleware');
+const roles = require('../utils/roles');
 
 function getAllAnnouncements(req, res, next) {
+  const before = (Date.parse(req.query.before)) ? new Date(req.query.before) : null;
+  const after = (Date.parse(req.query.after)) ? new Date(req.query.after) : null;
+  const limit = Number.parseInt(req.query.limit) || null;
 
-	var before = (Date.parse(req.query.before)) ? new Date(req.query.before) : null;
-	var after = (Date.parse(req.query.after)) ? new Date(req.query.after) : null;
-	var limit = Number.parseInt(req.query.limit) || null;
-
-	return AnnouncementService.getAllAnnouncements(before, after, limit).then(function (result) {
-		res.body = result.toJSON();
-		next();
-		return null;
-	}).catch(function (err) {
-		next(err);
-		return null;
-	});
+  return AnnouncementService.getAllAnnouncements(before, after, limit)
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function createAnnouncement(req, res, next) {
-	return AnnouncementService.createAnnouncement(req.body).then(function (result) {
-		res.body = result.toJSON();
-		next();
-		return null;
-	}).catch(function (err) {
-		next(err);
-		return null;
-	});
+  return AnnouncementService.createAnnouncement(req.body)
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function updateAnnouncement(req, res, next) {
-	return AnnouncementService.findById(req.params.id).then(function (announcement) {
-		return AnnouncementService.updateAnnouncement(announcement, req.body);
-	}).then(function (result) {
-		res.body = result.toJSON();
-		next();
-		return null;
-	}).catch(function (err) {
-		next(err);
-		return null;
-	});
+  return AnnouncementService.findById(req.params.id)
+    .then((announcement) => AnnouncementService.updateAnnouncement(announcement, req.body))
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function deleteAnnouncement(req, res, next) {
-	return AnnouncementService.findById(req.params.id).then(function (announcement) {
-		return AnnouncementService.deleteAnnouncement(announcement);
-	}).then(function () {
-		next();
-		return null;
-	}).catch(function (err) {
-		next(err);
-		return null;
-	});
+  return AnnouncementService.findById(req.params.id)
+    .then((announcement) => AnnouncementService.deleteAnnouncement(announcement))
+    .then(() => next())
+    .catch((err) => next(err));
 }
 
 router.use(bodyParser.json());

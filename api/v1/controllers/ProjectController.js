@@ -1,171 +1,131 @@
-var _ = require('lodash');
-var bodyParser = require('body-parser');
-var middleware = require('../middleware');
-var router = require('express').Router();
-var _Promise = require('bluebird');
+const _ = require('lodash');
+const bodyParser = require('body-parser');
+const middleware = require('../middleware');
+const router = require('express').Router();
+const _Promise = require('bluebird');
+const errors = require('../errors');
+const requests = require('../requests');
+const roles = require('../utils/roles');
 
-var errors = require('../errors');
-var config = require('../../config');
-var requests = require('../requests');
-var roles = require('../utils/roles');
-
-var ProjectService = require('../services/ProjectService');
-var PermissionService = require('../services/PermissionService');
+const ProjectService = require('../services/ProjectService');
+const PermissionService = require('../services/PermissionService');
 
 
-function _validGetAllRequest(page, count, published){
-	if(_.isNaN(page)){
-		var message = "Invalid page parameter";
-		var source = "page";
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
-	if(_.isNaN(count)){
-		var message = "Invalid count parameter";
-		var source = "count";
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
-	if(_.isNaN(published) || (published != 0 && published != 1)){
-		var message = "Invalid published parameter";
-		var source = "published";
-		return _Promise.reject(new errors.InvalidParameterError(message, source));
-	}
-	return _Promise.resolve(true);
+function _validGetAllRequest(page, count, published) {
+  if (_.isNaN(page)) {
+    const message = 'Invalid page parameter';
+    const source = 'page';
+    return _Promise.reject(new errors.InvalidParameterError(message, source));
+  }
+  if (_.isNaN(count)) {
+    const message = 'Invalid count parameter';
+    const source = 'count';
+    return _Promise.reject(new errors.InvalidParameterError(message, source));
+  }
+  if (_.isNaN(published) || (published != 0 && published != 1)) {
+    const message = 'Invalid published parameter';
+    const source = 'published';
+    return _Promise.reject(new errors.InvalidParameterError(message, source));
+  }
+
+  return _Promise.resolve(true);
 }
 
-function createProject (req, res, next) {
-	var attributes = req.body;
+function createProject(req, res, next) {
+  PermissionService
+    .canCreateProject(req.user)
+    .then(() => ProjectService.createProject(req.body))
+    .then((newProject) => {
+      res.body = newProject.toJSON();
 
-	PermissionService
-		.canCreateProject(req.user)
-		.then(function (isAuthed) {
-			return ProjectService.createProject(attributes);
-		})
-		.then(function (newProject) {
-			res.body = newProject.toJSON();
-
-			next();
-			return null;
-		})
-		.catch(function (error){
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
-function getProject (req, res, next) {
-	var id = req.params.id;
+function getProject(req, res, next) {
+  ProjectService
+    .findProjectById(req.params.id)
+    .then((project) => {
+      res.body = project.toJSON();
 
-	ProjectService
-		.findProjectById(id)
-		.then(function (project) {
-			res.body = project.toJSON();
-
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
-function getAllProjects (req, res, next) {
-	_.defaults(req.params, {'page': 1});
-	_.defaults(req.query, {'count': 10, 'published': 1});
-	var page = parseInt(req.params.page);
-	var count = parseInt(req.query.count);
-	var published = parseInt(req.query.published);
+function getAllProjects(req, res, next) {
+  _.defaults(req.params, {
+    'page': 1
+  });
+  _.defaults(req.query, {
+    'count': 10,
+    'published': 1
+  });
+  const page = parseInt(req.params.page);
+  const count = parseInt(req.query.count);
+  const published = parseInt(req.query.published);
 
-	_validGetAllRequest(page, count, published)
-		.then(function () {
-			return ProjectService.getAllProjects(page, count, published);
-		})
-		.then(function (results) {
-			res.body = {};
-			res.body.projects = results;
+  _validGetAllRequest(page, count, published)
+    .then(() => ProjectService.getAllProjects(page, count, published))
+    .then((results) => {
+      res.body = {};
+      res.body.projects = results;
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
-function updateProject (req, res, next) {
-	var id = req.params.id;
-	var attributes = req.body;
+function updateProject(req, res, next) {
+  ProjectService
+    .findProjectById(req.params.id)
+    .then((project) => ProjectService.updateProject(project, req.body))
+    .then((project) => {
+      res.body = project.toJSON();
 
-	ProjectService
-		.findProjectById(id)
-		.then(function (project) {
-			return ProjectService.updateProject(project, attributes);
-		})
-		.then(function (project) {
-			res.body = project.toJSON();
-
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
-function addProjectMentor (req, res, next) {
-	var project_id = req.body.project_id;
-	var mentor_id = req.body.mentor_id;
+function addProjectMentor(req, res, next) {
+  ProjectService
+    .addProjectMentor(req.body.project_id, req.body.mentor_id)
+    .then((projectMentor) => {
+      res.body = projectMentor.toJSON();
 
-	ProjectService
-		.addProjectMentor(project_id, mentor_id)
-		.then(function (projectMentor) {
-			res.body = projectMentor.toJSON();
-
-			next();
-			return null;
-		})
-		.catch( function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
-function deleteProjectMentor (req, res, next) {
-	var project_id = req.body.project_id;
-	var mentor_id = req.body.mentor_id;
+function deleteProjectMentor(req, res, next) {
+  ProjectService
+    .deleteProjectMentor(req.body.project_id, req.body.mentor_id)
+    .then(() => {
+      res.body = {};
 
-	ProjectService
-		.deleteProjectMentor(project_id, mentor_id)
-		.then(function () {
-			res.body = {}
-
-			next();
-			return null;
-		})
-		.catch( function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/mentor', middleware.request(requests.ProjectMentorRequest),
-	middleware.permission(roles.ORGANIZERS), addProjectMentor);
+  middleware.permission(roles.ORGANIZERS), addProjectMentor);
 router.delete('/mentor', middleware.request(requests.ProjectMentorRequest),
-	middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
+  middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 router.post('/', middleware.request(requests.ProjectRequest),
-	middleware.permission(roles.ORGANIZERS), createProject);
-router.get('/:id', middleware.permission(roles.ALL), getProject);
-router.put('/:id', middleware.request(requests.ProjectRequest),
-	middleware.permission(roles.ORGANIZERS), updateProject);
-router.get('/all/:page', middleware.permission(roles.ALL), getAllProjects);
+  middleware.permission(roles.ORGANIZERS), createProject);
+router.get('/:id(\\d+)', middleware.permission(roles.ALL), getProject);
+router.put('/:id(\\d+)', middleware.request(requests.ProjectRequest),
+  middleware.permission(roles.ORGANIZERS), updateProject);
+router.get('/all/:page(\\d+)', middleware.permission(roles.ALL), getAllProjects);
 
 router.use(middleware.response);
 router.use(middleware.errors);
 
 module.exports.router = router;
-

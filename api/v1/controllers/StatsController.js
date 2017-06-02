@@ -1,69 +1,48 @@
-var bodyParser = require('body-parser');
-var middleware = require('../middleware');
-var router = require('express').Router();
-var _Promise = require('bluebird');
+const bodyParser = require('body-parser');
+const middleware = require('../middleware');
+const router = require('express').Router();
 
-var errors = require('../errors');
-var config = require('../../config');
-var requests = require('../requests');
-var roles = require('../utils/roles');
+const roles = require('../utils/roles');
 
-var StatsService = require('../services/StatsService');
-
+const StatsService = require('../services/StatsService');
 function getAllStats(req, res, next) {
-    StatsService.fetchAllStats()
-    	.then(function (stats) {
-    		res.body = stats;
+  StatsService.fetchAllStats()
+    .then((stats) => {
+      res.body = stats;
 
-    		next();
-    		return null;
-    	})
-    	.catch(function (error) {
-    		next(error);
-    		return null;
-    	});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getRegStats(req, res, next) {
-	StatsService.fetchRegistrationStats()
-		.then(function (stats) {
-			res.body = stats;
+  StatsService.fetchRegistrationStats()
+    .then((stats) => {
+      res.body = stats;
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getRSVPStats(req, res, next) {
-	StatsService.fetchRSVPStats()
-		.then(function (stats) {
-			res.body = stats;
+  StatsService.fetchRSVPStats()
+    .then((stats) => {
+      res.body = stats;
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getLiveEventStats(req, res, next) {
-	StatsService.fetchLiveEventStats()
-		.then(function (stats) {
-			res.body = stats;
+  StatsService.fetchLiveEventStats()
+    .then((stats) => {
+      res.body = stats;
 
-			next();
-			return null;
-		})
-		.catch(function (error) {
-			next(error);
-			return null;
-		});
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 
