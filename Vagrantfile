@@ -44,5 +44,6 @@ Vagrant.configure("2") do |config|
       npm install
       npm run dev-migrations
 
+    echo "cd /vagrant/" >> /home/ubuntu/.bashrc
   SHELL
 end
