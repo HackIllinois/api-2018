@@ -44,7 +44,7 @@ function _buildFindAllQuery(before, after, limit) {
  * @return {Promise<Collection>} a promise resolving to the resulting collection
  */
 Announcement.findAll = (before, after, limit) => Announcement.query(_buildFindAllQuery(before, after, limit))
-		.orderBy('created', 'DESC')
-		.fetchAll();
+  .orderBy('created', 'DESC')
+  .fetchAll();
 
 module.exports = Announcement;

@@ -15,11 +15,11 @@ function SendListRequest(headers, body) {
   this.bodyValidations = bodyValidations;
 }
 
-function checkValidMailName (listName) {
+function checkValidMailName(listName) {
   return !_.isUndefined(mail.lists[listName]);
 }
 
-function checkValidTemplateName (templateName) {
+function checkValidTemplateName(templateName) {
   return !_.isUndefined(mail.templates[templateName]);
 }
 

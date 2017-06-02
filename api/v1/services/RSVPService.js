@@ -6,15 +6,12 @@ const RSVP = require('../models/AttendeeRSVP');
 const UserRole = require('../models/UserRole');
 const errors = require('../errors');
 const utils = require('../utils');
-
 /**
  * Gets an rsvp by its id
  * @param {integer} id the id of the RSVP to find
  * @returns {Promise} the resolved rsvp
  */
-module.exports.getRSVPById = function(id) {
-  return RSVP.findById(id);
-};
+module.exports.getRSVPById = (id) => RSVP.findById(id);
 
 /**
  * Creates an RSVP and sets the users attendee role to active
@@ -24,7 +21,7 @@ module.exports.getRSVPById = function(id) {
  * @returns {Promise} the resolved rsvp
  * @throws {InvalidParameterError} thrown when an attendee already has an rsvp
  */
-module.exports.createRSVP = function(attendee, user, attributes) {
+module.exports.createRSVP = (attendee, user, attributes) => {
   attributes.attendeeId = attendee.get('id');
   const rsvp = RSVP.forge(attributes);
 
@@ -34,10 +31,10 @@ module.exports.createRSVP = function(attendee, user, attributes) {
     .then(() => RSVP.transaction((t) => rsvp.save(null, {
       transacting: t
     })
-          .tap(() => {
-            const userRole = user.getRole(utils.roles.ATTENDEE);
-            return UserRole.setActive(userRole, true, t);
-          })))
+      .tap(() => {
+        const userRole = user.getRole(utils.roles.ATTENDEE);
+        return UserRole.setActive(userRole, true, t);
+      })))
     .catch(
       utils.errors.DuplicateEntryError,
       utils.errors.handleDuplicateEntryError('An RSVP already exists for the given attendee', 'attendeeId')
@@ -50,8 +47,7 @@ module.exports.createRSVP = function(attendee, user, attributes) {
  * @returns {Promise} the resolved rsvp for the attendee
  * @throws {NotFoundError} when the attendee has no RSVP
  */
-module.exports.findRSVPByAttendee = function(attendee) {
-  return RSVP
+module.exports.findRSVPByAttendee = (attendee) => RSVP
     .findByAttendeeId(attendee.get('id'))
     .then((result) => {
       if (_.isNull(result)) {
@@ -62,7 +58,6 @@ module.exports.findRSVPByAttendee = function(attendee) {
 
       return _Promise.resolve(result);
     });
-};
 
 /**
  * Updates a given RSVP
@@ -70,7 +65,7 @@ module.exports.findRSVPByAttendee = function(attendee) {
  * @param {Object} attributes the new RSVP data to set
  * @returns {Promise} the resolved RSVP
  */
-module.exports.updateRSVP = function(user, rsvp, attributes) {
+module.exports.updateRSVP = (user, rsvp, attributes) => {
   rsvp.set({
     'type': null
   });

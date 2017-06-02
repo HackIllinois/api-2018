@@ -9,27 +9,27 @@ const router = require('express').Router();
 
 function createTrackedEvent(req, res, next) {
   services.TrackingService
-		.createTrackingEvent(req.body)
-		.then((result) => {
-  res.body = result.toJSON();
+    .createTrackingEvent(req.body)
+    .then((result) => {
+      res.body = result.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function addTrackedEventParticipant(req, res, next) {
   services.TrackingService
-		.addEventParticipant(req.params.participantId)
-		.then(() => next())
-		.catch((error) => next(error));
+    .addEventParticipant(req.params.participantId)
+    .then(() => next())
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.UniversalTrackingRequest),
-	middleware.permission(roles.ADMIN), createTrackedEvent);
+  middleware.permission(roles.ADMIN), createTrackedEvent);
 router.get('/:participantId', middleware.permission(roles.HOSTS), addTrackedEventParticipant);
 
 router.use(middleware.response);

@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const middleware = require('../middleware');
 const router = require('express').Router();
 const _Promise = require('bluebird');
-
 const errors = require('../errors');
 const requests = require('../requests');
 const roles = require('../utils/roles');
@@ -34,25 +33,25 @@ function _validGetAllRequest(page, count, published) {
 
 function createProject(req, res, next) {
   PermissionService
-		.canCreateProject(req.user)
-		.then(() => ProjectService.createProject(req.body))
-		.then((newProject) => {
-  res.body = newProject.toJSON();
+    .canCreateProject(req.user)
+    .then(() => ProjectService.createProject(req.body))
+    .then((newProject) => {
+      res.body = newProject.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getProject(req, res, next) {
   ProjectService
-		.findProjectById(req.params.id)
-		.then((project) => {
-  res.body = project.toJSON();
+    .findProjectById(req.params.id)
+    .then((project) => {
+      res.body = project.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getAllProjects(req, res, next) {
@@ -68,62 +67,62 @@ function getAllProjects(req, res, next) {
   const published = parseInt(req.query.published);
 
   _validGetAllRequest(page, count, published)
-		.then(() => ProjectService.getAllProjects(page, count, published))
-		.then((results) => {
-  res.body = {};
-  res.body.projects = results;
+    .then(() => ProjectService.getAllProjects(page, count, published))
+    .then((results) => {
+      res.body = {};
+      res.body.projects = results;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function updateProject(req, res, next) {
   ProjectService
-		.findProjectById(req.params.id)
-		.then((project) => ProjectService.updateProject(project, req.body))
-		.then((project) => {
-  res.body = project.toJSON();
+    .findProjectById(req.params.id)
+    .then((project) => ProjectService.updateProject(project, req.body))
+    .then((project) => {
+      res.body = project.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function addProjectMentor(req, res, next) {
   ProjectService
-		.addProjectMentor(req.body.project_id, req.body.mentor_id)
-		.then((projectMentor) => {
-  res.body = projectMentor.toJSON();
+    .addProjectMentor(req.body.project_id, req.body.mentor_id)
+    .then((projectMentor) => {
+      res.body = projectMentor.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function deleteProjectMentor(req, res, next) {
   ProjectService
-		.deleteProjectMentor(req.body.project_id, req.body.mentor_id)
-		.then(() => {
-  res.body = {};
+    .deleteProjectMentor(req.body.project_id, req.body.mentor_id)
+    .then(() => {
+      res.body = {};
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/mentor', middleware.request(requests.ProjectMentorRequest),
-	middleware.permission(roles.ORGANIZERS), addProjectMentor);
+  middleware.permission(roles.ORGANIZERS), addProjectMentor);
 router.delete('/mentor', middleware.request(requests.ProjectMentorRequest),
-	middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
+  middleware.permission(roles.ORGANIZERS), deleteProjectMentor);
 router.post('/', middleware.request(requests.ProjectRequest),
-	middleware.permission(roles.ORGANIZERS), createProject);
+  middleware.permission(roles.ORGANIZERS), createProject);
 router.get('/:id(\\d+)', middleware.permission(roles.ALL), getProject);
 router.put('/:id(\\d+)', middleware.request(requests.ProjectRequest),
-	middleware.permission(roles.ORGANIZERS), updateProject);
+  middleware.permission(roles.ORGANIZERS), updateProject);
 router.get('/all/:page(\\d+)', middleware.permission(roles.ALL), getAllProjects);
 
 router.use(middleware.response);

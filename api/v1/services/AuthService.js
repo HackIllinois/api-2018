@@ -32,7 +32,7 @@ function _issue(payload, subject) {
  * @param  {User} user the User model holding the information to claim
  * @return {Promise} resolving to the auth token
  */
-module.exports.issueForUser = function(user) {
+module.exports.issueForUser = (user) => {
   const subject = user.get('id')
 		.toString();
   const payload = {
@@ -53,11 +53,9 @@ module.exports.issueForUser = function(user) {
  * @return {Promise} resolving to the validity of the token, or a rejected
  * promise resolving to an UnprocessableRequestError
  */
-module.exports.verify = function(token) {
-  return _Promise
+module.exports.verify = (token) => _Promise
 		.try(() => _Promise.resolve(jwt.verify(token, JWT_SECRET)))
 		.catch(jwt.JsonWebTokenError, (error) => {
   const message = error.message;
   throw new errors.UnprocessableRequestError(message);
 });
-};

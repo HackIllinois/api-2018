@@ -3,13 +3,13 @@
 const errors = require('../errors');
 const logUtils = require('../utils/logs');
 
-module.exports = function (err, req, res, next) {
+module.exports = (err, req, res, next) => {
   if (err instanceof Error && err.status === 413) {
-		// caught a body-parser entity length error
+    // caught a body-parser entity length error
     err = new errors.EntityTooLargeError();
   } else if (err instanceof SyntaxError && err.status === 400) {
-		// caught a body-parser formatting error
-		// https://github.com/expressjs/body-parser/issues/122
+    // caught a body-parser formatting error
+    // https://github.com/expressjs/body-parser/issues/122
     err = new errors.UnprocessableRequestError();
   }
 
@@ -32,5 +32,6 @@ module.exports = function (err, req, res, next) {
     error: err.toJSON()
   };
 
-  return res.status(err.status).json(response);
+  return res.status(err.status)
+    .json(response);
 };

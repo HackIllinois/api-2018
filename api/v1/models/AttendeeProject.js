@@ -19,7 +19,7 @@ const AttendeeProject = Model.extend({
 AttendeeProject.findByAttendeeId = (attendeeId) => AttendeeProject.where({
   attendee_id: attendeeId
 })
-		.fetch();
+  .fetch();
 
 /**
  * Finds an attendee project by its ID
@@ -29,6 +29,6 @@ AttendeeProject.findByAttendeeId = (attendeeId) => AttendeeProject.where({
 AttendeeProject.findById = (id) => AttendeeProject.where({
   id: id
 })
-		.fetch();
+  .fetch();
 
 module.exports = AttendeeProject;

@@ -8,24 +8,24 @@ const PermissionService = require('../services/PermissionService');
 
 function isOrganizer(req, res, next) {
   PermissionService.isOrganizer(req.user)
-		.then((isOrganizer) => {
-  res.body = {};
-  res.body.allowed = isOrganizer;
+    .then((isOrganizer) => {
+      res.body = {};
+      res.body.allowed = isOrganizer;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function isHost(req, res, next) {
   PermissionService.isHost(req.user)
-		.then((isHost) => {
-  res.body = {};
-  res.body.allowed = isHost;
+    .then((isHost) => {
+      res.body = {};
+      res.body.allowed = isHost;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());

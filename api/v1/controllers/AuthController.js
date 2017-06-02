@@ -23,32 +23,32 @@ const router = require('express').Router();
  */
 function _issueByEmail(email, password) {
   return UserService
-		.findUserByEmail(email)
-		.then((user) => {
-  if (!password) {
-    return AuthService.issueForUser(user);
-  }
+    .findUserByEmail(email)
+    .then((user) => {
+      if (!password) {
+        return AuthService.issueForUser(user);
+      }
 
-  return UserService
-				.verifyPassword(user, password)
-				.then(() => AuthService.issueForUser(user));
-});
+      return UserService
+        .verifyPassword(user, password)
+        .then(() => AuthService.issueForUser(user));
+    });
 }
 
 function createToken(req, res, next) {
-	// the requester must have a valid password to receive a new token
+  // the requester must have a valid password to receive a new token
   _issueByEmail(req.body.email, req.body.password)
-		.then((auth) => {
-  res.body = {};
-  res.body.auth = auth;
+    .then((auth) => {
+      res.body = {};
+      res.body.auth = auth;
 
-  next();
-  return null;
-})
-		.catch((error) => {
-  next(error);
-  return null;
-});
+      next();
+      return null;
+    })
+    .catch((error) => {
+      next(error);
+      return null;
+    });
 }
 
 function refreshToken(req, res, next) {
@@ -57,32 +57,32 @@ function refreshToken(req, res, next) {
     return next(new errors.InvalidHeaderError(message));
   }
 
-	// the requester's token must be valid and present, so we can re-issue
-	// without requiring a password
+  // the requester's token must be valid and present, so we can re-issue
+  // without requiring a password
   _issueByEmail(req.user.email)
-		.then((auth) => {
-  res.body = {};
-  res.body.auth = auth;
+    .then((auth) => {
+      res.body = {};
+      res.body.auth = auth;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function passwordReset(req, res, next) {
   TokenService
-		.findTokenByValue(req.body.token, utils.scopes.AUTH)
-		.then((token) => {
-  token.destroy();
-  return UserService.resetPassword(token.related('user'), req.body.password);
-})
-		.then((user) => AuthService.issueForUser(user))
-		.then((auth) => {
-  res.body = {};
-  res.body.auth = auth;
-  return next();
-})
-		.catch((error) => next(error));
+    .findTokenByValue(req.body.token, utils.scopes.AUTH)
+    .then((token) => {
+      token.destroy();
+      return UserService.resetPassword(token.related('user'), req.body.password);
+    })
+    .then((user) => AuthService.issueForUser(user))
+    .then((auth) => {
+      res.body = {};
+      res.body.auth = auth;
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());

@@ -14,7 +14,7 @@ const ERROR_TYPES = {
 // although we won't make use of this now, it might be useful in
 // the future (e.g. logging the body in development but not in production)
 // eslint-disable-next-line no-unused-vars
-function _filterBody (body, blacklist) {
+function _filterBody(body, blacklist) {
   for (const key in body) { // eslint-disable-line guard-for-in
     const value = body[key];
     if (_.isPlainObject(value)) {
@@ -25,25 +25,32 @@ function _filterBody (body, blacklist) {
   return _.omit(body, blacklist);
 }
 
-function _makeRequestMetadata (req) {
-  return { id: req.id, method: req.method, url: req.originalUrl };
+function _makeRequestMetadata(req) {
+  return {
+    id: req.id,
+    method: req.method,
+    url: req.originalUrl
+  };
 }
 
-function _makeResponseMetadata (req, res) {
-  return { id: req.id, status: res.statusCode };
+function _makeResponseMetadata(req, res) {
+  return {
+    id: req.id,
+    status: res.statusCode
+  };
 }
 
 module.exports.errorTypes = ERROR_TYPES;
 
-module.exports.logRequest = function (req) {
+module.exports.logRequest = (req) => {
   logger.debug('received request', _makeRequestMetadata(req));
 };
 
-module.exports.logResponse = function (req, res) {
+module.exports.logResponse = (req, res) => {
   logger.debug('sent response', _makeResponseMetadata(req, res));
 };
 
-module.exports.logError = function (req, error, status, cause) {
+module.exports.logError = (req, error, status, cause) => {
   const metadata = _makeRequestMetadata(req);
   metadata.cause = cause;
   metadata.error = error;

@@ -6,7 +6,7 @@ const ErrorConstants = require('../errors/Constants');
  * @param  {Checkit.Error} error the error to re-throw
  * @throws {InvalidParameterError} the re-thrown error
  */
-module.exports.handleValidationError = function(error) {
+module.exports.handleValidationError = (error) => {
   const errorKey = error.keys()[0];
   let specificError = error.errors[errorKey];
 
@@ -21,12 +21,8 @@ module.exports.handleValidationError = function(error) {
   throw new InvalidParameterError(errorDetail, errorSource);
 };
 
-module.exports.DuplicateEntryError = function(error) {
-  return error.code === ErrorConstants.DupEntry;
-};
+module.exports.DuplicateEntryError = (error) => error.code === ErrorConstants.DupEntry;
 
-module.exports.handleDuplicateEntryError = function(message, source) {
-  return function() {
-    throw new InvalidParameterError(message, source);
-  };
+module.exports.handleDuplicateEntryError = (message, source) => () => {
+  throw new InvalidParameterError(message, source);
 };

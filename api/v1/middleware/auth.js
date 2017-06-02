@@ -5,7 +5,7 @@ const errors = require('../errors');
 
 const AUTH_HEADER = config.auth.header;
 
-module.exports = function(req, res, next) {
+module.exports = (req, res, next) => {
   const auth = req.header(AUTH_HEADER);
 
   if (!auth) {
@@ -13,22 +13,22 @@ module.exports = function(req, res, next) {
   }
 
   return AuthService.verify(auth)
-		.then((decoded) => {
-			// specifies that request supplied a valid auth token
-			// (but not necessarily that the associated user data has been retrieved)
-  req.auth = true;
+    .then((decoded) => {
+      // specifies that request supplied a valid auth token
+      // (but not necessarily that the associated user data has been retrieved)
+      req.auth = true;
 
-  return User.findById(decoded.sub);
-})
-		.then((user) => {
-  req.user = user;
+      return User.findById(decoded.sub);
+    })
+    .then((user) => {
+      req.user = user;
 
-  return next();
-})
-		.catch(errors.UnprocessableRequestError, (error) => {
-  const message = 'The provided token was invalid (' + error.message + ')';
-  const source = AUTH_HEADER;
+      return next();
+    })
+    .catch(errors.UnprocessableRequestError, (error) => {
+      const message = 'The provided token was invalid (' + error.message + ')';
+      const source = AUTH_HEADER;
 
-  return next(new errors.InvalidHeaderError(message, source));
-});
+      return next(new errors.InvalidHeaderError(message, source));
+    });
 };

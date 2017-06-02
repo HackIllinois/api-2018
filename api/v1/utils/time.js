@@ -4,19 +4,13 @@ const MILLISECONDS_PER_SECOND = 1000;
 
 const milliseconds = require('ms');
 
-module.exports.unix = function () {
-  return Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
-};
+module.exports.unix = () => Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
 
-module.exports.toMilliseconds = function (description) {
-  return milliseconds(description);
-};
+module.exports.toMilliseconds = (description) => milliseconds(description);
 
-module.exports.verifyDate= function(date) {
-  return !!Date.parse(date);
-};
+module.exports.verifyDate = (date) => !!Date.parse(date);
 
-module.exports.secondsToHHMMSS = function (numSeconds) {
+module.exports.secondsToHHMMSS = (numSeconds) => {
   numSeconds = Number(numSeconds);
   const h = Math.floor(numSeconds / 3600);
   const m = Math.floor(numSeconds % 3600 / 60);

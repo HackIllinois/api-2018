@@ -9,7 +9,7 @@ const bookshelf = database.instance();
  * @param  {Function} callback	method to start transaction
  * @return {Promise} 			the result of the callback
  */
-function _transaction (callback) {
+function _transaction(callback) {
   return bookshelf.transaction(callback);
 }
 
@@ -18,17 +18,20 @@ function _transaction (callback) {
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
-function _findById (id) {
+function _findById(id) {
   const _model = new this();
 
   const queryParams = {};
   queryParams[_model.idAttribute] = id;
-  return _model.query({ where: queryParams }).fetch();
+  return _model.query({
+    where: queryParams
+  })
+    .fetch();
 }
 
 const Model = bookshelf.Model.extend({
-	// the default model has no validations, but more can be
-	// added as desired
+  // the default model has no validations, but more can be
+  // added as desired
   validations: {}
 }, {
   transaction: _transaction,
@@ -38,7 +41,7 @@ const Model = bookshelf.Model.extend({
 /**
  * Initializes the model by setting up all event handlers
  */
-Model.prototype.initialize = function () {
+Model.prototype.initialize = function() {
   this.on('saving', this.validate);
 };
 
@@ -47,7 +50,7 @@ Model.prototype.initialize = function () {
  * @param  {Object} attrs the attributes to transform
  * @return {Object}       the transformed attributes (underscored)
  */
-Model.prototype.format = function (attrs) {
+Model.prototype.format = function(attrs) {
   return databaseUtils.format(attrs);
 };
 
@@ -56,7 +59,7 @@ Model.prototype.format = function (attrs) {
  * @param  {Object} attrs the attributes to transform
  * @return {Object}       the transformed attributes (camel-cased)
  */
-Model.prototype.parse = function (attrs) {
+Model.prototype.parse = function(attrs) {
   return databaseUtils.parse(attrs);
 };
 
@@ -65,8 +68,9 @@ Model.prototype.parse = function (attrs) {
  * @return {Promise} resolving to the validity of the attributes, as decided by
  * the Checkit library
  */
-Model.prototype.validate = function () {
-  return checkit(this.validations).run(this.attributes);
+Model.prototype.validate = function() {
+  return checkit(this.validations)
+    .run(this.attributes);
 };
 
 module.exports = Model;

@@ -13,59 +13,59 @@ function updateCheckInByUserId(req, res, next) {
   delete req.body.credentialsRequested;
 
   services.CheckInService
-		.updateCheckIn(req.body)
-		.then((response) => {
-  response.checkin = response.checkin.toJSON();
-  if (!_.isNil(response.credentials)) {
-    response.credentials = response.credentials.toJSON();
-  }
-  res.body = response;
-  return next();
-})
-		.catch((error) => next(error));
+    .updateCheckIn(req.body)
+    .then((response) => {
+      response.checkin = response.checkin.toJSON();
+      if (!_.isNil(response.credentials)) {
+        response.credentials = response.credentials.toJSON();
+      }
+      res.body = response;
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function fetchCheckInByUserId(req, res, next) {
   services.CheckInService
-		.findCheckInByUserId(req.params.id)
-		.then((response) => {
-  response.checkin = response.checkin.toJSON();
-  if (!_.isNil(response.credentials)) {
-    response.credentials = response.credentials.toJSON();
-  }
-  res.body = response;
-  return next();
-})
-		.catch((error) => next(error));
+    .findCheckInByUserId(req.params.id)
+    .then((response) => {
+      response.checkin = response.checkin.toJSON();
+      if (!_.isNil(response.credentials)) {
+        response.credentials = response.credentials.toJSON();
+      }
+      res.body = response;
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function fetchCheckInByUser(req, res, next) {
   services.CheckInService
-		.findCheckInByUserId(req.user.id)
-		.then((response) => {
-  response.checkin = response.checkin.toJSON();
-  if (!_.isNil(response.credentials)) {
-    response.credentials = response.credentials.toJSON();
-  }
-  res.body = response;
-  return next();
-})
-		.catch((error) => next(error));
+    .findCheckInByUserId(req.user.id)
+    .then((response) => {
+      response.checkin = response.checkin.toJSON();
+      if (!_.isNil(response.credentials)) {
+        response.credentials = response.credentials.toJSON();
+      }
+      res.body = response;
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function createCheckIn(req, res, next) {
   req.body.userId = req.params.id;
   services.CheckInService
-		.createCheckIn(req.body)
-		.then((response) => {
-  response.checkin = response.checkin.toJSON();
-  if (!_.isNil(response.credentials)) {
-    response.credentials = response.credentials.toJSON();
-  }
-  res.body = response;
-  return next();
-})
-		.catch((error) => next(error));
+    .createCheckIn(req.body)
+    .then((response) => {
+      response.checkin = response.checkin.toJSON();
+      if (!_.isNil(response.credentials)) {
+        response.credentials = response.credentials.toJSON();
+      }
+      res.body = response;
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 
@@ -73,9 +73,9 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/user/:id(\\d+)', middleware.request(requests.CheckInRequest),
-	middleware.permission(roles.HOSTS), createCheckIn);
+  middleware.permission(roles.HOSTS), createCheckIn);
 router.put('/user/:id(\\d+)', middleware.request(requests.CheckInRequest),
-	middleware.permission(roles.HOSTS), updateCheckInByUserId);
+  middleware.permission(roles.HOSTS), updateCheckInByUserId);
 router.get('/user/:id(\\d+)', middleware.permission(roles.HOSTS), fetchCheckInByUserId);
 router.get('/', fetchCheckInByUser);
 

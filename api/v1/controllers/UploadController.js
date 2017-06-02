@@ -24,12 +24,12 @@ const RESUME_BUCKET = utils.storage.buckets.resumes;
 
 function _findUpload(req, res, next) {
   return services.StorageService.findUploadById(req.params.id)
-		.then((upload) => {
-  req.upload = upload;
+    .then((upload) => {
+      req.upload = upload;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function _isOwner(req) {
@@ -50,51 +50,51 @@ function createResumeUpload(req, res, next) {
   };
 
   Upload.findByOwner(uploadOwner, uploadParams.bucket)
-		.then((results) => {
-  if (results.length) {
-    throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
-  }
+    .then((results) => {
+      if (results.length) {
+        throw new errors.ExistsError(UPLOAD_ALREADY_PRESENT);
+      }
 
 
-})
-		.then(() => services.StorageService.createUpload(uploadOwner, uploadParams))
-		.tap((newUpload) => {
-  const fileParams = _makeFileParams(req);
-  return services.StorageService.persistUpload(newUpload, fileParams);
-})
-		.then((newUpload) => {
-  res.body = newUpload.toJSON();
+    })
+    .then(() => services.StorageService.createUpload(uploadOwner, uploadParams))
+    .tap((newUpload) => {
+      const fileParams = _makeFileParams(req);
+      return services.StorageService.persistUpload(newUpload, fileParams);
+    })
+    .then((newUpload) => {
+      res.body = newUpload.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function replaceResumeUpload(req, res, next) {
   return req.upload.save()
-		.then((upload) => {
-  const fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
-  return services.StorageService.persistUpload(upload, fileParams);
-})
-		.then(() => {
-  res.body = req.upload.toJSON();
+    .then((upload) => {
+      const fileParams = _makeFileParams(req, RESUME_UPLOAD_TYPE);
+      return services.StorageService.persistUpload(upload, fileParams);
+    })
+    .then(() => {
+      res.body = req.upload.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getUpload(req, res, next) {
   return services.StorageService.getUpload(req.upload)
-		.then((result) => {
-  res.set('Content-Length', result.content.length);
-  res.set('Content-Type', result.type);
+    .then((result) => {
+      res.set('Content-Length', result.content.length);
+      res.set('Content-Type', result.type);
 
-  res.send(result.content);
+      res.send(result.content);
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(middleware.auth);
@@ -105,9 +105,9 @@ router.use(bodyParser.raw({
 }));
 
 router.post('/resume/', middleware.request(UploadRequest), middleware.upload,
-	middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+  middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
 router.put('/resume/:id(\\d+)', middleware.request(UploadRequest), middleware.upload,
-	_findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
+  _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
 router.get('/resume/:id(\\d+)', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
 
 router.use(middleware.response);

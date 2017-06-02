@@ -10,8 +10,11 @@ const TrackingEvent = Model.extend({
   }
 });
 
-TrackingEvent.findByName = function (searchName) {
-  return TrackingEvent.where({ name: searchName }).fetch();
+TrackingEvent.findByName = function(searchName) {
+  return TrackingEvent.where({
+    name: searchName
+  })
+    .fetch();
 };
 
 module.exports = TrackingEvent;

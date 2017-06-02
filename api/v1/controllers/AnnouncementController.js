@@ -12,37 +12,37 @@ function getAllAnnouncements(req, res, next) {
   const limit = Number.parseInt(req.query.limit) || null;
 
   return AnnouncementService.getAllAnnouncements(before, after, limit)
-		.then((result) => {
-  res.body = result.toJSON();
-  return next();
-})
-		.catch((err) => next(err));
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function createAnnouncement(req, res, next) {
   return AnnouncementService.createAnnouncement(req.body)
-		.then((result) => {
-  res.body = result.toJSON();
-  return next();
-})
-		.catch((err) => next(err));
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function updateAnnouncement(req, res, next) {
   return AnnouncementService.findById(req.params.id)
-		.then((announcement) => AnnouncementService.updateAnnouncement(announcement, req.body))
-		.then((result) => {
-  res.body = result.toJSON();
-  return next();
-})
-		.catch((err) => next(err));
+    .then((announcement) => AnnouncementService.updateAnnouncement(announcement, req.body))
+    .then((result) => {
+      res.body = result.toJSON();
+      return next();
+    })
+    .catch((err) => next(err));
 }
 
 function deleteAnnouncement(req, res, next) {
   return AnnouncementService.findById(req.params.id)
-		.then((announcement) => AnnouncementService.deleteAnnouncement(announcement))
-		.then(() => next())
-		.catch((err) => next(err));
+    .then((announcement) => AnnouncementService.deleteAnnouncement(announcement))
+    .then(() => next())
+    .catch((err) => next(err));
 }
 
 router.use(bodyParser.json());

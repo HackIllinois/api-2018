@@ -9,35 +9,35 @@ const EcosystemService = require('../services/EcosystemService');
 
 function createEcosystem(req, res, next) {
   EcosystemService
-		.createEcosystem(req.body.name)
-		.then((newEcosystem) => {
-  res.body = newEcosystem.toJSON();
+    .createEcosystem(req.body.name)
+    .then((newEcosystem) => {
+      res.body = newEcosystem.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getAllEcosystems(req, res, next) {
   EcosystemService
-		.getAllEcosystems()
-		.then((results) => {
-  res.body = results.toJSON();
+    .getAllEcosystems()
+    .then((results) => {
+      res.body = results.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function deleteEcosystem(req, res, next) {
   EcosystemService
-		.deleteEcosystem(req.body.name)
-		.then(() => {
-  res.body = {};
+    .deleteEcosystem(req.body.name)
+    .then(() => {
+      res.body = {};
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 

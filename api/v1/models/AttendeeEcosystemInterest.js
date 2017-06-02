@@ -11,11 +11,11 @@ const AttendeeEcosystemInterest = Model.extend({
 AttendeeEcosystemInterest.findByAttendeeId = (attendeeId) => AttendeeEcosystemInterest.where({
   attendee_id: attendeeId
 })
-		.fetch();
+  .fetch();
 
 AttendeeEcosystemInterest.findById = (id) => AttendeeEcosystemInterest.where({
   id: id
 })
-		.fetch();
+  .fetch();
 
 module.exports = AttendeeEcosystemInterest;

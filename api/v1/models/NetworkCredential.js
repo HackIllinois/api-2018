@@ -20,7 +20,7 @@ NetworkCredential.findByUserId = function(userId) {
   return NetworkCredential.where({
     user_id: userId
   })
-		.fetch();
+    .fetch();
 };
 /**
  * Finds a network credential by its ID
@@ -31,7 +31,7 @@ NetworkCredential.findById = function(id) {
   return NetworkCredential.where({
     id: id
   })
-		.fetch();
+    .fetch();
 };
 
 /**
@@ -43,7 +43,7 @@ NetworkCredential.findUnassigned = function() {
   return NetworkCredential.where({
     assigned: 0
   })
-		.fetch();
+    .fetch();
 };
 
 module.exports = NetworkCredential;

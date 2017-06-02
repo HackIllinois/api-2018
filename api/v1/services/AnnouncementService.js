@@ -10,18 +10,14 @@ const Announcement = require('../models/Announcement');
  * @param  {Number} limit the maximum number of announcements to return (optional)
  * @return {Promise<Collection>} a promise resolving to a collection of Announcements
  */
-module.exports.getAllAnnouncements = function (before, after, limit) {
-  return Announcement.findAll(before, after, limit);
-};
+module.exports.getAllAnnouncements = (before, after, limit) => Announcement.findAll(before, after, limit);
 
 /**
  * Creates a new announcement
  * @param  {Object} parameters the parameters for creation
  * @return {Promise<Announcement>} a promise resolving to a new Announcement
  */
-module.exports.createAnnouncement = function (parameters) {
-  return Announcement.forge(parameters).save();
-};
+module.exports.createAnnouncement = (parameters) => Announcement.forge(parameters).save();
 
 /**
  * Finds an announcement by its id
@@ -29,17 +25,15 @@ module.exports.createAnnouncement = function (parameters) {
  * @return {Promise<Announcement>} a promise resolving to the desired Announcement
  * @throws {InvalidParameterError} when no Announcement can be found
  */
-module.exports.findById = function (id) {
-  return Announcement.findById(id).then((result) => {
-    if (_.isNil(result)) {
-      const message = 'An Announcement with the given id does not exist';
-      const source = 'id';
-      throw new InvalidParameterError(message, source);
-    }
+module.exports.findById = (id) => Announcement.findById(id).then((result) => {
+  if (_.isNil(result)) {
+    const message = 'An Announcement with the given id does not exist';
+    const source = 'id';
+    throw new InvalidParameterError(message, source);
+  }
 
-    return result;
-  });
-};
+  return result;
+});
 
 /**
  * Updates an announcement
@@ -47,7 +41,7 @@ module.exports.findById = function (id) {
  * @param  {Object} parameters the key-value pairs with which to update the announcement
  * @return {Promise<Announcement>} a promise resolving to the updated announcement
  */
-module.exports.updateAnnouncement = function (announcement, parameters) {
+module.exports.updateAnnouncement = (announcement, parameters) => {
   announcement.set(parameters);
   return announcement.save();
 };
@@ -57,6 +51,4 @@ module.exports.updateAnnouncement = function (announcement, parameters) {
  * @param  {Announcement} announcement an existing announcement
  * @return {Promise<>} an empty-resolving promise
  */
-module.exports.deleteAnnouncement = function (announcement) {
-  return announcement.destroy();
-};
+module.exports.deleteAnnouncement = (announcement) => announcement.destroy();

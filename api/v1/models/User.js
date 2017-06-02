@@ -80,24 +80,24 @@ User.create = function(email, password, role) {
 
   return User
     .transaction((t) => user.setPassword(password)
-        .then((result) => result.save(null, {
+      .then((result) => result.save(null, {
+        transacting: t
+      }))
+      .tap(() => {
+        userRole.set({
+          userId: user.get('id')
+        });
+        return userRole.save(null, {
           transacting: t
-        }))
-        .tap(() => {
-          userRole.set({
-            userId: user.get('id')
-          });
-          return userRole.save(null, {
-            transacting: t
-          });
-        })
-        .then((user) => User.where({
-          id: user.get('id')
-        })
-            .fetch({
-              withRelated: [ 'roles' ],
-              transacting: t
-            })));
+        });
+      })
+      .then((user) => User.where({
+        id: user.get('id')
+      })
+        .fetch({
+          withRelated: [ 'roles' ],
+          transacting: t
+        })));
 };
 
 /**

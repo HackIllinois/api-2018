@@ -23,68 +23,68 @@ function isRequester(req) {
 
 function createUser(req, res, next) {
   services.UserService
-		.createUser(req.body.email, req.body.password)
-		.then((user) => services.AuthService.issueForUser(user))
-		.then((auth) => {
-  res.body = {};
-  res.body.auth = auth;
+    .createUser(req.body.email, req.body.password)
+    .then((user) => services.AuthService.issueForUser(user))
+    .then((auth) => {
+      res.body = {};
+      res.body.auth = auth;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function createAccreditedUser(req, res, next) {
   services.PermissionService
-		.canCreateUser(req.user, req.body.role)
-		.then(() => services.UserService
-				.createUser(req.body.email, req.body.password, req.body.role))
-		.then((user) => {
-  res.body = user.toJSON();
+    .canCreateUser(req.user, req.body.role)
+    .then(() => services.UserService
+      .createUser(req.body.email, req.body.password, req.body.role))
+    .then((user) => {
+      res.body = user.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getUser(req, res, next) {
   services.UserService
-		.findUserById(req.params.id)
-		.then((user) => {
-  res.body = user.toJSON();
+    .findUserById(req.params.id)
+    .then((user) => {
+      res.body = user.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function getUserByEmail(req, res, next) {
   services.UserService
-		.findUserByEmail(req.params.email)
-		.then((user) => {
-  res.body = user.toJSON();
+    .findUserByEmail(req.params.email)
+    .then((user) => {
+      res.body = user.toJSON();
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 function requestPasswordReset(req, res, next) {
   services.UserService
-		.findUserByEmail(req.body.email)
-		.then((user) => services.TokenService.generateToken(user, scopes.AUTH))
-		.then((tokenVal) => {
-  const substitutions = {
-    token: tokenVal,
-    isDevelopment: config.isDevelopment
-  };
-  return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
-})
-		.then(() => {
-  res.body = {};
-  return next();
-})
-		.catch((error) => next(error));
+    .findUserByEmail(req.body.email)
+    .then((user) => services.TokenService.generateToken(user, scopes.AUTH))
+    .then((tokenVal) => {
+      const substitutions = {
+        token: tokenVal,
+        isDevelopment: config.isDevelopment
+      };
+      return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
+    })
+    .then(() => {
+      res.body = {};
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 router.use(bodyParser.json());
@@ -92,7 +92,7 @@ router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
-	middleware.permission(roles.ORGANIZERS), createAccreditedUser);
+  middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);

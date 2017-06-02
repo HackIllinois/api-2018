@@ -109,8 +109,7 @@ function _handleRemoval(upload) {
  * @return {Promise<Upload>}	the requested upload
  * @throws {NotFoundError}	when the upload does not exist
  */
-module.exports.findUploadById = function(id) {
-  return Upload
+module.exports.findUploadById = (id) => Upload
     .findById(id)
     .then((result) => {
       if (_.isNull(result)) {
@@ -121,7 +120,6 @@ module.exports.findUploadById = function(id) {
 
       return _Promise.resolve(result);
     });
-};
 
 /**
  * Finds an upload by its key in a given bucket
@@ -130,8 +128,7 @@ module.exports.findUploadById = function(id) {
  * @return {Promise<Upload>} the requested upload
  * @throws {NotFoundError} when the upload does not exist
  */
-module.exports.findUploadByKey = function(key, bucket) {
-  return Upload
+module.exports.findUploadByKey = (key, bucket) => Upload
     .findByKey(key, bucket)
     .then((result) => {
       if (_.isNull(result)) {
@@ -141,7 +138,6 @@ module.exports.findUploadByKey = function(key, bucket) {
 
       return _Promise.resolve(result);
     });
-};
 
 /**
  * Creates an internal upload representation
@@ -153,7 +149,7 @@ module.exports.findUploadByKey = function(key, bucket) {
  * @return {Promise<Upload>}		a promise resolving to the new upload
  *
  */
-module.exports.createUpload = function(owner, params) {
+module.exports.createUpload = (owner, params) => {
   const uploadParams = {};
   uploadParams.ownerId = owner.get('id');
   uploadParams.key = params.key || uuid.v4();
@@ -172,7 +168,7 @@ module.exports.createUpload = function(owner, params) {
  * @return {Promise<String>} an upload to which the file will be accepted
  * @throws {ExternalProviderError}	when the upload fails any imposed validations
  */
-module.exports.persistUpload = function(upload, file) {
+module.exports.persistUpload = (upload, file) => {
   if (!config.aws.enabled) {
     return _handleDisabledUpload(upload, file);
   }
@@ -187,7 +183,7 @@ module.exports.persistUpload = function(upload, file) {
  *                               	{String} type			the MIME type of the content
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.getUpload = function(upload) {
+module.exports.getUpload = (upload) => {
   if (!config.aws.enabled) {
     return _handleDisabledRetrieval(upload);
   }
@@ -202,7 +198,7 @@ module.exports.getUpload = function(upload) {
  * @return {Promise<>}				an empty promise indicating success
  * @throws {ExternalProviderError}	when the client throws an error
  */
-module.exports.removeUpload = function(upload) {
+module.exports.removeUpload = (upload) => {
   if (!config.aws.enabled) {
     return _handleDisabledRemoval(upload);
   }

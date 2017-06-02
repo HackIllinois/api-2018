@@ -15,7 +15,7 @@ const utils = require('../utils');
  * @return {Promise} resolving to the newly-created user
  * @throws InvalidParameterError when a user exists with the specified email
  */
-module.exports.createUser = function(email, password, role) {
+module.exports.createUser = (email, password, role) => {
 
   email = email.toLowerCase();
   const storedPassword = (password) ? password : utils.crypto.generatePassword();
@@ -47,8 +47,7 @@ module.exports.createUser = function(email, password, role) {
  * @return {Promise} resolving to the associated User model
  * @throws {NotFoundError} when the requested user cannot be found
  */
-module.exports.findUserById = function(id) {
-  return User
+module.exports.findUserById = (id) => User
     .findById(id)
     .then((result) => {
       if (_.isNull(result)) {
@@ -59,7 +58,6 @@ module.exports.findUserById = function(id) {
 
       return _Promise.resolve(result);
     });
-};
 
 /**
  * Finds a user by querying for the given email
@@ -67,8 +65,7 @@ module.exports.findUserById = function(id) {
  * @return {Promise} resolving to the associated User model
  * @throws {NotFoundError} when the requested user cannot be found
  */
-module.exports.findUserByEmail = function(email) {
-  return User
+module.exports.findUserByEmail = (email) => User
     .findByEmail(email)
     .then((result) => {
       if (_.isNull(result)) {
@@ -78,7 +75,6 @@ module.exports.findUserByEmail = function(email) {
       }
       return _Promise.resolve(result);
     });
-};
 
 /**
  * Verifies that the provided password matches the user's password
@@ -87,8 +83,7 @@ module.exports.findUserByEmail = function(email) {
  * @return {Promise} resolving to the validity of the provided password
  * @throws {InvalidParameterError} when the password is invalid
  */
-module.exports.verifyPassword = function(user, password) {
-  return user
+module.exports.verifyPassword = (user, password) => user
     .hasPassword(password)
     .then((result) => {
       if (!result) {
@@ -99,7 +94,6 @@ module.exports.verifyPassword = function(user, password) {
 
       return _Promise.resolve(true);
     });
-};
 
 /**
  * Resets the user's password and saves it.
@@ -107,8 +101,6 @@ module.exports.verifyPassword = function(user, password) {
  * @param  {String} password the password to change to
  * @return {Promise} resolving to the new User model
  */
-module.exports.resetPassword = function(user, password) {
-  return user
+module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
-};

@@ -226,7 +226,7 @@ function _populateTrackedEvents(cb) {
  * Fetches the current stats, requerying them if not cached
  * @return {Promise<Object>}	resolving to key-value pairs of stats
  */
-module.exports.fetchAllStats = function() {
+module.exports.fetchAllStats = () => {
   const stats = {};
   stats.registrationStats = {};
   stats.rsvpStats = {};
@@ -247,8 +247,7 @@ module.exports.fetchAllStats = function() {
     });
 };
 
-module.exports.fetchRegistrationStats = function() {
-  return cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
+module.exports.fetchRegistrationStats = () => cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
       if (hasKey) {
         return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
@@ -299,10 +298,8 @@ module.exports.fetchRegistrationStats = function() {
               }));
 
     });
-};
 
-module.exports.fetchRSVPStats = function() {
-  return cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
+module.exports.fetchRSVPStats = () => cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
       if (hasKey) {
         return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
@@ -353,10 +350,8 @@ module.exports.fetchRSVPStats = function() {
               }));
 
     });
-};
 
-module.exports.fetchLiveEventStats = function() {
-  return cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
+module.exports.fetchLiveEventStats = () => cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
     .then((hasKey) => {
       if (hasKey) {
         return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
@@ -383,4 +378,3 @@ module.exports.fetchLiveEventStats = function() {
               }));
 
     });
-};

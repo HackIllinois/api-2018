@@ -3,7 +3,7 @@
 const inflection = require('inflection');
 const _ = require('lodash');
 
-module.exports.format = function (target) {
+module.exports.format = (target) => {
   if (_.isObject(target)) {
     return _.mapKeys(target, (v, k) => inflection.underscore(k, true));
   }
@@ -13,7 +13,7 @@ module.exports.format = function (target) {
   return _.isString(target) ? inflection.underscore(target, true) : target;
 };
 
-module.exports.parse = function (target) {
+module.exports.parse = (target) => {
   if (_.isObject(target)) {
     return _.mapKeys(target, (v, k) => inflection.camelize(k, true));
   }

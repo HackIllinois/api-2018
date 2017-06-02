@@ -11,15 +11,19 @@ const Upload = Model.extend({
  * @param  {String} bucket	(optional) the bucket in which to search
  * @return {Promise<Collection<Upload>>} all of the uploads belonging to the owner
  */
-Upload.findByOwner = function (owner, bucket) {
-  const queryParams = { where: {} };
+Upload.findByOwner = function(owner, bucket) {
+  const queryParams = {
+    where: {}
+  };
 
   queryParams.where.owner_id = owner.get('id');
   if (bucket) {
     queryParams.where.bucket = bucket;
   }
 
-  return Upload.collection().query(queryParams).fetch();
+  return Upload.collection()
+    .query(queryParams)
+    .fetch();
 };
 
 /**
@@ -28,8 +32,15 @@ Upload.findByOwner = function (owner, bucket) {
  * @param  {String} bucket	the bucket in which to look
  * @return {Promise<Upload>} the requested upload, if it exists
  */
-Upload.findByKey = function (key, bucket) {
-  return Upload.collection().query({ where: { key: key, bucket: bucket } }).fetchOne();
+Upload.findByKey = function(key, bucket) {
+  return Upload.collection()
+    .query({
+      where: {
+        key: key,
+        bucket: bucket
+      }
+    })
+    .fetchOne();
 };
 
 module.exports = Upload;

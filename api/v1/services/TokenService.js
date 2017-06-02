@@ -19,7 +19,7 @@ const TOKEN_SCOPE_INVALID_ERROR = 'An invalid or non-existent scope was supplied
  * @throws {TokenExpirationError} when the request token has expired
  * @throws {TypeError} when the scope was not found
  */
-module.exports.findTokenByValue = function(value, scope) {
+module.exports.findTokenByValue = (value, scope) => {
   if (!(scope in config.token.expiration)) {
     return _Promise.reject(new TypeError(TOKEN_SCOPE_INVALID_ERROR));
   }
@@ -50,7 +50,7 @@ module.exports.findTokenByValue = function(value, scope) {
  * @return {Promise<Bool>} Returns a Promise that resolves to
  *                         true on a successful token creation.
  */
-module.exports.generateToken = function(user, scope) {
+module.exports.generateToken = (user, scope) => {
   const tokenVal = utils.crypto.generateResetToken();
   const userId = user.get('id');
 
@@ -61,13 +61,13 @@ module.exports.generateToken = function(user, scope) {
     })
     .fetchAll()
     .then((tokens) => tokens.invokeThen('destroy')
-        .then(() => {
-          const token = Token.forge({
-            type: scope,
-            value: tokenVal,
-            user_id: userId
-          });
-          return token.save()
-            .then(() => tokenVal);
-        }));
+      .then(() => {
+        const token = Token.forge({
+          type: scope,
+          value: tokenVal,
+          user_id: userId
+        });
+        return token.save()
+          .then(() => tokenVal);
+      }));
 };

@@ -8,8 +8,11 @@ const EventLocation = Model.extend({
   }
 });
 
-EventLocation.eventId = function (eventId) {
-  return EventLocation.where({ event_id: eventId }).fetch();
+EventLocation.eventId = function(eventId) {
+  return EventLocation.where({
+    event_id: eventId
+  })
+    .fetch();
 };
 
 module.exports = EventLocation;

@@ -10,12 +10,12 @@ module.exports = function(Request) {
 
     const request = new Request(req.headers, req.body);
     request.validate()
-			.then(() => {
-  req.body = request.body();
+      .then(() => {
+        req.body = request.body();
 
-  return next();
-})
-			.catch(CheckitError, errorUtils.handleValidationError)
-			.catch((error) => next(error));
+        return next();
+      })
+      .catch(CheckitError, errorUtils.handleValidationError)
+      .catch((error) => next(error));
   };
 };

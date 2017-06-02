@@ -18,20 +18,20 @@ function sendMailinglist(req, res, next) {
   const template = req.body.template;
 
   services.MailService.checkIfSent(mailList)
-		.then(() => services.MailService.sendToList(mailList, template))
-		.then(() => {
-  if (_.includes(ACCEPTANCE_LISTS, listName)) {
-    return services.MailService.markAsSent(mailList);
-  }
-  return _Promise.resolve(true);
-})
-		.then(() => {
-  res.body = {};
-  res.body.sent = true;
+    .then(() => services.MailService.sendToList(mailList, template))
+    .then(() => {
+      if (_.includes(ACCEPTANCE_LISTS, listName)) {
+        return services.MailService.markAsSent(mailList);
+      }
+      return _Promise.resolve(true);
+    })
+    .then(() => {
+      res.body = {};
+      res.body.sent = true;
 
-  return next();
-})
-		.catch((error) => next(error));
+      return next();
+    })
+    .catch((error) => next(error));
 }
 
 

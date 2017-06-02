@@ -18,7 +18,7 @@ ProjectMentor.findByProjectAndMentorId = function(project_id, mentor_id) {
     project_id: project_id,
     mentor_id: mentor_id
   })
-		.fetch();
+    .fetch();
 };
 
 module.exports = ProjectMentor;

@@ -239,7 +239,7 @@ function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
  * @return {Promise<Mentor>} the mentor with related ideas
  * @throws {InvalidParameterError} when a mentor exists for the specified user
  */
-module.exports.createMentor = function(user, attributes) {
+module.exports.createMentor = (user, attributes) => {
   const mentorAttributes = attributes.mentor;
   delete attributes.mentor;
 
@@ -267,8 +267,7 @@ module.exports.createMentor = function(user, attributes) {
  * @return {Promise<Mentor>}	resolving to the associated Mentor model
  * @throws {NotFoundError} when the requested mentor cannot be found
  */
-module.exports.findMentorByUser = function(user) {
-  return Mentor.findByUserId(user.get('id'))
+module.exports.findMentorByUser = (user) => Mentor.findByUserId(user.get('id'))
     .tap((result) => {
       if (_.isNull(result)) {
         const message = 'A mentor with the given user ID cannot be found';
@@ -276,7 +275,6 @@ module.exports.findMentorByUser = function(user) {
         throw new errors.NotFoundError(message, source);
       }
     });
-};
 
 /**
  * Finds a mentor by querying for the given ID
@@ -284,8 +282,7 @@ module.exports.findMentorByUser = function(user) {
  * @return {Promise<Mentor>} resolving to the associated Mentor model
  * @throws {NotFoundError} when the requested mentor cannot be found
  */
-module.exports.findMentorById = function(id) {
-  return Mentor.findById(id)
+module.exports.findMentorById = (id) => Mentor.findById(id)
     .tap((result) => {
       if (_.isNull(result)) {
         const message = 'A mentor with the given ID cannot be found';
@@ -293,7 +290,6 @@ module.exports.findMentorById = function(id) {
         throw new errors.NotFoundError(message, source);
       }
     });
-};
 
 /**
  * Updates a mentor and their project ideas by relational user
@@ -302,7 +298,7 @@ module.exports.findMentorById = function(id) {
  * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
  * @throws {InvalidParameterError} when a mentor doesn't exist for the specified user
  */
-module.exports.updateMentor = function(mentor, attributes) {
+module.exports.updateMentor = (mentor, attributes) => {
   const mentorAttributes = attributes.mentor;
   delete attributes.mentor;
 
@@ -324,7 +320,7 @@ module.exports.updateMentor = function(mentor, attributes) {
  * @return {Promise<Attendee>} the attendee with their related properties
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
-module.exports.createAttendee = function(user, attributes) {
+module.exports.createAttendee = (user, attributes) => {
   if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
     const message = 'One project or ecosystem interest must be provided';
     const source = ['projects', 'ecosystemInterests'];
@@ -359,7 +355,7 @@ module.exports.createAttendee = function(user, attributes) {
  * @return {Promise<Attendee>}	resolving to the associated Attendee model
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
-module.exports.findAttendeeByUser = function(user, withResume) {
+module.exports.findAttendeeByUser = (user, withResume) => {
   let findFunction;
   if (withResume) {
     findFunction = Attendee.fetchWithResumeByUserId;
@@ -384,7 +380,7 @@ module.exports.findAttendeeByUser = function(user, withResume) {
  * @return {Promise<Attendee>} resolving to the associated Attendee model
  * @throws {NotFoundError} when the requested attendee cannot be found
  */
-module.exports.findAttendeeById = function(id, withResume) {
+module.exports.findAttendeeById = (id, withResume) => {
   let findFunction;
   if (withResume) {
     findFunction = Attendee.fetchWithResumeById;
@@ -410,7 +406,7 @@ module.exports.findAttendeeById = function(id, withResume) {
  * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
  * @throws {InvalidParameterError} when an attendee doesn't exist for the specified user
  */
-module.exports.updateAttendee = function(attendee, attributes) {
+module.exports.updateAttendee = (attendee, attributes) => {
   // some attendee registration attributes are optional, but we need to
   // be sure that they are at least considered for removal during adjustment
   attributes = _.merge(attributes, {
@@ -456,7 +452,7 @@ module.exports.updateAttendee = function(attendee, attributes) {
 };
 
 
-module.exports.applyDecision = function(attendee, decisionAttrs) {
+module.exports.applyDecision = (attendee, decisionAttrs) => {
   const prevAttendeeAttrs = _.clone(attendee.attributes);
 
   return attendee.validate()
@@ -479,7 +475,7 @@ module.exports.applyDecision = function(attendee, decisionAttrs) {
  * @param {int} ascending 0 or 1 signaling what way to order the results
  * @return {Promise} resolving to a the list of attendees
  */
-module.exports.fetchAllAttendees = function(page, count, category, ascending) {
+module.exports.fetchAllAttendees = (page, count, category, ascending) => {
   const ordering = (ascending ? '' : '-') + utils.database.format(category);
   return Attendee.forge()
     .orderBy(ordering)
@@ -502,7 +498,7 @@ module.exports.fetchAllAttendees = function(page, count, category, ascending) {
  * @param  {string} searchTerm the name of the person to find
  * @return {Promise} resolving to a the list of attendees
  */
-module.exports.findAttendeesByName = function(page, count, category, ascending, searchTerm) {
+module.exports.findAttendeesByName = (page, count, category, ascending, searchTerm) => {
   const ordering = (ascending ? '' : '-') + utils.database.format(category);
   return Attendee
     .query((qb) => {
@@ -530,7 +526,7 @@ module.exports.findAttendeesByName = function(page, count, category, ascending, 
  * @param  {string} filterVal the value of the filter to go by
  * @return {Promise} resolving to a the list of attendees
  */
-module.exports.filterAttendees = function(page, count, category, ascending, filterCategory, filterVal) {
+module.exports.filterAttendees = (page, count, category, ascending, filterCategory, filterVal) => {
   const ordering = (ascending ? '' : '-') + utils.database.format(category);
   filterCategory = utils.database.format(filterCategory);
   return Attendee

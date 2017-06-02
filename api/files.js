@@ -2,9 +2,7 @@
 
 const _Promise = require('bluebird');
 const fs = _Promise.promisifyAll(require('fs'), {
-  filter: function(n, f, t, d) {
-    return d && !n.includes('Sync');
-  }
+  filter: (n, f, t, d) => d && !n.includes('Sync')
 });
 const mkdirp = require('mkdirp');
 const _ = require('lodash');
@@ -27,7 +25,7 @@ const LOG_FILENAME = 'api.log';
  * Sets up the log file for local development
  * @return {String}		the path to the log file
  */
-module.exports.initializeLogfile = function() {
+module.exports.initializeLogfile = () => {
   mkdirp.sync(LOG_DIRECTORY);
   return LOG_DIRECTORY + LOG_FILENAME;
 };
@@ -40,7 +38,7 @@ module.exports.initializeLogfile = function() {
  * @param  {Object} 		substitutions the intended substitutions (if any)
  * @return {Promise<>}		a resolved promise
  */
-module.exports.writeMail = function(recipients, template, substitutions) {
+module.exports.writeMail = (recipients, template, substitutions) => {
   if (!config.isDevelopment) {
     return _Promise.resolve(null);
   }
@@ -77,7 +75,7 @@ module.exports.writeMail = function(recipients, template, substitutions) {
  *                         		{String} type	the MIME type of the file
  * @return {Promise<>}			a resolved promise
  */
-module.exports.writeFile = function(content, params) {
+module.exports.writeFile = (content, params) => {
   if (!config.isDevelopment) {
     return _Promise.resolve(null);
   }
@@ -105,7 +103,7 @@ module.exports.writeFile = function(content, params) {
  *                              {Buffer} content the file content
  *                              {type} type the MIME type of the original file
  */
-module.exports.getFile = function(key, bucket) {
+module.exports.getFile = (key, bucket) => {
   if (!config.isDevelopment) {
     return _Promise.resolve(null);
   }
@@ -134,7 +132,7 @@ module.exports.getFile = function(key, bucket) {
  * @param  {String} key		the key by which the content was stored
  * @return {Promise<>}		a resolved promise
  */
-module.exports.removeFile = function(key, bucket) {
+module.exports.removeFile = (key, bucket) => {
   if (!config.isDevelopment) {
     return _Promise.resolve(null);
   }

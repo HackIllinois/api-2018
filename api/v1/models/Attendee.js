@@ -76,9 +76,9 @@ Attendee.findByUserId = function(userId) {
   return Attendee.where({
     user_id: userId
   })
-		.fetch({
-  withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-});
+    .fetch({
+      withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+    });
 };
 
 
@@ -93,29 +93,29 @@ Attendee.fetchWithResumeByUserId = function(userId) {
     return Attendee.where({
       user_id: userId
     })
-			.fetch({
-  withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-  transacting: t
-})
-			.then((a) => {
-  attendee = a;
-  if (_.isNull(a)) {
-    return null;
-  }
-  return Upload.where({
-    owner_id: userId,
-    bucket: utils.storage.buckets.resumes
-  })
-					.fetch({
-  transacting: t
-});
-})
-			.then((u) => {
-  if (!_.isNull(u)) {
-    attendee.set('resume', (u !== null) ? u.attributes : u);
-  }
-  return attendee;
-});
+      .fetch({
+        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+        transacting: t
+      })
+      .then((a) => {
+        attendee = a;
+        if (_.isNull(a)) {
+          return null;
+        }
+        return Upload.where({
+          owner_id: userId,
+          bucket: utils.storage.buckets.resumes
+        })
+          .fetch({
+            transacting: t
+          });
+      })
+      .then((u) => {
+        if (!_.isNull(u)) {
+          attendee.set('resume', (u !== null) ? u.attributes : u);
+        }
+        return attendee;
+      });
   });
 };
 
@@ -128,9 +128,9 @@ Attendee.findById = function(id) {
   return Attendee.where({
     id: id
   })
-		.fetch({
-  withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
-});
+    .fetch({
+      withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+    });
 };
 
 /**
@@ -144,29 +144,29 @@ Attendee.fetchWithResumeById = function(id) {
     return Attendee.where({
       id: id
     })
-			.fetch({
-  withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
-  transacting: t
-})
-			.then((a) => {
-  attendee = a;
-  if (_.isNull(a)) {
-    return null;
-  }
-  return Upload.where({
-    owner_id: a.get('userId'),
-    bucket: utils.storage.buckets.resumes
-  })
-					.fetch({
-  transacting: t
-});
-})
-			.then((u) => {
-  if (!_.isNull(u)) {
-    attendee.set('resume', (u !== null) ? u.attributes : u);
-  }
-  return attendee;
-});
+      .fetch({
+        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+        transacting: t
+      })
+      .then((a) => {
+        attendee = a;
+        if (_.isNull(a)) {
+          return null;
+        }
+        return Upload.where({
+          owner_id: a.get('userId'),
+          bucket: utils.storage.buckets.resumes
+        })
+          .fetch({
+            transacting: t
+          });
+      })
+      .then((u) => {
+        if (!_.isNull(u)) {
+          attendee.set('resume', (u !== null) ? u.attributes : u);
+        }
+        return attendee;
+      });
   });
 };
 

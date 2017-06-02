@@ -8,9 +8,12 @@ const Ecosystem = Model.extend({
   }
 });
 
-Ecosystem.findByName = function (name) {
+Ecosystem.findByName = function(name) {
   name = name.toLowerCase();
-  return Ecosystem.where({ name: name }).fetch();
+  return Ecosystem.where({
+    name: name
+  })
+    .fetch();
 };
 
 module.exports = Ecosystem;

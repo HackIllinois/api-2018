@@ -10,21 +10,27 @@ const AttendeeRequestedCollaborator = Model.extend({
 
 
 /**
-* Finds an attendee's requested collaborator by its relational attendee's id
-* @param  {Number|String} id	the ID of the attendee with the appropriate type
-* @return {Promise<Model>}	a Promise resolving to the resulting AttendeeRequestedCollaborator or null
-*/
-AttendeeRequestedCollaborator.findByAttendeeId = function (attendeeId) {
-  return AttendeeRequestedCollaborator.where({ attendee_id: attendeeId }).fetch();
+ * Finds an attendee's requested collaborator by its relational attendee's id
+ * @param  {Number|String} id	the ID of the attendee with the appropriate type
+ * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeRequestedCollaborator or null
+ */
+AttendeeRequestedCollaborator.findByAttendeeId = function(attendeeId) {
+  return AttendeeRequestedCollaborator.where({
+    attendee_id: attendeeId
+  })
+    .fetch();
 };
 
 /**
-* Finds an attendee's requested collaborator by its ID
-* @param  {Number|String} id	the ID of the model with the appropriate type
-* @return {Promise<Model>}		a Promise resolving to the resulting model or null
-*/
-AttendeeRequestedCollaborator.findById = function (id) {
-  return AttendeeRequestedCollaborator.where({ id: id }).fetch();
+ * Finds an attendee's requested collaborator by its ID
+ * @param  {Number|String} id	the ID of the model with the appropriate type
+ * @return {Promise<Model>}		a Promise resolving to the resulting model or null
+ */
+AttendeeRequestedCollaborator.findById = function(id) {
+  return AttendeeRequestedCollaborator.where({
+    id: id
+  })
+    .fetch();
 };
 
 module.exports = AttendeeRequestedCollaborator;

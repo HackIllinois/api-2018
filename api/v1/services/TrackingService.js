@@ -18,7 +18,7 @@ const TRACKED_EVENT = 'trackedEvent';
  * @throws {InvalidParameterError} when the provided event is already a tracked event
  * @throws {InvalidTrackingStateError} when an active event is already occurring
  */
-module.exports.createTrackingEvent = function(attributes) {
+module.exports.createTrackingEvent = (attributes) => {
   const trackingItem = TrackingItem.forge(attributes);
 
   return trackingItem
@@ -54,7 +54,7 @@ module.exports.createTrackingEvent = function(attributes) {
  * @throws {InvalidTrackingStateError} when there is no event being currently tracked
  * @throws {InvalidParameterError} when an attendee has already participated in an event
  */
-module.exports.addEventParticipant = function(participantId) {
+module.exports.addEventParticipant = (participantId) => {
   let currentEvent;
   return cache.getAsync(TRACKED_EVENT)
     .then((result) => {
