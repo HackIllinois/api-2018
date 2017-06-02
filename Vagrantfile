@@ -6,19 +6,21 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/xenial64"
 
   config.vm.provision "shell", inline: <<-SHELL
 
     echo "Provisioning Start"
-    apt-get -qq update
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -qq update && apt-get -qq dist-upgrade
 
     echo "Installing MySql"
-    export DEBIAN_FRONTEND=noninteractive
-      && wget http://dev.mysql.com/get/mysql-apt-config_0.6.0-1_all.deb -nv \
-
-      && sudo -E apt-get -qq -y install mysql-server \
-      && mysql -u root -e "create database hackillinois" \
+    sudo -E apt-get -qq -y install mysql-server
+    /etc/init.d/mysql stop
+    mysqld --skip-grant-tables &
+    mysql -u root -e "UPDATE user SET Password=PASSWORD('pass123') WHERE User='root'; FLUSH PRIVILEGES; exit;"
+    /etc/init.d/mysql restart
+    mysql -u root -p=pass123 -e "create database hackillinois"
 
     echo "Installing Flyway"
     wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.0.3/flyway-commandline-4.0.3-linux-x64.tar.gz -nv \
@@ -41,9 +43,6 @@ Vagrant.configure("2") do |config|
       cp config/dev.config.template config/dev.config
       npm install
       npm run dev-migrations
-
-    echo "cd /vagrant/" >> /home/vagrant/.bashrc
-    echo "npm run dev" >> /home/vagrant/.bashrc
 
   SHELL
 end
