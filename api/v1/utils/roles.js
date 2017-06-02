@@ -1,9 +1,9 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
+const ALL_ROLES = ['ADMIN', 'STAFF', 'SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
 
-_.forEach(ALL_ROLES, function (role) {
-	module.exports[role] = role;
+_.forEach(ALL_ROLES, (role) => {
+  module.exports[role] = role;
 });
 
 module.exports.NONE = [];
@@ -21,9 +21,7 @@ module.exports.COMMON = ['SPONSOR', 'MENTOR', 'VOLUNTEER', 'ATTENDEE'];
  * @param  {String}  role  a role to verify
  * @return {Boolean}       whether or not role is in the given group
  */
-module.exports.isIn = function (group, role) {
-	return _.includes(group, role);
-};
+module.exports.isIn = (group, role) => _.includes(group, role);
 
 /**
  * Ensures that the provided role is in ALL_ROLES
@@ -31,10 +29,10 @@ module.exports.isIn = function (group, role) {
  * @return {Boolean} true when the role is valid
  * @throws TypeError when the role is invalid
  */
-module.exports.verifyRole = function (role) {
-	if (!module.exports.isIn(ALL_ROLES, role)) {
-		throw new TypeError(role + " is not a valid role");
-	}
+module.exports.verifyRole = (role) => {
+  if (!module.exports.isIn(ALL_ROLES, role)) {
+    throw new TypeError(role + ' is not a valid role');
+  }
 
-	return true;
+  return true;
 };

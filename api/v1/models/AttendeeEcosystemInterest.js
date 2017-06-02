@@ -1,21 +1,21 @@
-var _ = require('lodash');
-
-var Model = require('./Model');
-var AttendeeEcosystemInterest = Model.extend({
-    tableName: 'attendee_ecosystem_interests',
-    idAttribute: 'id',
-    validations: {
-        attendeeId: ['required', 'integer'],
-        ecosystemId:  ['required', 'integer']
-    }
+const Model = require('./Model');
+const AttendeeEcosystemInterest = Model.extend({
+  tableName: 'attendee_ecosystem_interests',
+  idAttribute: 'id',
+  validations: {
+    attendeeId: ['required', 'integer'],
+    ecosystemId: ['required', 'integer']
+  }
 });
 
-AttendeeEcosystemInterest.findByAttendeeId = function (attendeeId) {
-    return AttendeeEcosystemInterest.where({ attendee_id: attendeeId }).fetch();
-};
+AttendeeEcosystemInterest.findByAttendeeId = (attendeeId) => AttendeeEcosystemInterest.where({
+  attendee_id: attendeeId
+})
+  .fetch();
 
-AttendeeEcosystemInterest.findById = function (id) {
-    return AttendeeEcosystemInterest.where({ id: id }).fetch();
-};
+AttendeeEcosystemInterest.findById = (id) => AttendeeEcosystemInterest.where({
+  id: id
+})
+  .fetch();
 
 module.exports = AttendeeEcosystemInterest;

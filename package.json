@@ -35,6 +35,8 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-http": "^3.0.0",
+    "eslint": "^3.19.0",
+    "eslint-plugin-node": "^4.2.2",
     "mocha": "^3.2.0",
     "mock-knex": "^0.3.7",
     "mockery": "^2.0.0",
@@ -47,5 +49,8 @@
     "prod": "./resources/scripts/prod.sh",
     "dev-migrations": "./database/flyway.sh migrate dev",
     "prod-migrations": "./database/flyway.sh migrate prod"
+  },
+  "engines": {
+    "node": ">=6.10.3"
   }
 }

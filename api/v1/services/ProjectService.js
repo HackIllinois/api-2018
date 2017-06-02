@@ -1,14 +1,13 @@
-var Checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const Checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var Mentor = require('../models/Mentor');
-var Project = require('../models/Project');
-var ProjectMentor = require('../models/ProjectMentor');
+const Mentor = require('../models/Mentor');
+const Project = require('../models/Project');
+const ProjectMentor = require('../models/ProjectMentor');
 
-var errors = require('../errors');
-var utils = require('../utils');
-var roles = require('../utils/roles');
+const errors = require('../errors');
+const utils = require('../utils');
 
 
 /**
@@ -17,23 +16,21 @@ var roles = require('../utils/roles');
  * @return {Promise} resolving to the newly-created project
  * @throws InvalidParameterError when a project exists with the specified name
  */
-module.exports.createProject = function (attributes) {
-	if(_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)){
-		attributes.isPublished = false;
-	}
+module.exports.createProject = (attributes) => {
+  if (_.isNull(attributes.isPublished) || _.isUndefined(attributes.isPublished)) {
+    attributes.isPublished = false;
+  }
 
-	var project = Project.forge(attributes);
-	return project
-		.validate()
-		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function (validated) {
-			return project.save()
-		})
-		.catch(
-			utils.errors.DuplicateEntryError,
-			utils.errors.handleDuplicateEntryError("A project with the given name already exists", "name")
-		);
-}
+  const project = Project.forge(attributes);
+  return project
+    .validate()
+    .catch(Checkit.Error, utils.errors.handleValidationError)
+    .then(() => project.save())
+    .catch(
+      utils.errors.DuplicateEntryError,
+      utils.errors.handleDuplicateEntryError('A project with the given name already exists', 'name')
+    );
+};
 
 /**
  * Returns a project with the specified project id
@@ -41,19 +38,17 @@ module.exports.createProject = function (attributes) {
  * @return {Promise} resolving to the project
  * @throws InvalidParameterError when a project doesn't exist with the specified ID
  */
-module.exports.findProjectById = function (id) {
-	return Project
-		.findById(id)
-		.then(function (result) {
-			if(_.isNull(result)){
-				var message = "A project with the given ID cannot be found";
-				var source = "id";
-				throw new errors.NotFoundError(message, source);
-			}
+module.exports.findProjectById = (id) => Project
+    .findById(id)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'A project with the given ID cannot be found';
+        const source = 'id';
+        throw new errors.NotFoundError(message, source);
+      }
 
-			return _Promise.resolve(result);
-		});
-}
+      return _Promise.resolve(result);
+    });
 
 /**
  * Update a key value pair in a project
@@ -62,16 +57,14 @@ module.exports.findProjectById = function (id) {
  * @return {Promise} resolving to the updated project
  * @throws InvalidParameterError when the key is not valid
  */
-module.exports.updateProject = function (project, attributes) {
-	project.set(attributes);
+module.exports.updateProject = (project, attributes) => {
+  project.set(attributes);
 
-	return project
-		.validate()
-		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function (validated) {
-			return project.save();
-		});
-}
+  return project
+    .validate()
+    .catch(Checkit.Error, utils.errors.handleValidationError)
+    .then(() => project.save());
+};
 
 /**
  * Helper function for determining valid project/mentor ids
@@ -80,25 +73,25 @@ module.exports.updateProject = function (project, attributes) {
  * @return {Promise} resolving to whether or not the ids are valid
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
-_isProjectMentorValid = function (project_id, mentor_id) {
-	return Project
-		.findById(project_id)
-		.then(function (result) {
-			if(_.isNull(result)) {
-				var message = "The project id is invalid";
-				var source = "project_id";
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return Mentor.findById(mentor_id);
-		})
-		.then(function (mentor) {
-			if(_.isNull(mentor)) {
-				var message = "The mentor id is invalid";
-				var source = "mentor_id";
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return _Promise.resolve(false);
-		});
+function _isProjectMentorValid(project_id, mentor_id) {
+  return Project
+    .findById(project_id)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'The project id is invalid';
+        const source = 'project_id';
+        throw new errors.InvalidParameterError(message, source);
+      }
+      return Mentor.findById(mentor_id);
+    })
+    .then((mentor) => {
+      if (_.isNull(mentor)) {
+        const message = 'The mentor id is invalid';
+        const source = 'mentor_id';
+        throw new errors.InvalidParameterError(message, source);
+      }
+      return _Promise.resolve(false);
+    });
 }
 
 /**
@@ -108,17 +101,17 @@ _isProjectMentorValid = function (project_id, mentor_id) {
  * @return {Promise} resolving to null
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
-_deleteProjectMentor = function (project_id, mentor_id) {
-	return ProjectMentor
-		.findByProjectAndMentorId(project_id, mentor_id)
-		.then(function(oldProjectMentor) {
-			if(_.isNull(oldProjectMentor)) {
-				var message = "A project-mentor relationship with the given IDs cannot be found";
-				var source = "project_id/mentor_id";
-				throw new errors.NotFoundError(message, source);
-			}
-			return oldProjectMentor.destroy();
-		});
+function _deleteProjectMentor(project_id, mentor_id) {
+  return ProjectMentor
+    .findByProjectAndMentorId(project_id, mentor_id)
+    .then((oldProjectMentor) => {
+      if (_.isNull(oldProjectMentor)) {
+        const message = 'A project-mentor relationship with the given IDs cannot be found';
+        const source = 'project_id/mentor_id';
+        throw new errors.NotFoundError(message, source);
+      }
+      return oldProjectMentor.destroy();
+    });
 }
 
 
@@ -129,21 +122,22 @@ _deleteProjectMentor = function (project_id, mentor_id) {
  * @return {Promise} resolving to the new relationship
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
-module.exports.addProjectMentor = function (project_id, mentor_id) {
-	var projectMentor = ProjectMentor.forge({ project_id: project_id, mentor_id: mentor_id });
+module.exports.addProjectMentor = (project_id, mentor_id) => {
+  const projectMentor = ProjectMentor.forge({
+    project_id: project_id,
+    mentor_id: mentor_id
+  });
 
-	return _isProjectMentorValid(project_id, mentor_id)
-		.then(function (isValid) {
-			return ProjectMentor.findByProjectAndMentorId(project_id, mentor_id);
-		})
-		.then(function (result) {
-			if (!_.isNull(result)) {
-				//The project mentor relationship already exists
-				return _Promise.resolve(result);
-			}
-			return projectMentor.save()
-		});
-}
+  return _isProjectMentorValid(project_id, mentor_id)
+    .then(() => ProjectMentor.findByProjectAndMentorId(project_id, mentor_id))
+    .then((result) => {
+      if (!_.isNull(result)) {
+        //The project mentor relationship already exists
+        return _Promise.resolve(result);
+      }
+      return projectMentor.save();
+    });
+};
 
 /**
  * Deletes a project-mentor relationship
@@ -152,9 +146,7 @@ module.exports.addProjectMentor = function (project_id, mentor_id) {
  * @return {Promise} resolving to the deleted relationship
  * @throws InvalidParameterError when a project or mentor doesn't exist with the specified ID
  */
-module.exports.deleteProjectMentor = function (project_id, mentor_id) {
-	return _deleteProjectMentor(project_id, mentor_id);
-}
+module.exports.deleteProjectMentor = (project_id, mentor_id) => _deleteProjectMentor(project_id, mentor_id);
 
 
 /**
@@ -164,19 +156,17 @@ module.exports.deleteProjectMentor = function (project_id, mentor_id) {
  * @param  {Int} Boolean in int form representing published/unpublished
  * @return {Promise} resolving to an array of project objects
  */
-module.exports.getAllProjects = function (page, count, isPublished) {
-	return Project
-		.query(function (qb){
-			qb.groupBy('projects.id');
-			qb.where('is_published', '=', isPublished);
-		})
-		.orderBy('-name')
-		.fetchPage({
-			pageSize: count,
-			page: page
-		})
-		.then(function (results) {
-			var projects = _.map(results.models, 'attributes');
-			return projects;
-		});
-}
+module.exports.getAllProjects = (page, count, isPublished) => Project
+    .query((qb) => {
+      qb.groupBy('projects.id');
+      qb.where('is_published', '=', isPublished);
+    })
+    .orderBy('-name')
+    .fetchPage({
+      pageSize: count,
+      page: page
+    })
+    .then((results) => {
+      const projects = _.map(results.models, 'attributes');
+      return projects;
+    });

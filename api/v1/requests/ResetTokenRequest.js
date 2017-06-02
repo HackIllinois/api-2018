@@ -1,15 +1,15 @@
-var Request = require('./Request');
+const Request = require('./Request');
 
-var bodyRequired = ['email'];
-var bodyValidations = {
-	'email': ['email']
+const bodyRequired = [ 'email' ];
+const bodyValidations = {
+  'email': [ 'email' ]
 };
 
 function ResetTokenRequest(headers, body) {
-	Request.call(this, headers, body);
+  Request.call(this, headers, body);
 
-	this.bodyRequired = bodyRequired;
-	this.bodyValidations = bodyValidations;
+  this.bodyRequired = bodyRequired;
+  this.bodyValidations = bodyValidations;
 }
 
 ResetTokenRequest.prototype = Object.create(Request.prototype);

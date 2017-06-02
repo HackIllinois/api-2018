@@ -1,6 +1,6 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
+const LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
 
 /**
  * Ensures that location upon check in is valid
@@ -8,10 +8,10 @@ var LOCATIONS = ['NONE', 'ECEB', 'SIEBEL', 'DCL'];
  * @return {Boolean} true when the location is valid
  * @throws TypeError when the location is invalid
  */
-module.exports.verifyLocation = function (location) {
-    if (!_.includes(LOCATIONS, location)) {
-        throw new TypeError(location + " is not a valid check in location");
-    }
+module.exports.verifyLocation = (location) => {
+  if (!_.includes(LOCATIONS, location)) {
+    throw new TypeError(location + ' is not a valid check in location');
+  }
 
-    return true;
-}
+  return true;
+};

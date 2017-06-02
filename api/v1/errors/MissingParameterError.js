@@ -1,17 +1,17 @@
-var UnprocessableRequestError = require('./UnprocessableRequestError');
+const UnprocessableRequestError = require('./UnprocessableRequestError');
 
-var ERROR_TYPE = 'MissingParameterError';
-var ERROR_TITLE = 'Missing Parameter';
+const ERROR_TYPE = 'MissingParameterError';
+const ERROR_TITLE = 'Missing Parameter';
 
-var DEFAULT_MESSAGE = "One or more parameters were missing from the request";
+const DEFAULT_MESSAGE = 'One or more parameters were missing from the request';
 
 function MissingParameterError(message, source) {
-	UnprocessableRequestError.call(this, message, source);
+  UnprocessableRequestError.call(this, message, source);
 
-	this.type = ERROR_TYPE;
-	this.title = ERROR_TITLE;
-	this.message = (message) ? message : DEFAULT_MESSAGE;
-	this.source = (source) ? source : null;
+  this.type = ERROR_TYPE;
+  this.title = ERROR_TITLE;
+  this.message = (message) ? message : DEFAULT_MESSAGE;
+  this.source = (source) ? source : null;
 }
 
 MissingParameterError.prototype = Object.create(UnprocessableRequestError.prototype);

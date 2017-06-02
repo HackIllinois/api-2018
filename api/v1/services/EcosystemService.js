@@ -1,34 +1,32 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
-var utils = require('../utils')
-var errors = require('../errors');
-var Ecosystem = require('../models/Ecosystem');
+const utils = require('../utils');
+const errors = require('../errors');
+const Ecosystem = require('../models/Ecosystem');
 
 
-module.exports.getAllEcosystems = function () {
-	return Ecosystem.fetchAll();
-}
+module.exports.getAllEcosystems = () => Ecosystem.fetchAll();
 
-module.exports.createEcosystem = function (name) {
-	var ecosystem = Ecosystem.forge({name: name.toLowerCase()});
+module.exports.createEcosystem = (name) => {
+  const ecosystem = Ecosystem.forge({
+    name: name.toLowerCase()
+  });
 
-	return ecosystem.save()
-		.catch(
-			utils.errors.DuplicateEntryError,
-			utils.errors.handleDuplicateEntryError("An ecosystem with the given name already exists", "name")
-		);
-}
+  return ecosystem.save()
+    .catch(
+      utils.errors.DuplicateEntryError,
+      utils.errors.handleDuplicateEntryError('An ecosystem with the given name already exists', 'name')
+    );
+};
 
-module.exports.deleteEcosystem = function (name) {
-	return Ecosystem
-		.findByName(name)
-		.then(function (result) {
-			if (_.isNull(result)) {
-				var message = "An ecosystem with the given name does not exist";
-				var source = "name";
-				throw new errors.InvalidParameterError(message, source);
-			}
+module.exports.deleteEcosystem = (name) => Ecosystem
+    .findByName(name)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'An ecosystem with the given name does not exist';
+        const source = 'name';
+        throw new errors.InvalidParameterError(message, source);
+      }
 
-			return result.destroy();
-		});
-}
+      return result.destroy();
+    });
