@@ -45,5 +45,11 @@ Vagrant.configure("2") do |config|
       npm run dev-migrations
 
     echo "cd /vagrant/" >> /home/ubuntu/.bashrc
+
+    sudo npm install node-gyp -g
+    apt-get install python
+    apt-get install make
+    apt-get install g++
+
   SHELL
 end
