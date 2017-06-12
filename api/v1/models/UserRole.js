@@ -1,29 +1,35 @@
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var roles = require('../utils/roles');
+const roles = require('../utils/roles');
 
-var Model = require('./Model');
-var UserRole = Model.extend({
-	tableName: 'user_roles',
-	idAttribute: 'id',
-	validations: {
-		role: ['required', 'string', roles.verifyRole]
-	}
+const Model = require('./Model');
+const UserRole = Model.extend({
+  tableName: 'user_roles',
+  idAttribute: 'id',
+  validations: {
+    role: ['required', 'string', roles.verifyRole]
+  }
 });
 /**
  * Saves a forged user role using the passed transaction
  */
-function _addRole (userRole, active, t) {
-	return userRole
-		.fetch({ transacting: t })
-		.then(function (result) {
-			if (result) {
-				return _Promise.resolve(result);
-			}
-			userRole.set({ active: (_.isUndefined(active) || active) });
-			return userRole.save(null, { transacting: t });
-		});
+function _addRole(userRole, active, t) {
+  return userRole
+    .fetch({
+      transacting: t
+    })
+    .then((result) => {
+      if (result) {
+        return _Promise.resolve(result);
+      }
+      userRole.set({
+        active: (_.isUndefined(active) || active)
+      });
+      return userRole.save(null, {
+        transacting: t
+      });
+    });
 }
 
 /**
@@ -35,14 +41,15 @@ function _addRole (userRole, active, t) {
  * @param {Transaction} t	pending transaction (optional)
  * @returns {Promise<UserRole>} the result of the addititon
  */
-UserRole.addRole = function (user, role, active, t) {
-	var userRole = UserRole.forge({ user_id: user.id, role: role });
-	if (t) {
-		return _addRole(userRole, active, t);
-	}
-	return UserRole.transaction(function(t){
-		return _addRole(userRole, active, t);
-	});
+UserRole.addRole = function(user, role, active, t) {
+  const userRole = UserRole.forge({
+    user_id: user.id,
+    role: role
+  });
+  if (t) {
+    return _addRole(userRole, active, t);
+  }
+  return UserRole.transaction((t) => _addRole(userRole, active, t));
 };
 
 /**
@@ -53,15 +60,20 @@ UserRole.addRole = function (user, role, active, t) {
  * @param {Transaction} t optional pending transaction
  * @returns {Promise<UserRole>} the updated role
  */
-UserRole.setActive = function (userRole, active, t) {
-	if (userRole.get('active') == active) {
-		return _Promise.resolve(userRole);
-	}
-	return userRole.set({ active: active }).save(null, { transacting: t });
+UserRole.setActive = function(userRole, active, t) {
+  if (userRole.get('active') == active) {
+    return _Promise.resolve(userRole);
+  }
+  return userRole.set({
+    active: active
+  })
+    .save(null, {
+      transacting: t
+    });
 };
 
-UserRole.prototype.serialize = function () {
-	return _.omit(this.attributes, ['id', 'userId']);
+UserRole.prototype.serialize = function() {
+  return _.omit(this.attributes, ['id', 'userId']);
 };
 
 module.exports = UserRole;

@@ -1,43 +1,43 @@
-var checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var errors = require('../errors');
+const errors = require('../errors');
 
-var headerValidations = { };
-var bodyValidations = { };
+const headerValidations = {};
+const bodyValidations = {};
 
-var headerRequired = [];
-var bodyRequired = [];
+const headerRequired = [];
+const bodyRequired = [];
 
-var bodyAllowed = [];
+const bodyAllowed = [];
 
 // base request class
 function Request(headers, body) {
-	this.headerValidations = headerValidations;
-	this.bodyValidations = bodyValidations;
-	this.headerRequired = headerRequired;
-	this.bodyRequired = bodyRequired;
-	this.bodyAllowed = bodyAllowed;
+  this.headerValidations = headerValidations;
+  this.bodyValidations = bodyValidations;
+  this.headerRequired = headerRequired;
+  this.bodyRequired = bodyRequired;
+  this.bodyAllowed = bodyAllowed;
 
-	this._headers = headers;
-	this._body = body;
-	this._audited = false;
-	this._marshalled = false;
+  this._headers = headers;
+  this._body = body;
+  this._audited = false;
+  this._marshalled = false;
 }
 
 Request.prototype.constructor = Request;
 
-Request.prototype._isRaw = function () {
-	return (this._body instanceof Buffer || this._body instanceof String);
+Request.prototype._isRaw = function() {
+  return (this._body instanceof Buffer || this._body instanceof String);
 };
 
 /**
  * Provides read-only access to this request's body
  * @return {Object} a request body which may or may not be validated
  */
-Request.prototype.body = function () {
-	return this._body;
+Request.prototype.body = function() {
+  return this._body;
 };
 
 /**
@@ -47,51 +47,52 @@ Request.prototype.body = function () {
  * @throws MissingParameterError when the request is missing a parameter
  * @throws MissingHeaderError when the request is missing a header
  */
-Request.prototype.audit = function () {
-	var missingHeaders = [];
-	var missingParameters = [];
+Request.prototype.audit = function() {
+  const missingHeaders = [];
+  const missingParameters = [];
 
-	_.forEach(this.headerRequired, _.bind(function (requiredHeader) {
-		if (!_.has(this._headers, requiredHeader.toLowerCase())) {
-			missingHeaders.push(requiredHeader);
-		}
-	}, this));
+  _.forEach(this.headerRequired, _.bind(function(requiredHeader) {
+    if (!_.has(this._headers, requiredHeader.toLowerCase())) {
+      missingHeaders.push(requiredHeader);
+    }
+  }, this));
 
-	if (missingHeaders.length) {
-		throw new errors.MissingHeaderError(null, missingHeaders);
-	}
+  if (missingHeaders.length) {
+    throw new errors.MissingHeaderError(null, missingHeaders);
+  }
 
-	if (_.isUndefined(this._body) || _.isNull(this._body)) {
-		var errorDetail = 'The request body could not be parsed';
-		throw new errors.UnprocessableRequestError(errorDetail, null);
-	}
+  if (_.isUndefined(this._body) || _.isNull(this._body)) {
+    const errorDetail = 'The request body could not be parsed';
+    throw new errors.UnprocessableRequestError(errorDetail, null);
+  }
 
-	if (!this._isRaw()) {
-		_.forEach(this.bodyRequired, _.bind(function(requiredParameter) {
-			if (!_.has(this._body, requiredParameter))
-				missingParameters.push(requiredParameter);
-		}, this));
+  if (!this._isRaw()) {
+    _.forEach(this.bodyRequired, _.bind(function(requiredParameter) {
+      if (!_.has(this._body, requiredParameter)) {
+        missingParameters.push(requiredParameter);
+      }
+    }, this));
 
-		if (missingParameters.length) {
-			throw new errors.MissingParameterError(null, missingParameters);
-		}
-	}
+    if (missingParameters.length) {
+      throw new errors.MissingParameterError(null, missingParameters);
+    }
+  }
 
-	this._audited = true;
+  this._audited = true;
 };
 
 /**
  * Removes any request parameters in the body that are not either required or
  * allowed and set the marshalled flag
  */
-Request.prototype.marshal = function () {
-	if (this._isRaw()) {
-		this._marshalled = true;
-		return;
-	}
+Request.prototype.marshal = function() {
+  if (this._isRaw()) {
+    this._marshalled = true;
+    return;
+  }
 
-	this._body = _.pick(this._body, _.concat(this.bodyRequired, this.bodyAllowed));
-	this._marshalled = true;
+  this._body = _.pick(this._body, _.concat(this.bodyRequired, this.bodyAllowed));
+  this._marshalled = true;
 };
 
 /**
@@ -99,20 +100,24 @@ Request.prototype.marshal = function () {
  * running request-specific validations
  * @return {Promise<>} when the validation is complete
  */
-Request.prototype.validate = function () {
-	if (!this._audited)
-		this.audit();
-	if (!this.marshalled)
-		this.marshal();
+Request.prototype.validate = function() {
+  if (!this._audited) {
+    this.audit();
+  }
+  if (!this.marshalled) {
+    this.marshal();
+  }
 
-	return checkit(this.headerValidations).run(this._headers)
-		.bind(this)
-		.then(function () {
-			if (this._isRaw()) {
-				return _Promise.resolve(true);
-			}
-			return checkit(this.bodyValidations).run(this._body);
-		});
+  return checkit(this.headerValidations)
+    .run(this._headers)
+    .bind(this)
+    .then(function() {
+      if (this._isRaw()) {
+        return _Promise.resolve(true);
+      }
+      return checkit(this.bodyValidations)
+        .run(this._body);
+    });
 };
 
 module.exports = Request;
