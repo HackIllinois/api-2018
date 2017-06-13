@@ -16,10 +16,6 @@ before_script:
   - pwd
   - cp ~/build/HackIllinois/api-2017/config/test.config.template ~/build/HackIllinois/api-2017/config/test.config
   - npm install
-before_deploy:
-  - pwd
-  - cd /tmp/
-  - wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.0.3/flyway-commandline-4.0.3-linux-x64.tar.gz && tar -xzf flyway-commandline-4.0.3-linux-x64.tar.gz && mv flyway-4.0.3 /opt/flyway-4.0.3 && ln -s /opt/flyway-4.0.3/jre/bin/java /usr/local/bin/java && ln -s /opt/flyway-4.0.3/flyway /usr/local/bin/flyway && rm -rf /tmp/flyway-*
 deploy:
   provider: elasticbeanstalk
   skip_cleanup: true
@@ -32,5 +28,3 @@ deploy:
   env: "api-hackillinois"
   bucket_name:
     secure: "zU+i6unLI5R8q+L3ZqqJupJmQlfkH4IEvNBaM+mX+jgKqMHZ808sZhlTV/urKvoTlQ/s5V2Z1UfK9piPE6lhzpYq4L5/A9LG5rudxcKGnijU5emvhRISrJYM/e4XtMdFQ/9faHsSayFObj+qvR18zExjRXei1ycxsB3r9KRkR/t5LI4DfhnRZtZYgu4fOkDxPcGLSc5R3/hg7ZUaGquK5llz2Lq/GvmRKBZXlkYyuSg+jMda3dnNkF7gr6K4IwNFq3hGzrBkhOAL5D30q4oewGKqjUsidMtQPPFKXLN0jshHnhme5al/gqMHt8QhWKzVR02VHxoGh+0pyNf2IcqcmsEFTN9O7/OCrLpYFsZmyHIc22E7quWawSa1Hi8xLSKrMOf/IHcPm5z9XAcZr85x3Ed/DPFkZDqiWzGMsQBphCZ3WkNcVn/aRoCCvozZgvstyi5joc8GXFM/YMPvYsQ1ol0BrLYVSqqvXJ6hZF3J38aUDegHwIS9oh5K/23XCz5d0wSf3jYVNdY4kCueTYLgoMSf3fNUYnJx4SLdLUDWpgTm+sN7IzLG09WAWAPqmDCTMT28U8nkA7nzAJPg/ZPHWDodiJRe9TopERiBbtnASxp5cXb614LfpUmfnNKilqRXvT559itHnohft9tT+sXneI70vZygrKtctDonWz+Bl4Y="
-after_deploy:
-  - cp config/prod.config.template config/prod.config
