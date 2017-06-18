@@ -10,7 +10,7 @@ function bookshelfMock (knex) {
 }
 
 mockery.registerMock('bookshelf', bookshelfMock);
-mockery.registerMock('redis', require('redis-mock'));
+mockery.registerMock('redis', require('fakeredis'));
 
 mockery.enable({ warnOnUnregistered: false });
 
@@ -23,6 +23,7 @@ require('./token.js');
 require('./storage.js');
 require('./checkin.js');
 require('./event.js');
+require('./tracking.js');
 require('./rsvp.js');
 
 mockery.disable();

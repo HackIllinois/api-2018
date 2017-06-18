@@ -54,20 +54,20 @@ describe('EventService', () => {
         query.response([ testLocations ]);
       });
 
-      const allTestLocations = EventService.getAllLocations();
-      allTestLocations.then((response) => {
-        let location = response.models[0].attributes[0].attributes;
-        expect(location).to.have.deep.property('id', testLocations[0].id);
-        expect(location).to.have.deep.property('name', testLocations[0].attributes.name);
+      EventService.getAllLocations()
+          .then((response) => {
+            let location = response.models[0].attributes[0].attributes;
+            expect(location).to.have.deep.property('id', testLocations[0].id);
+            expect(location).to.have.deep.property('name', testLocations[0].attributes.name);
 
-        location = response.models[0].attributes[1].attributes;
-        expect(location).to.have.deep.property('id', testLocations[1].id);
-        expect(location).to.have.deep.property('name', testLocations[1].attributes.name);
+            location = response.models[0].attributes[1].attributes;
+            expect(location).to.have.deep.property('id', testLocations[1].id);
+            expect(location).to.have.deep.property('name', testLocations[1].attributes.name);
 
-        assert(_fetchAll.calledOnce, 'fetchAll() not called once');
+            assert(_fetchAll.calledOnce, 'fetchAll() not called once');
 
-        done();
-      });
+            done();
+          });
     });
 
     afterEach((done) => {
@@ -118,18 +118,18 @@ describe('EventService', () => {
         query.response([ [ Location.forge(locationParams) ] ]);
       });
 
-      const createdLocation = EventService.createLocation(locationParams);
-      createdLocation.then((location) => {
-        expect(location).to.have.deep.property('id', locationParams.id);
-        expect(location).to.have.deep.property('attributes.name', locationParams.name);
-        expect(location).to.have.deep.property('attributes.latitude', locationParams.latitude);
-        expect(location).to.have.deep.property('attributes.longitude', locationParams.longitude);
+      EventService.createLocation(locationParams)
+          .then((location) => {
+            expect(location).to.have.deep.property('id', locationParams.id);
+            expect(location).to.have.deep.property('attributes.name', locationParams.name);
+            expect(location).to.have.deep.property('attributes.latitude', locationParams.latitude);
+            expect(location).to.have.deep.property('attributes.longitude', locationParams.longitude);
 
-        assert(_forge.called, 'forge() not called');
-        assert(_save.calledOnce, 'save() not called once');
+            assert(_forge.called, 'forge() not called');
+            assert(_save.calledOnce, 'save() not called once');
 
-        done();
-      });
+            done();
+          });
     });
 
     it('rejects a duplicate location', (done) => {
@@ -142,31 +142,37 @@ describe('EventService', () => {
       const _duplicateEntryError = sinon.spy(utils.errors, 'DuplicateEntryError');
       const _handleDuplicateEntryError = sinon.spy(utils.errors, 'handleDuplicateEntryError');
 
-      const createdLocation = EventService.createLocation(locationParams);
-      createdLocation.catch((error) => {
-        assert(_forge.called, 'forge() not called');
-        assert(_save.calledOnce, 'save() not called once');
-        assert(_duplicateEntryError.calledOnce, 'duplicateEntryError() not called once');
-        assert(_handleDuplicateEntryError.calledOnce, 'handleDuplicateEntryError() not called once');
+      EventService.createLocation(locationParams)
+          .then(() => {
+            assert.fail('Duplicate location was not rejected');
+          })
+          .catch((error) => {
+            assert(_forge.called, 'forge() not called');
+            assert(_save.calledOnce, 'save() not called once');
+            assert(_duplicateEntryError.calledOnce, 'duplicateEntryError() not called once');
+            assert(_handleDuplicateEntryError.calledOnce, 'handleDuplicateEntryError() not called once');
 
-        expect(error).to.be.an.instanceof(errors.InvalidParameterError);
+            expect(error).to.be.an.instanceof(errors.InvalidParameterError);
 
-        _duplicateEntryError.restore();
-        _handleDuplicateEntryError.restore();
+            _duplicateEntryError.restore();
+            _handleDuplicateEntryError.restore();
 
-        done();
-      });
+            done();
+          });
     });
 
     it('rejects an invalid location', (done) => {
-      const createdLocation = EventService.createLocation(invalidLocationParams);
-      createdLocation.catch((error) => {
-        assert(_forge.called, 'forge() not called');
-        assert(_save.calledOnce, 'save() not called once');
-        expect(error).to.be.an.instanceof(checkit.Error);
+      EventService.createLocation(invalidLocationParams)
+          .then(() => {
+            assert.fail('Invalid location was not rejected');
+          })
+          .catch((error) => {
+            assert(_forge.called, 'forge() not called');
+            assert(_save.calledOnce, 'save() not called once');
+            expect(error).to.be.an.instanceof(checkit.Error);
 
-        done();
-      });
+            done();
+          });
     });
 
     afterEach((done) => {
@@ -249,21 +255,21 @@ describe('EventService', () => {
     it('gets all events with locations', (done) => {
       _fetchAll.withArgs({withRelated: [ 'locations' ]}).returns(_Promise.resolve(testEvents.slice(0, 2)));
 
-      const allTestEvents = EventService.getEvents(false);
-      allTestEvents.then((events) => {
-        assert(events.length == 2, 'More events returned than expected (2), received (' + events.length + ')');
+      EventService.getEvents(false)
+          .then((events) => {
+            assert(events.length == 2, 'More events returned than expected (2), received (' + events.length + ')');
 
-        expect(events[0]).to.have.deep.property('id', testEvents[0].id);
-        expect(events[0]).to.have.deep.property('attributes.name', testEvents[0].attributes.name);
+            expect(events[0]).to.have.deep.property('id', testEvents[0].id);
+            expect(events[0]).to.have.deep.property('attributes.name', testEvents[0].attributes.name);
 
-        expect(events[1]).to.have.deep.property('id', testEvents[1].id);
-        expect(events[1]).to.have.deep.property('attributes.name', testEvents[1].attributes.name);
+            expect(events[1]).to.have.deep.property('id', testEvents[1].id);
+            expect(events[1]).to.have.deep.property('attributes.name', testEvents[1].attributes.name);
 
 
-        assert(_fetchAll.calledOnce);
+            assert(_fetchAll.calledOnce);
 
-        done();
-      });
+            done();
+          });
     });
 
     it('gets all occurring events with locations', (done) => {
@@ -272,20 +278,20 @@ describe('EventService', () => {
       const _query = sinon.stub(Event, 'query');
       _query.returns(Event);
 
-      const allTestEvents = EventService.getEvents(true);
-      allTestEvents.then((events) => {
-        assert(events.length == 1, 'More events returned than expected (1), received (' + events.length + ')');
+      EventService.getEvents(true)
+          .then((events) => {
+            assert(events.length == 1, 'More events returned than expected (1), received (' + events.length + ')');
 
-        expect(events[0]).to.have.deep.property('id', testEvents[1].id);
-        expect(events[0]).to.have.deep.property('attributes.name', testEvents[1].attributes.name);
+            expect(events[0]).to.have.deep.property('id', testEvents[1].id);
+            expect(events[0]).to.have.deep.property('attributes.name', testEvents[1].attributes.name);
 
-        assert(_fetchAll.calledOnce);
-        assert(_query.called);
+            assert(_fetchAll.calledOnce);
+            assert(_query.called);
 
-        _query.restore();
+            _query.restore();
 
-        done();
-      });
+            done();
+          });
     });
 
     afterEach((done) => {
@@ -348,22 +354,22 @@ describe('EventService', () => {
         query.response([ responseEvent ]);
       });
 
-      const createdLocation = EventService.createEvent({event: eventParams, eventLocations: locationParams});
-      createdLocation.then((response) => {
-        const event = response.event;
-        const locations = response.eventLocations;
-        expect(event).to.have.deep.property('id', eventParams.id);
-        expect(event).to.have.deep.property('attributes.name', eventParams.name);
-        expect(event).to.have.deep.property('attributes.tag', eventParams.tag);
-        expect(locations[0]).to.have.deep.property('id', locationParams[0].id);
-        expect(locations[1]).to.have.deep.property('id', locationParams[1].id);
-        expect(locations[0]).to.have.deep.property('attributes.eventId', eventParams.id);
-        expect(locations[1]).to.have.deep.property('attributes.eventId', eventParams.id);
+      EventService.createEvent({event: eventParams, eventLocations: locationParams})
+          .then((response) => {
+            const event = response.event;
+            const locations = response.eventLocations;
+            expect(event).to.have.deep.property('id', eventParams.id);
+            expect(event).to.have.deep.property('attributes.name', eventParams.name);
+            expect(event).to.have.deep.property('attributes.tag', eventParams.tag);
+            expect(locations[0]).to.have.deep.property('id', locationParams[0].id);
+            expect(locations[1]).to.have.deep.property('id', locationParams[1].id);
+            expect(locations[0]).to.have.deep.property('attributes.eventId', eventParams.id);
+            expect(locations[1]).to.have.deep.property('attributes.eventId', eventParams.id);
 
-        assert(_save.calledOnce, 'save() not called once');
+            assert(_save.calledOnce, 'save() not called once');
 
-        done();
-      });
+            done();
+          });
     });
 
     it('creates a valid event without locations', (done) => {
@@ -372,19 +378,19 @@ describe('EventService', () => {
         query.response([ responseEvent ]);
       });
 
-      const createdLocation = EventService.createEvent({event: eventParams});
-      createdLocation.then((response) => {
-        const event = response.event;
-        expect(event).to.have.deep.property('id', eventParams.id);
-        expect(event).to.have.deep.property('attributes.name', eventParams.name);
-        expect(event).to.have.deep.property('attributes.tag', eventParams.tag);
+      EventService.createEvent({event: eventParams})
+          .then((response) => {
+            const event = response.event;
+            expect(event).to.have.deep.property('id', eventParams.id);
+            expect(event).to.have.deep.property('attributes.name', eventParams.name);
+            expect(event).to.have.deep.property('attributes.tag', eventParams.tag);
 
-        assert(response.eventLocations == null, 'events incorrectly included');
+            assert(response.eventLocations == null, 'events incorrectly included');
 
-        assert(_save.calledOnce, 'save() not called once');
+            assert(_save.calledOnce, 'save() not called once');
 
-        done();
-      });
+            done();
+          });
     });
 
     it('rejects a duplicate event', (done) => {
@@ -397,18 +403,21 @@ describe('EventService', () => {
       const _duplicateEntryError = sinon.spy(utils.errors, 'DuplicateEntryError');
       const _handleDuplicateEntryError = sinon.spy(utils.errors, 'handleDuplicateEntryError');
 
-      const createdLocation = EventService.createEvent({event: eventParams, eventLocations: locationParams});
-      createdLocation.catch((error) => {
-        assert(_duplicateEntryError.calledOnce, 'duplicateEntryError() not called once');
-        assert(_handleDuplicateEntryError.calledOnce, 'handleDuplicateEntryError() not called once');
+      EventService.createEvent({event: eventParams, eventLocations: locationParams})
+          .then(() => {
+            assert.fail('Duplicate event was not rejected');
+          })
+          .catch((error) => {
+            assert(_duplicateEntryError.calledOnce, 'duplicateEntryError() not called once');
+            assert(_handleDuplicateEntryError.calledOnce, 'handleDuplicateEntryError() not called once');
 
-        expect(error).to.be.an.instanceof(errors.InvalidParameterError);
+            expect(error).to.be.an.instanceof(errors.InvalidParameterError);
 
-        _duplicateEntryError.restore();
-        _handleDuplicateEntryError.restore();
+            _duplicateEntryError.restore();
+            _handleDuplicateEntryError.restore();
 
-        done();
-      });
+            done();
+          });
     });
 
     afterEach((done) => {
