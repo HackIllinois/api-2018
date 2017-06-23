@@ -1,9 +1,10 @@
 const AuthService = require('../services/AuthService');
-const PermissionService = require('../services/PermissionService');
 const User = require('../models/User');
 const config = require('../../config');
 const errors = require('../errors');
+const roles = require('../utils/roles');
 const _ = require('lodash');
+const logger = require('../../logging');
 
 const AUTH_HEADER = config.auth.header;
 const ADMIN_USER_OVERRIDE_HEADER = 'Admin-User-Override';
@@ -25,17 +26,25 @@ module.exports = (req, res, next) => {
     .then((user) => {
       const adminUserOverride = req.get('Admin-User-Override');
 
-      if (!_.isUndefined(adminUserOverride) && PermissionService.isOrganizer(user)) {
+      if (!_.isUndefined(adminUserOverride) && user.hasRole(roles.SUPERUSER)) {
         return User.findById(adminUserOverride)
-          .then((user) => {
-            if (_.isNull(user) || PermissionService.isOrganizer(user)) {
+          .then((impersonated) => {
+            if (_.isNull(impersonated) || impersonated.hasRole(roles.SUPERUSER)) {
               const message = 'The provided userId was invalid (' + adminUserOverride + ')';
               const source = ADMIN_USER_OVERRIDE_HEADER;
 
               return next(new errors.InvalidHeaderError(message, source));
             }
 
-            req.user = user;
+            logger.info('Impersonation: %d %d at %s with %s %s',
+              user.get('id'),
+              impersonated.get('id'),
+              new Date(),
+              req.method,
+              req.originalUrl
+            );
+
+            req.user = impersonated;
             return next();
           });
       }
