@@ -41,8 +41,7 @@
     "mocha": "^3.2.0",
     "mock-knex": "^0.3.7",
     "mockery": "^2.0.0",
-    "sinon": "^1.17.2",
-    "sleep-promise": "^2.0.0"
+    "sinon": "^1.17.2"
   },
   "scripts": {
     "test": "./resources/scripts/test.sh",

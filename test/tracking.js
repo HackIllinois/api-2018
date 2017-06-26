@@ -1,24 +1,16 @@
 const chai = require('chai');
 const sinon = require('sinon');
-const sleep = require('sleep-promise');
 
 const errors = require('../api/v1/errors');
-const config = require('../api/config');
 const TrackingItem = require('../api/v1/models/TrackingEvent');
 const TrackingService = require('../api/v1/services/TrackingService');
 
 const assert = chai.assert;
 const expect = chai.expect;
 const tracker = require('mock-knex').getTracker();
-const fakeredis = require('fakeredis');
 
-const _REDIS_CONFIG = {
-  host: config.redis.host,
-  port: config.redis.port
-};
-
-const _cache = fakeredis.createClient(_REDIS_CONFIG);
-
+const cache = require('../api/cache')
+    .instance();
 
 describe('TrackingService', () => {
   describe('createTrackingEvent', () => {
@@ -56,7 +48,7 @@ describe('TrackingService', () => {
 
     beforeEach((done) => {
       tracker.install();
-      _cache.flushdb('trackedEvent');
+      cache.flushdb('trackedEvent');
       done();
     });
 
@@ -76,34 +68,22 @@ describe('TrackingService', () => {
           });
     });
 
-
     it('rejects an event when an active event is already occurring', (done) => {
       tracker.on('query', (query) => {
         const attributes = testTrackingAttributes[query.bindings[1]];
         query.response(TrackingItem.forge(attributes));
       });
 
-      TrackingService.createTrackingEvent(testTrackingAttributes[1])
-          .then(() => TrackingService.createTrackingEvent(testTrackingAttributes[0]))
-          .then(() => {
-            assert.fail('Tracked event was not rejected');
-          })
-          .catch((error) => {
-            expect(error).to.be.an.instanceof(errors.InvalidTrackingStateError);
-            done();
-          });
+      const validEvent = TrackingService.createTrackingEvent(testTrackingAttributes[1]);
+      validEvent.then(() => {
+        const invalidEvent = TrackingService.createTrackingEvent(testTrackingAttributes[0]);
+        expect(invalidEvent).to.eventually.be.rejectedWith(errors.InvalidTrackingStateError).and.notify(done);
+      });
     });
 
     it('rejects an invalid tracking event', (done) => {
-      TrackingService.createTrackingEvent(testInvalidTrackingAttributes[0])
-          .then(() => {
-            assert.fail('Invalid event was not rejected');
-          })
-          .catch((error) => {
-            assert(!_save.called, 'save called');
-            expect(error).to.be.an.instanceof(errors.InvalidParameterError);
-            done();
-          });
+      const event = TrackingService.createTrackingEvent(testInvalidTrackingAttributes[0]);
+      expect(event).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
     });
 
     afterEach((done) => {
@@ -137,22 +117,13 @@ describe('TrackingService', () => {
 
     beforeEach((done) => {
       tracker.install();
-      _cache.flushdb('trackedEvent');
-      sleep(1000)
-          .then(() => {
-            done();
-          });
+      cache.flushdb('trackedEvent');
+      done();
     });
 
     it('fails when no event is currently being tracked', (done) => {
-      TrackingService.addEventParticipant(testId)
-          .then(() => {
-            assert.fail('Invalid id was not rejected');
-          })
-          .catch((error) => {
-            expect(error).to.be.an.instanceof(errors.InvalidTrackingStateError);
-            done();
-          });
+      const participant = TrackingService.addEventParticipant(testId);
+      expect(participant).to.eventually.be.rejectedWith(errors.InvalidTrackingStateError).and.notify(done);
     });
 
     it('adds participant to an event', (done) => {
@@ -175,6 +146,5 @@ describe('TrackingService', () => {
       tracker.uninstall();
       done();
     });
-
   });
 });
