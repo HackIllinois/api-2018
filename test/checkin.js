@@ -173,11 +173,9 @@ describe('CheckInService', () => {
       checkin.bind(this).then(() => {
         assert(_saveCheckin.calledOnce, 'Checkin forge not called');
         done();
-      })
-                .catch((err) => {
-                  done(err);
-                });
+      });
     });
+
     it('fails when user already has CheckIn', (done) => {
       const testCheckInClone = _.clone(testCheckIn);
 
@@ -190,10 +188,12 @@ describe('CheckInService', () => {
       const checkin = CheckInService.createCheckIn(testCheckInClone);
       expect(checkin).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
     });
+
     afterEach((done) => {
       tracker.uninstall();
       done();
     });
+
     after((done) => {
       _saveCheckin.restore();
       done();

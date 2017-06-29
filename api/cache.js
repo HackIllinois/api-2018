@@ -2,12 +2,7 @@ const config = require('./config');
 const logger = require('./logging');
 
 const _Promise = require('bluebird');
-const redis = require('redis');
-
-_Promise.promisifyAll(redis.RedisClient.prototype);
-if(redis.Multi) {
-  _Promise.promisifyAll(redis.Multi.prototype);
-}
+const redis = _Promise.promisifyAll(require('redis'));
 
 const _REDIS_CONFIG = {
   host: config.redis.host,
