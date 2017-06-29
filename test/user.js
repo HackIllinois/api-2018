@@ -1,161 +1,184 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var chai = require('chai');
-var sinon = require('sinon');
+const chai = require('chai');
+const sinon = require('sinon');
+const _ = require('lodash');
 
-var errors = require('../api/v1/errors');
-var utils = require('../api/v1/utils');
-var UserService = require('../api/v1/services/UserService.js');
-var User = require('../api/v1/models/User.js');
+const errors = require('../api/v1/errors');
+const UserService = require('../api/v1/services/UserService.js');
+const User = require('../api/v1/models/User.js');
 
-var assert = chai.assert;
-var expect = chai.expect;
+const assert = chai.assert;
+const expect = chai.expect;
+const tracker = require('mock-knex').getTracker();
 
-describe('UserService',function() {
-	describe('createUser', function() {
-		var _createUser;
-		var _findByEmail;
+describe('UserService', () => {
+  describe('createUser', () => {
+    let _createUser;
+    let _findByEmail;
+    let testUser;
 
-		before(function (done) {
-			var testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.setPassword('password123').then(function () {
-				testUser.related('roles').add({ role: utils.roles.ATTENDEE });
+    before((done) => {
+      testUser = { id: 1, email: 'new@example.com', password: 'password123' };
 
-				_createUser = sinon.stub(User, 'create');
-				_findByEmail = sinon.stub(User, 'findByEmail');
+      _createUser = sinon.spy(User, 'create');
+      _findByEmail = sinon.spy(User, 'findByEmail');
+      done();
+    });
+    beforeEach((done) => {
+      tracker.install();
+      done();
+    });
+    it('creates a new user', function (done) {
+      const testUserClone = _.clone(testUser);
 
-				_createUser.withArgs(sinon.match.string, sinon.match.string, sinon.match.string).returns(_Promise.resolve(testUser));
-				_findByEmail.withArgs('existing@example.com').returns(_Promise.resolve(testUser));
-				_findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
+      tracker.on('query', (query) => {
+        query.response([ '1' ]);
+      });
 
-				done();
-			});
-		});
-		it('creates a new user', function (done) {
-			var user = UserService.createUser('new@example.com', 'password123', utils.roles.ATTENDEE);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1).then(function(){
-				expect(user).to.eventually.have.deep.property("attributes.email", 'new@example.com').then(function(){
-					user.tap(function (u) {
-						return expect(u.hasRole(utils.roles.ATTENDEE)).to.equal(true);
-					}).tap(function (u) {
-						return expect(u.hasPassword('password123')).to.eventually.equal(true);
-					}).then(function () { done(); }).catch(done);
-				});
-			});
-		});
-		it('throws an error for an existing user', function (done) {
-			var user = UserService.createUser('existing@example.com', 'password123', utils.roles.ATTENDEE);
-			expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
-		});
-		after(function(done) {
-			_createUser.restore();
-			_findByEmail.restore();
-			done();
-		});
-	});
-	describe('findUserByEmail',function() {
-		var _findByEmail;
+      const user = UserService.createUser(testUserClone.email, testUserClone.password, null);
 
-		before(function (done) {
-			var testUser = User.forge({ id: 1, email: 'valid@example.com' });
+      user.bind(this).then(() => {
 
-			_findByEmail = sinon.stub(User,'findByEmail');
+        assert(_createUser.calledOnce, 'User forge not called with right parameters');
+        return done();
+      }).catch((err) => done(err));
 
-			_findByEmail.withArgs(testUser.get('email')).returns(_Promise.resolve(testUser));
-			_findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
-			_findByEmail.withArgs(sinon.match.any).throws("TypeError");
-			done();
-		});
-		it('finds an existing user', function (done) {
-			var user = UserService.findUserByEmail('valid@example.com');
-			expect(user).to.eventually.have.deep.property("attributes.id", 1);
-			expect(user).to.eventually.have.deep.property("attributes.email", 'valid@example.com').and.notify(done);
-		});
-		it('throws an error for non-existent user', function (done) {
-			var user = UserService.findUserByEmail('invalid@example.com');
-			expect(user).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
-		});
-		after(function(done) {
-			_findByEmail.restore();
-			done();
-		});
-	});
+    });
+    it('throws an error for an existing user', (done) => {
+      const testUserClone = _.clone(testUser);
+      tracker.on('query', (query) => {
+        const err = new Error();
+        err.code = errors.Constants.DupEntry;
+        query.reject(err);
+      });
 
-	describe('findUserById',function(){
-		var _findById;
-		before(function(done){
-			var testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.setPassword('password123');
+      const user = UserService.createUser(testUserClone.email, testUserClone.password, null);
+      expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
+    });
+    afterEach((done) => {
+      tracker.uninstall();
+      done();
+    });
+    after((done) => {
+      _createUser.restore();
+      _findByEmail.restore();
+      done();
+    });
+  });
 
-			_findById = sinon.stub(User, 'findById');
+  describe('findUserByEmail', () => {
+    let _findByEmail;
 
-			_findById.withArgs(1).returns(_Promise.resolve(testUser));
-			_findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+    before((done) => {
+      const testUser = User.forge({ id: 1, email: 'valid@example.com' });
 
-			done();
-		});
-		it('finds existing user',function(done){
-			var user = UserService.findUserById(1);
-			expect(user).to.eventually.have.deep.property("attributes.id", 1,"ID should be 1, the searched for ID")
-				.then(function(){
-					expect(user).to.eventually.have.deep.property("attributes.email",
-						'new@example.com',"email should be new@example.com").notify(done);
-			})
-		});
-		it('throws exception after searching for non-existent user',function(done){
-			var user = UserService.findUserById(2);
-			expect(user).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
-		});
-		after(function(done){
-			_findById.restore();
-			done();
-		});
-	});
+      _findByEmail = sinon.stub(User, 'findByEmail');
 
-	describe('verifyPassword',function(){ 
-		var testUser; 
-		before(function(done){
-			testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.setPassword('password123')
+      _findByEmail.withArgs(testUser.get('email')).returns(_Promise.resolve(testUser));
+      _findByEmail.withArgs(sinon.match.string).returns(_Promise.resolve(null));
+      _findByEmail.withArgs(sinon.match.any).throws('TypeError');
+      done();
+    });
+    it('finds an existing user', (done) => {
+      const user = UserService.findUserByEmail('valid@example.com');
+      expect(user).to.eventually.have.deep.property('attributes.id', 1);
+      expect(user).to.eventually.have.deep.property('attributes.email', 'valid@example.com').and.notify(done);
+    });
+    it('throws an error for non-existent user', (done) => {
+      const user = UserService.findUserByEmail('invalid@example.com');
+      expect(user).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+    });
+    after((done) => {
+      _findByEmail.restore();
+      done();
+    });
+  });
+
+  describe('findUserById', () => {
+    let _findById;
+    before((done) => {
+      const testUser = User.forge({ id: 1, email: 'new@example.com' });
+      testUser.setPassword('password123');
+
+      _findById = sinon.stub(User, 'findById');
+
+      _findById.withArgs(1).returns(_Promise.resolve(testUser));
+      _findById.withArgs(sinon.match.number).returns(_Promise.resolve(null));
+
+      done();
+    });
+    it('finds existing user', (done) => {
+      const user = UserService.findUserById(1);
+      expect(user).to.eventually.have.deep.property('attributes.id', 1, 'ID should be 1, the searched for ID')
+				.then(() => {
+  expect(user).to.eventually.have.deep.property('attributes.email',
+						'new@example.com', 'email should be new@example.com').notify(done);
+});
+    });
+    it('throws exception after searching for non-existent user', (done) => {
+      const user = UserService.findUserById(2);
+      expect(user).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+    });
+    after((done) => {
+      _findById.restore();
+      done();
+    });
+  });
+
+  describe('verifyPassword', () => {
+
+    let testUser;
+
+    before((done) => {
+      testUser = User.forge({ id: 1, email: 'new@example.com' });
+      testUser.setPassword('password123')
+				.then((updatedUser) => {
+  testUser = updatedUser;
+  done();
+});
+    });
+
+
+    it('tries a correct password', (done) => {
+
+      const user = UserService.verifyPassword(testUser, 'password123');
+
+      expect(user).to.eventually.equal(true).and.notify(done);
+
+    });
+
+    it('tries an incorrect password', (done) => {
+
+      const user = UserService.verifyPassword(testUser, 'wrongPassword');
+
+      expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
+    });
+
+  });
+
+  describe('resetPassword', () => {
+    let testUser;
+    let _save;
+    before((done) => {
+      testUser = User.forge({ id: 1, email: 'new@example.com' });
+      testUser.setPassword('password123')
 				.then(function(updatedUser){
-					testUser = updatedUser;
-					done();
-				});
-		});  
-		it('tries a correct password',function(done){ 
-			var user = UserService.verifyPassword(testUser,"password123"); 
-			expect(user).to.eventually.equal(true).and.notify(done); 
-		}); 
-		it('tries an incorrect password',function(done){ 
-			var user = UserService.verifyPassword(testUser,"wrongPassword"); 
-			expect(user).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done)
-		}); 
-	});
+  testUser = updatedUser;
 
-	describe('resetPassword',function(){
-		var testUser;
-		var _save;
-		before(function(done){
-			testUser = User.forge({ id: 1, email: 'new@example.com' });
-			testUser.setPassword('password123')
-				.then(function(updatedUser){
-					testUser = updatedUser;
+  _save = sinon.stub(User.prototype, 'save');
+  _save.withArgs().returns(this);
 
-					_save = sinon.stub(User.prototype,'save');
-					_save.withArgs().returns(this);
-
-					done();
-				});
-		});
-		it('resets password',function(done){
-			var user = UserService.resetPassword(testUser,'password456').then(function(updatedUser){
-				return UserService.verifyPassword(updatedUser,"password456");
-			});
-			expect(user).to.eventually.equal(true).and.notify(done);
-		});
-		after(function(done){
-			_save.restore();
-			done();
-		});
-	})
+  done();
+});
+    });
+    it('resets password', (done) => {
+      const user = UserService.resetPassword(testUser, 'password456').then((updatedUser) => UserService.verifyPassword(updatedUser, 'password456'));
+      expect(user).to.eventually.equal(true).and.notify(done);
+    });
+    after((done) => {
+      _save.restore();
+      done();
+    });
+  });
 });

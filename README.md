@@ -17,16 +17,22 @@ If you are a front-end developer that wants to use a local instance of the API
 or someone who just wants to run the API for novelty, the most-accessible
 major releases of the following software will likely work for you.
 
+For ease of setting up a developement environment we support a Vagrant developement image,
+to use this you must have Vagrant installed, and then run `vagrant up`, which will
+install the image and setup your dev environment for you. You can access it with `vagrant ssh`
+
+Alternatively, you can setup the dev environment yourself
+
 These version notes are more important for back-end developers who will be committing
 code to this repository.
 
 #### Node.js Version
 
-Our application is deployed with Node.js v4.6.2. It is recommended that you install
-this version, although using a different release version (v4.6.x) will
+Our application is deployed with Node.js v6.10.3. It is recommended that you install
+this version, although using a different release version (v6.x) will
 probably work too.
 
-The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v4.6.2/).
+The production-ready version of Node.js can be downloaded from [here](https://nodejs.org/dist/v6.10.3/).
 
 #### MySQL Version
 
@@ -163,3 +169,5 @@ Environment variables should be set in `test.config`. With these values set, run
 ``` shell
 npm test
 ```
+
+which will output the test results, as well as any linter errors that may occur 

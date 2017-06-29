@@ -1,37 +1,61 @@
-var AuthService = require('../services/AuthService');
-var User = require('../models/User');
-var config = require('../../config');
-var errors = require('../errors');
+const AuthService = require('../services/AuthService');
+const User = require('../models/User');
+const config = require('../../config');
+const errors = require('../errors');
+const roles = require('../utils/roles');
+const _ = require('lodash');
+const logger = require('../../logging');
 
-var AUTH_HEADER = config.auth.header;
+const AUTH_HEADER = config.auth.header;
+const ADMIN_USER_OVERRIDE_HEADER = 'Admin-User-Override';
 
-module.exports = function (req, res, next) {
-	var auth = req.header(AUTH_HEADER);
+module.exports = (req, res, next) => {
+  const auth = req.header(AUTH_HEADER);
 
-	if (!auth) {
-		return next();
-	}
+  if (!auth) {
+    return next();
+  }
 
-	return AuthService.verify(auth)
-		.then(function (decoded) {
-			// specifies that request supplied a valid auth token
-			// (but not necessarily that the associated user data has been retrieved)
-			req.auth = true;
+  return AuthService.verify(auth)
+    .then((decoded) => {
+      // specifies that request supplied a valid auth token
+      // (but not necessarily that the associated user data has been retrieved)
+      req.auth = true;
+      return User.findById(decoded.sub);
+    })
+    .then((user) => {
+      const adminUserOverride = req.get('Admin-User-Override');
 
-			return User.findById(decoded.sub);
-		})
-		.then(function (user) {
-			req.user = user;
+      if (!_.isUndefined(adminUserOverride) && user.hasRole(roles.SUPERUSER)) {
+        return User.findById(adminUserOverride)
+          .then((impersonated) => {
+            if (_.isNull(impersonated) || impersonated.hasRole(roles.SUPERUSER)) {
+              const message = 'The provided userId was invalid (' + adminUserOverride + ')';
+              const source = ADMIN_USER_OVERRIDE_HEADER;
 
-			next();
-			return null;
-		})
-		.catch(errors.UnprocessableRequestError, function (error) {
-			var message = "The provided token was invalid (" +
-				error.message + ")";
-			var source = AUTH_HEADER;
+              return next(new errors.InvalidHeaderError(message, source));
+            }
 
-			next(new errors.InvalidHeaderError(message, source));
-			return null;
-		});
+            logger.info('Impersonation: %d %d at %s with %s %s',
+              user.get('id'),
+              impersonated.get('id'),
+              new Date(),
+              req.method,
+              req.originalUrl
+            );
+
+            req.user = impersonated;
+            return next();
+          });
+      }
+
+      req.user = user;
+      return next();
+    })
+    .catch(errors.UnprocessableRequestError, (error) => {
+      const message = 'The provided token was invalid (' + error.message + ')';
+      const source = AUTH_HEADER;
+
+      return next(new errors.InvalidHeaderError(message, source));
+    });
 };

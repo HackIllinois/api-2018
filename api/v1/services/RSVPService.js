@@ -1,20 +1,17 @@
-var CheckitError = require('checkit').Error;
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const CheckitError = require('checkit').Error;
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var RSVP = require('../models/AttendeeRSVP');
-var UserRole = require('../models/UserRole');
-var errors = require('../errors');
-var utils = require('../utils');
-
+const RSVP = require('../models/AttendeeRSVP');
+const UserRole = require('../models/UserRole');
+const errors = require('../errors');
+const utils = require('../utils');
 /**
  * Gets an rsvp by its id
  * @param {integer} id the id of the RSVP to find
  * @returns {Promise} the resolved rsvp
  */
-module.exports.getRSVPById = function (id) {
-    return RSVP.findById(id);
-};
+module.exports.getRSVPById = (id) => RSVP.findById(id);
 
 /**
  * Creates an RSVP and sets the users attendee role to active
@@ -24,28 +21,24 @@ module.exports.getRSVPById = function (id) {
  * @returns {Promise} the resolved rsvp
  * @throws {InvalidParameterError} thrown when an attendee already has an rsvp
  */
-module.exports.createRSVP = function (attendee, user, attributes) {
-    attributes.attendeeId = attendee.get('id');
-    var rsvp = RSVP.forge(attributes);
+module.exports.createRSVP = (attendee, user, attributes) => {
+  attributes.attendeeId = attendee.get('id');
+  const rsvp = RSVP.forge(attributes);
 
-    return rsvp
-        .validate()
-        .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function (validated) {
-            return RSVP.findByAttendeeId(attributes.attendeeId);
-        })
-        .then(function (result) {
-            if (!_.isNull(result)) {
-                var message = "An RSVP already exists for the given attendee";
-                var source = "attendeeId";
-                throw new errors.InvalidParameterError(message, source);
-            }
-
-            var userRole = user.getRole(utils.roles.ATTENDEE);
-            UserRole.setActive(userRole, true);
-
-            return rsvp.save();
-        })
+  return rsvp
+    .validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => RSVP.transaction((t) => rsvp.save(null, {
+      transacting: t
+    })
+      .tap(() => {
+        const userRole = user.getRole(utils.roles.ATTENDEE);
+        return UserRole.setActive(userRole, true, t);
+      })))
+    .catch(
+      utils.errors.DuplicateEntryError,
+      utils.errors.handleDuplicateEntryError('An RSVP already exists for the given attendee', 'attendeeId')
+    );
 };
 
 /**
@@ -54,19 +47,17 @@ module.exports.createRSVP = function (attendee, user, attributes) {
  * @returns {Promise} the resolved rsvp for the attendee
  * @throws {NotFoundError} when the attendee has no RSVP
  */
-module.exports.findRSVPByAttendee = function (attendee) {
-    return RSVP
-        .findByAttendeeId(attendee.get('id'))
-        .then(function (result) {
-            if (_.isNull(result)) {
-                var message = "An RSVP cannot be found for the given attendee";
-                var source = "attendeeId";
-                throw new errors.NotFoundError(message, source);
-            }
+module.exports.findRSVPByAttendee = (attendee) => RSVP
+    .findByAttendeeId(attendee.get('id'))
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'An RSVP cannot be found for the given attendee';
+        const source = 'attendeeId';
+        throw new errors.NotFoundError(message, source);
+      }
 
-            return _Promise.resolve(result);
-        });
-};
+      return _Promise.resolve(result);
+    });
 
 /**
  * Updates a given RSVP
@@ -74,17 +65,19 @@ module.exports.findRSVPByAttendee = function (attendee) {
  * @param {Object} attributes the new RSVP data to set
  * @returns {Promise} the resolved RSVP
  */
-module.exports.updateRSVP = function (user, rsvp, attributes) {
-    rsvp.set({'type': null});
-    rsvp.set(attributes);
+module.exports.updateRSVP = (user, rsvp, attributes) => {
+  rsvp.set({
+    'type': null
+  });
+  rsvp.set(attributes);
 
-    return rsvp
-        .validate()
-        .catch(CheckitError, utils.errors.handleValidationError)
-        .then(function (validated) {
-            var userRole = user.getRole(utils.roles.ATTENDEE);
-            rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false);
+  return rsvp
+    .validate()
+    .catch(CheckitError, utils.errors.handleValidationError)
+    .then(() => {
+      const userRole = user.getRole(utils.roles.ATTENDEE);
+      rsvp.get('isAttending') ? UserRole.setActive(userRole, true) : UserRole.setActive(userRole, false); //eslint-disable-line no-unused-expressions
 
-            return rsvp.save();
-        });
+      return rsvp.save();
+    });
 };

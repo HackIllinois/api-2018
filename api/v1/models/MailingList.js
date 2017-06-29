@@ -1,15 +1,15 @@
-var _Promise = require('bluebird');
+const _Promise = require('bluebird');
 
-var Model = require('./Model');
-var User = require('./User');
-var MailingListUser = require('./MailingListUser');
+const Model = require('./Model');
+const User = require('./User');
+const MailingListUser = require('./MailingListUser');
 
-var MailingList = Model.extend({
-	tableName: 'mailing_lists',
-	idAttribute: 'id',
-	validations: {
-		sent: ['boolean']
-	}
+const MailingList = Model.extend({
+  tableName: 'mailing_lists',
+  idAttribute: 'id',
+  validations: {
+    sent: [ 'boolean' ]
+  }
 });
 
 /**
@@ -17,8 +17,14 @@ var MailingList = Model.extend({
  * @param  {String} name			a list's name
  * @return {Promise<MailingList>} 	the desired mailing list, or null
  */
-MailingList.findByName = function (name) {
-	return this.collection().query({ where: { name: name } }).fetchOne();
+MailingList.findByName = function(name) {
+  return this.collection()
+    .query({
+      where: {
+        name: name
+      }
+    })
+    .fetchOne();
 };
 
 /**
@@ -26,19 +32,24 @@ MailingList.findByName = function (name) {
  * @param {User}	user				the user to add
  * @returns {Promise<MailingListUser>}	an promise with the save result
  */
-MailingList.prototype.addUser = function (user) {
-	var mailingListUser = MailingListUser.forge({ user_id: user.id, mailing_list_id: this.attributes.id });
-	return MailingListUser
-		.transaction(function (t) {
-			return mailingListUser
-				.fetch({ transacting: t })
-				.then(function (result) {
-					if (result) {
-						return _Promise.resolve(result);
-					}
-					return mailingListUser.save(null, { transacting: t });
-				});
-		});
+MailingList.prototype.addUser = function(user) {
+  const mailingListUser = MailingListUser.forge({
+    user_id: user.id,
+    mailing_list_id: this.attributes.id
+  });
+  return MailingListUser
+    .transaction((t) => mailingListUser
+      .fetch({
+        transacting: t
+      })
+      .then((result) => {
+        if (result) {
+          return _Promise.resolve(result);
+        }
+        return mailingListUser.save(null, {
+          transacting: t
+        });
+      }));
 };
 
 /**
@@ -46,18 +57,23 @@ MailingList.prototype.addUser = function (user) {
  * @param  {User} user					the user to remove from the list
  * @return {Promise<MailingListUser>}	a promise with the deleted result
  */
-MailingList.prototype.removeUser = function (user) {
-	return MailingListUser
-		.where({ user_id: user.id, mailing_list_id: this.attributes.id })
-		.destroy();
+MailingList.prototype.removeUser = function(user) {
+  return MailingListUser
+    .where({
+      user_id: user.id,
+      mailing_list_id: this.attributes.id
+    })
+    .destroy();
 };
 
 /**
  * Determines the members of this list
  * @return {Promise<Collection>} the Users that are on this list
  */
-MailingList.prototype.members = function (list) {
-	return this.belongsToMany(User).through(MailingListUser).fetch();
+MailingList.prototype.members = function() {
+  return this.belongsToMany(User)
+    .through(MailingListUser)
+    .fetch();
 };
 
 module.exports = MailingList;

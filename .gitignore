@@ -16,5 +16,8 @@ temp
 
 /.idea
 
-*.config
+config/*.config
 .env
+
+.vagrant
+.eslintcache

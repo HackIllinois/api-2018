@@ -1,11 +1,10 @@
-var Checkit = require('checkit');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const Checkit = require('checkit');
+const _Promise = require('bluebird');
+const _ = require('lodash');
 
-var User = require('../models/User');
-var Token = require('../models/Token');
-var errors = require('../errors');
-var utils = require('../utils');
+const User = require('../models/User');
+const errors = require('../errors');
+const utils = require('../utils');
 
 /**
  * Creates a user of the specified role. When a password is not specified, a
@@ -16,33 +15,30 @@ var utils = require('../utils');
  * @return {Promise} resolving to the newly-created user
  * @throws InvalidParameterError when a user exists with the specified email
  */
-module.exports.createUser = function (email, password, role) {
+module.exports.createUser = (email, password, role) => {
 
-	email = email.toLowerCase();
-	var storedPassword = (password) ? password : utils.crypto.generatePassword();
-	var user = User.forge({ email: email, password: storedPassword });
-	return user
-		.validate()
-		.catch(Checkit.Error, utils.errors.handleValidationError)
-		.then(function (validated) {
-			return User.findByEmail(email);
-		})
-		.then(function (result) {
-			if (!_.isNull(result)) {
-				var message = "A user with the given email already exists";
-				var source = "email";
-				throw new errors.InvalidParameterError(message, source);
-			}
-			return User.create(email, storedPassword, role);
-		})
-		.then(function (result) {
-			if (_.isUndefined(password) || _.isNull(password)) {
-				// TODO: send user an email requiring a password reset when
-				// the password is automatically generated
-			}
+  email = email.toLowerCase();
+  const storedPassword = (password) ? password : utils.crypto.generatePassword();
+  const user = User.forge({
+    email: email,
+    password: storedPassword
+  });
+  return user
+    .validate()
+    .catch(Checkit.Error, utils.errors.handleValidationError)
+    .then(() => User.create(email, storedPassword, role))
+    .then((result) => {
+      if (_.isUndefined(password) || _.isNull(password)) {
+        // TODO: send user an email requiring a password reset when
+        // the password is automatically generated
+      }
 
-			return _Promise.resolve(result);
-		});
+      return _Promise.resolve(result);
+    })
+    .catch(
+      utils.errors.DuplicateEntryError,
+      utils.errors.handleDuplicateEntryError('A user with the given email already exists', 'email')
+    );
 };
 
 /**
@@ -51,19 +47,17 @@ module.exports.createUser = function (email, password, role) {
  * @return {Promise} resolving to the associated User model
  * @throws {NotFoundError} when the requested user cannot be found
  */
-module.exports.findUserById = function (id) {
-	return User
-		.findById(id)
-		.then(function (result) {
-			if (_.isNull(result)) {
-				var message = "A user with the given ID cannot be found";
-				var source = "id";
-				throw new errors.NotFoundError(message, source);
-			}
+module.exports.findUserById = (id) => User
+    .findById(id)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'A user with the given ID cannot be found';
+        const source = 'id';
+        throw new errors.NotFoundError(message, source);
+      }
 
-			return _Promise.resolve(result);
-		});
-};
+      return _Promise.resolve(result);
+    });
 
 /**
  * Finds a user by querying for the given email
@@ -71,18 +65,16 @@ module.exports.findUserById = function (id) {
  * @return {Promise} resolving to the associated User model
  * @throws {NotFoundError} when the requested user cannot be found
  */
-module.exports.findUserByEmail = function (email) {
-	return User
-		.findByEmail(email)
-		.then(function (result) {
-			if (_.isNull(result)) {
-				var message = "A user with the given email cannot be found";
-				var source = "email";
-				throw new errors.NotFoundError(message, source);
-			}
-			return _Promise.resolve(result);
-		});
-};
+module.exports.findUserByEmail = (email) => User
+    .findByEmail(email)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'A user with the given email cannot be found';
+        const source = 'email';
+        throw new errors.NotFoundError(message, source);
+      }
+      return _Promise.resolve(result);
+    });
 
 /**
  * Verifies that the provided password matches the user's password
@@ -91,19 +83,17 @@ module.exports.findUserByEmail = function (email) {
  * @return {Promise} resolving to the validity of the provided password
  * @throws {InvalidParameterError} when the password is invalid
  */
-module.exports.verifyPassword = function (user, password) {
-	return user
-		.hasPassword(password)
-		.then(function (result) {
-			if (!result) {
-				var message = "The provided password is incorrect";
-				var source = "password";
-				throw new errors.InvalidParameterError(message, source);
-			}
+module.exports.verifyPassword = (user, password) => user
+    .hasPassword(password)
+    .then((result) => {
+      if (!result) {
+        const message = 'The provided password is incorrect';
+        const source = 'password';
+        throw new errors.InvalidParameterError(message, source);
+      }
 
-			return _Promise.resolve(true);
-		});
-};
+      return _Promise.resolve(true);
+    });
 
 /**
  * Resets the user's password and saves it.
@@ -111,10 +101,6 @@ module.exports.verifyPassword = function (user, password) {
  * @param  {String} password the password to change to
  * @return {Promise} resolving to the new User model
  */
-module.exports.resetPassword = function (user, password) {
-	return user
-		.setPassword(password)
-		.then(function (updated) {
-			return updated.save();
-		});
-};
+module.exports.resetPassword = (user, password) => user
+    .setPassword(password)
+    .then((updated) => updated.save());

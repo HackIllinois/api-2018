@@ -1,27 +1,26 @@
-var Request = require('./Request');
-var mail = require('../utils/mail');
-var _Promise = require('bluebird');
-var _ = require('lodash');
+const Request = require('./Request');
+const mail = require('../utils/mail');
+const _ = require('lodash');
 
-var bodyRequired = ['listName', 'template'];
-var bodyValidations = {
-	'listName':  ['required', 'string', checkValidMailName],
-	'template': ['required', 'string', checkValidTemplateName]
+const bodyRequired = ['listName', 'template'];
+const bodyValidations = {
+  'listName': ['required', 'string', checkValidMailName],
+  'template': ['required', 'string', checkValidTemplateName]
 };
 
 function SendListRequest(headers, body) {
-	Request.call(this, headers, body);
+  Request.call(this, headers, body);
 
-	this.bodyRequired = bodyRequired;
-	this.bodyValidations = bodyValidations;
+  this.bodyRequired = bodyRequired;
+  this.bodyValidations = bodyValidations;
 }
 
-function checkValidMailName (listName) {
-	return !_.isUndefined(mail.lists[listName]);
+function checkValidMailName(listName) {
+  return !_.isUndefined(mail.lists[listName]);
 }
 
-function checkValidTemplateName (templateName) {
-	return !_.isUndefined(mail.templates[templateName]);
+function checkValidTemplateName(templateName) {
+  return !_.isUndefined(mail.templates[templateName]);
 }
 
 SendListRequest.prototype = Object.create(Request.prototype);
