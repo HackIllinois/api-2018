@@ -5,6 +5,8 @@ const sinon = require('sinon');
 const _ = require('lodash');
 
 const errors = require('../api/v1/errors');
+const utils = require('../api/v1/utils');
+const User = require('../api/v1/models/User.js');
 const CheckInService = require('../api/v1/services/CheckInService.js');
 const CheckIn = require('../api/v1/models/CheckIn.js');
 
@@ -16,30 +18,60 @@ const tracker = require('mock-knex').getTracker();
 describe('CheckInService', () => {
   describe('findCheckInByUserId', () => {
 
+    let testUser;
+    let noCheckinTestUser;
+    let testCheckIn;
     let _findByUserId;
 
     before((done) => {
-      const testCheckIn = CheckIn.forge({ id: 1, user_id: 2342, location: 'ECEB'});
+      testUser = User.forge({id: 1, email: 'test@exmple.com' });
+      testUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-      _findByUserId = sinon.stub(CheckIn, 'findByUserId');
+      noCheckinTestUser = User.forge({id: 2, email: 'nullTest@exmple.com' });
+      noCheckinTestUser.related('roles').add({ role: utils.roles.ATTENDEE });
 
-      _findByUserId.withArgs(2342).returns(_Promise.resolve(testCheckIn));
-      _findByUserId.withArgs(3232).returns(_Promise.resolve(null));
+      testCheckIn = CheckIn.forge({ id: 1, user_id: testUser.id, location: 'ECEB', swag: false});
+
+      _findByUserId = sinon.spy(CheckIn, 'findByUserId');
+
+      tracker.install();
+
+      tracker.on('query', (query) => {
+        if (query.bindings[0] == testUser.id) {
+          query.response([ testCheckIn ]);
+        } else {
+          query.response([]);
+        }
+      });
 
       done();
     });
 
     it('finds a CheckIn using valid user id', (done) => {
-      const checkin = CheckInService.findCheckInByUserId(2342);
-      expect(checkin).to.eventually.have.deep.property('checkin.attributes.id', 1).and.notify(done);
+      const checkin = CheckInService.findCheckInByUserId(testUser.id);
+      checkin.then((response) => {
+        expect(response).to.have.deep.property('checkin.attributes.id', testCheckIn.id);
+        assert(_findByUserId.calledOnce, 'CheckIn findByUserId not called once');
+        done();
+      });
     });
 
     it('throws error for requesting a CheckIn for non-existent user', (done) => {
-      const checkin = CheckInService.findCheckInByUserId(3232);
-      expect(checkin).to.eventually.be.rejectedWith(errors.NotFoundError).and.notify(done);
+      const checkin = CheckInService.findCheckInByUserId(noCheckinTestUser.id);
+      checkin.catch((error) => {
+        expect(error).to.be.an.instanceof(errors.NotFoundError);
+        assert(_findByUserId.calledOnce, 'CheckIn findByUserId not called once');
+        done();
+      });
+    });
+
+    afterEach((done) => {
+      _findByUserId.reset();
+      done();
     });
 
     after((done) => {
+      tracker.uninstall();
       _findByUserId.restore();
       done();
     });
@@ -81,11 +113,11 @@ describe('CheckInService', () => {
       testCheckIn.swag = true;
 
       CheckInService.updateCheckIn(testCheckIn)
-								.then((checkin) => {
-  expect(checkin).to.have.deep.property('checkin.attributes.location', 'SIEBEL');
-  expect(checkin).to.have.deep.property('checkin.attributes.swag', true);
-  done();
-});
+                .then((checkin) => {
+                  expect(checkin).to.have.deep.property('checkin.attributes.location', 'SIEBEL');
+                  expect(checkin).to.have.deep.property('checkin.attributes.swag', true);
+                  done();
+                });
     });
     it('cannot change swag from true to false', (done) => {
       testAttendeeCheckIn = CheckIn.forge(testCheckIn);
@@ -95,11 +127,11 @@ describe('CheckInService', () => {
       testCheckIn.swag = false;
 
       CheckInService.updateCheckIn(testCheckIn)
-								.then((checkin) => {
-  expect(checkin).to.have.deep.property('checkin.attributes.location', 'SIEBEL');
-  expect(checkin).to.have.deep.property('checkin.attributes.swag', true);
-  done();
-});
+                .then((checkin) => {
+                  expect(checkin).to.have.deep.property('checkin.attributes.location', 'SIEBEL');
+                  expect(checkin).to.have.deep.property('checkin.attributes.swag', true);
+                  done();
+                });
     });
     after((done) => {
       _get.restore();
@@ -141,11 +173,9 @@ describe('CheckInService', () => {
       checkin.bind(this).then(() => {
         assert(_saveCheckin.calledOnce, 'Checkin forge not called');
         done();
-      })
-					.catch((err) => {
-  done(err);
-});
+      });
     });
+
     it('fails when user already has CheckIn', (done) => {
       const testCheckInClone = _.clone(testCheckIn);
 
@@ -158,14 +188,15 @@ describe('CheckInService', () => {
       const checkin = CheckInService.createCheckIn(testCheckInClone);
       expect(checkin).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
     });
+
     afterEach((done) => {
       tracker.uninstall();
       done();
     });
+
     after((done) => {
       _saveCheckin.restore();
       done();
     });
   });
-
 });
