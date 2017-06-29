@@ -40,7 +40,7 @@
       "module.exports"
     ],
     "node/no-unpublished-require": ["error", {
-      "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "fakeredis", "redis-mock", "redis-js"],
+      "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "fakeredis"],
       "tryExtensions": [".js", ".json", ".node"]
     }],
     "prefer-const": "error",
@@ -90,7 +90,6 @@
     "key-spacing": "error",
     "arrow-body-style": "error",
     "arrow-parens": "error",
-    "arrow-spacing": "error",
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "arrow-spacing": "error"
   }
 }
