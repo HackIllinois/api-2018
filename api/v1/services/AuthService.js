@@ -1,4 +1,6 @@
 const _Promise = require('bluebird');
+const request = require('request-promise');
+const qs = require('querystring');
 
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
@@ -10,6 +12,13 @@ const JWT_SECRET = config.auth.secret;
 const JWT_CONFIG = {
   expiresIn: config.auth.expiration
 };
+
+const GITHUB_CLIENT_ID = config.auth.githubclient.id;
+const GITHUB_CLIENT_SECRET = config.auth.githubclient.secret;
+
+const githubAuthRedirect = 'https://github.com/login/oauth/authorize?scope=user:email&client_id=';
+const githubTokenPath = 'https://github.com/login/oauth/access_token';
+const githubEmailPath = 'https://api.github.com/user/emails';
 
 /**
  * Issues an auth token using the provided payload and optional subject
@@ -59,3 +68,43 @@ module.exports.verify = (token) => _Promise
   const message = error.message;
   throw new errors.UnprocessableRequestError(message);
 });
+
+module.exports.getGitSessionCodePath = () => {
+  return githubAuthRedirect + GITHUB_CLIENT_ID;
+};
+
+module.exports.requestGitAccessToken = (code) => {
+  let token;
+
+  return request({
+    uri: githubTokenPath,
+    qs: {
+      client_id: GITHUB_CLIENT_ID,
+      client_secret: GITHUB_CLIENT_SECRET,
+      code: code
+    }
+  })
+  .then((body) => {
+    token = qs.parse(body).access_token;
+
+    return request({
+      uri: githubEmailPath,
+      qs: {
+        access_token: token
+      },
+      headers: {
+        'User-Agent': 'HackIllinois-API'
+      },
+      json: true
+    });
+  })
+  .then((body) => {
+    const primaryEmail = _.find(body, 'primary').email;
+    if(_.isUndefined(primaryEmail)) {
+      const message = 'The GitHub account has no primary email';
+      throw new errors.UnprocessableRequestError(message);
+    }
+
+    return {email: primaryEmail, accessToken: token};
+  });
+}

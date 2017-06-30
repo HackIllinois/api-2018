@@ -42,13 +42,25 @@ function createToken(req, res, next) {
       res.body = {};
       res.body.auth = auth;
 
-      next();
-      return null;
+      return next();
     })
-    .catch((error) => {
-      next(error);
-      return null;
-    });
+    .catch((error) => next(error));
+}
+
+function getGitAuthToken(req, res, next) {
+  res.redirect(AuthService.getGitSessionCodePath());
+  return next();
+}
+
+function getGitAccessToken(req, res, next) {
+  AuthService.requestGitAccessToken(req.query.code)
+  .then((gitLogin) => {
+    //TODO persist accounts, and integrate with our own auth middleware
+    res.body = gitLogin;
+
+    return next();
+  })
+  .catch((error) => next(error));
 }
 
 function refreshToken(req, res, next) {
@@ -88,9 +100,12 @@ function passwordReset(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('', middleware.request(requests.BasicAuthRequest), createToken);
+router.post('/', middleware.request(requests.BasicAuthRequest), createToken);
 router.get('/refresh', refreshToken);
 router.post('/reset', middleware.request(requests.ResetPasswordRequest), passwordReset);
+
+router.get('/', getGitAuthToken);
+router.get('/github', getGitAccessToken);
 
 router.use(middleware.response);
 router.use(middleware.errors);

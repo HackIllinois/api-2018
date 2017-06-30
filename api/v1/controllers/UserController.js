@@ -90,7 +90,8 @@ function requestPasswordReset(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
+router.post('/', middleware.request(requests.BasicAuthRequest),
+  middleware.permission(roles.ORGANIZERS), createUser);
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
   middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
