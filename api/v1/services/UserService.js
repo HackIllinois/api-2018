@@ -41,6 +41,19 @@ module.exports.createUser = (email, password, role) => {
     );
 };
 
+module.exports.createGitHubUser = (email, handle) => {
+  email = email.toLowerCase();
+  const user = User.forge({
+    email: email,
+    githubId: handle
+  });
+
+  return user
+  .validate()
+  .catch(Checkit.Error, utils.errors.handleValidationError)
+  .then(() => user.save());
+};
+
 /**
  * Finds a user by querying for the given ID
  * @param  {Number} id the ID to query

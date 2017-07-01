@@ -1,6 +1,7 @@
 const _Promise = require('bluebird');
+const UserService = require('../services/UserService');
+const User = require('../models/User');
 const request = require('request-promise');
-const qs = require('querystring');
 
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
@@ -18,6 +19,7 @@ const GITHUB_CLIENT_SECRET = config.auth.githubclient.secret;
 
 const githubAuthRedirect = 'https://github.com/login/oauth/authorize?scope=user:email&client_id=';
 const githubTokenPath = 'https://github.com/login/oauth/access_token';
+const githubUserPath = 'https://api.github.com/user';
 const githubEmailPath = 'https://api.github.com/user/emails';
 
 /**
@@ -69,12 +71,11 @@ module.exports.verify = (token) => _Promise
   throw new errors.UnprocessableRequestError(message);
 });
 
-module.exports.getGitSessionCodePath = () => {
-  return githubAuthRedirect + GITHUB_CLIENT_ID;
-};
+module.exports.getGitSessionCodePath = () => githubAuthRedirect + GITHUB_CLIENT_ID;
 
 module.exports.requestGitAccessToken = (code) => {
   let token;
+  let githubId;
 
   return request({
     uri: githubTokenPath,
@@ -82,22 +83,52 @@ module.exports.requestGitAccessToken = (code) => {
       client_id: GITHUB_CLIENT_ID,
       client_secret: GITHUB_CLIENT_SECRET,
       code: code
+    },
+    headers: {
+      'Accept': 'application/json'
     }
   })
   .then((body) => {
-    token = qs.parse(body).access_token;
-
-    return request({
-      uri: githubEmailPath,
-      qs: {
-        access_token: token
-      },
-      headers: {
-        'User-Agent': 'HackIllinois-API'
-      },
-      json: true
-    });
+    token = JSON.parse(body).access_token;
+    return module.exports.getGitHubAccountDetails(token);
   })
+  .then((handle) => {
+    githubId = handle;
+    return User.findByGitHubHandle(handle);
+  })
+  .then((user) => {
+    if(_.isNull(user)) {
+      return module.exports.getGitHubAccountEmail(token)
+      .then((email) => UserService.createGitHubUser(email, githubId))
+      .then(() => token);
+    }
+
+    return token;
+  });
+};
+
+module.exports.getGitHubAccountDetails = (authToken) => request({
+  uri: githubUserPath,
+  qs: {
+    access_token: authToken
+  },
+  headers: {
+    'User-Agent': 'HackIllinois-API'
+  },
+  json: true
+})
+.then((account) => account.login);
+
+module.exports.getGitHubAccountEmail = (authToken) => request({
+  uri: githubEmailPath,
+  qs: {
+    access_token: authToken
+  },
+  headers: {
+    'User-Agent': 'HackIllinois-API'
+  },
+  json: true
+})
   .then((body) => {
     const primaryEmail = _.find(body, 'primary').email;
     if(_.isUndefined(primaryEmail)) {
@@ -105,6 +136,5 @@ module.exports.requestGitAccessToken = (code) => {
       throw new errors.UnprocessableRequestError(message);
     }
 
-    return {email: primaryEmail, accessToken: token};
+    return primaryEmail;
   });
-}

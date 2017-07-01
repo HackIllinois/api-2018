@@ -17,12 +17,14 @@ function ApiError(message, source) {
 }
 
 ApiError.prototype = Object.create(Error.prototype);
-ApiError.prototype.toJSON = () => ({
-  type: this.type,
-  status: this.status,
-  title: this.title,
-  message: this.message,
-  source: this.source
-});
+ApiError.prototype.toJSON = function() {
+  return {
+    type: this.type,
+    status: this.status,
+    title: this.title,
+    message: this.message,
+    source: this.source
+  };
+};
 
 module.exports = ApiError;

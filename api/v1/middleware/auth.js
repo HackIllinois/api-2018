@@ -2,21 +2,37 @@ const AuthService = require('../services/AuthService');
 const User = require('../models/User');
 const config = require('../../config');
 const errors = require('../errors');
+const StatusCodeError = require('request-promise/errors').StatusCodeError;
 const roles = require('../utils/roles');
 const _ = require('lodash');
 const logger = require('../../logging');
 
-const AUTH_HEADER = config.auth.header;
-const ADMIN_USER_OVERRIDE_HEADER = 'Admin-User-Override';
+const API_AUTH_HEADER = config.auth.headers.api;
+const GITHUB_AUTH_HEADER = config.auth.headers.github;
+const ADMIN_USER_OVERRIDE_HEADER = config.auth.headers.impersonation;
 
 module.exports = (req, res, next) => {
-  const auth = req.header(AUTH_HEADER);
+  const auth = req.header(API_AUTH_HEADER);
+  const oauth = req.header(GITHUB_AUTH_HEADER);
 
-  if (!auth) {
-    return next();
-  }
+  if(oauth) {
+    return AuthService.getGitHubAccountDetails(oauth)
+    .then((handle) => {
+      req.auth = true;
+      return User.findByGitHubHandle(handle);
+    })
+    .then((user) => {
+      req.user = user;
+      return next();
+    })
+    .catch(StatusCodeError, (error) => {
+      const message = 'The provided token was invalid (' + error.message + ')';
+      const source = GITHUB_AUTH_HEADER;
 
-  return AuthService.verify(auth)
+      return next(new errors.InvalidHeaderError(message, source));
+    });
+  } else if(auth) {
+    return AuthService.verify(auth)
     .then((decoded) => {
       // specifies that request supplied a valid auth token
       // (but not necessarily that the associated user data has been retrieved)
@@ -24,7 +40,7 @@ module.exports = (req, res, next) => {
       return User.findById(decoded.sub);
     })
     .then((user) => {
-      const adminUserOverride = req.get('Admin-User-Override');
+      const adminUserOverride = req.get(ADMIN_USER_OVERRIDE_HEADER);
 
       if (!_.isUndefined(adminUserOverride) && user.hasRole(roles.SUPERUSER)) {
         return User.findById(adminUserOverride)
@@ -54,8 +70,11 @@ module.exports = (req, res, next) => {
     })
     .catch(errors.UnprocessableRequestError, (error) => {
       const message = 'The provided token was invalid (' + error.message + ')';
-      const source = AUTH_HEADER;
+      const source = API_AUTH_HEADER;
 
       return next(new errors.InvalidHeaderError(message, source));
     });
+  }
+
+  return next();
 };

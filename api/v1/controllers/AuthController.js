@@ -55,8 +55,9 @@ function getGitAuthToken(req, res, next) {
 function getGitAccessToken(req, res, next) {
   AuthService.requestGitAccessToken(req.query.code)
   .then((gitLogin) => {
-    //TODO persist accounts, and integrate with our own auth middleware
-    res.body = gitLogin;
+    res.body = {
+      auth: gitLogin
+    };
 
     return next();
   })

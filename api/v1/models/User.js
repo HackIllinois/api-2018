@@ -16,7 +16,8 @@ const User = Model.extend({
   hasTimestamps: ['created', 'updated'],
   validations: {
     email: ['required', 'email'],
-    password: ['required', 'string']
+    password: [ 'string' ],
+    githubId: [ 'string' ]
   },
   roles: function() {
     return this.hasMany(UserRole);
@@ -39,6 +40,13 @@ User.findById = function(id) {
       withRelated: [ 'roles' ]
     });
 };
+
+User.findByGitHubHandle = (handle) => User.where({
+  github_id: handle
+})
+  .fetch({
+    withRelated: [ 'roles' ]
+  });
 
 /**
  * Finds a user by its email address

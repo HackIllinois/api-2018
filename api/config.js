@@ -39,7 +39,11 @@ config.superuser.email = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
 config.superuser.password = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 
 config.auth.secret = config.secret;
-config.auth.header = 'Authorization';
+config.auth.headers = {
+  api: 'API-Authorization',
+  github: 'GitHub-Authorization',
+  impersonation: 'Admin-User-Override'
+};
 config.auth.expiration = '7d';
 config.auth.githubclient.id = process.env.GITHUB_CLIENT_ID;
 config.auth.githubclient.secret = process.env.GITHUB_CLIENT_SECRET;
