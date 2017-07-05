@@ -8,5 +8,6 @@ module.exports = (req, res, next) => {
     data: (res.body) ? res.body : {}
   };
 
-  return res.json(response);
+  res.json(response);
+  return next();
 };
