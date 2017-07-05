@@ -10,7 +10,7 @@ const TEST_IDENTIFIER = 'test';
 
 const config = {};
 config.auth = {
-  githubclient: {}
+  github: {}
 };
 config.aws = {
   defaults: {}
@@ -40,13 +40,17 @@ config.superuser.password = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 
 config.auth.secret = config.secret;
 config.auth.headers = {
-  api: 'API-Authorization',
-  github: 'GitHub-Authorization',
+  all: 'Authorization',
   impersonation: 'Admin-User-Override'
 };
+config.auth.types = {
+  basic: 'Basic',
+  bearer: 'Bearer'
+};
 config.auth.expiration = '7d';
-config.auth.githubclient.id = process.env.GITHUB_CLIENT_ID;
-config.auth.githubclient.secret = process.env.GITHUB_CLIENT_SECRET;
+config.auth.github.id = process.env.GITHUB_CLIENT_ID;
+config.auth.github.secret = process.env.GITHUB_CLIENT_SECRET;
+config.auth.github.useragent = 'HackIllinois';
 
 const sharedAWSCreds = new(require('aws-sdk')
   .SharedIniFileCredentials)();

@@ -2,21 +2,20 @@ const AuthService = require('../services/AuthService');
 const User = require('../models/User');
 const config = require('../../config');
 const errors = require('../errors');
-const StatusCodeError = require('request-promise/errors').StatusCodeError;
 const roles = require('../utils/roles');
 const _ = require('lodash');
 const logger = require('../../logging');
 
-const API_AUTH_HEADER = config.auth.headers.api;
-const GITHUB_AUTH_HEADER = config.auth.headers.github;
-const ADMIN_USER_OVERRIDE_HEADER = config.auth.headers.impersonation;
-
 module.exports = (req, res, next) => {
-  const auth = req.header(API_AUTH_HEADER);
-  const oauth = req.header(GITHUB_AUTH_HEADER);
+  let auth = req.get(config.auth.headers.all);
+  if(auth) {
+    auth = _.split(auth, ' ', 2);
+  } else {
+    return next();
+  }
 
-  if(oauth) {
-    return AuthService.getGitHubAccountDetails(oauth)
+  if(auth[0] == config.auth.types.bearer) {
+    return AuthService.getGitHubAccountDetails(auth[1])
     .then((handle) => {
       req.auth = true;
       return User.findByGitHubHandle(handle);
@@ -25,14 +24,14 @@ module.exports = (req, res, next) => {
       req.user = user;
       return next();
     })
-    .catch(StatusCodeError, (error) => {
+    .catch(errors.UnprocessableRequestError, (error) => {
       const message = 'The provided token was invalid (' + error.message + ')';
-      const source = GITHUB_AUTH_HEADER;
+      const source = config.auth.headers.all + ': ' + config.auth.types.bearer;
 
       return next(new errors.InvalidHeaderError(message, source));
     });
-  } else if(auth) {
-    return AuthService.verify(auth)
+  } else if(auth[0] == config.auth.types.basic) {
+    return AuthService.verify(auth[1])
     .then((decoded) => {
       // specifies that request supplied a valid auth token
       // (but not necessarily that the associated user data has been retrieved)
@@ -40,14 +39,14 @@ module.exports = (req, res, next) => {
       return User.findById(decoded.sub);
     })
     .then((user) => {
-      const adminUserOverride = req.get(ADMIN_USER_OVERRIDE_HEADER);
+      const adminUserOverride = req.get(config.auth.headers.impersonation);
 
       if (!_.isUndefined(adminUserOverride) && user.hasRole(roles.SUPERUSER)) {
         return User.findById(adminUserOverride)
           .then((impersonated) => {
             if (_.isNull(impersonated) || impersonated.hasRole(roles.SUPERUSER)) {
               const message = 'The provided userId was invalid (' + adminUserOverride + ')';
-              const source = ADMIN_USER_OVERRIDE_HEADER;
+              const source = config.auth.headers.impersonation;
 
               return next(new errors.InvalidHeaderError(message, source));
             }
@@ -70,7 +69,7 @@ module.exports = (req, res, next) => {
     })
     .catch(errors.UnprocessableRequestError, (error) => {
       const message = 'The provided token was invalid (' + error.message + ')';
-      const source = API_AUTH_HEADER;
+      const source = config.auth.headers.all + ': ' + config.auth.types.basic;
 
       return next(new errors.InvalidHeaderError(message, source));
     });

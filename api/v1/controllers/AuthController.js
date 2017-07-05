@@ -47,13 +47,13 @@ function createToken(req, res, next) {
     .catch((error) => next(error));
 }
 
-function getGitAuthToken(req, res, next) {
-  res.redirect(AuthService.getGitSessionCodePath());
+function getGitHubAuthToken(req, res, next) {
+  res.redirect(AuthService.getGitHubSessionCodeURL());
   return next();
 }
 
-function getGitAccessToken(req, res, next) {
-  AuthService.requestGitAccessToken(req.query.code)
+function getGitHubAccessToken(req, res, next) {
+  AuthService.requestGitHubAccessToken(req.query.code)
   .then((gitLogin) => {
     res.body = {
       auth: gitLogin
@@ -105,8 +105,8 @@ router.post('/', middleware.request(requests.BasicAuthRequest), createToken);
 router.get('/refresh', refreshToken);
 router.post('/reset', middleware.request(requests.ResetPasswordRequest), passwordReset);
 
-router.get('/', getGitAuthToken);
-router.get('/github', getGitAccessToken);
+router.get('/', getGitHubAuthToken);
+router.get('/github', getGitHubAccessToken);
 
 router.use(middleware.response);
 router.use(middleware.errors);

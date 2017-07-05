@@ -1,13 +1,13 @@
 CREATE TABLE `users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `github_id` VARCHAR(50),
+  `github_handle` VARCHAR(50),
   `email` VARCHAR(255) NOT NULL,
   `password` CHAR(60),
   `created` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC),
-  UNIQUE KEY `github_id_UNIQUE` (`github_id`)
+  UNIQUE INDEX `github_handle_UNIQUE` (`github_handle` ASC)
 );
 
 CREATE TABLE `user_roles` (

@@ -45,7 +45,7 @@ module.exports.createGitHubUser = (email, handle) => {
   email = email.toLowerCase();
   const user = User.forge({
     email: email,
-    githubId: handle
+    githubHandle: handle
   });
 
   return user

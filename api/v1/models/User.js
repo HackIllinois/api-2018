@@ -17,7 +17,7 @@ const User = Model.extend({
   validations: {
     email: ['required', 'email'],
     password: [ 'string' ],
-    githubId: [ 'string' ]
+    githubHandle: [ 'string' ]
   },
   roles: function() {
     return this.hasMany(UserRole);
@@ -42,7 +42,7 @@ User.findById = function(id) {
 };
 
 User.findByGitHubHandle = (handle) => User.where({
-  github_id: handle
+  github_handle: handle
 })
   .fetch({
     withRelated: [ 'roles' ]
