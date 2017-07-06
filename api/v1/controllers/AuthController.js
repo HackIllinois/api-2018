@@ -42,13 +42,26 @@ function createToken(req, res, next) {
       res.body = {};
       res.body.auth = auth;
 
-      next();
-      return null;
+      return next();
     })
-    .catch((error) => {
-      next(error);
-      return null;
-    });
+    .catch((error) => next(error));
+}
+
+function getGitHubAuthToken(req, res, next) {
+  res.redirect(AuthService.getGitHubSessionCodeURL());
+  return next();
+}
+
+function getGitHubAccessToken(req, res, next) {
+  AuthService.requestGitHubAccessToken(req.query.code)
+  .then((gitLogin) => {
+    res.body = {
+      auth: gitLogin
+    };
+
+    return next();
+  })
+  .catch((error) => next(error));
 }
 
 function refreshToken(req, res, next) {
@@ -88,9 +101,12 @@ function passwordReset(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.post('', middleware.request(requests.BasicAuthRequest), createToken);
+router.post('/', middleware.request(requests.BasicAuthRequest), createToken);
 router.get('/refresh', refreshToken);
 router.post('/reset', middleware.request(requests.ResetPasswordRequest), passwordReset);
+
+router.get('/', getGitHubAuthToken);
+router.get('/github', getGitHubAccessToken);
 
 router.use(middleware.response);
 router.use(middleware.errors);
