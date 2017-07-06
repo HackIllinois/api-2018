@@ -42,18 +42,15 @@ function _issue(payload, subject) {
  * @return {Promise} resolving to the auth token
  */
 module.exports.issueForUser = (user) => {
-  const subject = user.get('id')
-    .toString();
+  const subject = user.get('id').toString();
   const payload = {
     email: user.get('email'),
-    roles: user.related('roles')
-      .toJSON()
+    roles: user.related('roles').toJSON()
   };
-  return _Promise
-    .try(() =>
-      // the JWT library behind _issue may thrown any number
-      // of errors, which we do not want to propogate yet
-      _Promise.resolve(_issue(payload, subject)));
+  return _Promise.try(() =>
+    // the JWT library behind _issue may thrown any number
+    // of errors, which we do not want to propogate yet
+    _Promise.resolve(_issue(payload, subject)));
 };
 
 /**
@@ -62,8 +59,9 @@ module.exports.issueForUser = (user) => {
  * @return {Promise} resolving to the validity of the token, or a rejected
  * promise resolving to an UnprocessableRequestError
  */
-module.exports.verify = (token) => _Promise
-  .try(() => _Promise.resolve(jwt.verify(token, JWT_SECRET)))
+module.exports.verify = (token) => _Promise.try(() =>
+    _Promise.resolve(jwt.verify(token, JWT_SECRET))
+  )
   .catch(jwt.JsonWebTokenError, (error) => {
     const message = error.message;
     throw new errors.UnprocessableRequestError(message);
@@ -87,8 +85,7 @@ module.exports.requestGitHubAccessToken = (code) => {
       }
     })
     .then((body) => {
-      token = JSON.parse(body)
-        .access_token;
+      token = JSON.parse(body).access_token;
       return module.exports.getGitHubAccountDetails(token);
     })
     .then((handle) => {
@@ -101,7 +98,6 @@ module.exports.requestGitHubAccessToken = (code) => {
           .then((email) => UserService.createGitHubUser(email, githubHandle))
           .then(() => token);
       }
-
       return token;
     });
 };
@@ -135,8 +131,7 @@ module.exports.getGitHubAccountEmail = (authToken) => request({
     json: true
   })
   .then((body) => {
-    const primaryEmail = _.find(body, 'primary')
-      .email;
+    const primaryEmail = _.find(body, 'primary').email;
     if (_.isUndefined(primaryEmail)) {
       const message = 'The GitHub account has no primary email';
       throw new errors.UnprocessableRequestError(message);
