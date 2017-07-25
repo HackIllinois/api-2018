@@ -74,16 +74,16 @@ module.exports.requestGitHubAccessToken = (code) => {
   let githubHandle;
 
   return request({
-      uri: GITHUB_TOKEN_URL,
-      qs: {
-        client_id: config.auth.github.id,
-        client_secret: config.auth.github.secret,
-        code: code
-      },
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
+    uri: GITHUB_TOKEN_URL,
+    qs: {
+      client_id: config.auth.github.id,
+      client_secret: config.auth.github.secret,
+      code: code
+    },
+    headers: {
+      'Accept': 'application/json'
+    }
+  })
     .then((body) => {
       token = JSON.parse(body).access_token;
       return module.exports.getGitHubAccountDetails(token);
@@ -103,15 +103,15 @@ module.exports.requestGitHubAccessToken = (code) => {
 };
 
 module.exports.getGitHubAccountDetails = (authToken) => request({
-    uri: GITHUB_USER_URL,
-    qs: {
-      access_token: authToken
-    },
-    headers: {
-      'User-Agent': config.auth.github.useragent
-    },
-    json: true
-  })
+  uri: GITHUB_USER_URL,
+  qs: {
+    access_token: authToken
+  },
+  headers: {
+    'User-Agent': config.auth.github.useragent
+  },
+  json: true
+})
   .then((account) => account.login)
   .catch(StatusCodeError, (error) => {
     const message = 'The request failed with reason (' + error.message + ')';
@@ -121,15 +121,15 @@ module.exports.getGitHubAccountDetails = (authToken) => request({
   });
 
 module.exports.getGitHubAccountEmail = (authToken) => request({
-    uri: GITHUB_EMAIL_URL,
-    qs: {
-      access_token: authToken
-    },
-    headers: {
-      'User-Agent': config.auth.github.useragent
-    },
-    json: true
-  })
+  uri: GITHUB_EMAIL_URL,
+  qs: {
+    access_token: authToken
+  },
+  headers: {
+    'User-Agent': config.auth.github.useragent
+  },
+  json: true
+})
   .then((body) => {
     const primaryEmail = _.find(body, 'primary').email;
     if (_.isUndefined(primaryEmail)) {

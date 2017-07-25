@@ -51,7 +51,7 @@ module.exports = (req, res, next) => {
               return next(new errors.InvalidHeaderError(message, source));
             }
 
-            logger.info('Impersonation: %d %d at %s with %s %s',
+            logger.debug('Impersonation: %d %d at %s with %s %s',
               user.get('id'),
               impersonated.get('id'),
               new Date(),
@@ -60,6 +60,7 @@ module.exports = (req, res, next) => {
             );
 
             req.user = impersonated;
+            req.originUser = user.get('id');
             return next();
           });
       }

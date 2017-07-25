@@ -4,9 +4,9 @@ const v1 = express.Router();
 const controllers = require('./controllers');
 const utils = require('./utils');
 
-// log any incoming requests for debugging
+// acknowledge receipt of request
 v1.use((req, res, next) => {
-  utils.logs.logRequest(req);
+  utils.logs.logRequestReceipt(req);
   next();
 });
 
@@ -35,8 +35,9 @@ v1.use('/tracking', controllers.TrackingController.router);
 v1.use('/mail', controllers.MailController.router);
 v1.use('/event', controllers.EventController.router);
 
-// log any outgoing response for debugging
+// logs resolved requests (the request once processed by various middleware) and outgoing responses
 v1.use((req, res, next) => {
+  utils.logs.logRequest(req);
   utils.logs.logResponse(req, res);
   next();
 });
