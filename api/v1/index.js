@@ -4,7 +4,7 @@ const v1 = express.Router();
 const controllers = require('./controllers');
 const utils = require('./utils');
 
-// acknowledge recieval of a request
+// acknowledge receipt of request
 v1.use((req, res, next) => {
   utils.logs.logRequestReceipt(req);
   next();

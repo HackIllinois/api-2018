@@ -29,14 +29,14 @@ function _acknowledgeRequest(req) {
     method: req.method,
     url: req.originalUrl,
     ip: req.ip
-  }
+  };
 }
 
 function _makeRequestMetadata(req) {
   return {
     id: req.id,
-    user: req.user ? req.user.get('id') : 'Unauthenticated',
-    adminOverRide: req.originUser ? req.originUser : 'No impersonation',
+    user: req.user ? req.user.get('id') : null,
+    adminOverRide: req.originUser ? req.originUser : null,
     query: req.query,
     params: req.params,
     body: _filterBody(req.body, REQUEST_BLACKLIST)
@@ -47,7 +47,7 @@ function _makeResponseMetadata(req, res) {
   return {
     id: req.id,
     status: res.statusCode,
-    body : res.body
+    body: res.body
   };
 }
 
@@ -55,10 +55,10 @@ module.exports.errorTypes = ERROR_TYPES;
 
 module.exports.logRequestReceipt = (req) => {
   logger.debug('received request', _acknowledgeRequest(req));
-}
+};
 
 module.exports.logRequest = (req) => {
-  logger.debug('request finalized', _makeRequestMetadata(req));
+  logger.debug('qualified request', _makeRequestMetadata(req));
 };
 
 module.exports.logResponse = (req, res) => {
