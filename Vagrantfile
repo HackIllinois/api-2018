@@ -1,10 +1,3 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
 
@@ -12,7 +5,10 @@ Vagrant.configure("2") do |config|
 
     echo "Provisioning Start"
     export DEBIAN_FRONTEND=noninteractive
-    apt-get -qq update && apt-get -qq dist-upgrade
+    apt-get -y -qq update && apt-get -qq dist-upgrade
+    apt-get -y install python2.7
+    apt-get -y install make
+    apt-get -y install g++
 
     echo "Installing MySql"
     sudo -E apt-get -qq -y install mysql-server
@@ -35,10 +31,12 @@ Vagrant.configure("2") do |config|
 
     echo "Installing nodejs"
     curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - \
-      && apt-get -qq install -y nodejs
+      && apt-get -qq install -y nodejs \
+      && npm config set python python2.7 \
+      && sudo npm install node-gyp -g -y\
+      && npm install -g nodemon
 
     echo "API Setup"
-      npm install -g nodemon
       cd /vagrant/
       cp config/dev.config.template config/dev.config
       npm install
@@ -46,10 +44,9 @@ Vagrant.configure("2") do |config|
 
     echo "cd /vagrant/" >> /home/ubuntu/.bashrc
 
-    sudo npm install node-gyp -g
-    apt-get install python
-    apt-get install make
-    apt-get install g++
-
   SHELL
+
+  # Access guest api with postman, and guest db with workbench
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 3306, host: 3306
 end
