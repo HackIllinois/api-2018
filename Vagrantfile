@@ -1,6 +1,10 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
 
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/hackillinois/api", create: "true", type: "rsync",
+    rsync__exclude: "node_modules/"
+
   config.vm.provider :virtualbox do |vb|
     vb.name = "hackillinois-api"
   end
@@ -21,7 +25,7 @@ Vagrant.configure("2") do |config|
     curl -sL https://deb.nodesource.com/setup_6.x | bash - \
       && apt-get -y -q install nodejs \
       && npm config set python python2.7 \
-      && npm install -g -y node-gyp nodemon
+      && npm install -g node-gyp nodemon
     
     echo "Installing Flyway"
     wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.0.3/flyway-commandline-4.0.3-linux-x64.tar.gz -nv &>/dev/null \
@@ -29,6 +33,7 @@ Vagrant.configure("2") do |config|
     	&& mv flyway-4.0.3 /opt/flyway-4.0.3 \
     	&& ln -s /opt/flyway-4.0.3/jre/bin/java /usr/local/bin/java \
     	&& ln -s /opt/flyway-4.0.3/flyway /usr/local/bin/flyway \
+        && chmod +x /opt/flyway-4.0.3/flyway \
     	&& rm -rf /tmp/flyway-* \
 
     echo "Configuring MySQL"
@@ -42,14 +47,15 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SETUP
     onerror(){ echo "Command failed. Stopping execution..."; exit 1; }
     trap onerror ERR
-    cd /vagrant/
+    cd /hackillinois/api
 
     echo "Installing API"
-    cp config/dev.config.template config/dev.config
-    rm -rf node_modules && npm install
+    npm install
+    cp /hackillinois/api/config/dev.config.template /hackillinois/api/config/dev.config
     npm run dev-migrations
 
-    echo "cd /vagrant/" >> /home/ubuntu/.bashrc
+    echo "Finishing Setup"
+    echo "cd /hackillinois/api" >> /home/ubuntu/.bashrc
 
   SETUP
 
