@@ -3,7 +3,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/hackillinois/api", create: "true", type: "rsync",
-    rsync__exclude: "node_modules/"
+    rsync__exclude: [".git", "node_modules"]
 
   config.vm.provider :virtualbox do |vb|
     vb.name = "hackillinois-api"
@@ -50,8 +50,9 @@ Vagrant.configure("2") do |config|
     cd /hackillinois/api
 
     echo "Installing API"
-    npm install
-    cp /hackillinois/api/config/dev.config.template /hackillinois/api/config/dev.config
+    rm -rf /hackillinois/api/node_modules && npm install
+    
+    cp /hackillinois/api/config/dev.config.template /hackillinois/api/config/dev.config 
     npm run dev-migrations
 
     echo "Finishing Setup"
