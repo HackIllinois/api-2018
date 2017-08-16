@@ -1,10 +1,10 @@
 {
-  "name": "hackillinois-api-2017",
+  "name": "hackillinois-api",
   "version": "0.0.1",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/HackIllinois/api-2017.git"
+    "url": "https://github.com/HackIllinois/api.git"
   },
   "dependencies": {
     "aws-sdk": "^2.5.0",
@@ -45,9 +45,10 @@
     "sinon": "^1.17.2"
   },
   "scripts": {
-    "test": "./resources/scripts/test.sh",
-    "dev": "./resources/scripts/dev.sh",
     "prod": "./resources/scripts/prod.sh",
+    "dev": "./resources/scripts/dev.sh",
+    "test": "./resources/scripts/test.sh",
+    "bridge": "python ./resources/scripts/bridge.py",
     "dev-migrations": "./database/flyway.sh migrate dev",
     "prod-migrations": "./database/flyway.sh migrate prod"
   },

@@ -69,7 +69,7 @@ see instead**
 
 ### Pull Requests
 
-Issues that we need help on will be tagged as `help-wanted` and listed under "To Do" in [Projects](https://github.com/HackIllinois/api-2017/projects).
+Issues that we need help on will be tagged as `help-wanted` and listed under "To Do" in [Projects](https://github.com/HackIllinois/api/projects).
 If you're interested in tackling an open issue, leave a comment and let us know your
 intent.
 
