@@ -8,7 +8,7 @@ You do not have to set up any of these components yourself!
 
 ## Environment
 
-A development environment is available as a Vagrant box. To use it, you must have Vagrant, Virtualbox, and Rsync installed. If you are in a \*nix-like environment you probably have Rsync installed already. Then, from the project directory, run `vagrant up`.
+A development environment is available as a Vagrant box. To use it, you must have Vagrant, Virtualbox, and rsync installed. If you are in a \*nix-like environment you probably have rsync installed already. Windows 10+ users should use the Windows Linux Subsystem. Then, from the project directory, run `vagrant up`.
 
 By default, the box forwards ports 8080 and 3306 for the application and database, respectively. If you would like to change these defaults, set `VAGRANT_APP_PORT` and/or `VAGRANT_DB_PORT` as environment variables prior to running `vagrant up` (e.g. `VAGRANT_DB_PORT=3305 vagrant up`).
 
