@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
       && apt-get -y -q install nodejs \
       && npm config set python python2.7 \
       && npm install -g node-gyp nodemon
-    
+
     echo "Installing Flyway"
     wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.0.3/flyway-commandline-4.0.3-linux-x64.tar.gz -nv &>/dev/null \
     	&& tar -xzf flyway-commandline-4.0.3-linux-x64.tar.gz \
@@ -50,9 +50,7 @@ Vagrant.configure("2") do |config|
     cd /hackillinois/api
 
     echo "Installing API"
-    rm -rf /hackillinois/api/node_modules && npm install
-    
-    cp /hackillinois/api/config/dev.config.template /hackillinois/api/config/dev.config 
+    npm install
     npm run dev-migrations
 
     echo "Finishing Setup"
