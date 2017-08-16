@@ -1,10 +1,10 @@
 {
-  "name": "hackillinois-api-2017",
+  "name": "hackillinois-api",
   "version": "0.0.1",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/HackIllinois/api-2017.git"
+    "url": "https://github.com/HackIllinois/api.git"
   },
   "dependencies": {
     "aws-sdk": "^2.5.0",

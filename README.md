@@ -1,5 +1,5 @@
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api-2017?utm_source=badge&utm_medium=badge)
-[![Build Status](https://travis-ci.org/HackIllinois/api-2017.svg?branch=staging)](https://travis-ci.org/HackIllinois/api-2017)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackIllinois/api?utm_source=badge&utm_medium=badge)
+[![Build Status](https://travis-ci.org/HackIllinois/api.svg?branch=staging)](https://travis-ci.org/HackIllinois/api)
 
 # HackIllinois API
 
@@ -8,7 +8,7 @@ contribute? See the [contribution guidelines](/CONTRIBUTING.md) and [setup docum
 
 ## Documentation
 
-All documentation is available on the [project wiki](https://github.com/HackIllinois/api-2017/wiki).
+All documentation is available on the [project wiki](https://github.com/HackIllinois/api/wiki).
 
 ## Configuration
 

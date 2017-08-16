@@ -14,7 +14,7 @@ cache:
     - node_modules
 before_script:
   - pwd
-  - cp ~/build/HackIllinois/api-2017/config/test.config.template ~/build/HackIllinois/api-2017/config/test.config
+  - cp ~/build/HackIllinois/api/config/test.config.template ~/build/HackIllinois/api/config/test.config
   - npm install
 deploy:
   provider: elasticbeanstalk
