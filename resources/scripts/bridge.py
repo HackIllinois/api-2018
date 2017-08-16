@@ -1,6 +1,6 @@
 import os
 import signal
-from subprocess import Popen, PIPE, STDOUT 
+from subprocess import Popen, STDOUT 
 
 # see https://stackoverflow.com/a/11270665/996249
 # and https://stackoverflow.com/a/4791612/996249
