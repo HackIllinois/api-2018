@@ -9,13 +9,21 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - python3
 cache:
   directories:
     - node_modules
 before_script:
-  - pwd
-  - cp ~/build/HackIllinois/api/config/test.config.template ~/build/HackIllinois/api/config/test.config
   - npm install
+  - cp ./config/test.config.template ./config/test.config
+after_success:
+  - rm ./config/test.config
+before_deploy:
+  - ./scripts/install/flyway.sh
+  - pip3 install requests
+  - TODO: create deps
+  - cp ./config/prod.config.template ./config/prod.config
+  - npm run prod-migrations
 deploy:
   provider: elasticbeanstalk
   skip_cleanup: true

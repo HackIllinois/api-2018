@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source resources/scripts/env.sh $2
+source scripts/env.sh $2
 
 cd "$(dirname ${BASH_SOURCE[0]})"
 

@@ -45,10 +45,10 @@
     "sinon": "^1.17.2"
   },
   "scripts": {
-    "prod": "./resources/scripts/prod.sh",
-    "dev": "./resources/scripts/dev.sh",
-    "test": "./resources/scripts/test.sh",
-    "bridge": "python ./resources/scripts/bridge.py",
+    "prod": "./scripts/prod.sh",
+    "dev": "./scripts/dev.sh",
+    "test": "./scripts/test.sh",
+    "bridge": "python ./scripts/bridge.py",
     "dev-migrations": "./database/flyway.sh migrate dev",
     "prod-migrations": "./database/flyway.sh migrate prod"
   },
