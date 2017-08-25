@@ -21,7 +21,7 @@ deploy:
   skip_cleanup: true
   access_key_id: $HACKILLINOIS_ACCESS_KEY_ID
   secret_access_key: $HACKILLINOIS_SECRET_ACCESS_KEY
-  region: "us-east-2"
+  region: "us-east-1"
   app: "hackillinois-api"
-  env: "api-hackillinois"
+  env: "hackillinois-api"
   bucket_name: $HACKILLINOIS_BUCKET_NAME
