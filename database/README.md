@@ -36,5 +36,7 @@ If you're not sure which to pick, make your best guess and leave a justification
 
 ### Deploying Schema Changes
 
-We will come back to this once we are ready to release. However, note that it is generally a good idea to check the timestamps of the upcoming release's
-schema changes before actually releasing, so as to ensure that no date-time conflicts happen with flyway.
+In development, execute `npm run dev-migrations` from the root of the project directory. Equivalently, before deploying
+to production, execute `npm run prod-migrations`.
+
+If you see any errors, such as an inability to access the database, make sure you have set up the schema correctly and that you have set any necessary MySQL environment variables listed in the configuration section above.

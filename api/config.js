@@ -9,7 +9,9 @@ const PRODUCTION_IDENTIFIER = 'production';
 const TEST_IDENTIFIER = 'test';
 
 const config = {};
-config.auth = {};
+config.auth = {
+  github: {}
+};
 config.aws = {
   defaults: {}
 };
@@ -37,8 +39,18 @@ config.superuser.email = process.env.HACKILLINOIS_SUPERUSER_EMAIL;
 config.superuser.password = process.env.HACKILLINOIS_SUPERUSER_PASSWORD;
 
 config.auth.secret = config.secret;
-config.auth.header = 'Authorization';
+config.auth.headers = {
+  all: 'Authorization',
+  impersonation: 'Admin-User-Override'
+};
+config.auth.types = {
+  basic: 'Basic',
+  bearer: 'Bearer'
+};
 config.auth.expiration = '7d';
+config.auth.github.id = process.env.GITHUB_CLIENT_ID;
+config.auth.github.secret = process.env.GITHUB_CLIENT_SECRET;
+config.auth.github.useragent = 'HackIllinois';
 
 const sharedAWSCreds = new(require('aws-sdk')
   .SharedIniFileCredentials)();

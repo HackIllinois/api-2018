@@ -7,7 +7,8 @@ const consoleTransport = new winston.transports.Console({
   colorize: !config.isProduction,
   prettyPrint: !config.isProduction,
   stringify: config.isProduction,
-  json: config.isProduction
+  json: config.isProduction,
+  level: config.isProduction ? 'debug' : 'error' 
 });
 
 // add other transports as needed

@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source resources/scripts/env.sh dev
-nodemon api.js
+nodemon --delay 125ms api.js
