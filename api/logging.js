@@ -8,7 +8,7 @@ const consoleTransport = new winston.transports.Console({
   prettyPrint: !config.isProduction,
   stringify: config.isProduction,
   json: config.isProduction,
-  level: config.isProduction ? 'debug' : 'error' 
+  level: 'debug'
 });
 
 // add other transports as needed
@@ -17,6 +17,5 @@ transports.push(consoleTransport);
 const logger = new winston.Logger({
   transports: transports
 });
-logger.info('prepared environment for %s', config.environment);
 
 module.exports = logger;

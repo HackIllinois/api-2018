@@ -1,4 +1,3 @@
 #!/bin/bash
-
-source resources/scripts/env.sh prod
+export NODE_ENV=production
 node api.js

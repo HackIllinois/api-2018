@@ -7,9 +7,9 @@ const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
 const mail = require('../utils/mail');
-const registration = require('../utils/registration');
 const errors = require('../errors');
 
+const attendeeQueryCategories = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
 
 const router = require('express')
   .Router();
@@ -34,7 +34,7 @@ function _validateGetAttendeesRequest(page, count, category, ascending) {
     const source = 'ascending';
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
-  if (_.isNaN(category) || !registration.verifyCategory(category)) {
+  if (_.isNaN(category) || !_.includes(attendeeQueryCategories, category)) {
     const message = 'Invalid category parameter';
     const source = 'category';
     return _Promise.reject(new errors.InvalidParameterError(message, source));
@@ -275,7 +275,7 @@ function filterAttendees(req, res, next) {
 
   _validateGetAttendeesRequest(page, count, category, ascending)
     .then(() => {
-      if (_.isUndefined(filterCategory) || !registration.verifyCategory(filterCategory)) {
+      if (_.isUndefined(filterCategory) || !_.includes(attendeeQueryCategories, category)) {
         const message = 'Invalid filterCategory parameter';
         const source = 'filterCategory';
         return _Promise.reject(new errors.InvalidParameterError(message, source));
