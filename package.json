@@ -53,6 +53,6 @@
     "prod-migrations": "./database/flyway.sh migrate prod"
   },
   "engines": {
-    "node": ">=6.10.3"
+    "node": ">=6.11.1"
   }
 }
