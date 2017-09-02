@@ -9,20 +9,22 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - python3
+      - python3-pip
 cache:
   directories:
     - node_modules
+before_install:
+  - ln /usr/bin/python $(which python3)
 before_script:
   - npm install
-  - cp ./config/test.config.template ./config/test.config
+  - cp ./config/test.json.template ./config/test.json
 after_success:
-  - rm ./config/test.config
+  - rm ./config/test.json
 before_deploy:
   - ./scripts/install/flyway.sh
-  - pip3 install requests
-  - TODO: create deps
-  - cp ./config/prod.config.template ./config/prod.config
+  - ./scripts/install/deps.sh
+  - cp ./config/prod.json.template ./config/prod.json
+  - python3 ./scripts/deploy/deps.py
   - npm run prod-migrations
 deploy:
   provider: elasticbeanstalk

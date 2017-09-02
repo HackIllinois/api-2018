@@ -49,8 +49,8 @@
     "dev": "./scripts/dev.sh",
     "test": "./scripts/test.sh",
     "bridge": "python ./scripts/bridge.py",
-    "dev-migrations": "./database/flyway.sh migrate dev",
-    "prod-migrations": "./database/flyway.sh migrate prod"
+    "dev-migrations": "./database/flyway.sh migrate development",
+    "prod-migrations": "./database/flyway.sh migrate production"
   },
   "engines": {
     "node": ">=6.11.1"
