@@ -163,7 +163,7 @@ Attendee.fetchWithResumeById = function(id) {
         }
         return Upload.where({
           owner_id: a.get('userId'),
-          bucket: utils.storage.buckets.resumes
+          bucket: storage.buckets.resumes
         })
           .fetch({
             transacting: t
