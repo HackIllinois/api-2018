@@ -13,6 +13,8 @@ addons:
 cache:
   directories:
     - node_modules
+before_install:
+  - ln $(which python3) /usr/bin/python
 before_script:
   - npm install
   - cp ./config/test.json.template ./config/test.json
@@ -22,7 +24,7 @@ before_deploy:
   - ./scripts/install/flyway.sh
   - ./scripts/install/deps.sh
   - cp ./config/prod.json.template ./config/prod.json
-  - python3 ./scripts/deploy/deps.py
+  - python ./scripts/deploy/deps.py
   - npm run prod-migrations
 deploy:
   provider: elasticbeanstalk
