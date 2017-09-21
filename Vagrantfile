@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
 
     echo "Installing system packages (this may take a while)"
     apt-get -y -q install python2.7 make g++ mysql-server-5.7 redis-server
+    ln /usr/bin/python2.7 /usr/bin/python
 
     echo "Installing Node.js"
     curl -sL https://deb.nodesource.com/setup_6.x | bash - \
@@ -51,6 +52,13 @@ Vagrant.configure("2") do |config|
 
     echo "Installing API"
     npm install
+
+    echo "Running migrations"
+    export DB_USERNAME=root
+    export DB_PASSWORD=pass123
+    export DB_HOSTNAME=127.0.0.1
+    export DB_PORT=3306
+    export DB_NAME=hackillinois
     npm run dev-migrations
 
     echo "Finishing Setup"

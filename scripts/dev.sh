@@ -1,4 +1,3 @@
 #!/bin/bash
-
-source resources/scripts/env.sh dev
+export NODE_ENV=development 
 nodemon --delay 125ms api.js

@@ -1,7 +1,7 @@
-const time = require('../utils/time');
-const events = require('../utils/events');
-
 const Model = require('./Model');
+const validators = require('../utils/validators');
+
+const TAGS = ['PRE_EVENT', 'POST_EVENT'];
 const EventLocation = require('./EventLocation');
 const Event = Model.extend({
   tableName: 'events',
@@ -9,9 +9,9 @@ const Event = Model.extend({
   validations: {
     name: ['required', 'string', 'maxLength:255'],
     description: ['required', 'string', 'maxLength:2047'],
-    startTime: ['required', time.verifyDate],
-    endTime: ['required', time.verifyDate],
-    tag: ['required', 'string', events.verifyTag]
+    startTime: ['required', validators.date],
+    endTime: ['required', validators.date],
+    tag: ['required', 'string', validators.in(TAGS)]
   },
   locations: function() {
     return this.hasMany(EventLocation);

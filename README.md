@@ -13,48 +13,54 @@ All documentation is available on the [project wiki](https://github.com/HackIlli
 ## Configuration
 
 The API is configured using configuration files placed in the `config` directory. The
-naming convention is `{ENV}.config`, where `{ENV}` is the target environment (like `dev` or `prod`).
+naming convention is `{NODE_ENV}.config`, where `NODE_ENV` is an environment variable
+set to prior to starting the API.
 
 We have provided templates in the directory already with all available configuration options.
-These templates are named `{ENV}.config.template`. You should copy these templates into
-files named `{ENV}.config` and fill them with sensible values; these values can be raw
+These templates are named `{NODE_ENV}.json.template`. You should copy these templates into
+files named `{NODE_ENV}.config` and fill them with sensible values; these values can be raw
 values or existing environment variables. In the Vagrant development box, this
 is already handled for you.
 
 Note that changes to the templates are committed to the project codebase, but
 changes to any `*.config` files are ignored.
 
-A list of configuration keys is provided below:
-
-| Key | Possible Values | Purpose |
-| --- | --------------- | ------- |
-| NODE_ENV | 'production', 'development', 'testing' | Determines how environment should be configured |
-| AWS | 0 or 1 | Whether or not to use AWS |
-| HACKILLINOIS_SECRET | Any string | Sets the master secret |
-| HACKILLINOIS_PORT | Any valid port number | Sets the port |
-| HACKILLINOIS_SUPERUSER_EMAIL | Any valid email | Sets the default superuser email |
-| HACKILLINOIS_SUPERUSER_PASSWORD | Any string | Sets the default superuser password |
-| HACKILLINOIS_MAIL_KEY | Any string | Sets the mail service API key |
-| DB_NAME |  Any valid MySQL schema name | Sets database name |
-| DB_USERNAME | Any string | Sets MySQL username |
-| DB_PASSWORD | Any string | Sets MySQL password |
-| DB_HOSTNAME | Any valid URI | Sets MySQL host |
-| DB_PORT | Any valid port number | Sets MySQL port |
-| REDIS_HOST | IP address | Sets Redis host |
-| REDIS_PORT | Any valid port number | Sets Redis port |
-
 #### Amazon Web Services
 
 Additionally, an [AWS shared credentials file](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 can be made available with configuration options for those systems under the profile
 identified by `hackillinois-api`. Be sure to set the `AWS` configuration key to `1` and
-add the key `AWS_PROFILE` to your configuration with your corresponding profile name.
+add the key `AWS_PROFILE` to your configuration with your corresponding profile name (see 'Overrides').
 
 #### Considerations
 
 Not all configuration options must be set during development (but all options _should_
 be set in production). When certain keys are left empty, the API determines whether
 or not it can use a local alternative or a default value at startup.
+
+#### Overrides
+
+Some configuration keys are more easily set via environment variables (especially in production). The
+following table provides the environment variable names that will (if set) override the corresponding
+configuration key values.
+
+| Name | Overriding Key | Possible Values |
+| ---- | --- | --------------- |
+| AWS | aws.enabled |0 or 1 |
+| SECRET | auth.secret | Any string |
+| PORT | port | Any valid port number |
+| SUPERUSER_EMAIL | superuser.email | Any valid email |
+| SUPERUSER_PASSWORD | superuser.password | Any string |
+| MAIL_KEY | mail.key | Any string |
+| GITHUB_CLIENT_ID | auth.github.id | Any string |
+| GITHUB_CLIENT_SECRET | auth.github.secret | Any String |
+| DB_NAME | database.primary.name | Any valid MySQL schema name |
+| DB_USERNAME | database.primary.user | Any string |
+| DB_PASSWORD | database.primary.password | Any string |
+| DB_HOSTNAME | database.primary.host | Any valid URI |
+| DB_PORT | database.primary.port | Any valid port number |
+| REDIS_HOST | redis.host | IP address |
+| REDIS_PORT | redis.port | Any valid port number |
 
 ## Running the API
 

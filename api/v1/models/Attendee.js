@@ -1,6 +1,14 @@
 const _ = require('lodash');
-const registration = require('../utils/registration');
-const utils = require('../utils');
+const storage = require('../utils/storage');
+const validators = require('../utils/validators');
+
+const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
+const STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
+const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
+const PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
+const GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
+const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
+const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 const Model = require('./Model');
 const Upload = require('./Upload');
@@ -17,27 +25,27 @@ const Attendee = Model.extend({
     userId: ['required', 'integer'],
     firstName: ['required', 'string', 'maxLength:255'],
     lastName: ['required', 'string', 'maxLength:255'],
-    shirtSize: ['required', 'string', registration.verifyTshirtSize],
-    diet: ['required', 'string', registration.verifyDiet],
+    shirtSize: ['required', 'string', validators.in(TSHIRT_SIZES)],
+    diet: ['required', 'string', validators.in(DIETS)],
     age: ['required', 'integer', 'min:13', 'max:115'],
     graduationYear: ['required', 'integer', 'min:2017', 'max:2024'],
-    transportation: ['required', 'string', registration.verifyTransportation],
+    transportation: ['required', 'string', validators.in(TRANSPORTATION_OPTIONS)],
     school: ['required', 'string', 'maxLength:255'],
     major: ['required', 'string', 'maxLength:255'],
-    gender: ['required', 'string', registration.verifyGender],
-    professionalInterest: ['required', 'string', registration.verifyProfessionalInterest],
+    gender: ['required', 'string', validators.in(GENDERS)],
+    professionalInterest: ['required', 'string', validators.in(PROFESSIONAL_INTERESTS)],
     github: ['required', 'string', 'maxLength:50'],
     linkedin: ['required', 'string', 'maxLength:50'],
     interests: ['required', 'string', 'maxLength:255'],
     priority: ['integer', 'max:10'],
-    status: ['string', registration.verifyStatus],
+    status: ['string', validators.in(STATUSES)],
     wave: ['integer', 'max:5'],
     reviewer: [ 'string' ],
     reviewTime: [ 'date' ],
     isNovice: ['required', 'boolean'],
     isPrivate: ['required', 'boolean'],
     phoneNumber: ['string', 'maxLength:15'],
-    acceptanceType: ['string', registration.verifyAcceptanceType],
+    acceptanceType: ['string', validators.in(ACCEPTANCE_TYPES)],
     acceptedEcosystemId: [ 'integer' ]
   },
   interests: function() {
@@ -104,7 +112,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
         }
         return Upload.where({
           owner_id: userId,
-          bucket: utils.storage.buckets.resumes
+          bucket: storage.buckets.resumes
         })
           .fetch({
             transacting: t
@@ -155,7 +163,7 @@ Attendee.fetchWithResumeById = function(id) {
         }
         return Upload.where({
           owner_id: a.get('userId'),
-          bucket: utils.storage.buckets.resumes
+          bucket: storage.buckets.resumes
         })
           .fetch({
             transacting: t
