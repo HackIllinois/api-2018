@@ -1,5 +1,6 @@
-const registration = require('../utils/registration');
+const validators = require('../utils/validators');
 
+const PROJECT_INTEREST_TYPES = ['CREATE', 'CONTRIBUTE', 'SUGGEST'];
 
 const Model = require('./Model');
 const AttendeeProjectInterest = Model.extend({
@@ -7,7 +8,7 @@ const AttendeeProjectInterest = Model.extend({
   idAttribute: 'id',
   validations: {
     attendeeId: ['required', 'integer'],
-    type: ['required', 'string', registration.verifyProjectInterestType],
+    type: ['required', 'string', validators.in(PROJECT_INTEREST_TYPES)],
     projectId: ['required', 'integer'],
     attendeeProjectId: [ 'integer' ]
   }
