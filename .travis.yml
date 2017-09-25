@@ -20,7 +20,7 @@ before_script:
 before_deploy:
   - ./scripts/install/flyway.sh
   - ./scripts/install/deps.sh
-  - cp ./config/prod.json.template ./config/prod.json
+  - cp ./config/production.json.template ./config/production.json
   - python3 ./scripts/deploy/deps.py
   - npm run prod-migrations
 deploy:
