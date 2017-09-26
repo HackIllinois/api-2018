@@ -9,12 +9,6 @@ if [ "$#" -ne 2 ]; then
 	exit 2
 fi
 
-FLYWAY_USERNAME=$DB_USERNAME
-FLYWAY_PASSWORD=$DB_PASSWORD
-FLYWAY_HOSTNAME=$DB_HOSTNAME
-FLYWAY_PORT=$DB_PORT
-FLYWAY_NAME=$DB_NAME
-
 cd "$(dirname ${BASH_SOURCE[0]})"
 if [ -f "../config/$2.json" ]; then
 	configuration=`echo -e $(cat ../config/$2.json)`
@@ -26,5 +20,11 @@ if [ -f "../config/$2.json" ]; then
 else
 	echo "no configuration found for target '$2'. defaulting to environment"
 fi
+
+FLYWAY_USERNAME=${DB_USERNAME:-$FLYWAY_USERNAME}
+FLYWAY_PASSWORD=${DB_PASSWORD:-$FLYWAY_PASSWORD}
+FLYWAY_HOSTNAME=${DB_HOSTNAME:-$FLYWAY_HOSTNAME}
+FLYWAY_PORT=${DB_PORT:-$FLYWAY_PORT}
+FLYWAY_NAME=${DB_NAME:-$FLYWAY_NAME}
 
 flyway -user=$FLYWAY_USERNAME -password=$FLYWAY_PASSWORD -url=jdbc:mysql://$FLYWAY_HOSTNAME:$FLYWAY_PORT/$FLYWAY_NAME -locations=filesystem:"$PWD/migration" -baselineOnMigrate=true -sqlMigrationSuffix=.sql $1
