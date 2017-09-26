@@ -16,6 +16,8 @@ cache:
 before_script:
   - npm install
   - cp ./config/test.json.template ./config/test.json
+after_success:
+  - - rm ./config/test.json
 before_deploy:
   - ./scripts/install/flyway.sh
   - ./scripts/install/deps.sh
@@ -31,3 +33,4 @@ deploy:
   app: "hackillinois-api"
   env: "hackillinois-api"
   bucket_name: $HACKILLINOIS_BUCKET_NAME
+  skip_cleanup: true
