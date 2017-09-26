@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e
-pip3 install sparkpost
+pip3 install --user sparkpost
