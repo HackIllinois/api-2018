@@ -6,3 +6,4 @@ curl -o /tmp/flyway.tar.gz -s -S https://repo1.maven.org/maven2/org/flywaydb/fly
 mkdir -p /opt/flyway
 tar -xf /tmp/flyway.tar.gz -C /opt/flyway --strip-components=1
 chmod 755 /opt/flyway/flyway
+ln -s /opt/flyway/flyway ~/bin/flyway
