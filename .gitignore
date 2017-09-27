@@ -21,6 +21,4 @@ temp
 .vagrant
 .eslintcache
 
-# The last line is automatically removed during the travis build
-# Don't move it!
 config/*.json
