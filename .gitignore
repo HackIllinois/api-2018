@@ -16,9 +16,8 @@ temp
 
 /.idea
 
+config/*.json
 .env
 
 .vagrant
 .eslintcache
-
-config/*.json
