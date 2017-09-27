@@ -24,6 +24,7 @@ before_deploy:
   - cp ./config/production.json.template ./config/production.json
   - python3 ./scripts/deploy/deps.py
   - npm run prod-migrations
+  - git add -f ./config/production.json
 deploy:
   provider: elasticbeanstalk
   skip_cleanup: false
