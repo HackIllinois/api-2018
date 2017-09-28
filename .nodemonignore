@@ -1,5 +1,5 @@
 database/**
-resources/**
+scripts/**
 node_modules/**
 temp/**
 

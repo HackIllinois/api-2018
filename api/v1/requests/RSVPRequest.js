@@ -1,11 +1,12 @@
 const Request = require('./Request');
-const rsvp = require('../utils/rsvp');
+const RSVP = require('../models/AttendeeRSVP');
 
 const bodyRequired = [ 'isAttending' ];
 const bodyAllowed = [ 'type' ];
+const rsvp = new RSVP();
 const bodyValidations = {
   'isAttending': ['required', 'boolean'],
-  'type': ['string', rsvp.verifyAttendanceReply]
+  'type': rsvp.validations.type
 };
 
 function RSVPRequest(headers, body) {

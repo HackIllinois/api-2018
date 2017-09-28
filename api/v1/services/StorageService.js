@@ -6,7 +6,7 @@ const files = require('../../files');
 const errors = require('../errors');
 const Upload = require('../models/Upload');
 
-const uuid = require('node-uuid');
+const uuid4 = require('uuid/v4');
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
@@ -152,7 +152,7 @@ module.exports.findUploadByKey = (key, bucket) => Upload
 module.exports.createUpload = (owner, params) => {
   const uploadParams = {};
   uploadParams.ownerId = owner.get('id');
-  uploadParams.key = params.key || uuid.v4();
+  uploadParams.key = params.key || uuid4();
   uploadParams.bucket = params.bucket;
 
   return Upload.forge(uploadParams)

@@ -8,8 +8,6 @@ module.exports.unix = () => Math.floor(Date.now() / MILLISECONDS_PER_SECOND);
 
 module.exports.toMilliseconds = (description) => milliseconds(description);
 
-module.exports.verifyDate = (date) => !!Date.parse(date);
-
 module.exports.secondsToHHMMSS = (numSeconds) => {
   numSeconds = Number(numSeconds);
   const h = Math.floor(numSeconds / 3600);
