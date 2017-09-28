@@ -2,11 +2,11 @@ const AuthService = require('../services/AuthService');
 const User = require('../models/User');
 const appcontext = require('../../../appcontext');
 const config = appcontext.config();
-const logger = appcontext.logger();
+
 const errors = require('../errors');
 const roles = require('../utils/roles');
 const _ = require('lodash');
-
+const logger = appcontext.logger();
 
 module.exports = (req, res, next) => {
   let auth = req.get(config.auth.headers.all);

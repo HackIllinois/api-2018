@@ -1,7 +1,6 @@
 const config = require('./config');
 const logger = require('./logging');
 
-
 const _Promise = require('bluebird');
 const redis = _Promise.promisifyAll(require('redis'));
 
