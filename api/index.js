@@ -1,5 +1,6 @@
-const config = require('./config');
-const logger = require('./logging');
+const appcontext = require('../appcontext');
+const config = appcontext.config();
+const logger = appcontext.logger();
 const v1 = require('./v1');
 
 logger.info('starting superuser setup check in the background');

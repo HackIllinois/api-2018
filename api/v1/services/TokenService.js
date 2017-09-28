@@ -3,7 +3,8 @@
 const _Promise = require('bluebird');
 
 const Token = require('../models/Token');
-const config = require('../../config');
+const appcontext = require('../../../appcontext');
+const config = appcontext.config();
 const errors = require('../errors');
 const utils = require('../utils');
 

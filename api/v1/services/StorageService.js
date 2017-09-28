@@ -1,7 +1,8 @@
 /* jshint esversion: 6 */
 
 const client = require('aws-sdk');
-const config = require('../../config');
+const appcontext = require('../../../appcontext');
+const config = appcontext.config();
 const files = require('../../files');
 const errors = require('../errors');
 const Upload = require('../models/Upload');

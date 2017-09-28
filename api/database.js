@@ -33,7 +33,7 @@ DatabaseManager.prototype.instance = function() {
   return this._bookshelf;
 };
 
-DatabaseManager.prototype.connection = function () {
+DatabaseManager.prototype.connection = function() {
   return this._knex;
 };
 

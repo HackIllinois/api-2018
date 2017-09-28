@@ -9,8 +9,9 @@ const _Promise = require('bluebird');
 const SparkPost = require('sparkpost');
 const _ = require('lodash');
 
-const config = require('../../config');
-const logger = require('../../logging');
+const appcontext = require('../../../appcontext');
+const config = appcontext.config();
+const logger = appcontext.logger();
 const files = require('../../files');
 const errors = require('../errors');
 

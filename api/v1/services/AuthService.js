@@ -7,7 +7,8 @@ const StatusCodeError = require('request-promise/errors').StatusCodeError;
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
-const config = require('../../config');
+const appcontext = require('../../../appcontext');
+const config = appcontext.config();
 const errors = require('../errors');
 
 const JWT_SECRET = config.auth.secret;

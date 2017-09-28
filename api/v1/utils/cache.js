@@ -1,5 +1,5 @@
-const client = require('../../cache')
-  .instance();
+const appcontext = require('../../../appcontext');
+const client = appcontext.cache().instance();
 const errors = require('../errors');
 
 module.exports.hasKey = (key) => client.existsAsync(key);

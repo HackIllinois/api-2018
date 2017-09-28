@@ -1,4 +1,5 @@
-const config = require('../../config');
+const appcontext = require('../../../appcontext');
+const config = appcontext.config();
 
 module.exports.buckets = {};
 

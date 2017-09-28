@@ -3,9 +3,8 @@ const requid = require('cuid');
 const helmet = require('helmet');
 
 const appcontext = require('./appcontext');
-const config = APP.config;
-const database = APP.database; // eslint-disable-line no-unused-vars
-const logger = APP.logger;
+const config = appcontext.config();
+const logger = appcontext.logger();
 
 // the dirname is local to every module, so we expose the app root's cwd
 // here (before initializing the api)
