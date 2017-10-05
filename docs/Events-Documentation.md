@@ -4,7 +4,7 @@ Provides functionality for Events
 
 ---
 
-**GET /v1/eventsapi** <br />
+**GET /v1/event** <br />
 Obtain current events.
 
 Headers <br />
@@ -43,7 +43,7 @@ Response
 
 ---
 
-**GET /v1/eventsapi/location** <br />
+**GET /v1/event/location/all** <br />
 Returns all currently stored location objects.
 
 Headers <br />
@@ -73,7 +73,7 @@ Response
 
 ---
 
-**POST /v1/eventsapi/** <br />
+**POST /v1/event/** <br />
 Create an event. Locations must already exist
 
 Headers <br />
@@ -138,7 +138,7 @@ Errors: <br />
 
 ---
 
-**POST /v1/eventsapi/location** <br />
+**POST /v1/event/location** <br />
 Creates a location to use with the events
 
 Headers <br />

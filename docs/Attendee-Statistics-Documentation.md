@@ -4,7 +4,7 @@ Provides functionality for statistics. Registration and RSVP stats are cached fo
 
 ---
 
-**GET /v1/stats** <br />
+**GET /v1/stats/all** <br />
 Fetch all stats
 
 Headers <br />
