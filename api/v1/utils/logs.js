@@ -1,9 +1,8 @@
 /* jshint esversion: 6 */
 const _ = require('lodash');
-
+const config = require('../../config');
 const logger = require('../../logging');
 
-const REQUEST_BLACKLIST = [ 'password' ];
 const ERROR_TYPES = {
   UNCAUGHT: 'UNCAUGHT',
   CLIENT: 'CLIENT',
@@ -39,7 +38,7 @@ function _makeRequestMetadata(req) {
     adminOverRide: req.originUser ? req.originUser : null,
     query: req.query,
     params: req.params,
-    body: _filterBody(req.body, REQUEST_BLACKLIST)
+    body: _filterBody(req.body, config.logs.request.blacklist)
   };
 }
 

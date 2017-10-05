@@ -1,14 +1,15 @@
-const registration = require('../utils/registration');
 const Request = require('./Request');
+const Attendee = require('../models/Attendee');
 
 const bodyRequired = ['priority', 'wave', 'status'];
 const bodyAllowed = ['acceptanceType', 'acceptedEcosystemId'];
+const attendee = new Attendee();
 const bodyValidations = {
   'priority': ['required', 'integer', 'max:10'],
-  'wave': ['required', 'integer', 'max:5'],
-  'status': ['required', 'string', registration.verifyStatus],
+  'wave': attendee.validations.wave.concat([ 'required' ]),
+  'status': attendee.validations.status.concat([ 'required' ]),
   'acceptedEcosystemId': [ 'integer' ],
-  'acceptanceType': ['string', registration.verifyAcceptanceType]
+  'acceptanceType': attendee.validations.acceptanceType
 };
 
 function AttendeeDecisionRequest(headers, body) {

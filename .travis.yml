@@ -9,19 +9,29 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+      - python3-pip
 cache:
   directories:
     - node_modules
 before_script:
-  - pwd
-  - cp ~/build/HackIllinois/api/config/test.config.template ~/build/HackIllinois/api/config/test.config
   - npm install
+  - cp ./config/test.json.template ./config/test.json
+after_success:
+  - - rm ./config/test.json
+before_deploy:
+  - ./scripts/install/flyway.sh
+  - ./scripts/install/deps.sh
+  - cp ./config/production.json.template ./config/production.json
+  - python3 ./scripts/deploy/deps.py
+  - npm run prod-migrations
+  - git add -f ./config/production.json
 deploy:
   provider: elasticbeanstalk
-  skip_cleanup: true
+  skip_cleanup: false
   access_key_id: $HACKILLINOIS_ACCESS_KEY_ID
   secret_access_key: $HACKILLINOIS_SECRET_ACCESS_KEY
   region: "us-east-1"
   app: "hackillinois-api"
   env: "hackillinois-api"
   bucket_name: $HACKILLINOIS_BUCKET_NAME
+  skip_cleanup: true

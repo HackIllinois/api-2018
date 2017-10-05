@@ -1,4 +1,7 @@
-const registration = require('../utils/registration');
+const validators = require('../utils/validators');
+
+const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
+const STATUSES = ['ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING'];
 
 const Model = require('./Model');
 const MentorProjectIdea = require('./MentorProjectIdea');
@@ -8,8 +11,8 @@ const Mentor = Model.extend({
   validations: {
     firstName: ['required', 'string', 'maxLength:255'],
     lastName: ['required', 'string', 'maxLength:255'],
-    shirtSize: ['required', 'string', registration.verifyTshirtSize],
-    status: ['string', registration.verifyStatus],
+    shirtSize: ['required', 'string', validators.in(TSHIRT_SIZES)],
+    status: ['string', validators.in(STATUSES)],
     github: ['string', 'maxLength:50'],
     location: ['required', 'string', 'maxLength:255'],
     summary: ['required', 'string', 'maxLength:255'],

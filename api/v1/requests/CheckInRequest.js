@@ -1,11 +1,12 @@
 const Request = require('./Request');
-const checkin = require('../utils/check_in');
+const CheckIn = require('../models/CheckIn');
 
 const bodyRequired = ['location', 'swag', 'credentialsRequested'];
+const checkin = new CheckIn();
 const bodyValidations = {
-  location: ['required', 'string', checkin.verifyLocation],
+  location: checkin.validations.location,
   credentialsRequested: ['required', 'boolean'],
-  swag: ['required', 'boolean']
+  swag: checkin.validations.swag
 };
 
 function CheckInRequest(headers, body) {
