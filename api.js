@@ -2,9 +2,25 @@ const express = require('express');
 const requid = require('cuid');
 const helmet = require('helmet');
 
-const appcontext = require('./appcontext');
-const config = appcontext.config();
-const logger = appcontext.logger();
+const ctx = require('./ctx');
+const config = ctx.config();
+const logger = ctx.logger();
+
+require("./api/v1/utils/cache")(ctx);
+require("./api/v1/utils/logs")(ctx);
+require("./api/v1/utils/storage")(ctx);
+
+require("./api/v1/middleware/auth")(ctx);
+
+require("./api/v1/services/AuthService")(ctx);
+require("./api/v1/services/MailService")(ctx);
+require("./api/v1/services/StatsService")(ctx);
+require("./api/v1/services/StorageService")(ctx);
+require("./api/v1/services/TokenService")(ctx);
+require("./api/v1/services/TrackingService")(ctx);
+
+
+
 
 // the dirname is local to every module, so we expose the app root's cwd
 // here (before initializing the api)
@@ -17,7 +33,7 @@ instance.use((req, res, next) => {
   next();
 });
 
-const api = require('./api/');
+const api = require('./api/')(ctx);
 instance.use('/v1', api.v1);
 
 instance.listen(config.port, () => {

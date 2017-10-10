@@ -1,26 +1,26 @@
-function AppContext() {
+function Ctx() {
     this._config = require('./api/config');
     this._logger = require('./api/logging');
     this._database = require('./api/database'); // eslint-disable-line no-unused-vars
     this._cache  = require('./api/cache');
 }
 
-AppContext.prototype.constructor = AppContext;
+Ctx.prototype.constructor = Ctx;
 
-AppContext.prototype.config = function() {
+Ctx.prototype.config = function() {
     return this._config;
 };
 
-AppContext.prototype.logger = function() {
+Ctx.prototype.logger = function() {
     return this._logger;
 };
 
-AppContext.prototype.database = function() {
+Ctx.prototype.database = function() {
     return this._database;
 };
 
-AppContext.prototype.cache = function() {
+Ctx.prototype.cache = function() {
     return this._cache;
 };
 
-module.exports = new AppContext();
+module.exports = new Ctx();

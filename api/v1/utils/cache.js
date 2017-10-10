@@ -1,10 +1,10 @@
-const appcontext = require('../../../appcontext');
-const client = appcontext.cache().instance();
 const errors = require('../errors');
 
-module.exports.hasKey = (key) => client.existsAsync(key);
+function Cache(ctx) {
+  let client = ctx.cache().instance();
+  this.hasKey = (key) => client.existsAsync(key);
 
-module.exports.expireKey = (key, duration) => client.existsAsync(key)
+  this.expireKey = (key, duration) => client.existsAsync(key)
     .then((reply) => {
       if (reply != 1) {
         throw new errors.RedisError();
@@ -13,7 +13,7 @@ module.exports.expireKey = (key, duration) => client.existsAsync(key)
     .then(() => client.expireAsync(key, duration))
     .then((reply) => reply);
 
-module.exports.getString = (key) => client.existsAsync(key)
+  this.getString = (key) => client.existsAsync(key)
     .then((reply) => {
       if (reply != 1) {
         throw new errors.RedisError();
@@ -23,5 +23,17 @@ module.exports.getString = (key) => client.existsAsync(key)
     .then(() => client.getAsync(key))
     .then((res) => res);
 
-module.exports.storeString = (key, value) => client.setAsync(key, value)
+  this.storeString = (key, value) => client.setAsync(key, value)
     .then((reply) => reply);
+}
+
+Cache.prototype.constructor = Cache;
+
+let cache;
+
+module.exports = function(ctx) {
+  if (!cache) {
+    cache = new Cache(ctx);
+  }
+  return cache;
+}

@@ -20,6 +20,7 @@ const UPLOAD_ALREADY_PRESENT = 'An upload has already been associated with this 
 
 const RESUME_UPLOAD_LIMIT = '2mb';
 const RESUME_UPLOAD_TYPE = 'application/pdf';
+
 const RESUME_BUCKET = utils.storage.buckets.resumes;
 
 function _findUpload(req, res, next) {

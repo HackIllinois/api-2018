@@ -1,8 +1,6 @@
 /* jshint esversion: 6 */
-
 const client = require('aws-sdk');
-const appcontext = require('../../../appcontext');
-const config = appcontext.config();
+
 const files = require('../../files');
 const errors = require('../errors');
 const Upload = require('../models/Upload');
@@ -10,107 +8,109 @@ const Upload = require('../models/Upload');
 const uuid4 = require('uuid/v4');
 const _Promise = require('bluebird');
 const _ = require('lodash');
-
-client.config.update(config.aws.defaults);
-const remote = new client.S3();
-
 const CLIENT_NAME = 'AWS_S3';
 
-function _handleDisabledUpload(upload, file) {
-  if (!config.isDevelopment) {
-    // something went wrong and we made it into production without
-    // an enabled client, so do not expose the instance's file system
-    throw new errors.ApiError();
+function StorageService(ctx) {
+  let config = ctx.config();
+
+  client.config.update(config.aws.defaults);
+  let remote = new client.S3();
+
+  function _handleDisabledUpload(upload, file) {
+    if (!config.isDevelopment) {
+      // something went wrong and we made it into production without
+      // an enabled client, so do not expose the instance's file system
+      throw new errors.ApiError();
+    }
+
+    const params = {};
+    params.bucket = upload.get('bucket');
+    params.key = upload.get('key');
+    params.type = file.type;
+
+    return files.writeFile(file.content, params);
   }
 
-  const params = {};
-  params.bucket = upload.get('bucket');
-  params.key = upload.get('key');
-  params.type = file.type;
+  function _handleUpload(upload, file) {
+    const params = {};
+    params.Body = file.content;
+    params.Bucket = upload.get('bucket');
+    params.Key = upload.get('key');
+    params.ContentLength = file.content.length;
+    params.ContentType = file.type;
 
-  return files.writeFile(file.content, params);
-}
+    return remote.putObject(params)
+      .promise()
+      .catch((error) => {
+        let message = 'the storage client received an error on upload';
+        message += ' (' + error.message + ')';
 
-function _handleUpload(upload, file) {
-  const params = {};
-  params.Body = file.content;
-  params.Bucket = upload.get('bucket');
-  params.Key = upload.get('key');
-  params.ContentLength = file.content.length;
-  params.ContentType = file.type;
+        throw new errors.ExternalProviderError(message, CLIENT_NAME);
+      });
+  }
 
-  return remote.putObject(params)
-    .promise()
-    .catch((error) => {
-      let message = 'the storage client received an error on upload';
-      message += ' (' + error.message + ')';
+  function _handleDisabledRetrieval(upload) {
+    return files.getFile(upload.get('key'), upload.get('bucket'))
+      .then((file) => {
+        const result = {};
+        result.content = file.content;
+        result.type = file.type;
 
-      throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    });
-}
+        return _Promise.resolve(result);
+      });
+  }
 
-function _handleDisabledRetrieval(upload) {
-  return files.getFile(upload.get('key'), upload.get('bucket'))
-    .then((file) => {
-      const result = {};
-      result.content = file.content;
-      result.type = file.type;
+  function _handleRetrieval(upload) {
+    const params = {};
+    params.Bucket = upload.get('bucket');
+    params.Key = upload.get('key');
 
-      return _Promise.resolve(result);
-    });
-}
+    return remote.getObject(params)
+      .promise()
+      .then((data) => {
+        const result = {};
+        result.content = data.Body;
+        result.type = data.ContentType;
 
-function _handleRetrieval(upload) {
-  const params = {};
-  params.Bucket = upload.get('bucket');
-  params.Key = upload.get('key');
+        return result;
+      })
+      .catch((error) => {
+        let message = 'the storage client received an error on retrieval';
+        message += ' (' + error.message + ')';
 
-  return remote.getObject(params)
-    .promise()
-    .then((data) => {
-      const result = {};
-      result.content = data.Body;
-      result.type = data.ContentType;
+        throw new errors.ExternalProviderError(message, CLIENT_NAME);
+      });
+  }
 
-      return result;
-    })
-    .catch((error) => {
-      let message = 'the storage client received an error on retrieval';
-      message += ' (' + error.message + ')';
+  function _handleDisabledRemoval(upload) {
+    return files
+      .removeFile(upload.get('key'), upload.get('bucket'))
+      .then(() => upload.destroy());
+  }
 
-      throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    });
-}
+  function _handleRemoval(upload) {
+    const params = {};
+    params.Bucket = upload.get('bucket');
+    params.Key = upload.get('key');
 
-function _handleDisabledRemoval(upload) {
-  return files
-    .removeFile(upload.get('key'), upload.get('bucket'))
-    .then(() => upload.destroy());
-}
+    return remote.deleteObject(params)
+      .promise()
+      .catch((error) => {
+        let message = 'the storage client received an error on removal';
+        message += ' (' + error.message + ')';
 
-function _handleRemoval(upload) {
-  const params = {};
-  params.Bucket = upload.get('bucket');
-  params.Key = upload.get('key');
+        throw new errors.ExternalProviderError(message, CLIENT_NAME);
+      })
+      .then(() => upload.destory());
+  }
 
-  return remote.deleteObject(params)
-    .promise()
-    .catch((error) => {
-      let message = 'the storage client received an error on removal';
-      message += ' (' + error.message + ')';
-
-      throw new errors.ExternalProviderError(message, CLIENT_NAME);
-    })
-    .then(() => upload.destory());
-}
-
-/**
- * Finds an upload by its internal ID
- * @param  {Number} id			the internal ID of the requested upload
- * @return {Promise<Upload>}	the requested upload
- * @throws {NotFoundError}	when the upload does not exist
- */
-module.exports.findUploadById = (id) => Upload
+  /**
+   * Finds an upload by its internal ID
+   * @param  {Number} id			the internal ID of the requested upload
+   * @return {Promise<Upload>}	the requested upload
+   * @throws {NotFoundError}	when the upload does not exist
+   */
+  this.findUploadById = (id) => Upload
     .findById(id)
     .then((result) => {
       if (_.isNull(result)) {
@@ -122,14 +122,14 @@ module.exports.findUploadById = (id) => Upload
       return _Promise.resolve(result);
     });
 
-/**
- * Finds an upload by its key in a given bucket
- * @param  {String} key		the previously key given to the upload
- * @param  {String} bucket	the bucket assigned to the upload
- * @return {Promise<Upload>} the requested upload
- * @throws {NotFoundError} when the upload does not exist
- */
-module.exports.findUploadByKey = (key, bucket) => Upload
+  /**
+   * Finds an upload by its key in a given bucket
+   * @param  {String} key		the previously key given to the upload
+   * @param  {String} bucket	the bucket assigned to the upload
+   * @return {Promise<Upload>} the requested upload
+   * @throws {NotFoundError} when the upload does not exist
+   */
+  this.findUploadByKey = (key, bucket) => Upload
     .findByKey(key, bucket)
     .then((result) => {
       if (_.isNull(result)) {
@@ -140,68 +140,80 @@ module.exports.findUploadByKey = (key, bucket) => Upload
       return _Promise.resolve(result);
     });
 
-/**
- * Creates an internal upload representation
- *
- * @param  {User} owner				the owner of the upload
- * @param  {Object} params			parameter object with
- *                           		{String} bucket			the target upload bucket
- *                           		{String} key			(optional) the 36-character key to use for the upload
- * @return {Promise<Upload>}		a promise resolving to the new upload
- *
- */
-module.exports.createUpload = (owner, params) => {
-  const uploadParams = {};
-  uploadParams.ownerId = owner.get('id');
-  uploadParams.key = params.key || uuid4();
-  uploadParams.bucket = params.bucket;
+  /**
+   * Creates an internal upload representation
+   *
+   * @param  {User} owner				the owner of the upload
+   * @param  {Object} params			parameter object with
+   *                           		{String} bucket			the target upload bucket
+   *                           		{String} key			(optional) the 36-character key to use for the upload
+   * @return {Promise<Upload>}		a promise resolving to the new upload
+   *
+   */
+  this.createUpload = (owner, params) => {
+    const uploadParams = {};
+    uploadParams.ownerId = owner.get('id');
+    uploadParams.key = params.key || uuid4();
+    uploadParams.bucket = params.bucket;
 
-  return Upload.forge(uploadParams)
-    .save();
-};
+    return Upload.forge(uploadParams)
+      .save();
+  };
 
-/**
- * Provides a signed, short-term upload URI
- * @param  {Upload} upload			the internal upload representation associated with this upload
- * @param  {Object} file			parameter object with
- *                         			{String} content	the Buffer containing the file
- *                         			{String} type		the MIME type of the upload
- * @return {Promise<String>} an upload to which the file will be accepted
- * @throws {ExternalProviderError}	when the upload fails any imposed validations
- */
-module.exports.persistUpload = (upload, file) => {
-  if (!config.aws.enabled) {
-    return _handleDisabledUpload(upload, file);
+  /**
+   * Provides a signed, short-term upload URI
+   * @param  {Upload} upload			the internal upload representation associated with this upload
+   * @param  {Object} file			parameter object with
+   *                         			{String} content	the Buffer containing the file
+   *                         			{String} type		the MIME type of the upload
+   * @return {Promise<String>} an upload to which the file will be accepted
+   * @throws {ExternalProviderError}	when the upload fails any imposed validations
+   */
+  this.persistUpload = (upload, file) => {
+    if (!config.aws.enabled) {
+      return _handleDisabledUpload(upload, file);
+    }
+    return _handleUpload(upload, file);
+  };
+
+  /**
+   * Retrieves an upload from remote storage
+   * @param  {Upload} upload			an internal upload representation
+   * @return {Promise<Object>}		an object with
+   *                               	{Buffer} content 		the content retrieved
+   *                               	{String} type			the MIME type of the content
+   * @throws {ExternalProviderError}	when the client throws an error
+   */
+  this.getUpload = (upload) => {
+    if (!config.aws.enabled) {
+      return _handleDisabledRetrieval(upload);
+    }
+    return _handleRetrieval(upload);
+  };
+
+  /**
+   * Removes a file from storage
+   *
+   * @param {Upload} upload 			an internal upload representation
+   * @param {Transaction} transaction	(optional) a pending database transaction
+   * @return {Promise<>}				an empty promise indicating success
+   * @throws {ExternalProviderError}	when the client throws an error
+   */
+  this.removeUpload = (upload) => {
+    if (!config.aws.enabled) {
+      return _handleDisabledRemoval(upload);
+    }
+    return _handleRemoval(upload);
+  };
+}
+
+StorageService.prototype.constructor = StorageService;
+
+let storageService;
+
+module.exports = function(ctx) {
+  if (!storageService) {
+    storageService = new StorageService(ctx);
   }
-  return _handleUpload(upload, file);
-};
-
-/**
- * Retrieves an upload from remote storage
- * @param  {Upload} upload			an internal upload representation
- * @return {Promise<Object>}		an object with
- *                               	{Buffer} content 		the content retrieved
- *                               	{String} type			the MIME type of the content
- * @throws {ExternalProviderError}	when the client throws an error
- */
-module.exports.getUpload = (upload) => {
-  if (!config.aws.enabled) {
-    return _handleDisabledRetrieval(upload);
-  }
-  return _handleRetrieval(upload);
-};
-
-/**
- * Removes a file from storage
- *
- * @param {Upload} upload 			an internal upload representation
- * @param {Transaction} transaction	(optional) a pending database transaction
- * @return {Promise<>}				an empty promise indicating success
- * @throws {ExternalProviderError}	when the client throws an error
- */
-module.exports.removeUpload = (upload) => {
-  if (!config.aws.enabled) {
-    return _handleDisabledRemoval(upload);
-  }
-  return _handleRemoval(upload);
-};
+  return storageService;
+}
