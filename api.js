@@ -8,6 +8,7 @@ const logger = ctx.logger();
 
 require("./api/v1/utils/cache")(ctx);
 require("./api/v1/utils/logs")(ctx);
+require("./api/v1/utils/mail")(ctx);
 require("./api/v1/utils/storage")(ctx);
 
 require("./api/v1/middleware/auth")(ctx);

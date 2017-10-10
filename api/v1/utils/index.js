@@ -4,7 +4,7 @@ module.exports = {
   database: require('./database.js'),
   errors: require('./errors.js'),
   logs: require('./logs.js')(),
-  mail: require('./mail.js'),
+  mail: require('./mail.js')(),
   roles: require('./roles.js'),
   scopes: require('./scopes.js'),
   storage: require('./storage.js')(),
