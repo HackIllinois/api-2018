@@ -1,0 +1,101 @@
+{
+  "isTest": true,
+  "port": 8080,
+  "auth": {
+    "expiration": "7d",
+    "secret": "VERY_SPECIAL_KEY",
+    "github": {
+      "id": null,
+      "secret": null,
+      "useragent": "HackIllinois"
+    },
+    "headers": {
+      "all": "Authorization",
+      "impersonation": "Admin-User-Override"
+    },
+    "types": {
+      "basic": "Basic",
+      "bearer": "Bearer"
+    }
+  },
+  "aws": {
+    "enabled": 0,
+    "defaults": {
+      "credentials": null,
+      "region": "us-east-1",
+      "sslEnabled": true
+    }
+  },
+  "database": {
+    "primary": {
+      "host": "127.0.0.1",
+      "name": "hackillinois",
+      "password": "pass123",
+      "port": "3306",
+      "user": "root",
+      "pool": {
+        "min": 0,
+        "max": 7500,
+        "idleTimeout": "5s"
+      }
+    }
+  },
+  "mail": {
+    "key": null,
+    "sinkhole": ".sink.sparkpostmail.com",
+    "whitelistedDomains": [ "@hackillinois.org" ],
+    "whitelistedLists": [ "test" ],
+    "lists": {
+      "test": { "name": "test", "id": "test" },
+      "idlers": { "name": "idlers", "id": "idlers-2017" },
+      "applicants": { "name": "applicants", "id": "applicants-2017" },
+      "accepted": { "name": "accepted", "id": "accepted-2017" },
+      "lightningTalks": { "name": "lightning_talks", "id": "lightning-talks-2017" },
+      "waitlisted": { "name": "waitlisted", "id": "waitlisted-2017" },
+      "attendees": { "name": "attendees", "id": "attendees-2017" },
+      "admins": { "name": "admins", "id": "admins-2017" },
+      "staff": { "name": "staff", "id": "staff-2017" },
+      "sponsors": { "name": "sponsors", "id": "sponsors-2017" },
+      "mentors": { "name": "mentors", "id": "mentors-2017" },
+      "volunteers": { "name": "volunteers", "id": "volunteers-2017" },
+      "wave1": { "name": "wave_1", "id": "wave-1-2017" },
+      "wave2": { "name": "wave_2", "id": "wave-2-2017" },
+      "wave3": { "name": "wave_3", "id": "wave-3-2017" },
+      "wave4": { "name": "wave_4", "id": "wave-4-2017" },
+      "wave5": { "name": "wave_5", "id": "wave-5-2017" },
+      "rejected": { "name": "rejected", "id": "rejected-2017"}
+    },
+    "templates": {
+      "acceptance": "acceptance",
+      "passwordReset": "password_reset",
+      "test": "test"
+    }
+  },
+  "logs": {
+    "streamPrefix": "instances",
+    "groupName": "api-dev",
+    "request": {
+      "blacklist": [ "password" ]
+    }
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  },
+  "storage": {
+    "bucketExtension": "-development",
+    "buckets": {
+      "resumes": "hackillinois-resumes"
+    }
+  },
+  "superuser": {
+    "email": "admin@example.com",
+    "password": "ABCD1234!"
+  },
+  "token": {
+    "expiration": {
+      "DEFAULT": "7d",
+      "AUTH": "7d"
+    }
+  }
+}
