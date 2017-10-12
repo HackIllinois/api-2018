@@ -3,7 +3,7 @@ const chai = require('chai');
 const errors = require('../api/v1/errors');
 const utils = require('../api/v1/utils');
 const User = require('../api/v1/models/User.js');
-const AuthService = require('../api/v1/services/AuthService.js');
+const AuthService = require('../api/v1/services').AuthService;
 
 const jwt = require('jsonwebtoken');
 

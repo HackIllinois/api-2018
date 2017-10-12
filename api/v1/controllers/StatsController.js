@@ -4,7 +4,7 @@ const router = require('express').Router();
 
 const roles = require('../utils/roles');
 
-const StatsService = require('../services/StatsService');
+const StatsService = require('../services').StatsService;
 function getAllStats(req, res, next) {
   StatsService.fetchAllStats()
     .then((stats) => {

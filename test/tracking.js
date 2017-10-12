@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const errors = require('../api/v1/errors');
 const TrackingItem = require('../api/v1/models/TrackingEvent');
-const TrackingService = require('../api/v1/services/TrackingService');
+const TrackingService = require('../api/v1/services').TrackingService;
 
 const assert = chai.assert;
 const expect = chai.expect;

@@ -5,9 +5,9 @@ const middleware = require('../middleware');
 const requests = require('../requests');
 const utils = require('../utils');
 
-const AuthService = require('../services/AuthService');
-const TokenService = require('../services/TokenService');
-const UserService = require('../services/UserService');
+const AuthService = require('../services').AuthService;
+const TokenService = require('../services').TokenService;
+const UserService = require('../services').UserService;
 
 const router = require('express').Router();
 

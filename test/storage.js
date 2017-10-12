@@ -1,7 +1,7 @@
 const chai = require('chai');
 const sinon = require('sinon');
 
-const StorageService = require('../api/v1/services/StorageService.js');
+const StorageService = require('../api/v1/services').StorageService;
 const Upload = require('../api/v1/models/Upload.js');
 const User = require('../api/v1/models/User.js');
 

@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 const errors = require('../api/v1/errors');
 const utils = require('../api/v1/utils');
-const TokenService = require('../api/v1/services/TokenService.js');
+const TokenService = require('../api/v1/services').TokenService;
 const Token = require('../api/v1/models/Token.js');
 const User = require('../api/v1/models/User.js');
 
