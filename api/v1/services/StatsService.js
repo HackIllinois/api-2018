@@ -386,11 +386,6 @@ function StatsService(ctx) {
 
 StatsService.prototype.constructor = StatsService;
 
-let statsService;
-
 module.exports = function(ctx) {
-    if (!statsService) {
-        statsService = new StatsService(ctx);
-    }
-    return statsService;
+    return new StatsService(ctx);
 }

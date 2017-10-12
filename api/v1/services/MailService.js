@@ -268,11 +268,6 @@ function MailService(ctx) {
 
 MailService.prototype.constructor = MailService;
 
-let mailService;
-
 module.exports = function(ctx) {
-  if (!mailService) {
-    mailService = new MailService(ctx);
-  }
-  return mailService;
+  return new MailService(ctx);
 }

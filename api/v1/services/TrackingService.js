@@ -91,11 +91,6 @@ function TrackingService(ctx) {
 
 TrackingService.prototype.constructor = TrackingService;
 
-let trackingService;
-
 module.exports = function(ctx) {
-  if (!trackingService) {
-    trackingService = new TrackingService(ctx);
-  }
-  return trackingService;
+  return new TrackingService(ctx);
 }

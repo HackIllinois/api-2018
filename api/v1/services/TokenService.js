@@ -76,11 +76,6 @@ function TokenService(ctx) {
 
 TokenService.prototype.constructor = TokenService;
 
-let tokenService;
-
 module.exports = function(ctx) {
-  if (!tokenService) {
-    tokenService = new TokenService(ctx);
-  }
-  return tokenService;
+  return new TokenService(ctx);
 };

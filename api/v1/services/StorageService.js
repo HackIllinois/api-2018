@@ -209,11 +209,6 @@ function StorageService(ctx) {
 
 StorageService.prototype.constructor = StorageService;
 
-let storageService;
-
 module.exports = function(ctx) {
-  if (!storageService) {
-    storageService = new StorageService(ctx);
-  }
-  return storageService;
+  return new StorageService(ctx);
 }

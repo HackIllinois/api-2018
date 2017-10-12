@@ -79,11 +79,6 @@ function Logs(ctx) {
 
 Logs.prototype.constructor = Logs;
 
-let logs;
-
 module.exports = function(ctx) {
-  if (!logs) {
-    logs = new Logs(ctx);
-  }
-  return logs;
+  return new Logs(ctx);
 }

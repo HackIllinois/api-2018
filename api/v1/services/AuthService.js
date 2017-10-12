@@ -151,11 +151,6 @@ function AuthService(ctx) {
 
 AuthService.prototype.constructor = AuthService;
 
-let authService;
-
 module.exports = function(ctx) {
-  if (!authService) {
-    authService = new AuthService(ctx);
-  }
-  return authService;
+  return new AuthService(ctx);
 }

@@ -1,4 +1,4 @@
-function Store(ctx) {
+function Storage(ctx) {
   let config = ctx.config();
 
   this.buckets = {};
@@ -8,13 +8,8 @@ function Store(ctx) {
     });
 }
 
-Store.prototype.constructor = Store;
-
-let storage;
+Storage.prototype.constructor = Storage;
 
 module.exports = function(ctx) {
-  if(!storage) {
-    storage = new Store(ctx);
-  }
-  return storage;
+  return new Storage(ctx);
 }

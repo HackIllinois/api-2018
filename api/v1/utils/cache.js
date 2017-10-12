@@ -29,11 +29,6 @@ function Cache(ctx) {
 
 Cache.prototype.constructor = Cache;
 
-let cache;
-
 module.exports = function(ctx) {
-  if (!cache) {
-    cache = new Cache(ctx);
-  }
-  return cache;
+  return new Cache(ctx);
 }

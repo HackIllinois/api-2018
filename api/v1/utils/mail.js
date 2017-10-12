@@ -7,11 +7,7 @@ function Mail(ctx) {
 }
 
 Mail.prototype.constructor = Mail;
-let mailService;
 
 module.exports = function(ctx) {
-  if(!mailService){
-    mailService = new MailService(ctx);
-  }
-  return mailService;
+  return new Mail(ctx);
 }
