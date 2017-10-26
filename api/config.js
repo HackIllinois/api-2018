@@ -28,7 +28,7 @@ function handleEnvironmentOverrides (config, overrides) {
       if (envKey === 'AWS') {
         overrideValue = !!overrideValue;
       }
-      if (envKey === 'PORT' || envKey === 'DB_PORT' || envKey === 'REDIS_PORT') {
+      if (envKey === 'APP_PORT' || envKey === 'DB_PORT' || envKey === 'REDIS_PORT') {
         overrideValue = parseInt(overrideValue);
       }
 
@@ -65,7 +65,7 @@ const config = handleEnvironmentLoad();
 const overrides = {};
 overrides['AWS'] = 'aws.enabled';
 overrides['SECRET'] = 'auth.secret';
-overrides['PORT'] = 'port';
+overrides['APP_PORT'] = 'port';
 overrides['SUPERUSER_EMAIL'] = 'superuser.email';
 overrides['SUPERUSER_PASSWORD'] = 'superuser.password';
 overrides['MAIL_KEY'] = 'mail.key';

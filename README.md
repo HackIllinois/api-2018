@@ -48,7 +48,7 @@ configuration key values.
 | ---- | --- | --------------- |
 | AWS | aws.enabled |0 or 1 |
 | SECRET | auth.secret | Any string |
-| PORT | port | Any valid port number |
+| APP_PORT | port | Any valid port number |
 | SUPERUSER_EMAIL | superuser.email | Any valid email |
 | SUPERUSER_PASSWORD | superuser.password | Any string |
 | MAIL_KEY | mail.key | Any string |
