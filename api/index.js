@@ -18,5 +18,5 @@ module.exports = function(ctx) {
       return null;
     });
 
-  return require('./v1');
+  return {v1: require('./v1')};
 }
