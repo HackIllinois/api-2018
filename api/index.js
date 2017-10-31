@@ -1,5 +1,6 @@
 const User = require('./v1/models/User');
 const utils = require('./v1/utils/');
+const v1 = require('./v1');
 
 module.exports = function(ctx) {
   let config = ctx.config();
@@ -18,5 +19,5 @@ module.exports = function(ctx) {
       return null;
     });
 
-  return {v1: require('./v1')};
+  return {v1: v1};
 }
