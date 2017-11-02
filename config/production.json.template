@@ -97,5 +97,9 @@
       "DEFAULT": "7d",
       "AUTH": "7d"
     }
+  },
+  "ratelimiting": {
+    "limit": 100,
+    "resetTimer": "1 hour"
   }
 }
