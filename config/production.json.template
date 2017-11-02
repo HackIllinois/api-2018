@@ -99,7 +99,7 @@
     }
   },
   "ratelimiting": {
-    "limit": 100,
-    "resetTimer": "1 hour"
+    "limit": 50,
+    "resetTimer": "1 minute"
   }
 }
