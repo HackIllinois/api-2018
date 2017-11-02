@@ -4,7 +4,7 @@ const config = require('../../config');
 const redisStorage = require('express-rate-limit-middleware').redisRateLimit
 const redisClient = require('../../cache').instance();
 
-module.exports = function(limitCount, resetTimer) {
+module.exports = function(limitCount = config.ratelimiting.limit, resetTimer = config.ratelimiting.resetTimer) {
 	return (req, res, next) => {
 		rateLimiter({
 				limit: limitCount,
