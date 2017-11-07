@@ -78,8 +78,8 @@ overrides['DB_HOSTNAME'] = 'database.primary.host';
 overrides['DB_PORT'] = 'database.primary.port';
 overrides['REDIS_HOST'] = 'redis.host';
 overrides['REDIS_PORT'] = 'redis.port';
-overrides['RATELIMIT_LIMIT'] = 'ratelimiting.limit';
-overrides['RATELIMIT_RESET'] = 'ratelimiting.resetTimer';
+overrides['RATELIMIT_COUNT'] = 'limit.count';
+overrides['RATELIMIT_WINDOW'] = 'limit.window';
 handleEnvironmentOverrides(config, overrides);
 handleAWSOverrides(config);
 

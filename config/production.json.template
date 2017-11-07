@@ -98,8 +98,8 @@
       "AUTH": "7d"
     }
   },
-  "ratelimiting": {
-    "limit": 50,
-    "resetTimer": "1 minute"
+  "limit": {
+    "count": 50,
+    "window": "1 minute"
   }
 }
