@@ -97,5 +97,9 @@
       "DEFAULT": "7d",
       "AUTH": "7d"
     }
+  },
+  "limit": {
+    "count": 50,
+    "window": 60
   }
 }
