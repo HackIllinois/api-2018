@@ -40,7 +40,7 @@
       "module.exports"
     ],
     "node/no-unpublished-require": ["error", {
-      "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "fakeredis"],
+      "allowModules": ["chai", "sinon", "mock-knex", "chai-as-promised", "mockery", "fakeredis", "express-brute", "express-brute-redis"],
       "tryExtensions": [".js", ".json", ".node"]
     }],
     "prefer-const": "error",

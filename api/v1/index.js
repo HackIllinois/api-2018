@@ -11,7 +11,7 @@ v1.use((req, res, next) => {
   next();
 });
 
-v1.use(middleware.ratelimiting)
+v1.use(middleware.ratelimiting);
 
 // set up CORS to allow for usage from different origins
 // we may remove this in the future
