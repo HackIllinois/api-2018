@@ -88,6 +88,8 @@ if (!config.isProduction) {
   requireds.delete(overrides['MAIL_KEY']);
   requireds.delete(overrides['GITHUB_CLIENT_ID']);
   requireds.delete(overrides['GITHUB_CLIENT_SECRET']);
+  requireds.delete(overrides['RATELIMIT_COUNT']);
+  requireds.delete(overrides['RATELIMIT_WINDOW']);
 }
 handleEnvironmentRequireds(config, requireds);
 
