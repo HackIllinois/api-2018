@@ -25,5 +25,6 @@ require('./checkin.js');
 require('./event.js');
 require('./tracking.js');
 require('./rsvp.js');
+require('./stat.js');
 
 mockery.disable();

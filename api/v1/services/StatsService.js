@@ -4,6 +4,7 @@ const _ = require('lodash');
 const database = require('../../database');
 const knex = database.connection();
 
+const Stat = require('../models/Stat');
 const Attendee = require('../models/Attendee');
 const AttendeeRSVP = require('../models/AttendeeRSVP');
 const CheckIn = require('../models/CheckIn');
@@ -17,6 +18,22 @@ const STATS_CACHE_KEY = 'stats';
 const STATS_LIVE_HEADER = 'liveevent';
 const STATS_RSVP_HEADER = 'rsvp';
 const STATS_REG_HEADER = 'registration';
+
+module.exports.createStat = function (category, stat, field) {
+  return Stat.create(category, stat, field);
+};
+
+module.exports.find = function (category, stat, field) {
+  return Stat.where({
+    category: category,
+    stat: stat,
+    field: field
+  });
+};
+
+module.exports.incrementStat = function (category, stat, field) {
+  return () => Stat.increment(category, stat, field);
+};
 
 /**
  * Returns a function that takes a query result and populates a stats object
