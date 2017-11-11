@@ -3,12 +3,15 @@ const v1 = express.Router();
 
 const controllers = require('./controllers');
 const utils = require('./utils');
+const middleware = require('./middleware');
 
 // acknowledge receipt of request
 v1.use((req, res, next) => {
   utils.logs.logRequestReceipt(req);
   next();
 });
+
+v1.use(middleware.ratelimiting);
 
 // set up CORS to allow for usage from different origins
 // we may remove this in the future
