@@ -126,3 +126,57 @@ Errors:
 | InvalidParameterError | `password` | The given password cannot be used. The password is less than 8 characters.                                                                                        |
 
 ---
+
+**GET /v1/auth/**
+
+Requests a code for a Github user
+
+Headers
+
+None
+
+URL Parameters
+
+None
+
+Request Parameters
+
+None
+
+Response
+
+Redirects to the Github Authorization page which will redirect to the appropriate callback url, based on whether the client was a native or web application with the resulting code attached as a query parameter
+
+---
+
+**GET /v1/auth/github**
+
+Exchanges a Github code for a valid OAuth2.0 access token
+
+Headers
+
+None
+
+URL Parameters
+
+| Parameter  | Description                                                                                           | Required |
+|------------|-------------------------------------------------------------------------------------------------------|----------|
+| `code`     | A valid Github access code                                                                            | Yes      |
+
+Request Parameters
+
+None
+
+Response
+
+```
+{
+    "meta": null,
+    "data":
+    {
+        "auth": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6eyJpc0Z1bGZpbGxlZCI6ZmFsc2UsImlzUmVqZWN0ZWQiOmZhbHNlfSwicm9sZSI6eyJpc0Z1bGZpbGxlZCI6ZmFsc2UsImlzUmVqZWN0ZWQiOmZhbHNlfSwiaWF0IjoxNDY5NzM3NjE5LCJleHAiOjE0NzAzNDI0MTksInN1YiI6IltvYmplY3QgUHJvbWlzZV0ifQ.Ftnw9niIg_g-ICvANEi5xaY6zr_yWs41LkrHNzGW330"
+    }
+}
+```
+
+---
