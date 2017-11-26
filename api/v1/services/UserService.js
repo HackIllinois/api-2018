@@ -3,6 +3,7 @@ const _Promise = require('bluebird');
 const _ = require('lodash');
 
 const User = require('../models/User');
+const UserRole = require('../models/UserRole');
 const errors = require('../errors');
 const utils = require('../utils');
 
@@ -117,3 +118,9 @@ module.exports.verifyPassword = (user, password) => user
 module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
+
+module.exports.addRole = (user, role, active) => UserRole
+    .addRole(user, role, active)
+    .then((updatedUser) => {
+      return updatedUser;
+    });

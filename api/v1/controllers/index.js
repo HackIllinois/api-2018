@@ -13,5 +13,6 @@ module.exports = {
   RSVPController: require('./RSVPController.js'),
   StatsController: require('./StatsController.js'),
   TrackingController: require('./TrackingController.js'),
-  MailController: require('./MailController.js')
+  MailController: require('./MailController.js'),
+  RoleAssignmentController: require('./RoleAssignmentController.js')
 };
