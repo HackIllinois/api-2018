@@ -78,7 +78,7 @@ function requestPasswordReset(req, res, next) {
         token: tokenVal,
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
+      return services.MailService.send(req.body.email, config.mail.templates.passwordReset, substitutions);
     })
     .then(() => {
       res.body = {};
