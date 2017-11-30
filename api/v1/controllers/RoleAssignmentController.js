@@ -9,31 +9,18 @@ const roles = require('../utils/roles');
 
 const router = require('express').Router();
 
-const ROLE_VALUE_MAP = {"ADMIN":2, "STAFF":1, "SPONSOR":0, "MENTOR":0, "VOLUNTEER":0, "ATTENDEE":0};
 
-function maxRole(userRoles) {
-  let max = 0;
-  userRoles.forEach((roleObj) => {
-    if(ROLE_VALUE_MAP[roleObj.role] > max) {
-      max = ROLE_VALUE_MAP[roleObj.role];
-    }
-  });
-  return max;
-}
 
 //assigns new role and returns updatedUser
 function assignNewRole(req, res, next) {
   UserService
     .findUserById(req.body.id)
     .then((assignedUser) => {
-      if(maxRole(req.user.related('roles').toJSON())
-          > ROLE_VALUE_MAP[req.body.role]
-          && maxRole(req.user.related('roles').toJSON())
-          > maxRole(assignedUser.related('roles').toJSON())) {
-
+      if(UserService.canAssign(req.user, assignedUser, req.body.role)) {
         UserService.addRole(assignedUser, req.body.role, true)
-        .then((updatedUser) => {
-          res.body = updatedUser.toJSON();
+        .then((updatedRole) => {
+          //TODO:get whole user
+          res.body = updatedRole.toJSON();
           return next();
         })
         .catch((error) => next(error));

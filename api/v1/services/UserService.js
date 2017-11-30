@@ -7,6 +7,18 @@ const UserRole = require('../models/UserRole');
 const errors = require('../errors');
 const utils = require('../utils');
 
+const ROLE_VALUE_MAP = {"ADMIN":2, "STAFF":1, "SPONSOR":0, "MENTOR":0, "VOLUNTEER":0, "ATTENDEE":0};
+
+function maxRole(userRoles) {
+  let max = 0;
+  userRoles.forEach((roleObj) => {
+    if(ROLE_VALUE_MAP[roleObj.role] > max) {
+      max = ROLE_VALUE_MAP[roleObj.role];
+    }
+  });
+  return max;
+}
+
 /**
  * Creates a user of the specified role. When a password is not specified, a
  * password will be generated for it
@@ -118,6 +130,13 @@ module.exports.verifyPassword = (user, password) => user
 module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
+
+module.exports.canAssign = (user, assignedUser, newRole) => {
+  return maxRole(user.related('roles').toJSON())
+      > ROLE_VALUE_MAP[newRole]
+      && maxRole(user.related('roles').toJSON())
+      > maxRole(assignedUser.related('roles').toJSON());
+};
 
 module.exports.addRole = (user, role, active) => UserRole
     .addRole(user, role, active)
