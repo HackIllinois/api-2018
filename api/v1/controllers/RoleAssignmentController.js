@@ -19,9 +19,15 @@ function assignNewRole(req, res, next) {
       if(UserService.canAssign(req.user, assignedUser, req.body.role)) {
         UserService.addRole(assignedUser, req.body.role, true)
         .then((updatedRole) => {
-          //TODO:get whole user
-          res.body = updatedRole.toJSON();
-          return next();
+          UserService
+            .findUserById(assignedUser.id)
+            .then((updatedUser) => {
+              updatedUserJson = updatedUser.toJSON();
+              updatedUserJson.roles = updatedUser.related("roles").toJSON();
+              res.body = updatedUserJson;
+              return next();
+            })
+            .catch((error) => next(error));
         })
         .catch((error) => next(error));
       } else {

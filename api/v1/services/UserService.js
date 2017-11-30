@@ -131,6 +131,13 @@ module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
 
+/**
+ * Adds role to a user
+ * @param  {User} user a User model
+ * @param  {User} assignedUser the assigned User's model
+ * @param  {String} newRole a role to assign to the user
+ * @return {Boolean} whether user can assign new role to assignedUser
+ */
 module.exports.canAssign = (user, assignedUser, newRole) => {
   return maxRole(user.related('roles').toJSON())
       > ROLE_VALUE_MAP[newRole]
@@ -138,6 +145,13 @@ module.exports.canAssign = (user, assignedUser, newRole) => {
       > maxRole(assignedUser.related('roles').toJSON());
 };
 
+/**
+ * Adds role to a user
+ * @param  {User} user a User model
+ * @param  {String} role a role to assign to the user
+ * @param {Boolean} active a boolean whether new role should be active
+ * @return {UserRole} the updatedUserRole
+ */
 module.exports.addRole = (user, role, active) => UserRole
     .addRole(user, role, active)
     .then((updatedUser) => {
