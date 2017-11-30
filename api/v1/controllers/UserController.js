@@ -6,7 +6,6 @@ const config = require('../../config');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const scopes = require('../utils/scopes');
-const mail = require('../utils/mail');
 const roles = require('../utils/roles');
 
 const router = require('express').Router();
@@ -78,7 +77,7 @@ function requestPasswordReset(req, res, next) {
         token: tokenVal,
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
+      return services.MailService.send(req.body.email, config.mail.templates.passwordReset, substitutions);
     })
     .then(() => {
       res.body = {};
