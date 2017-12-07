@@ -16,7 +16,8 @@ function assignNewRole(req, res, next) {
   UserService
     .findUserById(req.body.id)
     .then((assignedUser) => {
-      if(UserService.canAssign(req.user, assignedUser, req.body.role)) {
+      console.log("Can assign:"+UserService.canAssign(req, assignedUser));
+      if(UserService.canAssign(req, assignedUser)) {
         UserService.addRole(assignedUser, req.body.role, true)
         .then(() => {
           UserService

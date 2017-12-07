@@ -6,6 +6,7 @@ const User = require('../models/User');
 const UserRole = require('../models/UserRole');
 const errors = require('../errors');
 const utils = require('../utils');
+const roles = require('../utils').roles;
 
 const ROLE_VALUE_MAP = {"ADMIN":2, "STAFF":1, "SPONSOR":0, "MENTOR":0, "VOLUNTEER":0, "ATTENDEE":0};
 
@@ -133,16 +134,18 @@ module.exports.resetPassword = (user, password) => user
 
 /**
  * Adds role to a user
- * @param  {User} user a User model
+ * @param  {Request} request
  * @param  {User} assignedUser the assigned User's model
- * @param  {String} newRole a role to assign to the user
  * @return {Boolean} whether user can assign new role to assignedUser
  */
-module.exports.canAssign = (user, assignedUser, newRole) => {
-  return maxRole(user.related('roles').toJSON())
-      > ROLE_VALUE_MAP[newRole]
-      && maxRole(user.related('roles').toJSON())
-      > maxRole(assignedUser.related('roles').toJSON());
+module.exports.canAssign = (request, assignedUser) => {
+  return maxRole(request.user.related('roles').toJSON())
+          > ROLE_VALUE_MAP[request.body.role]
+      && maxRole(request.user.related('roles').toJSON())
+          > maxRole(assignedUser.related('roles').toJSON())
+      && _.isUndefined(request.originUser)
+      && (maxRole(assignedUser.related('roles').toJSON()) > 0
+        || assignedUser.hasRole(roles.VOLUNTEER));
 };
 
 /**
