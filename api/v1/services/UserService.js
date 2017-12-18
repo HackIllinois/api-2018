@@ -134,16 +134,18 @@ module.exports.resetPassword = (user, password) => user
 
 /**
  * Adds role to a user
- * @param  {Request} request
+ * @param  {User} u_.isUndefined(originUser)ser assigning new role
  * @param  {User} assignedUser the assigned User's model
+ * @param  {Role} newRole the new role
+ * @param  {User} originUser the original user to determine if impersonated
  * @return {Boolean} whether user can assign new role to assignedUser
  */
-module.exports.canAssign = (request, assignedUser) => {
-  return maxRole(request.user.related('roles').toJSON())
-          > ROLE_VALUE_MAP[request.body.role]
-      && maxRole(request.user.related('roles').toJSON())
+module.exports.canAssign = (user, assignedUser, newRole, originUser) => {
+  return maxRole(user.related('roles').toJSON())
+          > ROLE_VALUE_MAP[newRole]
+      && maxRole(user.related('roles').toJSON())
           > maxRole(assignedUser.related('roles').toJSON())
-      && _.isUndefined(request.originUser)
+      && _.isUndefined(originUser)
       && (maxRole(assignedUser.related('roles').toJSON()) > 0
         || assignedUser.hasRole(roles.VOLUNTEER));
 };

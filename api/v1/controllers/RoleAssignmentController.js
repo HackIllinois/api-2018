@@ -16,21 +16,23 @@ function assignNewRole(req, res, next) {
   UserService
     .findUserById(req.body.id)
     .then((assignedUser) => {
-      console.log("Can assign:"+UserService.canAssign(req, assignedUser));
-      if(UserService.canAssign(req, assignedUser)) {
+      if (UserService.canAssign(req.user, assignedUser, req.body.newRole
+        ,req.originUser)) {
+
         UserService.addRole(assignedUser, req.body.role, true)
-        .then(() => {
-          UserService
-            .findUserById(assignedUser.id)
-            .then((updatedUser) => {
-              let updatedUserJson = updatedUser.toJSON();
-              updatedUserJson.roles = updatedUser.related("roles").toJSON();
-              res.body = updatedUserJson;
-              return next();
-            })
-            .catch((error) => next(error));
-        })
-        .catch((error) => next(error));
+          .then(() => {
+            UserService
+              .findUserById(assignedUser.id)
+              .then((updatedUser) => {
+                let updatedUserJson = updatedUser.toJSON();
+                updatedUserJson.roles = updatedUser.related("roles").toJSON();
+                res.body = updatedUserJson;
+                return next();
+              })
+              .catch((error) => next(error));
+          })
+          .catch((error) => next(error));
+
       } else {
         return next(new errors.UnauthorizedError());
       }
