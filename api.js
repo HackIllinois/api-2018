@@ -17,7 +17,7 @@ instance.use((req, res, next) => {
   next();
 });
 
-const api = require('./api/')(ctx);
+const api = require('./api/');
 instance.use('/v1', api.v1);
 
 instance.listen(config.port, () => {

@@ -1,13 +1,6 @@
 const _ = require('lodash');
+const ctx = require('ctx');
+const config = ctx.config();
 
-function Mail(ctx) {
-  let config = ctx.config();
-  this.checkValidMailName = (listName) => !_.isUndefined(config.mail.lists[listName]);
-  this.checkValidTemplateName = (templateName) => !_.isUndefined(config.mail.templates[templateName]);
-}
-
-Mail.prototype.constructor = Mail;
-
-module.exports = function(ctx) {
-  return new Mail(ctx);
-}
+module.exports.checkValidMailName = (listName) => !_.isUndefined(config.mail.lists[listName]);
+module.exports.checkValidTemplateName = (templateName) => !_.isUndefined(config.mail.templates[templateName]);
