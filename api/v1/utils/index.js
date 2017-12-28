@@ -1,4 +1,4 @@
-const ctx = require("../../../ctx.js");
+const ctx = require("ctx");
 module.exports = {
   crypto: require('./crypto.js'),
   cache: require('./cache.js')(ctx),

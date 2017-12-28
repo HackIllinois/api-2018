@@ -1,4 +1,4 @@
-const ctx = require("../../../ctx");
+const ctx = require("ctx");
 module.exports = {
   auth: require('./auth.js')(ctx),
   errors: require('./errors.js'),

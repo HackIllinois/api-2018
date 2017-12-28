@@ -1,8 +1,9 @@
 function Ctx() {
-    this._config = require('./api/config');
-    this._logger = require('./api/logging');
-    this._database = require('./api/database'); // eslint-disable-line no-unused-vars
-    this._cache  = require('./api/cache');
+    //relative to hackillinois/api/node_modules/ctx
+    this._config = require('../../api/config');
+    this._logger = require('../../api/logging');
+    this._database = require('../../api/database');
+    this._cache  = require('../../api/cache');
 }
 
 Ctx.prototype.constructor = Ctx;

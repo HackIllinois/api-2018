@@ -1,4 +1,4 @@
-const ctx = require("../../../ctx");
+const ctx = require("ctx");
 module.exports = {
   AuthService: require('./AuthService')(ctx),
   EcosystemService: require('./EcosystemService'),
