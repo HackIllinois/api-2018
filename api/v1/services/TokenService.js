@@ -2,8 +2,9 @@
 
 const _Promise = require('bluebird');
 
+const ctx = require('ctx');
 const Token = require('../models/Token');
-const config = require('../../config');
+const config = ctx.config();
 const errors = require('../errors');
 const utils = require('../utils');
 

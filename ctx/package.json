@@ -1,0 +1,6 @@
+{
+  "name": "ctx",
+  "version": "0.0.1",
+  "description": "context module",
+  "main": "ctx.js"
+}

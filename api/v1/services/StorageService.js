@@ -1,7 +1,8 @@
 /* jshint esversion: 6 */
 
+const ctx = require('ctx');
 const client = require('aws-sdk');
-const config = require('../../config');
+const config = ctx.config();
 const files = require('../../files');
 const errors = require('../errors');
 const Upload = require('../models/Upload');
