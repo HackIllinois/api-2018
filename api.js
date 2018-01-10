@@ -2,7 +2,7 @@ const express = require('express');
 const requid = require('cuid');
 const helmet = require('helmet');
 
-const ctx = require("ctx");
+const ctx = require('ctx');
 const config = ctx.config();
 const logger = ctx.logger();
 

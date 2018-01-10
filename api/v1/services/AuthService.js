@@ -7,7 +7,7 @@ const StatusCodeError = require('request-promise/errors').StatusCodeError;
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
-const ctx = require("ctx");
+const ctx = require('ctx');
 
 const config = ctx.config();
 const errors = require('../errors');

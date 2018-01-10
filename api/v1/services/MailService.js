@@ -9,7 +9,7 @@ const _Promise = require('bluebird');
 const SparkPost = require('sparkpost');
 const _ = require('lodash');
 
-const ctx = require("ctx");
+const ctx = require('ctx');
 const config = ctx.config();
 const logger = ctx.logger();
 const files = require('../../files');
