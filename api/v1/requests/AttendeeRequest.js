@@ -26,8 +26,12 @@ const websiteValidations = {
   website: ['string', 'maxLength:255']
 };
 
+const osContributorValidations = {
+  osContributor: ['string', 'maxLength:255']
+};
+
 const bodyRequired = [ 'attendee' ];
-const bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'websites', 'collaborators'];
+const bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'websites', 'osContributors', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
@@ -53,7 +57,8 @@ const bodyValidations = {
   'projects': ['array', 'maxLength:1', validators.upTo(['isSuggestion', false], 1, projectErrorMessage), validators.array(validators.nested(projectValidations, 'projects'))],
   'extras': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
   'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))],
-  'websites': ['array', 'maxLength:2', validators.array(validators.nested(websiteValidations, 'websites'), 'websites')]
+  'websites': ['array', 'maxLength:2', validators.array(validators.nested(websiteValidations, 'websites'), 'websites')],
+  'oscontributors': ['array', 'maxLength:8', validators.array(validators.nested(osContributorValidations, 'osContributors'), 'osContributors')]
 };
 
 function AttendeeRequest(headers, body) {
@@ -69,6 +74,7 @@ AttendeeRequest._projectValidations = projectValidations;
 AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
 AttendeeRequest._websiteValidations = websiteValidations;
+AttendeeRequest._osContributorValidations = osContributorValidations;
 
 
 AttendeeRequest.prototype = Object.create(Request.prototype);
