@@ -1,10 +1,11 @@
 const AuthService = require('../services/AuthService');
+const ctx = require('ctx');
 const User = require('../models/User');
-const config = require('../../config');
+const config = ctx.config();
 const errors = require('../errors');
 const roles = require('../utils/roles');
 const _ = require('lodash');
-const logger = require('../../logging');
+const logger = ctx.logger();
 
 module.exports = (req, res, next) => {
   let auth = req.get(config.auth.headers.all);

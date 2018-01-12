@@ -1,6 +1,7 @@
 /* jshint esversion: 6 */
 const _ = require('lodash');
-const config = require('../../config');
+const ctx = require('ctx');
+const config = ctx.config();
 const logger = require('../../logging');
 
 const ERROR_TYPES = {

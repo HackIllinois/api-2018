@@ -1,4 +1,5 @@
-const config = require('../../config');
+const ctx = require('ctx');
+const config = ctx.config();
 
 module.exports.buckets = {};
 
