@@ -71,7 +71,7 @@ module.exports.verify = (token) => _Promise.try(() =>
 
 module.exports.getGitHubSessionCodeURL = (isMobile) => {
   if (!_.isUndefined(isMobile)) {
-    return GITHUB_AUTH_REDIRECT + config.auth.github.id + '';
+    return GITHUB_AUTH_REDIRECT + config.auth.github.id + '&redirect_uri=' + config.auth.github.mobileRedirect;
   } else {
     return GITHUB_AUTH_REDIRECT + config.auth.github.id;
   }
