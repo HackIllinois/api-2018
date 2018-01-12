@@ -7,7 +7,8 @@
     "github": {
       "id": null,
       "secret": null,
-      "useragent": "HackIllinois"
+      "useragent": "HackIllinois",
+      "mobileRedirect": "https://hackillinois.org/auth/mobile"
     },
     "headers": {
       "all": "Authorization",

@@ -67,7 +67,13 @@ module.exports.verify = (token) => _Promise.try(() =>
     throw new errors.UnprocessableRequestError(message);
   });
 
-module.exports.getGitHubSessionCodeURL = () => GITHUB_AUTH_REDIRECT + config.auth.github.id;
+module.exports.getGitHubSessionCodeURL = (isMobile) => {
+  if (!_.isUndefined(isMobile)) {
+    return GITHUB_AUTH_REDIRECT + config.auth.github.id + '';
+  } else {
+    return GITHUB_AUTH_REDIRECT + config.auth.github.id;
+  }
+}
 
 module.exports.requestGitHubAccessToken = (code) => {
   let token;
