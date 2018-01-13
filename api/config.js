@@ -71,6 +71,7 @@ overrides['SUPERUSER_PASSWORD'] = 'superuser.password';
 overrides['MAIL_KEY'] = 'mail.key';
 overrides['GITHUB_CLIENT_ID'] = 'auth.github.id';
 overrides['GITHUB_CLIENT_SECRET'] = 'auth.github.secret';
+overrides['GITHUB_MOBILE_REDIRECT'] = 'auth.github.mobileRedirect';
 overrides['DB_NAME'] = 'database.primary.name';
 overrides['DB_USERNAME'] = 'database.primary.user';
 overrides['DB_PASSWORD'] = 'database.primary.password';
@@ -88,6 +89,7 @@ if (!config.isProduction) {
   requireds.delete(overrides['MAIL_KEY']);
   requireds.delete(overrides['GITHUB_CLIENT_ID']);
   requireds.delete(overrides['GITHUB_CLIENT_SECRET']);
+  requireds.delete(overrides['GITHUB_MOBILE_REDIRECT']);
   requireds.delete(overrides['RATELIMIT_COUNT']);
   requireds.delete(overrides['RATELIMIT_WINDOW']);
 }

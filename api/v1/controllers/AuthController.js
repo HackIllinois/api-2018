@@ -48,7 +48,7 @@ function createToken(req, res, next) {
 }
 
 function getGitHubAuthToken(req, res, next) {
-  res.redirect(AuthService.getGitHubSessionCodeURL());
+  res.redirect(AuthService.getGitHubSessionCodeURL(req.query.isMobile));
   return next();
 }
 

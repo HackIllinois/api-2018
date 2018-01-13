@@ -1,7 +1,8 @@
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
-const database = require('../../database');
+const ctx = require('ctx');
+const database = ctx.database();
 const knex = database.connection();
 
 const Attendee = require('../models/Attendee');
