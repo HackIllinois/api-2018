@@ -54,6 +54,7 @@ configuration key values.
 | MAIL_KEY | mail.key | Any string |
 | GITHUB_CLIENT_ID | auth.github.id | Any string |
 | GITHUB_CLIENT_SECRET | auth.github.secret | Any String |
+| GITHUB_MOBILE_REDIRECT | auth.github.mobileRedirect | Any String |
 | DB_NAME | database.primary.name | Any valid MySQL schema name |
 | DB_USERNAME | database.primary.user | Any string |
 | DB_PASSWORD | database.primary.password | Any string |
