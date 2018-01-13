@@ -8,7 +8,6 @@ const utils = require('../api/v1/utils');
 const User = require('../api/v1/models/User.js');
 const Attendee = require('../api/v1/models/Attendee.js');
 const AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
-const AttendeeProject = require('../api/v1/models/AttendeeProject.js');
 const AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
 const RegistrationService = require('../api/v1/services/RegistrationService.js');
 
@@ -19,7 +18,6 @@ const tracker = require('mock-knex').getTracker();
 describe('RegistrationService', () => {
   let _saveAttendee;
   let _saveAttendeeExtraInfo;
-  let _saveAttendeeProject;
   let _saveAttendeeRequestedCollaborator;
 
   describe('createAttendee', () => {
@@ -53,14 +51,6 @@ describe('RegistrationService', () => {
         'wave': 0,
         'priority': 0
       };
-      testRegistration.projects = [
-        {
-          'name': 'Example',
-          'description': 'Example project.',
-          'repo': 'http://www.github.com/hackillinois/api-2017',
-          'isSuggestion': true
-        }
-      ];
       testRegistration.extras = [
         {
           'info': 'Example extra info'
@@ -74,7 +64,6 @@ describe('RegistrationService', () => {
       _forgeAttendee = sinon.spy(Attendee, 'forge');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
       _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-      _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -96,7 +85,6 @@ describe('RegistrationService', () => {
 
         assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, 'Attendee forge not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
         assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
         assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
         return done();
@@ -116,7 +104,6 @@ describe('RegistrationService', () => {
     after((done) => {
       _forgeAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeProject.restore();
       _saveAttendeeExtraInfo.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
@@ -221,14 +208,6 @@ describe('RegistrationService', () => {
         'priority': 1,
         'wave': 2
       };
-      testRegistration.projects = [
-        {
-          'name': 'Example',
-          'description': 'Example project.',
-          'repo': 'http://www.github.com/hackillinois/api-2017',
-          'isSuggestion': true
-        }
-      ];
       testRegistration.extras = [
         {
           'info': 'Example extra info'
@@ -239,12 +218,10 @@ describe('RegistrationService', () => {
       testRegistration.attendee.firstName = 'Jane';
 
       testRegistration.extras[0].info = 'New example extra info';
-      testRegistration.projects[0].description = 'New example project description';
 
       _setAttendee = sinon.spy(Attendee.prototype, 'set');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
       _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-      _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -264,7 +241,6 @@ describe('RegistrationService', () => {
       attendee.then(() => {
         assert(_setAttendee.withArgs(attendeeParams).calledOnce, 'Attendee update not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
         assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
         assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
         return done();
@@ -277,7 +253,6 @@ describe('RegistrationService', () => {
     after((done) => {
       _setAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeProject.restore();
       _saveAttendeeExtraInfo.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();

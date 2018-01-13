@@ -222,17 +222,15 @@ function _addToMailingList(attendee, decision) {
 }
 
 /**
- * Determines whether or not an attendee has at least one
- * project
- * @param  {Array}  projects	the projects list (or undefined)
+ * Returns true, since proejcts and ecosystems have been removed
  * @return {Boolean} whether or not the pairing is valid
  */
-function _hasValidAttendeeAssignment(projects) {
-  return (!!projects && projects.length > 0);
+function _hasValidAttendeeAssignment() {
+  return true;
 }
 
 /**
- * Registers a mentor and their project ideas for the given user
+ * Registers a mentor
  * @param  {Object} user the user for which a mentor will be registered
  * @param  {Object} attributes a JSON object holding the mentor attributes
  * @return {Promise<Mentor>} the mentor with related ideas
@@ -291,7 +289,7 @@ module.exports.findMentorById = (id) => Mentor.findById(id)
     });
 
 /**
- * Updates a mentor and their project ideas by relational user
+ * Updates a mentor
  * @param  {Mentor} mentor the mentor to be updated
  * @param  {Object} attributes a JSON object holding the mentor registration attributes
  * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
@@ -320,9 +318,9 @@ module.exports.updateMentor = (mentor, attributes) => {
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
 module.exports.createAttendee = (user, attributes) => {
-  if (!_hasValidAttendeeAssignment(attributes.projects)) {
-    const message = 'One project interest must be provided';
-    const source = [ 'projects' ];
+  if (!_hasValidAttendeeAssignment()) {
+    const message = 'One interest must be provided';
+    const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
@@ -409,16 +407,15 @@ module.exports.updateAttendee = (attendee, attributes) => {
   // some attendee registration attributes are optional, but we need to
   // be sure that they are at least considered for removal during adjustment
   attributes = _.merge(attributes, {
-    'projects': [],
     'extras': [],
     'collaborators': [],
     'websites': [],
     'osContributors': []
   });
 
-  if (!_hasValidAttendeeAssignment(attributes.projects)) {
-    const message = 'One project interest must be provided';
-    const source = [ 'projects' ];
+  if (!_hasValidAttendeeAssignment()) {
+    const message = 'One interest must be provided';
+    const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 

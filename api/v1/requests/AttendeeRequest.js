@@ -6,14 +6,6 @@ const extraInfoValidations = {
   info: ['string', 'maxLength:255']
 };
 
-const projectErrorMessage = 'The projects supplied are invalid. Attendees can only create 1 project at most.';
-const projectValidations = {
-  name: ['required', 'string', 'maxLength:100'],
-  description: ['required', 'string', 'maxLength:255'],
-  repo: ['required', 'string', 'maxLength:150'],
-  isSuggestion: ['required', 'boolean']
-}; // NOTE: these are currently not supported
-
 const requestedCollaboratorValidations = {
   collaborator: ['required', 'string', 'maxLength:255']
 };
@@ -27,7 +19,7 @@ const osContributorValidations = {
 };
 
 const bodyRequired = [ 'attendee' ];
-const bodyAllowed = ['projects', 'extras', 'websites', 'osContributors', 'collaborators'];
+const bodyAllowed = ['extras', 'websites', 'osContributors', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
@@ -49,7 +41,6 @@ const bodyValidations = {
   'attendee.isPrivate': attendee.validations.isPrivate,
   'attendee.hasLightningInterest': [ 'boolean' ],
   'attendee.phoneNumber': attendee.validations.phoneNumber,
-  'projects': ['array', 'maxLength:1', validators.upTo(['isSuggestion', false], 1, projectErrorMessage), validators.array(validators.nested(projectValidations, 'projects'))],
   'extras': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
   'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))],
   'websites': ['array', 'maxLength:2', validators.array(validators.nested(websiteValidations, 'websites'), 'websites')],
@@ -65,7 +56,6 @@ function AttendeeRequest(headers, body) {
 }
 
 AttendeeRequest._extraInfoValidations = extraInfoValidations;
-AttendeeRequest._projectValidations = projectValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
 AttendeeRequest._websiteValidations = websiteValidations;
 AttendeeRequest._osContributorValidations = osContributorValidations;

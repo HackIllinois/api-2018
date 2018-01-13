@@ -13,7 +13,6 @@ const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 const Model = require('./Model');
 const Upload = require('./Upload');
 const AttendeeProjectInterest = require('./AttendeeProjectInterest');
-const AttendeeProject = require('./AttendeeProject');
 const AttendeeExtraInfo = require('./AttendeeExtraInfo');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
@@ -51,9 +50,6 @@ const Attendee = Model.extend({
   interests: function() {
     return this.hasMany(AttendeeProjectInterest);
   },
-  projects: function() {
-    return this.hasMany(AttendeeProject);
-  },
   extras: function() {
     return this.hasMany(AttendeeExtraInfo);
   },
@@ -79,7 +75,7 @@ const Attendee = Model.extend({
 
 
 /**
- * Finds an attendee by its relational user's id, joining in its related project ideas
+ * Finds an attendee by its relational user's id
  * @param  {Number|String} userId	the ID of the attendee's relational user
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
@@ -88,7 +84,7 @@ Attendee.findByUserId = function(userId) {
     user_id: userId
   })
     .fetch({
-      withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -105,7 +101,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
       user_id: userId
     })
       .fetch({
-        withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {
@@ -131,7 +127,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
 };
 
 /**
- * Finds an attendee by its ID, joining in its related project ideas
+ * Finds an attendee by its ID
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
@@ -140,7 +136,7 @@ Attendee.findById = function(id) {
     id: id
   })
     .fetch({
-      withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -156,7 +152,7 @@ Attendee.fetchWithResumeById = function(id) {
       id: id
     })
       .fetch({
-        withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {
