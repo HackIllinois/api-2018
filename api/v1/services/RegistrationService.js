@@ -223,13 +223,12 @@ function _addToMailingList(attendee, decision) {
 
 /**
  * Determines whether or not an attendee has at least one
- * project or ecosystem interest
+ * project
  * @param  {Array}  projects	the projects list (or undefined)
- * @param  {Array}  ecosystemInterests the ecosystem interests list (or undefined)
  * @return {Boolean} whether or not the pairing is valid
  */
-function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
-  return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
+function _hasValidAttendeeAssignment(projects) {
+  return (!!projects && projects.length > 0);
 }
 
 /**
@@ -321,9 +320,9 @@ module.exports.updateMentor = (mentor, attributes) => {
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
 module.exports.createAttendee = (user, attributes) => {
-  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-    const message = 'One project or ecosystem interest must be provided';
-    const source = ['projects', 'ecosystemInterests'];
+  if (!_hasValidAttendeeAssignment(attributes.projects)) {
+    const message = 'One project interest must be provided';
+    const source = [ 'projects' ];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
@@ -410,7 +409,6 @@ module.exports.updateAttendee = (attendee, attributes) => {
   // some attendee registration attributes are optional, but we need to
   // be sure that they are at least considered for removal during adjustment
   attributes = _.merge(attributes, {
-    'ecosystemInterests': [],
     'projects': [],
     'extras': [],
     'collaborators': [],
@@ -418,9 +416,9 @@ module.exports.updateAttendee = (attendee, attributes) => {
     'osContributors': []
   });
 
-  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-    const message = 'One project or ecosystem interest must be provided';
-    const source = ['projects', 'ecosystemInterests'];
+  if (!_hasValidAttendeeAssignment(attributes.projects)) {
+    const message = 'One project interest must be provided';
+    const source = [ 'projects' ];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 

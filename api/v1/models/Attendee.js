@@ -15,7 +15,6 @@ const Upload = require('./Upload');
 const AttendeeProjectInterest = require('./AttendeeProjectInterest');
 const AttendeeProject = require('./AttendeeProject');
 const AttendeeExtraInfo = require('./AttendeeExtraInfo');
-const AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
 const AttendeeWebsite = require('./AttendeeWebsite');
@@ -47,17 +46,13 @@ const Attendee = Model.extend({
     isNovice: ['required', 'boolean'],
     isPrivate: ['required', 'boolean'],
     phoneNumber: ['string', 'maxLength:15'],
-    acceptanceType: ['string', validators.in(ACCEPTANCE_TYPES)],
-    acceptedEcosystemId: [ 'integer' ]
+    acceptanceType: ['string', validators.in(ACCEPTANCE_TYPES)]
   },
   interests: function() {
     return this.hasMany(AttendeeProjectInterest);
   },
   projects: function() {
     return this.hasMany(AttendeeProject);
-  },
-  ecosystemInterests: function() {
-    return this.hasMany(AttendeeEcosystemInterest);
   },
   extras: function() {
     return this.hasMany(AttendeeExtraInfo);
@@ -93,7 +88,7 @@ Attendee.findByUserId = function(userId) {
     user_id: userId
   })
     .fetch({
-      withRelated: ['projects', 'ecosystemInterests', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -110,7 +105,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
       user_id: userId
     })
       .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {
@@ -145,7 +140,7 @@ Attendee.findById = function(id) {
     id: id
   })
     .fetch({
-      withRelated: ['projects', 'ecosystemInterests', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -161,7 +156,7 @@ Attendee.fetchWithResumeById = function(id) {
       id: id
     })
       .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['projects', 'extras', 'websites', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {

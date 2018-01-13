@@ -7,7 +7,6 @@ const errors = require('../api/v1/errors');
 const utils = require('../api/v1/utils');
 const User = require('../api/v1/models/User.js');
 const Attendee = require('../api/v1/models/Attendee.js');
-const AttendeeEcosystemInterest = require('../api/v1/models/AttendeeEcosystemInterest.js');
 const AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
 const AttendeeProject = require('../api/v1/models/AttendeeProject.js');
 const AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
@@ -19,7 +18,6 @@ const tracker = require('mock-knex').getTracker();
 
 describe('RegistrationService', () => {
   let _saveAttendee;
-  let _saveAttendeeEcosystemInterest;
   let _saveAttendeeExtraInfo;
   let _saveAttendeeProject;
   let _saveAttendeeRequestedCollaborator;
@@ -73,14 +71,8 @@ describe('RegistrationService', () => {
           'collaborator': 'existing@example.com'
         }
       ];
-      testRegistration.ecosystemInterests = [
-        {
-          'ecosystemId': 1
-        }
-      ];
       _forgeAttendee = sinon.spy(Attendee, 'forge');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
       _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
       _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
@@ -106,7 +98,6 @@ describe('RegistrationService', () => {
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
         assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
         assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
-        assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
         assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
         return done();
       }).catch((err) => done(err));
@@ -127,7 +118,6 @@ describe('RegistrationService', () => {
       _saveAttendee.restore();
       _saveAttendeeProject.restore();
       _saveAttendeeExtraInfo.restore();
-      _saveAttendeeEcosystemInterest.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });
@@ -244,22 +234,15 @@ describe('RegistrationService', () => {
           'info': 'Example extra info'
         }
       ];
-      testRegistration.ecosystemInterests = [
-        {
-          'ecosystemId': 1
-        }
-      ];
       testAttendee = Attendee.forge(testRegistration.attendee);
 
       testRegistration.attendee.firstName = 'Jane';
 
       testRegistration.extras[0].info = 'New example extra info';
       testRegistration.projects[0].description = 'New example project description';
-      testRegistration.ecosystemInterests[0].ecosystemId = 2;
 
       _setAttendee = sinon.spy(Attendee.prototype, 'set');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
       _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
       _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
@@ -283,7 +266,6 @@ describe('RegistrationService', () => {
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
         assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
         assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
-        assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
         assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
         return done();
       }).catch((err) => done(err));
@@ -297,7 +279,6 @@ describe('RegistrationService', () => {
       _saveAttendee.restore();
       _saveAttendeeProject.restore();
       _saveAttendeeExtraInfo.restore();
-      _saveAttendeeEcosystemInterest.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });

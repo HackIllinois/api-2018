@@ -14,10 +14,6 @@ const projectValidations = {
   isSuggestion: ['required', 'boolean']
 }; // NOTE: these are currently not supported
 
-const ecosystemInterestValidations = {
-  ecosystemId: ['required', 'integer']
-};
-
 const requestedCollaboratorValidations = {
   collaborator: ['required', 'string', 'maxLength:255']
 };
@@ -31,7 +27,7 @@ const osContributorValidations = {
 };
 
 const bodyRequired = [ 'attendee' ];
-const bodyAllowed = ['ecosystemInterests', 'projects', 'extras', 'websites', 'osContributors', 'collaborators'];
+const bodyAllowed = ['projects', 'extras', 'websites', 'osContributors', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
@@ -53,7 +49,6 @@ const bodyValidations = {
   'attendee.isPrivate': attendee.validations.isPrivate,
   'attendee.hasLightningInterest': [ 'boolean' ],
   'attendee.phoneNumber': attendee.validations.phoneNumber,
-  'ecosystemInterests': ['array', 'maxLength:4', validators.array(validators.nested(ecosystemInterestValidations, 'ecosystemInterests'))],
   'projects': ['array', 'maxLength:1', validators.upTo(['isSuggestion', false], 1, projectErrorMessage), validators.array(validators.nested(projectValidations, 'projects'))],
   'extras': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
   'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))],
@@ -71,7 +66,6 @@ function AttendeeRequest(headers, body) {
 
 AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._projectValidations = projectValidations;
-AttendeeRequest._ecosystemInterestValidations = ecosystemInterestValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
 AttendeeRequest._websiteValidations = websiteValidations;
 AttendeeRequest._osContributorValidations = osContributorValidations;
