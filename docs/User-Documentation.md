@@ -233,7 +233,7 @@ Response
   "meta": null,
   "data": {
 	"id": 1,
-	"email": "new@example.com",
+	"email": "newemail@example.com",
 	"created": "2016-06-19T00:01:00.000Z",
 	"updated": "2016-06-19T00:01:00.000Z",
         "roles": [{
@@ -248,6 +248,6 @@ Errors:
 
 | Error         | Source  | Cause                                           |
 |---------------|---------|-------------------------------------------------|
-| NotFoundError | `email` | A user with the given email could not be found. |
+| UnprocessableRequestError | `user` | Users under a basic authentication scheme can not change their contact info |
 
 ---
