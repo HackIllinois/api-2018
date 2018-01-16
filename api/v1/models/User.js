@@ -189,14 +189,11 @@ User.prototype.hasPassword = function(password) {
 };
 
 User.prototype.updateContactInfo = function(newEmail) {
-  if(!_.isNull(this.get('password'))) {
-    const message = 'Cannot update the contact info of a Basic user';
-    throw new UnprocessableRequestError(message);
-  }
-
-  return _Promise.resolve(this.set({
+  this.set({
     email: newEmail
-  }));
+  });
+
+  return this.save();
 };
 
 /**

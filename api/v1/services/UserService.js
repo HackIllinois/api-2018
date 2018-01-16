@@ -125,5 +125,11 @@ module.exports.setContactInfo = (user, newEmail) => {
     throw new errors.InvalidParameterError(message, source);
   }
 
+  if(!_.isNull(user.get('password'))) {
+    const message = 'Cannot update the contact info of a Basic user';
+    const source = 'user';
+    throw new UnprocessableRequestError(message, source);
+  }
+
   return user.setContactInfo(newEmail);
 };
