@@ -3,6 +3,7 @@
 const _Promise = require('bluebird');
 const bcrypt = _Promise.promisifyAll(require('bcrypt'));
 const _ = require('lodash');
+const UnprocessableRequestError = require('../errors/UnprocessableRequestError');
 
 const SALT_ROUNDS = 12;
 
@@ -185,6 +186,17 @@ User.prototype.hasPassword = function(password) {
     .then(function() {
       return bcrypt.compareAsync(password, this.get('password'));
     });
+};
+
+User.prototype.updateContactInfo = function(newEmail) {
+  if(!_.isNull(this.get('password'))) {
+    const message = 'Cannot update the contact info of a Basic user';
+    throw new UnprocessableRequestError(message);
+  }
+
+  return _Promise.resolve(this.set({
+    email: newEmail
+  }));
 };
 
 /**

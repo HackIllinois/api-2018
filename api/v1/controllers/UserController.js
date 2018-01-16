@@ -86,6 +86,16 @@ function requestPasswordReset(req, res, next) {
     .catch((error) => next(error));
 }
 
+function updateContactInfo(req, res, next) {
+  req.user.updateContactInfo(req.body.newEmail)
+  .then((result) => {
+    res.body = result.toJSON();
+
+    return next();
+  })
+  .catch((error) => next(error));
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -96,6 +106,8 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
+router.put('/contactinfo', middleware.permission(roles.NONE),
+  middleware.request(requests.UserContactInfoRequest), updateContactInfo);
 
 router.use(middleware.response);
 router.use(middleware.errors);
