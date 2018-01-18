@@ -17,6 +17,8 @@ Request Parameters <br />
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
 | `extraInfo` | an array of JSON objects of length at most two, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
+| `longform` | an array of JSON objects of length at most two, each containing the LongForm parameters below | No |
+| `osContributors` | an array of JSON objects of length at most eight, each containing the OSContributor parameters below | Yes |
 
 Attendee Parameters <br />
 
@@ -54,6 +56,18 @@ RequestedCollaborator Parameters <br />
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
 | `collaborator` | the requested collaborator's email of length 255 or less | Yes |
+
+LongForm Parameters <br />
+
+| Parameter        | Description           | Required  |
+| ---------------- | --------------------- | --------- |
+| `info` | the response string to the given prompt of length 1023 or less | Yes |
+
+OSContributor Parameters <br />
+
+| Parameter        | Description           | Required  |
+| ---------------- | --------------------- | --------- |
+| `osContributor` | the requested contributor's contact info of length 255 or less | Yes |
 
 Request
 ```
