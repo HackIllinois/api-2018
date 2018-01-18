@@ -1,5 +1,5 @@
 const Model = require('./Model');
-const AttendeeExtraInfo = Model.extend({
+const AttendeeLongForm = Model.extend({
   tableName: 'attendee_long_form',
   idAttribute: 'id',
   validations: {
@@ -11,9 +11,9 @@ const AttendeeExtraInfo = Model.extend({
 /**
  * Finds an attendee's extra information by its relational attendee's id
  * @param  {Number|String} id	the ID of the attendee with the appropriate type
- * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeExtraInfo or null
+ * @return {Promise<Model>}	a Promise resolving to the resulting AttendeeLongForm or null
  */
-AttendeeExtraInfo.findByAttendeeId = (attendeeId) => AttendeeExtraInfo.where({
+AttendeeLongForm.findByAttendeeId = (attendeeId) => AttendeeLongForm.where({
   attendee_id: attendeeId
 })
   .fetch();
@@ -23,9 +23,9 @@ AttendeeExtraInfo.findByAttendeeId = (attendeeId) => AttendeeExtraInfo.where({
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
-AttendeeExtraInfo.findById = (id) => AttendeeExtraInfo.where({
+AttendeeLongForm.findById = (id) => AttendeeLongForm.where({
   id: id
 })
   .fetch();
 
-module.exports = AttendeeExtraInfo;
+module.exports = AttendeeLongForm;

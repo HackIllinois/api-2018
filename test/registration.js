@@ -7,7 +7,7 @@ const errors = require('../api/v1/errors');
 const utils = require('../api/v1/utils');
 const User = require('../api/v1/models/User.js');
 const Attendee = require('../api/v1/models/Attendee.js');
-const AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
+const AttendeeLongForm = require('../api/v1/models/AttendeeLongForm.js');
 const AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
 const RegistrationService = require('../api/v1/services/RegistrationService.js');
 
@@ -17,7 +17,7 @@ const tracker = require('mock-knex').getTracker();
 
 describe('RegistrationService', () => {
   let _saveAttendee;
-  let _saveAttendeeExtraInfo;
+  let _saveAttendeeLongForm;
   let _saveAttendeeRequestedCollaborator;
 
   describe('createAttendee', () => {
@@ -63,7 +63,7 @@ describe('RegistrationService', () => {
       ];
       _forgeAttendee = sinon.spy(Attendee, 'forge');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
+      _saveAttendeeLongForm = sinon.spy(AttendeeLongForm.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -85,7 +85,7 @@ describe('RegistrationService', () => {
 
         assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, 'Attendee forge not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
+        assert(_saveAttendeeLongForm.calledOnce, 'AttendeeLongForm save not called');
         assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
         return done();
       }).catch((err) => done(err));
@@ -104,7 +104,7 @@ describe('RegistrationService', () => {
     after((done) => {
       _forgeAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeExtraInfo.restore();
+      _saveAttendeeLongForm.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });
@@ -221,7 +221,7 @@ describe('RegistrationService', () => {
 
       _setAttendee = sinon.spy(Attendee.prototype, 'set');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
+      _saveAttendeeLongForm = sinon.spy(AttendeeLongForm.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -241,7 +241,7 @@ describe('RegistrationService', () => {
       attendee.then(() => {
         assert(_setAttendee.withArgs(attendeeParams).calledOnce, 'Attendee update not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
+        assert(_saveAttendeeLongForm.calledOnce, 'AttendeeLongForm save not called');
         assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
         return done();
       }).catch((err) => done(err));
@@ -253,7 +253,7 @@ describe('RegistrationService', () => {
     after((done) => {
       _setAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeExtraInfo.restore();
+      _saveAttendeeLongForm.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });

@@ -13,7 +13,7 @@ const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 const Model = require('./Model');
 const Upload = require('./Upload');
 const AttendeeProjectInterest = require('./AttendeeProjectInterest');
-const AttendeeExtraInfo = require('./AttendeeExtraInfo');
+const AttendeeLongForm = require('./AttendeeLongForm');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
 const AttendeeWebsite = require('./AttendeeWebsite');
@@ -51,7 +51,7 @@ const Attendee = Model.extend({
     return this.hasMany(AttendeeProjectInterest);
   },
   longForm: function() {
-    return this.hasMany(AttendeeExtraInfo);
+    return this.hasMany(AttendeeLongForm);
   },
   extraInfo: function() {
     return this.hasMany(AttendeeWebsite);
