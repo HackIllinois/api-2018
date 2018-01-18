@@ -6,7 +6,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const config = require('../../config');
+const config = require('ctx').config();
 const errors = require('../errors');
 
 const attendeeQueryCategories = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
