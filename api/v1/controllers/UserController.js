@@ -20,6 +20,10 @@ function isRequester(req) {
   return req.user.get('id') == req.params.id;
 }
 
+function isAuthenticated(req) {
+  return req.auth && (req.user !== undefined);
+}
+
 function createUser(req, res, next) {
   services.UserService
     .createUser(req.body.email, req.body.password)
@@ -106,7 +110,8 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
-router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest), updateContactInfo);
+router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest),
+  middleware.permission(roles.NONE, isAuthenticated), updateContactInfo);
 
 router.use(middleware.response);
 router.use(middleware.errors);
