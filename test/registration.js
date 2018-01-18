@@ -61,6 +61,11 @@ describe('RegistrationService', () => {
           'collaborator': 'existing@example.com'
         }
       ];
+      testRegistration.osContributors = [
+        {
+          'osContributor': 'person'
+        }
+      ];
       _forgeAttendee = sinon.spy(Attendee, 'forge');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
       _saveAttendeeLongForm = sinon.spy(AttendeeLongForm.prototype, 'save');
@@ -211,6 +216,11 @@ describe('RegistrationService', () => {
       testRegistration.longForm = [
         {
           'info': 'Example extra info'
+        }
+      ];
+      testRegistration.osContributors = [
+        {
+          'osContributor': 'person'
         }
       ];
       testAttendee = Attendee.forge(testRegistration.attendee);

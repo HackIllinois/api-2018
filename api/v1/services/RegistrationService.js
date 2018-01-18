@@ -225,8 +225,8 @@ function _addToMailingList(attendee, decision) {
  * Returns true, since proejcts and ecosystems have been removed
  * @return {Boolean} whether or not the pairing is valid
  */
-function _hasValidAttendeeAssignment() {
-  return true;
+function _hasValidAttendeeAssignment(osContributors) {
+  return !!osContributors && osContributors.length > 0;
 }
 
 /**
@@ -318,7 +318,7 @@ module.exports.updateMentor = (mentor, attributes) => {
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
 module.exports.createAttendee = (user, attributes) => {
-  if (!_hasValidAttendeeAssignment()) {
+  if (!_hasValidAttendeeAssignment(attributes.osContributors)) {
     const message = 'One interest must be provided';
     const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
@@ -413,7 +413,7 @@ module.exports.updateAttendee = (attendee, attributes) => {
     'osContributors': []
   });
 
-  if (!_hasValidAttendeeAssignment()) {
+  if (!_hasValidAttendeeAssignment(attributes.osContributors)) {
     const message = 'One interest must be provided';
     const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
