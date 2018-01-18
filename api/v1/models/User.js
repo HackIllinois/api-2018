@@ -3,7 +3,6 @@
 const _Promise = require('bluebird');
 const bcrypt = _Promise.promisifyAll(require('bcrypt'));
 const _ = require('lodash');
-const UnprocessableRequestError = require('../errors/UnprocessableRequestError');
 
 const SALT_ROUNDS = 12;
 
