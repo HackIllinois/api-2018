@@ -18,8 +18,8 @@ const osContributorValidations = {
   osContributor: ['string', 'maxLength:255']
 };
 
-const bodyRequired = [ 'attendee' ];
-const bodyAllowed = ['longform', 'extraInfo', 'osContributors', 'collaborators'];
+const bodyRequired = ['attendee', 'osContributors'];
+const bodyAllowed = ['longform', 'extraInfo', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
