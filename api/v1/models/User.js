@@ -187,7 +187,7 @@ User.prototype.hasPassword = function(password) {
     });
 };
 
-User.prototype.updateContactInfo = function(newEmail) {
+User.prototype.setContactInfo = function(newEmail) {
   this.set({
     email: newEmail
   });

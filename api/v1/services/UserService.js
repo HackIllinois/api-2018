@@ -118,13 +118,7 @@ module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
 
-module.exports.setContactInfo = (user, newEmail) => {
-  if(user.get('email') !== newEmail) {
-    const message = 'A user can only change their own contact info';
-    const source = 'email';
-    throw new errors.InvalidParameterError(message, source);
-  }
-
+module.exports.updateContactInfo = (user, newEmail) => {
   if(!_.isNull(user.get('password'))) {
     const message = 'Cannot update the contact info of a Basic user';
     const source = 'user';

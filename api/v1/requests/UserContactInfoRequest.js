@@ -1,8 +1,8 @@
 const Request = require('./Request');
 
-const bodyRequired = [ 'email' ];
+const bodyRequired = [ 'newEmail' ];
 const bodyValidations = {
-  'email': [ 'email' ]
+  'newEmail': [ 'email' ]
 };
 
 function UserContactInfoRequest(headers, body) {

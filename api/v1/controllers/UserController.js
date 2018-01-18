@@ -87,7 +87,7 @@ function requestPasswordReset(req, res, next) {
 }
 
 function updateContactInfo(req, res, next) {
-  req.user.updateContactInfo(req.body.newEmail)
+  services.UserService.updateContactInfo(req.user, req.body.newEmail)
   .then((result) => {
     res.body = result.toJSON();
 
@@ -106,8 +106,7 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
-router.put('/contactinfo', middleware.permission(roles.NONE),
-  middleware.request(requests.UserContactInfoRequest), updateContactInfo);
+router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest), updateContactInfo);
 
 router.use(middleware.response);
 router.use(middleware.errors);
