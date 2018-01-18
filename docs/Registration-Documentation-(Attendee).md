@@ -15,7 +15,6 @@ Request Parameters <br />
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
-| `ecosystemInterests` | an array of JSON objects of length at least one and at most two, each containing the EcosystemInterest parameters below | Yes |
 | `extras` | an array of JSON objects of length at most three, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
 
@@ -42,27 +41,6 @@ Attendee Parameters <br />
 | `hasLightningInterest` | a boolean indicating whether the user is interested in giving a short talk | No |
 | `phoneNumber` | the user's phone number, formatted as a string of length 15 or less | No |
 
-
-
-EcosystemInterest Parameters <br />
-
-| Parameter        | Description           | Required  |
-| ---------------- | --------------------- | --------- |
-| `ecosystemId` | the id for the ecosystem the user is interested in | Yes |
-
-
-
-Project Parameters <br />
-
-| Parameter        | Description           | Required  |
-| ---------------- | --------------------- | --------- |
-| `name` | the name of the project of length 100 or less | Yes |
-| `description` | the description of the project of length 255 or less | Yes |
-| `repo` | the repo for the project of length 150 or less | Yes |
-| `isSuggestion` | a boolean indicating whether or not the user intends to suggest the project or create the project | Yes |
-
-
-
 ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
@@ -80,7 +58,7 @@ RequestedCollaborator Parameters <br />
 Request
 ```
 {
-	"attendee": {
+    "attendee": {
                 "firstName": "John",
                 "lastName": "Doe",
                 "shirtSize": "M",
@@ -99,92 +77,84 @@ Request
                 "isPrivate": false,
                 "hasLightningInterest": false,
                 "phoneNumber": "12345678910"
-	},
-	"ecosystemInterests": [
-		{
-                    "ecosystemId": 1
-		}
-	],
-	"projects": [
-		{
-            		"name": "HackIllinois API",
-            		"description": "API written in NodeJS + Express. Supports HackIllinois 2017",
-            		"repo": "http://www.github.com/hackillinois/api-2017",
-            		"isSuggestion": true
-		}
-	],
-	"collaborators": [
-		{
-            		"collaborator": "collaborator@hackillinois.org"
-		}
-	],
-	"extras": [
-		{
-            		"info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!"
-		}
-	]
+    },
+    "collaborators": [
+        {
+                    "collaborator": "collaborator@hackillinois.org"
+        }
+    ],
+    "longform": [
+        {
+                    "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!"
+        }
+    ],
+    "extraInfo": [
+        {
+                    "website": "mywebsite.com"
+        }
+    ],
+    "osContributors": [
+        {
+                    "osContributor": "os contributors"
+        }
+    ]
 }
 ```
 
 Response
 ```
 {
-  "meta": null,
-  "data": {
-    "id": 1,
-    "userId": 1,
-    "firstName": "John",
-    "lastName": "Doe",
-    "shirtSize": "M",
-    "diet": "NONE",
-    "age": 19,
-    "graduationYear": 2019,
-    "transportation": "NOT_NEEDED",
-    "school": "University of Illinois at Urbana-Champaign",
-    "major": "Computer Science",
-    "gender": "MALE",
-    "professionalInterest": "BOTH",
-    "github": "JDoe1234",
-    "linkedin": "JDoe5678",
-    "interests": "CS",
-    "isNovice": true,
-    "isPrivate": false,
-    "hasLightningInterest": false,
-    "phoneNumber": "12345678910",
-    "status": null,
-    "resume": null,
-    "ecosystemInterests": [
-      {
-        "ecosystemId": 1,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "projects": [
-      {
-        "name": "HackIllinois API",
-        "description": "API written in NodeJS + Express. Supports HackIllinois 2017",
-        "repo": "http://www.github.com/hackillinois/api-2017",
-        "isSuggestion": true,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "collaborators": [
-      {
-        "collaborator": "collaborator@hackillinois.org",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "extras": [
-      {
-        "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ]
-  }
+    "meta": null,
+    "data": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "shirtSize": "M",
+        "diet": "NONE",
+        "age": 19,
+        "graduationYear": 2019,
+        "transportation": "NOT_NEEDED",
+        "school": "University of Illinois at Urbana-Champaign",
+        "major": "Computer Science",
+        "gender": "MALE",
+        "professionalInterest": "BOTH",
+        "github": "JDoe1234",
+        "linkedin": "JDoe5678",
+        "interests": "CS",
+        "isNovice": false,
+        "isPrivate": false,
+        "hasLightningInterest": false,
+        "phoneNumber": "12345678910",
+        "userId": 1,
+        "id": 16,
+        "osContributors": [
+            {
+                "osContributor": "os contributors",
+                "attendeeId": 16,
+                "id": 7
+            }
+        ],
+        "longform": [
+            {
+                "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
+                "attendeeId": 16,
+                "id": 3
+            }
+        ],
+        "extraInfo": [
+            {
+                "website": "mywebsite.com",
+                "attendeeId": 16,
+                "id": 2
+            }
+        ],
+        "collaborators": [
+            {
+                "collaborator": "collaborator@hackillinois.org",
+                "attendeeId": 16,
+                "id": 16
+            }
+        ]
+    }
 }
 ```
 
@@ -211,62 +181,57 @@ None
 Response
 ```
 {
-  "meta": null,
-  "data": {
-    "id": 1,
-    "userId": 1,
-    "firstName": "John",
-    "lastName": "Doe",
-    "shirtSize": "M",
-    "diet": "NONE",
-    "age": 19,
-    "graduationYear": 2019,
-    "transportation": "NOT_NEEDED",
-    "school": "University of Illinois at Urbana-Champaign",
-    "major": "Computer Science",
-    "gender": "MALE",
-    "professionalInterest": "BOTH",
-    "github": "JDoe1234",
-    "linkedin": "JDoe5678",
-    "interests": "CS",
-    "isNovice": true,
-    "isPrivate": false,
-    "hasLightningInterest": false,
-    "phoneNumber": "12345678910",
-    "status": null,
-    "resume": null,
-    "ecosystemInterests": [
-      {
-        "ecosystemId": 1,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "projects": [
-      {
-        "name": "HackIllinois API",
-        "description": "API written in NodeJS + Express. Supports HackIllinois 2017",
-        "repo": "http://www.github.com/hackillinois/api-2017",
-        "isSuggestion": true,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "collaborators": [
-      {
-        "collaborator": "collaborator@hackillinois.org",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "extras": [
-      {
-        "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ]
-  }
+    "meta": null,
+    "data": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "shirtSize": "M",
+        "diet": "NONE",
+        "age": 19,
+        "graduationYear": 2019,
+        "transportation": "NOT_NEEDED",
+        "school": "University of Illinois at Urbana-Champaign",
+        "major": "Computer Science",
+        "gender": "MALE",
+        "professionalInterest": "BOTH",
+        "github": "JDoe1234",
+        "linkedin": "JDoe5678",
+        "interests": "CS",
+        "isNovice": false,
+        "isPrivate": false,
+        "hasLightningInterest": false,
+        "phoneNumber": "12345678910",
+        "userId": 1,
+        "id": 16,
+        "osContributors": [
+            {
+                "osContributor": "os contributors",
+                "attendeeId": 16,
+                "id": 7
+            }
+        ],
+        "longform": [
+            {
+                "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
+                "attendeeId": 16,
+                "id": 3
+            }
+        ],
+        "extraInfo": [
+            {
+                "website": "mywebsite.com",
+                "attendeeId": 16,
+                "id": 2
+            }
+        ],
+        "collaborators": [
+            {
+                "collaborator": "collaborator@hackillinois.org",
+                "attendeeId": 16,
+                "id": 16
+            }
+        ]
+    }
 }
 ```
 
@@ -340,7 +305,6 @@ Request Parameters <br />
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
-| `ecosystemInterests` | an array of JSON objects of length at least one and at most two, each containing the EcosystemInterest parameters below | Yes |
 | `extras` | an array of JSON objects of length at most three, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
 
@@ -368,25 +332,6 @@ Attendee Parameters <br />
 | `phoneNumber` | the user's phone number, formatted as a string of length 15 or less | No |
 
 
-EcosystemInterest Parameters <br />
-
-| Parameter        | Description           | Required  |
-| ---------------- | --------------------- | --------- |
-| `ecosystemId` | the id for the ecosystem the user is interested in | Yes |
-| `id` | the preexisting id of an EcosystemInterest to be updated | No|
-
-
-Project Parameters <br />
-
-| Parameter        | Description           | Required  |
-| ---------------- | --------------------- | --------- |
-| `name` | the name of the project of length 100 or less | Yes |
-| `description` | the description of the project of length 255 or less | Yes |
-| `repo` | the repo for the project of length 150 or less | Yes |
-| `isSuggestion` | a boolean indicating whether or not the user intends to suggest the project or create the project | Yes |
-| `id` | the preexisting id of a Project to be updated | No|
-
-
 ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
@@ -405,10 +350,10 @@ RequestedCollaborator Parameters <br />
 Request
 ```
 {
-	"attendee": {
-		"firstName": "Jane",
-		"lastName": "Doe",
-		"shirtSize": "M",
+    "attendee": {
+                "firstName": "John",
+                "lastName": "Doe",
+                "shirtSize": "M",
                 "diet": "NONE",
                 "age": 19,
                 "graduationYear": 2019,
@@ -424,95 +369,84 @@ Request
                 "isPrivate": false,
                 "hasLightningInterest": false,
                 "phoneNumber": "12345678910"
-	},
-	"ecosystemInterests": [
-		{
-                    "ecosystemId": 2,
-                    "id": 1
-		}
-	],
-	"projects": [
-		{
-                    "name": "HackIllinois API",
-                    "description": "API written in NodeJS + Express. Supports HackIllinois 2017.",
-                    "repo": "http://www.github.com/hackillinois/api-2017",
-                    "isSuggestion": true,
-                    "id": 1
-		}
-	],
-	"collaborators": [
-		{
-                    "collaborator": "collaborator2@hackillinois.org",
-                    "id": 1                 
-		}
-	],
-	"extras": [
-		{
-            	    "info": "One of the projects I'm really proud of is my GoodbyeWorld Machine. It says 'Goodbye World' in ten different languages!",
-                    "id": 1     
-		}
-	]
+    },
+    "collaborators": [
+        {
+                    "collaborator": "collaborator@hackillinois.org"
+        }
+    ],
+    "longform": [
+        {
+                    "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!"
+        }
+    ],
+    "extraInfo": [
+        {
+                    "website": "mywebsite.com"
+        }
+    ],
+    "osContributors": [
+        {
+                    "osContributor": "os contributors"
+        }
+    ]
 }
 ```
 
 Response
 ```
 {
-  "meta": null,
-  "data": {
-    "id": 1,
-    "userId": 1,
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "shirtSize": "M",
-    "diet": "NONE",
-    "age": 19,
-    "graduationYear": 2019,
-    "transportation": "NOT_NEEDED",
-    "school": "University of Illinois at Urbana-Champaign",
-    "major": "Computer Science",
-    "gender": "MALE",
-    "professionalInterest": "BOTH",
-    "github": "JDoe1234",
-    "linkedin": "JDoe5678",
-    "interests": "CS",
-    "isNovice": true,
-    "isPrivate": false,
-    "hasLightningInterest": false,
-    "phoneNumber": "12345678910",
-    "status": null,
-    "ecosystemInterests": [
-      {
-        "ecosystemId": 2,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "projects": [
-      {
-        "name": "HackIllinois API",
-        "description": "API written in NodeJS + Express. Supports HackIllinois 2017.",
-        "repo": "http://www.github.com/hackillinois/api-2017",
-        "isSuggestion": true,
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "collaborators": [
-      {
-        "collaborator": "collaborator2@hackillinois.org",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ],
-    "extras": [
-      {
-        "info": "One of the projects I'm really proud of is my GoodbyeWorld Machine. It says 'Goodbye World' in ten different languages!",
-        "attendeeId": 1,
-        "id": 1
-      }
-    ]
-  }
+    "meta": null,
+    "data": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "shirtSize": "M",
+        "diet": "NONE",
+        "age": 19,
+        "graduationYear": 2019,
+        "transportation": "NOT_NEEDED",
+        "school": "University of Illinois at Urbana-Champaign",
+        "major": "Computer Science",
+        "gender": "MALE",
+        "professionalInterest": "BOTH",
+        "github": "JDoe1234",
+        "linkedin": "JDoe5678",
+        "interests": "CS",
+        "isNovice": false,
+        "isPrivate": false,
+        "hasLightningInterest": false,
+        "phoneNumber": "12345678910",
+        "userId": 1,
+        "id": 16,
+        "osContributors": [
+            {
+                "osContributor": "os contributors",
+                "attendeeId": 16,
+                "id": 7
+            }
+        ],
+        "longform": [
+            {
+                "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
+                "attendeeId": 16,
+                "id": 3
+            }
+        ],
+        "extraInfo": [
+            {
+                "website": "mywebsite.com",
+                "attendeeId": 16,
+                "id": 2
+            }
+        ],
+        "collaborators": [
+            {
+                "collaborator": "collaborator@hackillinois.org",
+                "attendeeId": 16,
+                "id": 16
+            }
+        ]
+    }
 }
 ```
 
