@@ -50,7 +50,6 @@ function _deleteExtraAttendeeParams(req) {
   delete req.body.attendee.reviewer;
   delete req.body.attendee.reviewTime;
   delete req.body.attendee.acceptedEcosystemId;
-  delete req.body.attendee.acceptanceType;
   return req;
 }
 
@@ -308,7 +307,6 @@ function fetchAttendeeForHost(req, res, next) {
       res.body.diet = attendee.get('diet');
       res.body.status = attendee.get('status');
       res.body.school = attendee.get('school');
-      res.body.acceptanceType = attendee.get('acceptanceType');
       res.body.acceptedEcosystemId = attendee.get('acceptedEcosystemId');
 
       return next();

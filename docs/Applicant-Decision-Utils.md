@@ -57,8 +57,7 @@ Response
         "wave": 4,
         "reviewer": "Michael McCarthy",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       },
       {
         "id": 2,
@@ -86,8 +85,7 @@ Response
         "wave": 4,
         "reviewer": "John Fox",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       }
     ]
   }
@@ -160,8 +158,7 @@ Response
         "wave": 4,
         "reviewer": "Michael McCarthy",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       },
       {
         "id": 2,
@@ -189,8 +186,7 @@ Response
         "wave": 4,
         "reviewer": "John Fox",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       }
     ]
   }
@@ -265,8 +261,7 @@ Response
         "wave": 4,
         "reviewer": "Michael McCarthy",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       },
       {
         "id": 2,
@@ -294,8 +289,7 @@ Response
         "wave": 4,
         "reviewer": "John Fox",
         "reviewTime": 1000,
-        "acceptedEcosystemId": null,
-        "acceptanceType": "create"
+        "acceptedEcosystemId": null
       }
     ]
   }
@@ -335,7 +329,6 @@ Request Parameters <br />
 | `wave` | the acceptance wave of the attendee | Yes |
 | `status` | the status applied to the attendee | Yes |
 | `acceptedEcosystemId` | the ecosystem the attendee is accepted in | No |
-| `acceptanceType` | create or contribute based on their decision | No |
 
 
 Request
@@ -344,8 +337,7 @@ Request
 	"priority": 5,
 	"wave": 3,
 	"status": "ACCEPTED",
-        "acceptedEcosystemId": 2,
-	"acceptanceType": "CONTRIBUTE"
+        "acceptedEcosystemId": 2
 }
 ```
 
@@ -380,7 +372,6 @@ Response
     "wave": 3,
     "status": "ACCEPTED",
     "acceptedEcosystemId": "2",
-    "acceptanceType": "CONTRIBUTE",
     "ecosystemInterests": [
       {
         "ecosystemId": 1,

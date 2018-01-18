@@ -8,7 +8,6 @@ const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
 const PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
 const GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
-const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 const Model = require('./Model');
 const Upload = require('./Upload');
@@ -44,8 +43,7 @@ const Attendee = Model.extend({
     reviewTime: [ 'date' ],
     isNovice: ['required', 'boolean'],
     isPrivate: ['required', 'boolean'],
-    phoneNumber: ['string', 'maxLength:15'],
-    acceptanceType: ['string', validators.in(ACCEPTANCE_TYPES)]
+    phoneNumber: ['string', 'maxLength:15']
   },
   interests: function() {
     return this.hasMany(AttendeeProjectInterest);
