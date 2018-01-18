@@ -15,7 +15,7 @@ Request Parameters <br />
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
-| `extras` | an array of JSON objects of length at most three, each containing the ExtraInfo parameters below | No |
+| `extraInfo` | an array of JSON objects of length at most two, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
 
 Attendee Parameters <br />
@@ -45,7 +45,7 @@ ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
-| `info` | the extra information provided by the user of length 255 or less | Yes |
+| `website` | the website url by the user of length 255 or less | Yes |
 
 
 
@@ -305,7 +305,7 @@ Request Parameters <br />
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
-| `extras` | an array of JSON objects of length at most three, each containing the ExtraInfo parameters below | No |
+| `extraInfo` | an array of JSON objects of length at most two, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
 
 Attendee Parameters <br />
@@ -336,7 +336,7 @@ ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
-| `info` | the extra information provided by the user of length 255 or less | Yes |
+| `website` | the website urls provided by the user of length 255 or less | Yes |
 | `id` | the preexisting id of an ExtraInfo to be updated | No|
 
 
