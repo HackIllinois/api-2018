@@ -8,7 +8,6 @@ const knex = database.connection();
 const Attendee = require('../models/Attendee');
 const AttendeeRSVP = require('../models/AttendeeRSVP');
 const CheckIn = require('../models/CheckIn');
-const AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest');
 const TrackedEvent = require('../models/TrackingEvent');
 
 const utils = require('../utils');
@@ -53,15 +52,16 @@ function _populateStatsField(key, stats) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateEcosystems(cb) {
-  return AttendeeEcosystemInterest.query((qb) => {
-    qb.select('e.name')
-        .count('ecosystem_id as count')
-        .from('attendee_ecosystem_interests as aei')
-        .innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
-        .groupBy('aei.ecosystem_id');
-  })
-    .fetchAll()
-    .then(cb);
+  // return AttendeeEcosystemInterest.query((qb) => {
+  //   qb.select('e.name')
+  //       .count('ecosystem_id as count')
+  //       .from('attendee_ecosystem_interests as aei')
+  //       .innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
+  //       .groupBy('aei.ecosystem_id');
+  // })
+  //   .fetchAll()
+  //   .then(cb);
+  return cb;
 }
 
 /**
