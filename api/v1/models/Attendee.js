@@ -50,7 +50,7 @@ const Attendee = Model.extend({
   interests: function() {
     return this.hasMany(AttendeeProjectInterest);
   },
-  longform: function() {
+  longForm: function() {
     return this.hasMany(AttendeeExtraInfo);
   },
   extraInfo: function() {
@@ -84,7 +84,7 @@ Attendee.findByUserId = function(userId) {
     user_id: userId
   })
     .fetch({
-      withRelated: ['longform', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -101,7 +101,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
       user_id: userId
     })
       .fetch({
-        withRelated: ['longform', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {
@@ -136,7 +136,7 @@ Attendee.findById = function(id) {
     id: id
   })
     .fetch({
-      withRelated: ['longform', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
+      withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -152,7 +152,7 @@ Attendee.fetchWithResumeById = function(id) {
       id: id
     })
       .fetch({
-        withRelated: ['longform', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
+        withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {

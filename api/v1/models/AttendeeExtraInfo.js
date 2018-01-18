@@ -1,6 +1,6 @@
 const Model = require('./Model');
 const AttendeeExtraInfo = Model.extend({
-  tableName: 'attendee_longform',
+  tableName: 'attendee_long_form',
   idAttribute: 'id',
   validations: {
     attendeeId: ['required', 'integer'],

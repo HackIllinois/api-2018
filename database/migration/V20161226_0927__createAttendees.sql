@@ -41,13 +41,13 @@ CREATE TABLE `attendee_requested_collaborators` (
 		ON UPDATE NO ACTION
 );
 
-CREATE TABLE `attendee_longform` (
+CREATE TABLE `attendee_long_form` (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`attendee_id` INT UNSIGNED NOT NULL,
 	`info` VARCHAR(1023) NOT NULL,
 	PRIMARY KEY (`id`),
-	INDEX `fk_attendee_longform_attendee_id_idx` (`attendee_id` ASC),
-	CONSTRAINT `fk_attendee_longform_attendee_id`
+	INDEX `fk_attendee_long_form_attendee_id_idx` (`attendee_id` ASC),
+	CONSTRAINT `fk_attendee_long_form_attendee_id`
 		FOREIGN KEY (`attendee_id`)
 		REFERENCES `attendees` (`id`)
 		ON DELETE NO ACTION

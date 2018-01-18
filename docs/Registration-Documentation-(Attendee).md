@@ -17,7 +17,7 @@ Request Parameters <br />
 | `attendee` | a JSON object containing the Attendee Parameters below | Yes |
 | `extraInfo` | an array of JSON objects of length at most two, each containing the ExtraInfo parameters below | No |
 | `collaborators` | an array of JSON objects of length at most eight, each containing the RequestedCollaborator parameters below | No |
-| `longform` | an array of JSON objects of length at most two, each containing the LongForm parameters below | No |
+| `longForm` | an array of JSON objects of length at most two, each containing the LongForm parameters below | No |
 | `osContributors` | an array of JSON objects of length at most eight, each containing the OSContributor parameters below | Yes |
 
 Attendee Parameters <br />
@@ -97,7 +97,7 @@ Request
                     "collaborator": "collaborator@hackillinois.org"
         }
     ],
-    "longform": [
+    "longForm": [
         {
                     "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!"
         }
@@ -147,7 +147,7 @@ Response
                 "id": 7
             }
         ],
-        "longform": [
+        "longForm": [
             {
                 "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
                 "attendeeId": 16,
@@ -224,7 +224,7 @@ Response
                 "id": 7
             }
         ],
-        "longform": [
+        "longForm": [
             {
                 "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
                 "attendeeId": 16,
@@ -389,7 +389,7 @@ Request
                     "collaborator": "collaborator@hackillinois.org"
         }
     ],
-    "longform": [
+    "longForm": [
         {
                     "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!"
         }
@@ -439,7 +439,7 @@ Response
                 "id": 7
             }
         ],
-        "longform": [
+        "longForm": [
             {
                 "info": "One of the projects I'm really proud of is my HelloWorld Machine. It says 'Hello World' in ten different languages!",
                 "attendeeId": 16,

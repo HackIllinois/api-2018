@@ -51,7 +51,7 @@ describe('RegistrationService', () => {
         'wave': 0,
         'priority': 0
       };
-      testRegistration.longform = [
+      testRegistration.longForm = [
         {
           'info': 'Example extra info'
         }
@@ -208,7 +208,7 @@ describe('RegistrationService', () => {
         'priority': 1,
         'wave': 2
       };
-      testRegistration.longform = [
+      testRegistration.longForm = [
         {
           'info': 'Example extra info'
         }
@@ -217,7 +217,7 @@ describe('RegistrationService', () => {
 
       testRegistration.attendee.firstName = 'Jane';
 
-      testRegistration.longform[0].info = 'New example extra info';
+      testRegistration.longForm[0].info = 'New example extra info';
 
       _setAttendee = sinon.spy(Attendee.prototype, 'set');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
