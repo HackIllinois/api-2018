@@ -2,7 +2,7 @@ const Request = require('./Request');
 const Attendee = require('../models/Attendee');
 const validators = require('../utils/validators');
 
-const extraInfoValidations = {
+const longFormValidations = {
   info: ['string', 'maxLength:255']
 };
 
@@ -10,7 +10,7 @@ const requestedCollaboratorValidations = {
   collaborator: ['required', 'string', 'maxLength:255']
 };
 
-const websiteValidations = {
+const extraInfoValidations = {
   website: ['string', 'maxLength:255']
 };
 
@@ -41,9 +41,9 @@ const bodyValidations = {
   'attendee.isPrivate': attendee.validations.isPrivate,
   'attendee.hasLightningInterest': [ 'boolean' ],
   'attendee.phoneNumber': attendee.validations.phoneNumber,
-  'longForm': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'longForm'), 'longForm')],
+  'longForm': ['array', 'maxLength:1', validators.array(validators.nested(longFormValidations, 'longForm'), 'longForm')],
   'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))],
-  'extraInfo': ['array', 'maxLength:2', validators.array(validators.nested(websiteValidations, 'extraInfo'), 'extraInfo')],
+  'extraInfo': ['array', 'maxLength:2', validators.array(validators.nested(extraInfoValidations, 'extraInfo'), 'extraInfo')],
   'oscontributors': ['array', 'maxLength:8', validators.array(validators.nested(osContributorValidations, 'osContributors'), 'osContributors')]
 };
 
@@ -55,9 +55,9 @@ function AttendeeRequest(headers, body) {
   this.bodyValidations = bodyValidations;
 }
 
-AttendeeRequest._extraInfoValidations = extraInfoValidations;
+AttendeeRequest._longFormValidations = longFormValidations;
 AttendeeRequest._requestedCollaboratorValidations = requestedCollaboratorValidations;
-AttendeeRequest._websiteValidations = websiteValidations;
+AttendeeRequest._extraInfoValidations = extraInfoValidations;
 AttendeeRequest._osContributorValidations = osContributorValidations;
 
 
