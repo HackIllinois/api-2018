@@ -1,5 +1,5 @@
 const Model = require('./Model');
-const AttendeeWebsite = Model.extend({
+const AttendeeExtraInfo = Model.extend({
   tableName: 'attendee_extra_info',
   idAttribute: 'id',
   validations: {
@@ -8,14 +8,14 @@ const AttendeeWebsite = Model.extend({
   }
 });
 
-AttendeeWebsite.findByAttendeeId = (attendeeId) => AttendeeWebsite.where({
+AttendeeExtraInfo.findByAttendeeId = (attendeeId) => AttendeeExtraInfo.where({
   attendee_id: attendeeId
 })
   .fetch();
 
-AttendeeWebsite.findById = (id) => AttendeeWebsite.where({
+AttendeeExtraInfo.findById = (id) => AttendeeExtraInfo.where({
   id: id
 })
   .fetch();
 
-module.exports = AttendeeWebsite;
+module.exports = AttendeeExtraInfo;

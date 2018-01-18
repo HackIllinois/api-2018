@@ -16,7 +16,7 @@ const AttendeeProjectInterest = require('./AttendeeProjectInterest');
 const AttendeeLongForm = require('./AttendeeLongForm');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
-const AttendeeWebsite = require('./AttendeeWebsite');
+const AttendeeExtraInfo = require('./AttendeeExtraInfo');
 const AttendeeOSContributor = require('./AttendeeOSContributor');
 const Attendee = Model.extend({
   tableName: 'attendees',
@@ -54,7 +54,7 @@ const Attendee = Model.extend({
     return this.hasMany(AttendeeLongForm);
   },
   extraInfo: function() {
-    return this.hasMany(AttendeeWebsite);
+    return this.hasMany(AttendeeExtraInfo);
   },
   osContributors: function() {
     return this.hasMany(AttendeeOSContributor);
