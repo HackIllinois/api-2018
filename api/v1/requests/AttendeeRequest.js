@@ -3,7 +3,7 @@ const Attendee = require('../models/Attendee');
 const validators = require('../utils/validators');
 
 const longFormValidations = {
-  info: ['string', 'maxLength:255']
+  info: ['string', 'maxLength:1023']
 };
 
 const requestedCollaboratorValidations = {
