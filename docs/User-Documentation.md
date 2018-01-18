@@ -68,8 +68,8 @@ Request Parameters <br />
 
 Role Values <br />
 
-| ROLE | Who are part of the role | 
-| ---------------- | --------------------- | 
+| ROLE | Who are part of the role |
+| ---------------- | --------------------- |
 | `ALL` | `ADMIN, STAFF, SPONSOR, MENTOR, VOLUNTEER, ATTENDEE`|
 | `SUPERUSER ` | `ADMIN` |
 | `ORGANIZERS ` | `ADMIN, STAFF` |
@@ -197,5 +197,57 @@ Errors:
 | Error         | Source  | Cause                                           |
 |---------------|---------|-------------------------------------------------|
 | NotFoundError | `email` | A user with the given email could not be found. |
+
+---
+
+**PUT /v1/user/contactinfo**
+
+Allows a user created with the GitHub OAuth authentication scheme to change their contact email if they do not want to use their primary GitHub email as their contact email.
+
+Headers
+
+None
+
+URL Parameters
+
+None
+
+Request Parameters
+
+| Parameters | Description                             | Required |
+|------------|-----------------------------------------|----------|
+| `newEmail` | The new email the user wishes to use as their contact info  | Yes      |
+
+Request
+
+```
+{
+    "email": "newemail@example.com"
+}
+```
+
+Response
+
+```
+{
+  "meta": null,
+  "data": {
+	"id": 1,
+	"email": "newemail@example.com",
+	"created": "2016-06-19T00:01:00.000Z",
+	"updated": "2016-06-19T00:01:00.000Z",
+        "roles": [{
+          "role": "ATTENDEE",
+          "active": 1
+        }],
+  }
+}
+```
+
+Errors:
+
+| Error         | Source  | Cause                                           |
+|---------------|---------|-------------------------------------------------|
+| UnprocessableRequestError | `user` | Users under a basic authentication scheme can not change their contact info |
 
 ---

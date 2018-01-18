@@ -117,3 +117,13 @@ module.exports.verifyPassword = (user, password) => user
 module.exports.resetPassword = (user, password) => user
     .setPassword(password)
     .then((updated) => updated.save());
+
+module.exports.updateContactInfo = (user, newEmail) => {
+  if(!_.isNull(user.get('password'))) {
+    const message = 'Cannot update the contact info of a Basic user';
+    const source = 'user';
+    throw new errors.UnprocessableRequestError(message, source);
+  }
+
+  return user.setContactInfo(newEmail);
+};
