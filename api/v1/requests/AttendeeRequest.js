@@ -19,7 +19,7 @@ const osContributorValidations = {
 };
 
 const bodyRequired = [ 'attendee' ];
-const bodyAllowed = ['extras', 'websites', 'osContributors', 'collaborators'];
+const bodyAllowed = ['longform', 'websites', 'osContributors', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
@@ -41,7 +41,7 @@ const bodyValidations = {
   'attendee.isPrivate': attendee.validations.isPrivate,
   'attendee.hasLightningInterest': [ 'boolean' ],
   'attendee.phoneNumber': attendee.validations.phoneNumber,
-  'extras': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'extras'), 'extras')],
+  'longform': ['array', 'maxLength:1', validators.array(validators.nested(extraInfoValidations, 'longform'), 'longform')],
   'collaborators': ['array', 'maxLength:8', validators.array(validators.nested(requestedCollaboratorValidations, 'collaborators'))],
   'websites': ['array', 'maxLength:2', validators.array(validators.nested(websiteValidations, 'websites'), 'websites')],
   'oscontributors': ['array', 'maxLength:8', validators.array(validators.nested(osContributorValidations, 'osContributors'), 'osContributors')]

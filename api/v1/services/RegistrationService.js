@@ -407,7 +407,7 @@ module.exports.updateAttendee = (attendee, attributes) => {
   // some attendee registration attributes are optional, but we need to
   // be sure that they are at least considered for removal during adjustment
   attributes = _.merge(attributes, {
-    'extras': [],
+    'longform': [],
     'collaborators': [],
     'websites': [],
     'osContributors': []
