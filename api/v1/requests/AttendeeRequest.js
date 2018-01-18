@@ -11,7 +11,7 @@ const requestedCollaboratorValidations = {
 };
 
 const extraInfoValidations = {
-  website: ['string', 'maxLength:255']
+  info: ['string', 'maxLength:255']
 };
 
 const osContributorValidations = {

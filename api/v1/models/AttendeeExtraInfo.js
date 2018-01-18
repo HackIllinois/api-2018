@@ -4,7 +4,7 @@ const AttendeeExtraInfo = Model.extend({
   idAttribute: 'id',
   validations: {
     attendeeId: ['required', 'integer'],
-    website: ['required', 'string', 'maxLength:255']
+    info: ['required', 'string', 'maxLength:255']
   }
 });
 
