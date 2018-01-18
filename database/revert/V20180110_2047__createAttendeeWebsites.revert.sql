@@ -1,1 +1,1 @@
-DROP TABLE `attendee_websites`;
+DROP TABLE `attendee_extra_info`;

@@ -409,7 +409,7 @@ module.exports.updateAttendee = (attendee, attributes) => {
   attributes = _.merge(attributes, {
     'longform': [],
     'collaborators': [],
-    'websites': [],
+    'extraInfo': [],
     'osContributors': []
   });
 
