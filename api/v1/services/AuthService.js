@@ -7,7 +7,7 @@ const StatusCodeError = require('request-promise/errors').StatusCodeError;
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
-const ctx = require("ctx");
+const ctx = require('ctx');
 
 const config = ctx.config();
 const errors = require('../errors');
@@ -72,10 +72,10 @@ module.exports.verify = (token) => _Promise.try(() =>
 module.exports.getGitHubSessionCodeURL = (isMobile) => {
   if (!_.isUndefined(isMobile)) {
     return GITHUB_AUTH_REDIRECT + config.auth.github.id + '&redirect_uri=' + config.auth.github.mobileRedirect;
-  } else {
-    return GITHUB_AUTH_REDIRECT + config.auth.github.id;
-  }
-}
+  } 
+  return GITHUB_AUTH_REDIRECT + config.auth.github.id;
+  
+};
 
 module.exports.requestGitHubAccessToken = (code) => {
   let token;

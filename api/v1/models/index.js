@@ -1,8 +1,6 @@
 module.exports = {
   Attendee: require('./Attendee'),
-  AttendeeExtraInfo: require('./AttendeeExtraInfo'),
-  AttendeeProject: require('./AttendeeProject'),
-  AttendeeProjectInterest: require('./AttendeeProjectInterest'),
+  AttendeeLongForm: require('./AttendeeLongForm'),
   AttendeeRequestedCollaborator: require('./AttendeeRequestedCollaborator'),
   AttendeeRSVP: require('./AttendeeRSVP'),
   CheckIn: require('./CheckIn'),
