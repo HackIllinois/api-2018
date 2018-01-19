@@ -11,7 +11,6 @@ const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_
 
 const Model = require('./Model');
 const Upload = require('./Upload');
-const AttendeeProjectInterest = require('./AttendeeProjectInterest');
 const AttendeeLongForm = require('./AttendeeLongForm');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
@@ -44,9 +43,6 @@ const Attendee = Model.extend({
     isNovice: ['required', 'boolean'],
     isPrivate: ['required', 'boolean'],
     phoneNumber: ['string', 'maxLength:15']
-  },
-  interests: function() {
-    return this.hasMany(AttendeeProjectInterest);
   },
   longForm: function() {
     return this.hasMany(AttendeeLongForm);
