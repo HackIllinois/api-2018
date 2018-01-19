@@ -7,9 +7,7 @@ const errors = require('../api/v1/errors');
 const utils = require('../api/v1/utils');
 const User = require('../api/v1/models/User.js');
 const Attendee = require('../api/v1/models/Attendee.js');
-const AttendeeEcosystemInterest = require('../api/v1/models/AttendeeEcosystemInterest.js');
-const AttendeeExtraInfo = require('../api/v1/models/AttendeeExtraInfo.js');
-const AttendeeProject = require('../api/v1/models/AttendeeProject.js');
+const AttendeeLongForm = require('../api/v1/models/AttendeeLongForm.js');
 const AttendeeRequestedCollaborator = require('../api/v1/models/AttendeeRequestedCollaborator.js');
 const RegistrationService = require('../api/v1/services/RegistrationService.js');
 
@@ -19,9 +17,7 @@ const tracker = require('mock-knex').getTracker();
 
 describe('RegistrationService', () => {
   let _saveAttendee;
-  let _saveAttendeeEcosystemInterest;
-  let _saveAttendeeExtraInfo;
-  let _saveAttendeeProject;
+  let _saveAttendeeLongForm;
   let _saveAttendeeRequestedCollaborator;
 
   describe('createAttendee', () => {
@@ -55,15 +51,7 @@ describe('RegistrationService', () => {
         'wave': 0,
         'priority': 0
       };
-      testRegistration.projects = [
-        {
-          'name': 'Example',
-          'description': 'Example project.',
-          'repo': 'http://www.github.com/hackillinois/api-2017',
-          'isSuggestion': true
-        }
-      ];
-      testRegistration.extras = [
+      testRegistration.longForm = [
         {
           'info': 'Example extra info'
         }
@@ -73,16 +61,14 @@ describe('RegistrationService', () => {
           'collaborator': 'existing@example.com'
         }
       ];
-      testRegistration.ecosystemInterests = [
+      testRegistration.osContributors = [
         {
-          'ecosystemId': 1
+          'osContributor': 'person'
         }
       ];
       _forgeAttendee = sinon.spy(Attendee, 'forge');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
-      _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-      _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
+      _saveAttendeeLongForm = sinon.spy(AttendeeLongForm.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -104,9 +90,7 @@ describe('RegistrationService', () => {
 
         assert(_forgeAttendee.withArgs(attendeeParams).calledOnce, 'Attendee forge not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
-        assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
-        assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
+        assert(_saveAttendeeLongForm.calledOnce, 'AttendeeLongForm save not called');
         assert(_saveAttendeeRequestedCollaborator.calledOnce, 'AttendeeRequestedCollaborator save not called');
         return done();
       }).catch((err) => done(err));
@@ -125,9 +109,7 @@ describe('RegistrationService', () => {
     after((done) => {
       _forgeAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeProject.restore();
-      _saveAttendeeExtraInfo.restore();
-      _saveAttendeeEcosystemInterest.restore();
+      _saveAttendeeLongForm.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });
@@ -231,37 +213,25 @@ describe('RegistrationService', () => {
         'priority': 1,
         'wave': 2
       };
-      testRegistration.projects = [
-        {
-          'name': 'Example',
-          'description': 'Example project.',
-          'repo': 'http://www.github.com/hackillinois/api-2017',
-          'isSuggestion': true
-        }
-      ];
-      testRegistration.extras = [
+      testRegistration.longForm = [
         {
           'info': 'Example extra info'
         }
       ];
-      testRegistration.ecosystemInterests = [
+      testRegistration.osContributors = [
         {
-          'ecosystemId': 1
+          'osContributor': 'person'
         }
       ];
       testAttendee = Attendee.forge(testRegistration.attendee);
 
       testRegistration.attendee.firstName = 'Jane';
 
-      testRegistration.extras[0].info = 'New example extra info';
-      testRegistration.projects[0].description = 'New example project description';
-      testRegistration.ecosystemInterests[0].ecosystemId = 2;
+      testRegistration.longForm[0].info = 'New example extra info';
 
       _setAttendee = sinon.spy(Attendee.prototype, 'set');
       _saveAttendee = sinon.spy(Attendee.prototype, 'save');
-      _saveAttendeeEcosystemInterest = sinon.spy(AttendeeEcosystemInterest.prototype, 'save');
-      _saveAttendeeExtraInfo = sinon.spy(AttendeeExtraInfo.prototype, 'save');
-      _saveAttendeeProject = sinon.spy(AttendeeProject.prototype, 'save');
+      _saveAttendeeLongForm = sinon.spy(AttendeeLongForm.prototype, 'save');
       _saveAttendeeRequestedCollaborator = sinon.spy(AttendeeRequestedCollaborator.prototype, 'save');
 
       done();
@@ -281,9 +251,7 @@ describe('RegistrationService', () => {
       attendee.then(() => {
         assert(_setAttendee.withArgs(attendeeParams).calledOnce, 'Attendee update not called with right parameters');
         assert(_saveAttendee.calledOnce, 'Attendee save not called');
-        assert(_saveAttendeeProject.calledOnce, 'AttendeeProject save not called');
-        assert(_saveAttendeeExtraInfo.calledOnce, 'AttendeeExtraInfo save not called');
-        assert(_saveAttendeeEcosystemInterest.calledOnce, 'AttendeeEcosystemInterest save not called');
+        assert(_saveAttendeeLongForm.calledOnce, 'AttendeeLongForm save not called');
         assert(!_saveAttendeeRequestedCollaborator.called, 'AttendeeRequestedCollaborator save called when not updated');
         return done();
       }).catch((err) => done(err));
@@ -295,9 +263,7 @@ describe('RegistrationService', () => {
     after((done) => {
       _setAttendee.restore();
       _saveAttendee.restore();
-      _saveAttendeeProject.restore();
-      _saveAttendeeExtraInfo.restore();
-      _saveAttendeeEcosystemInterest.restore();
+      _saveAttendeeLongForm.restore();
       _saveAttendeeRequestedCollaborator.restore();
       done();
     });

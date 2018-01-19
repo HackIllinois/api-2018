@@ -6,7 +6,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('ctx').config();
 const errors = require('../errors');
 
 const attendeeQueryCategories = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
@@ -50,7 +50,6 @@ function _deleteExtraAttendeeParams(req) {
   delete req.body.attendee.reviewer;
   delete req.body.attendee.reviewTime;
   delete req.body.attendee.acceptedEcosystemId;
-  delete req.body.attendee.acceptanceType;
   return req;
 }
 
@@ -127,7 +126,7 @@ function createAttendee(req, res, next) {
 
   services.RegistrationService.createAttendee(req.user, req.body)
     .then((attendee) => {
-      services.MailService.addToList(req.user, mail.lists.applicants);
+      services.MailService.addToList(req.user, config.mail.lists.applicants);
       res.body = attendee.toJSON();
 
       return next();
@@ -308,7 +307,6 @@ function fetchAttendeeForHost(req, res, next) {
       res.body.diet = attendee.get('diet');
       res.body.status = attendee.get('status');
       res.body.school = attendee.get('school');
-      res.body.acceptanceType = attendee.get('acceptanceType');
       res.body.acceptedEcosystemId = attendee.get('acceptedEcosystemId');
 
       return next();
