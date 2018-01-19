@@ -24,21 +24,13 @@ CREATE TABLE `attendees` (
   `wave` TINYINT(1) UNSIGNED NULL DEFAULT 0,
   `reviewer` VARCHAR(255) NULL DEFAULT NULL,
   `review_time` TIMESTAMP NULL DEFAULT NULL,
-  `accepted_ecosystem_id` INT(10) UNSIGNED NULL DEFAULT NULL,
-  `acceptance_type` ENUM('CREATE', 'CONTRIBUTE') NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_attendees_user_id_idx` (`user_id` ASC),
-  INDEX `fk_attendees_ecosystem_id_idx` (`accepted_ecosystem_id` ASC),
   CONSTRAINT `fk_attendees_user_id`
 	FOREIGN KEY (`user_id`)
 	REFERENCES `users` (`id`)
 	ON DELETE NO ACTION
-	ON UPDATE NO ACTION,
-  CONSTRAINT `fk_attendees_ecosystem_id`
-    FOREIGN KEY (`accepted_ecosystem_id`)
-    REFERENCES `ecosystems` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+	ON UPDATE NO ACTION
 );
 
 CREATE TABLE `attendee_requested_collaborators` (
@@ -79,25 +71,6 @@ CREATE TABLE `attendee_projects` (
 	CONSTRAINT `fk_attendee_projects_attendee_id`
 		FOREIGN KEY (`attendee_id`)
 		REFERENCES `attendees` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION
-);
-
-CREATE TABLE `attendee_ecosystem_interests` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `attendee_id` INT UNSIGNED NOT NULL,
-  `ecosystem_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_attendee_ecosystem_interests_attendee_id_idx` (`attendee_id` ASC),
-  INDEX `fk_attendee_ecosystem_interests_ecosystem_id_idx` (`ecosystem_id` ASC),
-  CONSTRAINT `fk_attendee_ecosystem_interests_attendee_id_idx`
-		FOREIGN KEY (`attendee_id`)
-		REFERENCES `attendees` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION,
-  CONSTRAINT `fk_attendee_ecosystem_interests_ecosystem_id_idx`
-		FOREIGN KEY (`ecosystem_id`)
-		REFERENCES `ecosystems` (`id`)
 		ON DELETE NO ACTION
 		ON UPDATE NO ACTION
 );

@@ -4,7 +4,6 @@ DROP TABLE `attendee_rsvps`;
 DROP TABLE `attendee_extra_infos`;
 DROP TABLE `attendee_long_form`;
 DROP TABLE `attendee_os_contributor`;
-DROP TABLE `attendee_ecosystem_interests`;
 DROP TABLE `attendee_requested_collaborators`;
 
 DELETE FROM `mailing_lists` WHERE `name`='wave_1';
