@@ -18,14 +18,27 @@ CREATE TABLE `attendees` (
   `status` ENUM('ACCEPTED', 'WAITLISTED', 'REJECTED', 'PENDING') NOT NULL DEFAULT 'PENDING',
   `is_novice` TINYINT(1) NOT NULL DEFAULT 0,
   `is_private` TINYINT(1) NOT NULL DEFAULT 0,
+  `has_lightning_interest` TINYINT(1) NULL DEFAULT 0,
   `phone_number` VARCHAR(15) NULL,
+  `priority` TINYINT(1) UNSIGNED NULL DEFAULT 0,
+  `wave` TINYINT(1) UNSIGNED NULL DEFAULT 0,
+  `reviewer` VARCHAR(255) NULL DEFAULT NULL,
+  `review_time` TIMESTAMP NULL DEFAULT NULL,
+  `accepted_ecosystem_id` INT(10) UNSIGNED NULL DEFAULT NULL,
+  `acceptance_type` ENUM('CREATE', 'CONTRIBUTE') NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_attendees_user_id_idx` (`user_id` ASC),
+  INDEX `fk_attendees_ecosystem_id_idx` (`accepted_ecosystem_id` ASC),
   CONSTRAINT `fk_attendees_user_id`
 	FOREIGN KEY (`user_id`)
 	REFERENCES `users` (`id`)
 	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
+	ON UPDATE NO ACTION,
+  CONSTRAINT `fk_attendees_ecosystem_id`
+    FOREIGN KEY (`accepted_ecosystem_id`)
+    REFERENCES `ecosystems` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 CREATE TABLE `attendee_requested_collaborators` (
@@ -116,33 +129,6 @@ CREATE TABLE `attendee_project_interests` (
 		ON UPDATE NO ACTION
 );
 
-ALTER TABLE `attendees`
-ADD COLUMN `has_lightning_interest` TINYINT(1) NULL DEFAULT 0 AFTER `is_private`;
-
-INSERT INTO `mailing_lists` (`name`) VALUES ('lightning_talks');
-
-ALTER TABLE `attendees`
-ADD COLUMN `priority` TINYINT(1) UNSIGNED NULL DEFAULT 0 AFTER `phone_number`,
-ADD COLUMN `wave` TINYINT(1) UNSIGNED NULL DEFAULT 0 AFTER `priority`,
-ADD COLUMN `reviewer` VARCHAR(255) NULL DEFAULT NULL AFTER `wave`,
-ADD COLUMN `review_time` TIMESTAMP NULL DEFAULT NULL AFTER `reviewer`,
-ADD COLUMN `accepted_ecosystem_id` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `review_time`,
-ADD COLUMN `acceptance_type` ENUM('CREATE', 'CONTRIBUTE') NULL DEFAULT NULL AFTER `accepted_ecosystem_id`,
-ADD INDEX `fk_attendees_ecosystem_id_idx` (`accepted_ecosystem_id` ASC);
-ALTER TABLE `attendees`
-ADD CONSTRAINT `fk_attendees_ecosystem_id`
-  FOREIGN KEY (`accepted_ecosystem_id`)
-  REFERENCES `ecosystems` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-INSERT INTO `mailing_lists` (`name`) VALUES ('wave_1');
-INSERT INTO `mailing_lists` (`name`) VALUES ('wave_2');
-INSERT INTO `mailing_lists` (`name`) VALUES ('wave_3');
-INSERT INTO `mailing_lists` (`name`) VALUES ('wave_4');
-INSERT INTO `mailing_lists` (`name`) VALUES ('wave_5');
-INSERT INTO `mailing_lists` (`name`) VALUES ('rejected');
-
 CREATE TABLE `attendee_rsvps` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `attendee_id` INT UNSIGNED NOT NULL,
@@ -182,3 +168,12 @@ CREATE TABLE `attendee_os_contributor` (
 		ON DELETE NO ACTION
 		ON UPDATE NO ACTION
 );
+
+INSERT INTO `mailing_lists` (`name`) VALUES ('lightning_talks');
+
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_1');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_2');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_3');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_4');
+INSERT INTO `mailing_lists` (`name`) VALUES ('wave_5');
+INSERT INTO `mailing_lists` (`name`) VALUES ('rejected');
