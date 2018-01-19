@@ -59,49 +59,6 @@ CREATE TABLE `attendee_long_form` (
 		ON UPDATE NO ACTION
 );
 
-CREATE TABLE `attendee_projects` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`attendee_id` INT UNSIGNED NOT NULL,
-	`name` VARCHAR(100) NOT NULL,
-	`description` VARCHAR(255) NOT NULL,
-	`repo` VARCHAR(150) NOT NULL,
-	`is_suggestion` TINYINT(1) NOT NULL,
-	PRIMARY KEY (`id`),
-	INDEX `fk_attendee_projects_attendee_id_idx` (`attendee_id` ASC),
-	CONSTRAINT `fk_attendee_projects_attendee_id`
-		FOREIGN KEY (`attendee_id`)
-		REFERENCES `attendees` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION
-);
-
-CREATE TABLE `attendee_project_interests` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`attendee_id` INT UNSIGNED NOT NULL,
-	`type` ENUM('CREATE', 'CONTRIBUTE', 'SUGGEST') NOT NULL,
-	`project_id` INT UNSIGNED NULL,
-	`attendee_project_id` INT UNSIGNED NULL,
-	PRIMARY KEY (`id`),
-	INDEX `fk_attendee_project_interests_attendee_id_idx` (`attendee_id` ASC),
-	INDEX `fk_attendee_project_interests_attendee_project_id_idx` (`attendee_project_id` ASC),
-	INDEX `fk_attendee_project_interests_project_id_idx` (`project_id` ASC),
-	CONSTRAINT `fk_attendee_project_interests_project_id`
-		FOREIGN KEY (`project_id`)
-		REFERENCES `projects` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION,
-	CONSTRAINT `fk_attendee_project_interests_attendee_id`
-		FOREIGN KEY (`attendee_id`)
-		REFERENCES `attendees` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION,
-	CONSTRAINT `fk_attendee_project_interests_attendee_project_id`
-		FOREIGN KEY (`attendee_project_id`)
-		REFERENCES `attendee_projects` (`id`)
-		ON DELETE NO ACTION
-		ON UPDATE NO ACTION
-);
-
 CREATE TABLE `attendee_rsvps` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `attendee_id` INT UNSIGNED NOT NULL,
