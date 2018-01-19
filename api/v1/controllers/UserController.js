@@ -50,6 +50,17 @@ function createAccreditedUser(req, res, next) {
     .catch((error) => next(error));
 }
 
+function getAuthenticatedUser(req, res, next) {
+  services.UserService
+    .findUserById(req.user.get('id'))
+    .then((user) => {
+      res.body = user.toJSON();
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
 function getUser(req, res, next) {
   services.UserService
     .findUserById(req.params.id)
@@ -108,6 +119,7 @@ router.post('/', middleware.request(requests.BasicAuthRequest),
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
   middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
+router.get('/', middleware.permission(roles.NONE, isAuthenticated), getAuthenticatedUser);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
 router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest),
