@@ -34,7 +34,7 @@ const Attendee = Model.extend({
     professionalInterest: ['required', 'string', validators.in(PROFESSIONAL_INTERESTS)],
     github: ['required', 'string', 'maxLength:50'],
     linkedin: ['required', 'string', 'maxLength:50'],
-    interests: ['required', 'string', 'maxLength:255'],
+    interests: ['string', 'maxLength:255'],
     priority: ['integer', 'max:10'],
     status: ['string', validators.in(STATUSES)],
     wave: ['integer', 'max:5'],

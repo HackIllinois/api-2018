@@ -37,7 +37,7 @@ Attendee Parameters <br />
 | `professionalInterest` | a string from the following options: ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'] | Yes |
 | `github` | the user's GitHub handle of length 50 or less | Yes |
 | `linkedin` | the user's LinkedIn handle of length 50 or less | Yes |
-| `interests` | the user's interests of length 255 or less | Yes |
+| `interests` | the user's interests of length 255 or less | No |
 | `isNovice` | a boolean indicating whether or not the user is a novice | Yes |
 | `isPrivate` | a boolean indicating whether or not the user's information is private | Yes |
 | `hasLightningInterest` | a boolean indicating whether the user is interested in giving a short talk | No |

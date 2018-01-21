@@ -18,8 +18,8 @@ const osContributorValidations = {
   osContributor: ['string', 'maxLength:255']
 };
 
-const bodyRequired = ['attendee.firstName', 'attendee.lastName', 'attendee.shirtSize', 'attendee.diet', 'attendee.age', 'attendee.graduationYear', 'attendee.transportation', 'attendee.school', 'attendee.major', 'attendee.gender', 'attendee.professionalInterest', 'attendee.github', 'attendee.linkedin', 'attendee.interests', 'attendee.isNovice', 'attendee.isPrivate', 'osContributors'];
-const bodyAllowed = ['attendee.hasLightningInterest', 'attendee.phoneNumber', 'longForm', 'extraInfo', 'collaborators'];
+const bodyRequired = ['attendee.firstName', 'attendee.lastName', 'attendee.shirtSize', 'attendee.diet', 'attendee.age', 'attendee.graduationYear', 'attendee.transportation', 'attendee.school', 'attendee.major', 'attendee.gender', 'attendee.professionalInterest', 'attendee.github', 'attendee.linkedin', 'attendee.isNovice', 'attendee.isPrivate', 'osContributors'];
+const bodyAllowed = ['attendee.interests', 'attendee.hasLightningInterest', 'attendee.phoneNumber', 'longForm', 'extraInfo', 'collaborators'];
 const attendee = new Attendee();
 const bodyValidations = {
   'attendee': ['required', 'plainObject'],
