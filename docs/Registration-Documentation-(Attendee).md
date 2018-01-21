@@ -47,7 +47,7 @@ ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
-| `website` | the website url by the user of length 255 or less | Yes |
+| `info` | the extra user info length 255 or less | Yes |
 
 
 

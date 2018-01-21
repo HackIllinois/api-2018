@@ -104,7 +104,7 @@ Request.prototype.validate = function() {
   if (!this._audited) {
     this.audit();
   }
-  if (!this.marshalled) {
+  if (!this._marshalled) {
     this.marshal();
   }
 
