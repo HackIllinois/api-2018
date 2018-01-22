@@ -125,8 +125,16 @@ function createAttendee(req, res, next) {
   req = _deleteExtraAttendeeParams(req);
 
   services.RegistrationService.createAttendee(req.user, req.body)
-    .then((attendee) => {
+    .tap((attendee) => {
       services.MailService.addToList(req.user, config.mail.lists.applicants);
+
+      const substitutions = {
+        name: attendee.firstName,
+        isDevelopment: config.isDevelopment
+      };
+      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+    })
+    .then((attendee) => {
       res.body = attendee.toJSON();
 
       return next();

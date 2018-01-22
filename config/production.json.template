@@ -69,6 +69,7 @@
     "templates": {
       "acceptance": "acceptance",
       "passwordReset": "password_reset",
+      "registrationConfirmation": "registration_confirmation",
       "test": "test"
     }
   },

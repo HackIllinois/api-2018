@@ -128,7 +128,7 @@ function send(recipients, template, substitutions) {
 })
 		.then(() =>
 			// get rid of the transmission response
-     true)
+     _Promise.resolve(true))
 		.catch(_handleClientError);
 }
 
