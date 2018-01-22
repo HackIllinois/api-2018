@@ -129,7 +129,7 @@ function createAttendee(req, res, next) {
       services.MailService.addToList(req.user, config.mail.lists.applicants);
 
       const substitutions = {
-        name: attendee.firstName,
+        name: attendee..get('firstName'),
         isDevelopment: config.isDevelopment
       };
       return services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
