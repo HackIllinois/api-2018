@@ -6,7 +6,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('ctx').config();
 const errors = require('../errors');
 
 const attendeeQueryCategories = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
@@ -50,7 +50,6 @@ function _deleteExtraAttendeeParams(req) {
   delete req.body.attendee.reviewer;
   delete req.body.attendee.reviewTime;
   delete req.body.attendee.acceptedEcosystemId;
-  delete req.body.attendee.acceptanceType;
   return req;
 }
 
@@ -126,8 +125,16 @@ function createAttendee(req, res, next) {
   req = _deleteExtraAttendeeParams(req);
 
   services.RegistrationService.createAttendee(req.user, req.body)
+    .tap((attendee) => {
+      services.MailService.addToList(req.user, config.mail.lists.applicants);
+
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+    })
     .then((attendee) => {
-      services.MailService.addToList(req.user, mail.lists.applicants);
       res.body = attendee.toJSON();
 
       return next();
@@ -164,6 +171,13 @@ function updateAttendeeByUser(req, res, next) {
   services.RegistrationService
     .findAttendeeByUser(req.user)
     .then((attendee) => services.RegistrationService.updateAttendee(attendee, req.body))
+    .tap((attendee) => {
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+    })
     .then((attendee) => {
       res.body = attendee.toJSON();
       delete res.body.reviewer;
@@ -308,7 +322,6 @@ function fetchAttendeeForHost(req, res, next) {
       res.body.diet = attendee.get('diet');
       res.body.status = attendee.get('status');
       res.body.school = attendee.get('school');
-      res.body.acceptanceType = attendee.get('acceptanceType');
       res.body.acceptedEcosystemId = attendee.get('acceptedEcosystemId');
 
       return next();

@@ -2,9 +2,9 @@ const express = require('express');
 const requid = require('cuid');
 const helmet = require('helmet');
 
-const config = require('./api/config');
-const database = require('./api/database'); // eslint-disable-line no-unused-vars
-const logger = require('./api/logging');
+const ctx = require('ctx');
+const config = ctx.config();
+const logger = ctx.logger();
 
 // the dirname is local to every module, so we expose the app root's cwd
 // here (before initializing the api)

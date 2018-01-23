@@ -9,7 +9,7 @@ module.exports = function(Request) {
     }
 
     const request = new Request(req.headers, req.body);
-    request.validate()
+    return request.validate()
       .then(() => {
         req.body = request.body();
 

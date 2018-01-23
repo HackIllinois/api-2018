@@ -1,14 +1,14 @@
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
-const database = require('../../database');
+const ctx = require('ctx');
+const database = ctx.database();
 const knex = database.connection();
 
 const Stat = require('../models/Stat');
 const Attendee = require('../models/Attendee');
 const AttendeeRSVP = require('../models/AttendeeRSVP');
 const CheckIn = require('../models/CheckIn');
-const AttendeeEcosystemInterest = require('../models/AttendeeEcosystemInterest');
 const TrackedEvent = require('../models/TrackingEvent');
 
 const utils = require('../utils');
@@ -63,70 +63,6 @@ function _populateStatsField(key, stats) {
   };
 }
 
-/**
- * Queries Attendee ecosystems interests and performs a callback on the results
- * @param  {Function} cb the function to process the query results with
- * @return {Promise} resolving to the return value of the callback
- */
-function _populateEcosystems(cb) {
-  return AttendeeEcosystemInterest.query((qb) => {
-    qb.select('e.name')
-        .count('ecosystem_id as count')
-        .from('attendee_ecosystem_interests as aei')
-        .innerJoin('ecosystems as e', 'e.id', 'aei.ecosystem_id')
-        .groupBy('aei.ecosystem_id');
-  })
-    .fetchAll()
-    .then(cb);
-}
-
-/**
- * Queries (attending) Attendee ecosystems interests and performs a callback on the results
- * Attending is defined as a ACCEPTED status and is_attending RSVP
- * @param  {Function} cb the function to process the query results with
- * @return {Promise} resolving to the return value of the callback
- */
-function _populateAttendingEcosystems(cb) {
-  return Attendee.query((qb) => {
-    qb.select('e.name')
-        .count('a.accepted_ecosystem_id as count')
-        .from('attendees as a')
-        .innerJoin('ecosystems as e', function() {
-          this.on('e.id', '=', 'a.accepted_ecosystem_id')
-            .andOn('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]));
-        })
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('ar.attendee_id', '=', 'a.id')
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]))
-            .andOn('ar.type', '=', knex.raw('?', [ 'CONTRIBUTE' ]));
-        })
-        .groupBy('a.accepted_ecosystem_id');
-  })
-    .fetchAll()
-    .then(cb);
-}
-
-function _populateCheckedInEcosystems(cb) {
-  return Attendee.query((qb) => {
-    qb.select('e.name')
-        .count('a.accepted_ecosystem_id as count')
-        .from('attendees as a')
-        .innerJoin('ecosystems as e', function() {
-          this.on('e.id', '=', 'a.accepted_ecosystem_id')
-            .andOn('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]));
-        })
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('ar.attendee_id', '=', 'a.id')
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]))
-            .andOn('ar.type', '=', knex.raw('?', [ 'CONTRIBUTE' ]));
-        })
-        .innerJoin('checkins as ci', 'a.user_id', 'ci.user_id')
-        .groupBy('a.accepted_ecosystem_id');
-  })
-    .fetchAll()
-    .then(cb);
-}
-
 function _populateCheckins(cb) {
   return CheckIn.query((qb) => {
     qb.count('id as count');
@@ -137,7 +73,7 @@ function _populateCheckins(cb) {
 
 
 /**
- * Queries Attendee ecosystems interests and performs a callback on the results
+ * Queries Attendee rsvps and performs a callback on the results
  * @param  {Function} cb the function to process the query results with
  * @return {Promise} resolving to the return value of the callback
  */
@@ -154,7 +90,7 @@ function _populateRSVPs(cb) {
 
 
 /**
- * Queries Attendee ecosystems interests and performs a callback on the results
+ * Queries Attendee rsvp types interests and performs a callback on the results
  * @param  {Function} cb the function to process the query results with
  * @return {Promise} resolving to the return value of the callback
  */
@@ -273,9 +209,6 @@ module.exports.fetchRegistrationStats = () => cache.hasKey(STATS_REG_HEADER + ST
       const stats = {};
       const queries = [];
 
-      const ecosystemsQuery = _populateEcosystems(_populateStats('ecosystems', stats));
-      queries.push(ecosystemsQuery);
-
       const schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
       queries.push(schoolQuery);
 
@@ -324,9 +257,6 @@ module.exports.fetchRSVPStats = () => cache.hasKey(STATS_RSVP_HEADER + STATS_CAC
       }
       const stats = {};
       const queries = [];
-
-      const attendingEcosystemsQuery = _populateAttendingEcosystems(_populateStats('ecosystems', stats));
-      queries.push(attendingEcosystemsQuery);
 
       const attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
       queries.push(attendingSchoolQuery);
@@ -379,9 +309,6 @@ module.exports.fetchLiveEventStats = () => cache.hasKey(STATS_LIVE_HEADER + STAT
 
       const checkIns = _populateCheckins(_populateStatsField('checkins', stats));
       queries.push(checkIns);
-
-      const checkedInEcosystemsQuery = _populateCheckedInEcosystems(_populateStats('ecosystems', stats));
-      queries.push(checkedInEcosystemsQuery);
 
       const trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
       queries.push(trackedEventQuery);

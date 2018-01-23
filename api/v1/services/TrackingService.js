@@ -2,8 +2,8 @@ const CheckitError = require('checkit').Error;
 const _ = require('lodash');
 const _Promise = require('bluebird');
 
-const cache = require('../../cache')
-  .instance();
+const ctx = require('ctx');
+const cache = ctx.cache().instance();
 const TrackingItem = require('../models/TrackingEvent');
 const errors = require('../errors');
 const utils = require('../utils');

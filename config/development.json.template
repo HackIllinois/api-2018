@@ -7,7 +7,8 @@
     "github": {
       "id": null,
       "secret": null,
-      "useragent": "HackIllinois"
+      "useragent": "HackIllinois",
+      "mobileRedirect": "https://hackillinois.org/auth/mobile"
     },
     "headers": {
       "all": "Authorization",
@@ -68,6 +69,8 @@
     "templates": {
       "acceptance": "acceptance",
       "passwordReset": "password_reset",
+      "registrationConfirmation": "registration_confirmation",
+      "registrationUpdate": "registration_update",
       "test": "test"
     }
   },
@@ -97,5 +100,9 @@
       "DEFAULT": "7d",
       "AUTH": "7d"
     }
+  },
+  "limit": {
+    "count": 50,
+    "window": 60
   }
 }
