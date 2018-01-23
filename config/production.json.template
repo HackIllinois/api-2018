@@ -85,7 +85,7 @@
     "port": 6379
   },
   "storage": {
-    "bucketExtension": "",
+    "bucketExtension": "-2018",
     "buckets": {
       "resumes": "hackillinois-resumes"
     }
