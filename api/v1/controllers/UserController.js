@@ -54,7 +54,10 @@ function getAuthenticatedUser(req, res, next) {
   services.UserService
     .findUserById(req.user.get('id'))
     .then((user) => {
-      res.body = user.toJSON();
+      res.body = {
+        user: user.toJSON(),
+        roles: user.related('roles').toJSON()
+      };
 
       return next();
     })
