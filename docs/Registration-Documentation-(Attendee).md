@@ -47,7 +47,7 @@ ExtraInfo Parameters <br />
 
 | Parameter        | Description           | Required  |
 | ---------------- | --------------------- | --------- |
-| `info` | the extra user info length 255 or less | Yes |
+| `info` | the extra user info length 16383 or less | Yes |
 
 
 

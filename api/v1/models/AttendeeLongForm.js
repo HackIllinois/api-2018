@@ -4,7 +4,7 @@ const AttendeeLongForm = Model.extend({
   idAttribute: 'id',
   validations: {
     attendeeId: ['required', 'integer'],
-    info: ['required', 'string', 'maxLength:255']
+    info: ['required', 'string', 'maxLength:16383']
   }
 });
 
