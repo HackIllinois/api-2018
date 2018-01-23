@@ -171,6 +171,13 @@ function updateAttendeeByUser(req, res, next) {
   services.RegistrationService
     .findAttendeeByUser(req.user)
     .then((attendee) => services.RegistrationService.updateAttendee(attendee, req.body))
+    .tap((attendee) => {
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+    })
     .then((attendee) => {
       res.body = attendee.toJSON();
       delete res.body.reviewer;
