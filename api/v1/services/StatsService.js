@@ -23,6 +23,10 @@ module.exports.createStat = function (category, stat, field) {
   return Stat.create(category, stat, field);
 };
 
+module.exports.statExists = function (category, stat, field) {
+  return Stat.exists(category, stat, field);
+};
+
 module.exports.find = function (category, stat, field) {
   return Stat.where({
     category: category,

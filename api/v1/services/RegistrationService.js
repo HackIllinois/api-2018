@@ -339,6 +339,8 @@ module.exports.createAttendee = (user, attributes) => {
         throw new errors.InvalidParameterError(message, source);
       }
 
+      // TODO: UPDATE ALL REGISTRATION STATS HERE
+
       return Attendee.transaction((t) => UserRole
         .addRole(user, utils.roles.ATTENDEE, true, t)
         .then(() => _saveWithRelated(attendee, attributes, t)));

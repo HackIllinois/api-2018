@@ -12,6 +12,7 @@ const assert = chai.assert;
 // const expect = chai.expect;
 const tracker = require('mock-knex').getTracker();
 
+const expect = chai.expect;
 
 describe('StatService', () => {
   describe('increment', () => {
@@ -59,6 +60,56 @@ describe('StatService', () => {
 
     after((done) => {
       _createStat.restore();
+      done();
+    });
+  });
+
+  describe('exists', () => {
+    let _existsStat;
+    let testStat;
+
+    before((done) => {
+      testStat = { category: 'registration', stat: 'testStat', field: 'testField' };
+      StatService.createStat(
+        testStat.category,
+        testStat.stat,
+        testStat.field
+      );
+      _existsStat = sinon.spy(Stat, 'exists');
+      done();
+    });
+
+    beforeEach((done) => {
+      tracker.install();
+      done();
+    });
+
+    afterEach((done) => {
+      tracker.uninstall();
+      done();
+    });
+
+    it('checks if stat exists', (done) => {
+      const testStatClone = _.clone(testStat);
+ 
+      tracker.on('query', (query) => {
+        query.response([ { 'count(*)': 1 } ]);
+      });
+
+      const stat = StatService.statExists(
+        testStatClone.category,
+        testStatClone.stat,
+        testStatClone.field
+      );
+
+      assert(_existsStat.calledOnce, 'Stat exists not called with right parameters');
+      expect(stat)
+      .to.eventually.equal(true)
+      .and.notify(done);
+    });
+
+    after((done) => {
+      _existsStat.restore();
       done();
     });
   });

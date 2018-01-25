@@ -8,7 +8,6 @@ CREATE TABLE `stats` (
   CONSTRAINT `fk_unique_stats` UNIQUE (`category`, `stat`, `field`)
 );
 
-# ecosystems
 # schools
 # graduation year
 # major

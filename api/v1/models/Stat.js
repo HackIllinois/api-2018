@@ -1,4 +1,4 @@
-//const _Promise = require('bluebird');
+const _Promise = require('bluebird');
 const _ = require('lodash');
 
 const Model = require('./Model');
@@ -16,6 +16,23 @@ const Stat = Model.extend({
     count: ['required', 'integer'] // Change to default 0?
   }
 });
+
+/**
+ * Return true if the stat exists, false otherwise.
+ * @param {String} category
+ * @param {String} stat
+ * @param {String} field
+ * @return {Promise<boolean>} a Promise boolean, true if stat exists, false otherwise
+ */
+Stat.exists = (category, stat, field) => {
+  const s = Stat.where({
+    category: category,
+    stat: stat,
+    field: field
+  }).query().count().then((count) => _Promise.resolve(count[0]['count(*)'] > 0));
+
+  return s;
+};
 
 /**
  * Adds a row with category `category`, stat `stat`, and field `field`.
