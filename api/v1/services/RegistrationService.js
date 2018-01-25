@@ -331,7 +331,11 @@ module.exports.createAttendee = (user, attributes) => {
   StatsService.incrementStat('registration', 'shirt_size', attributes.attendee.shirtSize);
   StatsService.incrementStat('registration', 'gender', attributes.attendee.gender);
   StatsService.incrementStat('registration', 'is_novice', attributes.attendee.isNovice);
+  StatsService.incrementStat('registration', 'status', attributes.attendee.status);
   StatsService.incrementStat('registration', 'attendees', 'count');
+  StatsService.incrementStat('registration', 'school', attributes.attendee.school);
+  StatsService.incrementStat('registration', 'graduation_year', attributes.attendee.graduationYear);
+  StatsService.incrementStat('registration', 'major', attributes.attendee.major);
 
   const attendeeAttrs = attributes.attendee;
   delete attributes.attendee;

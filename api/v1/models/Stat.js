@@ -73,8 +73,15 @@ Stat.increment = (category, stat, field, amount) => {
   }).fetch();
 
   return s.then((model) => {
+    if(model == null) {
+      return Stat.create(category, stat, String(field)).then((createdModel) => {
+        createdModel.set('count', createdModel.get('count') + amount);
+        return createdModel.save(); 
+      });
+    } 
     model.set('count', model.get('count') + amount);
     return model.save();
+    
   }).catch(() => null);
 };
 
