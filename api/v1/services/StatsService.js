@@ -36,7 +36,7 @@ module.exports.find = function (category, stat, field) {
 };
 
 module.exports.incrementStat = function (category, stat, field) {
-  return () => Stat.increment(category, stat, field);
+  return Stat.increment(category, stat, field);
 };
 
 /**

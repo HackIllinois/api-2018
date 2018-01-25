@@ -13,6 +13,8 @@ const MailService = require('../services/MailService');
 const errors = require('../errors');
 const utils = require('../utils');
 
+const StatsService = require('../services/StatsService');
+
 /**
  * Persists (insert or update) a model instance and creates (insert only) any
  * related models as provided by the related mapping. Use #extractRelatedObjects
@@ -324,6 +326,13 @@ module.exports.createAttendee = (user, attributes) => {
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
+  StatsService.incrementStat('registration', 'transportation', attributes.attendee.transportation);
+  StatsService.incrementStat('registration', 'diet', attributes.attendee.diet);
+  StatsService.incrementStat('registration', 'shirt_size', attributes.attendee.shirtSize);
+  StatsService.incrementStat('registration', 'gender', attributes.attendee.gender);
+  StatsService.incrementStat('registration', 'is_novice', attributes.attendee.isNovice);
+  StatsService.incrementStat('registration', 'attendees', 'count');
+
   const attendeeAttrs = attributes.attendee;
   delete attributes.attendee;
 
@@ -338,8 +347,6 @@ module.exports.createAttendee = (user, attributes) => {
         const source = 'userId';
         throw new errors.InvalidParameterError(message, source);
       }
-
-      // TODO: UPDATE ALL REGISTRATION STATS HERE
 
       return Attendee.transaction((t) => UserRole
         .addRole(user, utils.roles.ATTENDEE, true, t)

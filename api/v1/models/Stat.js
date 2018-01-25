@@ -65,11 +65,17 @@ Stat.increment = (category, stat, field, amount) => {
   if (_.isUndefined(amount)) {
     amount = 1;
   }
-  return Stat.query().where({
-    'category': category,
-    'stat': stat,
-    'field': field
-  }).increment('count', amount);
+
+  const s = Stat.query((qb) => {
+    qb.where('category', '=', category);
+    qb.where('stat', '=', stat);
+    qb.where('field', '=', field);
+  }).fetch();
+
+  return s.then((model) => {
+    model.set('count', model.get('count') + amount);
+    return model.save();
+  });
 };
 
 module.exports = Stat;
