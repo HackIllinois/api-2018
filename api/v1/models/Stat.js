@@ -75,7 +75,7 @@ Stat.increment = (category, stat, field, amount) => {
   return s.then((model) => {
     model.set('count', model.get('count') + amount);
     return model.save();
-  });
+  }).catch(() => null);
 };
 
 module.exports = Stat;
