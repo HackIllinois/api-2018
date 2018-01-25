@@ -132,7 +132,8 @@ function createAttendee(req, res, next) {
         name: attendee.get('firstName'),
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+      return null;
     })
     .then((attendee) => {
       res.body = attendee.toJSON();
@@ -176,7 +177,8 @@ function updateAttendeeByUser(req, res, next) {
         name: attendee.get('firstName'),
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+      return null;
     })
     .then((attendee) => {
       res.body = attendee.toJSON();
