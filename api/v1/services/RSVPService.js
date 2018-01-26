@@ -6,6 +6,9 @@ const RSVP = require('../models/AttendeeRSVP');
 const UserRole = require('../models/UserRole');
 const errors = require('../errors');
 const utils = require('../utils');
+
+const StatsService = require('../services/StatsService');
+
 /**
  * Gets an rsvp by its id
  * @param {integer} id the id of the RSVP to find
@@ -22,6 +25,17 @@ module.exports.getRSVPById = (id) => RSVP.findById(id);
  * @throws {InvalidParameterError} thrown when an attendee already has an rsvp
  */
 module.exports.createRSVP = (attendee, user, attributes) => {
+
+  StatsService.incrementStat('rsvp', 'school', attendee.get('school'));
+  StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation'));
+  StatsService.incrementStat('rsvp', 'diet', attendee.get('diet'));
+  StatsService.incrementStat('rsvp', 'shirt_size', attendee.get('shirtSize'));
+  StatsService.incrementStat('rsvp', 'gender', attendee.get('gender'));
+  StatsService.incrementStat('rsvp', 'graduation_year', attendee.get('graduationYear'));
+  StatsService.incrementStat('rsvp', 'major', attendee.get('major'));
+  StatsService.incrementStat('rsvp', 'is_novice', attendee.get('isNovice'));
+
+
   attributes.attendeeId = attendee.get('id');
   const rsvp = RSVP.forge(attributes);
 
