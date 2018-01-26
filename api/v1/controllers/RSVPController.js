@@ -4,7 +4,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('../../config');
 
 const router = require('express').Router();
 function _isAuthenticated(req) {
@@ -30,7 +30,7 @@ function createRSVP(req, res, next) {
       .createRSVP(attendee, req.user, req.body))
     .then((rsvp) => {
       if (rsvp.get('isAttending')) {
-        services.MailService.addToList(req.user, mail.lists.attendees);
+        services.MailService.addToList(req.user, config.mail.lists.attendees);
       }
       res.body = rsvp.toJSON();
 
@@ -91,10 +91,10 @@ function _updateRSVPByAttendee(user, attendee, newRSVP) {
     .then((rsvp) => services.RSVPService.updateRSVP(user, rsvp, newRSVP)
       .then((updatedRSVP) => {
         if (_addToList(rsvp, newRSVP)) {
-          services.MailService.addToList(user, mail.lists.attendees);
+          services.MailService.addToList(user, config.mail.lists.attendees);
         }
         if (_removeFromList(rsvp, newRSVP)) {
-          services.MailService.removeFromList(user, mail.lists.attendees);
+          services.MailService.removeFromList(user, config.mail.lists.attendees);
         }
 
         return updatedRSVP;
