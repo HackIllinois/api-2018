@@ -5,6 +5,7 @@ const NetworkCredential = require('../models/NetworkCredential');
 const errors = require('../errors');
 const utils = require('../utils');
 
+const StatsService = require('../services/StatsService');
 
 /**
  * Finds a CheckIn by User ID
@@ -60,6 +61,8 @@ module.exports.updateCheckIn = (attributes) => module.exports.findCheckInByUserI
 module.exports.createCheckIn = (attributes) => {
   const credentialsRequested = attributes.credentialsRequested;
   delete attributes.credentialsRequested;
+
+  StatsService.incrementStat('liveevent', 'attendees', 'count');
 
   return CheckIn.transaction((t) => new CheckIn(attributes)
       .save(null, {

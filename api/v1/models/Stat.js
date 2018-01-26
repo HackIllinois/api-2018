@@ -4,7 +4,7 @@ const _ = require('lodash');
 const Model = require('./Model');
 const validators = require('../utils/validators');
 
-const CATEGORIES = ['registration', 'rsvp', 'live-event'];
+const CATEGORIES = ['registration', 'rsvp', 'liveevent'];
 
 const Stat = Model.extend({
   tableName: 'stats',
