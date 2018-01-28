@@ -36,8 +36,59 @@ module.exports.find = function (category, stat, field) {
 };
 
 module.exports.incrementStat = function (category, stat, field) {
+  cache.hasKey(STATS_CACHE_KEY).then((hasKey) => {
+    if (!hasKey) {
+      _resetCachedStat().then(() => _incrementCachedStat(category, stat, field));
+    } else {
+      _incrementCachedStat(category, stat, field);
+    }
+  });
   return Stat.increment(category, stat, field);
 };
+
+function _resetCachedStat() {
+  stats = {};
+  stats['registration'] = {};
+  stats['registration']['school'] = {};
+  stats['registration']['transportation'] = {};
+  stats['registration']['diet'] = {};
+  stats['registration']['shirtSize'] = {};
+  stats['registration']['gender'] = {};
+  stats['registration']['graduationYear'] = {};
+  stats['registration']['isNovice'] = {};
+  stats['registration']['status'] = {};
+  stats['registration']['major'] = {};
+  stats['registration']['attendees'] = {};
+  stats['rsvp'] = {};
+  stats['rsvp']['school'] = {};
+  stats['rsvp']['transportation'] = {};
+  stats['rsvp']['diet'] = {};
+  stats['rsvp']['shirtSize'] = {};
+  stats['rsvp']['gender'] = {};
+  stats['rsvp']['graduationYear'] = {};
+  stats['rsvp']['isNovice'] = {};
+  stats['rsvp']['major'] = {};
+  stats['rsvp']['attendees'] = {};
+  stats['liveevent'] = {};
+  stats['liveevent']['attendees'] = {};
+  return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
+}
+
+function _incrementCachedStat(category, stat, field) {
+  cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+    if(stats[category] == null) {
+      stats[category] = {};
+    }
+    if(stats[category][stat] == null) {
+      stats[category][stat] = {};
+    }
+    if(stats[category][stat][field] == null) {
+      stats[category][stat][field] = 0;
+    }
+    stats[category][stat][field] += 1;
+    return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
+  });
+}
 
 /**
  * Returns a function that takes a query result and populates a stats object

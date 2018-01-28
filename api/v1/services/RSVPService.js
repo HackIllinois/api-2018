@@ -34,6 +34,7 @@ module.exports.createRSVP = (attendee, user, attributes) => {
   StatsService.incrementStat('rsvp', 'graduation_year', attendee.get('graduationYear'));
   StatsService.incrementStat('rsvp', 'major', attendee.get('major'));
   StatsService.incrementStat('rsvp', 'is_novice', attendee.get('isNovice'));
+  StatsService.incrementStat('rsvp', 'attendees', 'count');
 
 
   attributes.attendeeId = attendee.get('id');
