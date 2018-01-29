@@ -8,6 +8,8 @@ const TrackingItem = require('../models/TrackingEvent');
 const errors = require('../errors');
 const utils = require('../utils');
 
+const StatsService = require('../services/StatsService');
+
 const TRACKING_NAMESPACE = 'utracking_';
 const TRACKED_EVENT = 'trackedEvent';
 
@@ -55,6 +57,7 @@ module.exports.createTrackingEvent = (attributes) => {
  * @throws {InvalidParameterError} when an attendee has already participated in an event
  */
 module.exports.addEventParticipant = (participantId) => {
+  
   let currentEvent;
   return cache.getAsync(TRACKED_EVENT)
     .then((result) => {
@@ -65,6 +68,8 @@ module.exports.addEventParticipant = (participantId) => {
       }
 
       currentEvent = result;
+
+      StatsService.incrementStat('liveevent', 'events', currentEvent);
 
       return cache.getAsync(TRACKING_NAMESPACE + participantId);
     })

@@ -1,6 +1,7 @@
 const _Promise = require('bluebird');
 
 const Stat = require('../models/Stat');
+const TrackingEvent = require('../models/TrackingEvent');
 
 const utils = require('../utils');
 const cache = utils.cache;
@@ -40,7 +41,11 @@ module.exports.incrementStat = function (category, stat, field) {
       _incrementCachedStat(category, stat, field);
     }
   });
-  return Stat.increment(category, stat, field);
+  if(category == 'liveevent' && category == 'events') {
+    return new _Promise();
+  } else {
+    return Stat.increment(category, stat, field);
+  }
 };
 
 function _resetCachedStat() {
@@ -68,6 +73,7 @@ function _resetCachedStat() {
   stats['rsvp']['attendees'] = {};
   stats['liveevent'] = {};
   stats['liveevent']['attendees'] = {};
+  stats['liveevent']['events'] = {};
   return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
 }
 
@@ -214,6 +220,12 @@ function _readStatsFromDatabase() {
     queries.push(_findAll('liveevent', 'attendees').then((collection) => {
       collection.forEach((model) => {
         stats['liveevent']['attendees'][model.get('field')] = model.get('count');
+      });
+    }));
+
+    queries.push(TrackingEvent.findAll().then((collection) => {
+      collection.forEach((model) => {
+        stats['liveevent']['events'][model.get('name')] = model.get('count');
       });
     }));
 

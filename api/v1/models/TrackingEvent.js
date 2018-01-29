@@ -17,4 +17,10 @@ TrackingEvent.findByName = function(searchName) {
     .fetch();
 };
 
+TrackingEvent.findAll = function() {
+  return TrackingEvent.where({
+
+  }).fetchAll();
+}
+
 module.exports = TrackingEvent;
