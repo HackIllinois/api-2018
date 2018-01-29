@@ -47,11 +47,6 @@ function getLiveEventStats(req, res, next) {
     .catch((error) => next(error));
 }
 
-function testStats(req, res, next) {
-  StatsService.testStats();
-  return next();
-}
-
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
@@ -60,7 +55,6 @@ router.get('/all', middleware.permission(roles.ORGANIZERS), getAllStats);
 router.get('/registration', middleware.permission(roles.ORGANIZERS), getRegStats);
 router.get('/rsvp', middleware.permission(roles.ORGANIZERS), getRSVPStats);
 router.get('/live', middleware.permission(roles.ORGANIZERS), getLiveEventStats);
-router.get('/test', middleware.permission(roles.ORGANIZERS), testStats);
 
 router.use(middleware.response);
 router.use(middleware.errors);

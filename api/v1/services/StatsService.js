@@ -100,8 +100,8 @@ function _incrementCachedStat(category, stat, field) {
 }
 
 function _readStatsFromDatabase() {
-  _resetCachedStat().then(() => {
-    cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+  return _resetCachedStat().then(() => {
+    return cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
 
       const queries = [];
       
@@ -379,150 +379,39 @@ function _populateTrackedEvents(cb) {
  * Fetches the current stats, requerying them if not cached
  * @return {Promise<Object>}	resolving to key-value pairs of stats
  */
-module.exports.fetchAllStats = () => {
-  const stats = {};
-  stats.registrationStats = {};
-  stats.rsvpStats = {};
-  stats.liveEventStats = {};
+function _fetchAllStats() {
 
-  return module.exports.fetchRegistrationStats()
-    .then((regstats) => {
-      stats.registrationStats = regstats;
-      return module.exports.fetchRSVPStats();
-    })
-    .then((rsvpstats) => {
-      stats.rsvpStats = rsvpstats;
-      return module.exports.fetchLiveEventStats();
-    })
-    .then((livestats) => {
-      stats.liveEventStats = livestats;
-      return stats;
-    });
+  return cache.hasKey(STATS_CACHE_KEY).then((hasKey) => {
+    if (!hasKey) {
+      return _readStatsFromDatabase().then(() => {
+        return cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+          return stats;
+        });
+      })
+    } else {
+      return cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+        return stats;
+      });
+    }
+  });
 };
 
-module.exports.fetchRegistrationStats = () => cache.hasKey(STATS_REG_HEADER + STATS_CACHE_KEY)
-    .then((hasKey) => {
-      if (hasKey) {
-        return cache.getString(STATS_REG_HEADER + STATS_CACHE_KEY)
-          .then((object) => JSON.parse(object));
-      }
-      const stats = {};
-      const queries = [];
+module.exports.fetchAllStats = _fetchAllStats;
 
-      const schoolQuery = _populateAttendeeAttribute('school', _populateStats('school', stats));
-      queries.push(schoolQuery);
+module.exports.fetchRegistrationStats = function() {
+  return _fetchAllStats().then((stats) => {
+    return stats['registration'];
+  });
+};
 
-      const transportationQuery = _populateAttendeeAttribute('transportation', _populateStats('transportation', stats));
-      queries.push(transportationQuery);
+module.exports.fetchRSVPStats = function() {
+  return _fetchAllStats().then((stats) => {
+    return stats['rsvp'];
+  });
+};
 
-      const dietQuery = _populateAttendeeAttribute('diet', _populateStats('diet', stats));
-      queries.push(dietQuery);
-
-      const shirtSizeQuery = _populateAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-      queries.push(shirtSizeQuery);
-
-      const genderQuery = _populateAttendeeAttribute('gender', _populateStats('gender', stats));
-      queries.push(genderQuery);
-
-      const graduationYearQuery = _populateAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-      queries.push(graduationYearQuery);
-
-      const majorQuery = _populateAttendeeAttribute('major', _populateStats('major', stats));
-      queries.push(majorQuery);
-
-      const isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-      queries.push(isNoviceQuery);
-
-      const attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
-      queries.push(attendeeQuery);
-
-      const statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
-      queries.push(statusQuery);
-
-      return _Promise.all(queries)
-          .then(() => cache.storeString(STATS_REG_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
-              .then(() => {
-                const tenMinutesFromNow = (10 * 60);
-                return cache.expireKey(STATS_REG_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
-                  .then(() => stats);
-              }));
-
-    });
-
-module.exports.fetchRSVPStats = () => cache.hasKey(STATS_RSVP_HEADER + STATS_CACHE_KEY)
-    .then((hasKey) => {
-      if (hasKey) {
-        return cache.getString(STATS_RSVP_HEADER + STATS_CACHE_KEY)
-          .then((object) => JSON.parse(object));
-      }
-      const stats = {};
-      const queries = [];
-
-      const attendingSchoolQuery = _populateAttendingAttendeeAttribute('school', _populateStats('school', stats));
-      queries.push(attendingSchoolQuery);
-
-      const attendingTransportationQuery = _populateAttendingAttendeeAttribute('transportation', _populateStats('transportation', stats));
-      queries.push(attendingTransportationQuery);
-
-      const attendingDietQuery = _populateAttendingAttendeeAttribute('diet', _populateStats('diet', stats));
-      queries.push(attendingDietQuery);
-
-      const attendingShirtSizeQuery = _populateAttendingAttendeeAttribute('shirt_size', _populateStats('shirtSize', stats));
-      queries.push(attendingShirtSizeQuery);
-
-      const attendingGenderQuery = _populateAttendingAttendeeAttribute('gender', _populateStats('gender', stats));
-      queries.push(attendingGenderQuery);
-
-      const attendingGraduationYearQuery = _populateAttendingAttendeeAttribute('graduation_year', _populateStats('graduationYear', stats));
-      queries.push(attendingGraduationYearQuery);
-
-      const attendingMajorQuery = _populateAttendingAttendeeAttribute('major', _populateStats('major', stats));
-      queries.push(attendingMajorQuery);
-
-      const attendingIsNoviceQuery = _populateAttendingAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
-      queries.push(attendingIsNoviceQuery);
-
-      const RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
-      queries.push(RSVPsQuery);
-
-      const RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
-      queries.push(RSVPTypesQuery);
-
-      return _Promise.all(queries)
-          .then(() => cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
-              .then(() => {
-                const tenMinutesFromNow = (10 * 60);
-                return cache.expireKey(STATS_RSVP_HEADER + STATS_CACHE_KEY, tenMinutesFromNow)
-                  .then(() => stats);
-              }));
-
-    });
-
-module.exports.fetchLiveEventStats = () => cache.hasKey(STATS_LIVE_HEADER + STATS_CACHE_KEY)
-    .then((hasKey) => {
-      if (hasKey) {
-        return cache.getString(STATS_LIVE_HEADER + STATS_CACHE_KEY)
-          .then((object) => JSON.parse(object));
-      }
-      const stats = {};
-      const queries = [];
-
-      const checkIns = _populateCheckins(_populateStatsField('checkins', stats));
-      queries.push(checkIns);
-
-      const trackedEventQuery = _populateTrackedEvents(_populateStats('trackedEvents', stats));
-      queries.push(trackedEventQuery);
-
-      return _Promise.all(queries)
-          .then(() => cache.storeString(STATS_LIVE_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
-              .then(() => {
-                const oneMinuteFromNow = 60;
-                return cache.expireKey(STATS_LIVE_HEADER + STATS_CACHE_KEY, oneMinuteFromNow)
-                  .then(() => stats);
-              }));
-
-    });
-
-module.exports.testStats = function() {
-  _readStatsFromDatabase();
+module.exports.fetchLiveEventStats = function() {
+  return _fetchAllStats().then((stats) => {
+    return stats['liveevent'];
+  });
 };
