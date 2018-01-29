@@ -35,6 +35,15 @@ module.exports.find = function (category, stat, field) {
   });
 };
 
+function _findAll(category, stat) {
+  return Stat.where({
+    category: category,
+    stat: stat
+  }).fetchAll();
+};
+
+module.exports.findAll = _findAll;
+
 module.exports.incrementStat = function (category, stat, field) {
   cache.hasKey(STATS_CACHE_KEY).then((hasKey) => {
     if (!hasKey) {
@@ -87,6 +96,142 @@ function _incrementCachedStat(category, stat, field) {
     }
     stats[category][stat][field] += 1;
     return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
+  });
+}
+
+function _readStatsFromDatabase() {
+  _resetCachedStat().then(() => {
+    cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+
+      const queries = [];
+      
+      queries.push(_findAll('registration', 'school').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['school'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'transportation').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['transportation'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'diet').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['diet'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'shirt_size').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['shirtSize'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'gender').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['gender'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'graduation_year').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['graduationYear'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'is_novice').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['isNovice'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'status').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['status'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'major').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['major'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('registration', 'attendees').then((collection) => {
+        collection.forEach((model) => {
+          stats['registration']['attendees'][model.get('field')] = model.get('count');
+        });
+      }));
+
+
+      queries.push(_findAll('rsvp', 'school').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['school'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'transportation').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['transportation'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'diet').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['diet'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'shirt_size').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['shirtSize'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'gender').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['gender'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'graduation_year').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['graduationYear'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'is_novice').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['isNovice'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'major').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['major'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      queries.push(_findAll('rsvp', 'attendees').then((collection) => {
+        collection.forEach((model) => {
+          stats['rsvp']['attendees'][model.get('field')] = model.get('count');
+        });
+      }));
+
+
+      queries.push(_findAll('liveevent', 'attendees').then((collection) => {
+        collection.forEach((model) => {
+          stats['liveevent']['attendees'][model.get('field')] = model.get('count');
+        });
+      }));
+
+      return _Promise.all(queries).then(() => {
+        return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
+      });
+    
+    });
   });
 }
 
@@ -377,3 +522,7 @@ module.exports.fetchLiveEventStats = () => cache.hasKey(STATS_LIVE_HEADER + STAT
               }));
 
     });
+
+module.exports.testStats = function() {
+  _readStatsFromDatabase();
+};
