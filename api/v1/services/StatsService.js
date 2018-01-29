@@ -43,9 +43,9 @@ module.exports.incrementStat = function (category, stat, field) {
   });
   if(category == 'liveevent' && category == 'events') {
     return new _Promise();
-  } else {
-    return Stat.increment(category, stat, field);
-  }
+  } 
+  return Stat.increment(category, stat, field);
+  
 };
 
 function _resetCachedStat() {
