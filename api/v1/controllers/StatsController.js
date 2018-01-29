@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const bodyParser = require('body-parser');
 const middleware = require('../middleware');
 const router = require('express').Router();
