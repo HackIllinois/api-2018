@@ -12,6 +12,7 @@ const UserRole = require('../models/UserRole');
 const MailService = require('../services/MailService');
 const errors = require('../errors');
 const utils = require('../utils');
+const config = require('ctx').config();
 
 /**
  * Persists (insert or update) a model instance and creates (insert only) any
