@@ -66,9 +66,6 @@ module.exports.findRSVPByAttendee = (attendee) => RSVP
  * @returns {Promise} the resolved RSVP
  */
 module.exports.updateRSVP = (user, rsvp, attributes) => {
-  rsvp.set({
-    'type': null
-  });
   rsvp.set(attributes);
 
   return rsvp
