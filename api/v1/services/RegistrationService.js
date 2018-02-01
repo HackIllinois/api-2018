@@ -166,9 +166,9 @@ function _addToMailingList(attendee, decision) {
     }
 
     promises = [];
-    promises.push(MailService.addToList(user, utils.mail.lists[listName]));
+    promises.push(MailService.addToList(user, config.mail.lists[listName]));
     if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
-      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+      promises.push(MailService.addToList(user, config.mail.lists.lightningTalks));
     }
 
     return _Promise.all(promises);
@@ -179,40 +179,40 @@ function _addToMailingList(attendee, decision) {
     const newListName = 'wave' + decision.wave;
 
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
-    promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
+    promises.push(MailService.removeFromList(user, config.mail.lists[oldListName]));
+    promises.push(MailService.addToList(user, config.mail.lists[newListName]));
     return _Promise.all(promises);
   }
   // applicant accepted off of waitlist (or removed from rejected)
   else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
     const waveListName = 'wave' + decision.wave;
-    const outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    const outgoingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
 
     promises = [];
     promises.push(MailService.removeFromList(user, outgoingList));
-    promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
+    promises.push(MailService.addToList(user, config.mail.lists[waveListName]));
     if (attendee.hasLightningInterest) {
-      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+      promises.push(MailService.addToList(user, config.mail.lists.lightningTalks));
     }
     return _Promise.all(promises);
   }
   // applicant rejected off of waitlist
   else if (attendee.status === 'WAITLISTED' && decision.status === 'REJECTED') {
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
-    promises.push(MailService.addToList(user, utils.mail.lists.rejected));
+    promises.push(MailService.removeFromList(user, config.mail.lists.waitlisted));
+    promises.push(MailService.addToList(user, config.mail.lists.rejected));
     return _Promise.all(promises);
   }
   // move applicant from accepted to rejected or waitlisted
   else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
     const oldWaveName = 'wave' + attendee.wave;
-    const incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    const incomingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
 
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
+    promises.push(MailService.removeFromList(user, config.mail.lists[oldWaveName]));
     promises.push(MailService.addToList(user, incomingList));
     if (attendee.hasLightningInterest) {
-      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+      MailService.removeFromList(user, config.mail.lists.lightningTalks);
     }
 
     return _Promise.all(promises);
@@ -430,9 +430,9 @@ module.exports.updateAttendee = (attendee, attributes) => {
     if (attendee.get('status') !== 'ACCEPTED') {
       // we do not add attendees to this list until they have been accepted
     } else if (attendeeAttrs.hasLightningInterest) {
-      MailService.addToList(user, utils.mail.lists.lightningTalks);
+      MailService.addToList(user, config.mail.lists.lightningTalks);
     } else {
-      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+      MailService.removeFromList(user, config.mail.lists.lightningTalks);
     }
   }
 
