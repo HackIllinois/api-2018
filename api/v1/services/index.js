@@ -6,6 +6,7 @@ module.exports = {
   PermissionService: require('./PermissionService'),
   ProjectService: require('./ProjectService'),
   RegistrationService: require('./RegistrationService'),
+  RecruiterService: require('./RecruiterService'),
   StatsService: require('./StatsService'),
   StorageService: require('./StorageService'),
   UserService: require('./UserService'),
