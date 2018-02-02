@@ -13,6 +13,7 @@ function isRecruiter(req) {
 }
 
 function createApplication(req, res, next) {
+  console.log("create applicants");
   services.JobApplicationService
     .createApplication(req.user.get('id'), req.body.applicantId, req.body.comments, req.body.favorite)
     .then((application) => {
@@ -23,8 +24,9 @@ function createApplication(req, res, next) {
 }
 
 function getRecruitersApplicants(req, res, next) {
+  console.log("get applicants");
   services.JobApplicationService
-    .findByRecruiterId(req.user.get('id'))
+    .findByRecruiterId(req.params.id)
     .then((applications) => {
       res.body = applications.toJSON();
       return next();
@@ -34,8 +36,8 @@ function getRecruitersApplicants(req, res, next) {
 
 router.use(bodyParser.json());
 router.use(middleware.auth);
-
-router.get('/:id(\\d+)', middleware.permission(roles.ADMIN, isRecruiter), getRecruitersApplicants);
+//middleware.permission(roles.ADMIN, isRecruiter)
+router.get('/:id(\\d+)',  getRecruitersApplicants);
 router.post('/apply', middleware.request(requests.JobApplicationRequest), createApplication);
 
 router.use(middleware.response);

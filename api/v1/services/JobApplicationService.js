@@ -45,6 +45,7 @@ module.exports.createApplication = (recruiterId, applicantId, comments, favorite
   if (!favorite) {
     favorite = 0;
   }
+
   const application = JobApplication.forge({
     recruiterId: recruiterId,
     applicantId: applicantId,

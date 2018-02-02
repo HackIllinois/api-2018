@@ -1,6 +1,6 @@
 const Request = require('./Request');
 
-const bodyRequired = ['applicantId', 'comments', 'favorite'];
+const bodyRequired = ['applicantId'];
 const bodyValidations = {
   'applicantId': ['required', 'naturalNonZero'],
   'comments': ['string', 'maxLength:255'],
