@@ -1,4 +1,4 @@
-CREATE TABLE `job_applicants` (
+CREATE TABLE `job_applications` (
   `app_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `recruiter_id` INT UNSIGNED NOT NULL,
   `applicant_id` INT UNSIGNED NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE `job_applicants` (
   `created` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`app_id`),
-  CONSTRAINT `fk_applicants_recruiters_id`
+  CONSTRAINT `fk_applications_recruiters_id`
     FOREIGN KEY (`recruiter_id`)
     REFERENCES `users` (`id`)
     ON DELETE NO ACTION
