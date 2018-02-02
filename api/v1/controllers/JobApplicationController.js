@@ -13,7 +13,7 @@ function isRecruiter(req) {
 }
 
 function createApplication(req, res, next) {
-  services.JobApplicantService
+  services.JobApplicationService
     .createApplication(req.user.get('id'), req.body.applicantId, req.body.comments, req.body.favorite)
     .then((application) => {
       res.body = application.toJSON();
@@ -23,7 +23,7 @@ function createApplication(req, res, next) {
 }
 
 function getRecruitersApplicants(req, res, next) {
-  services.JobApplicantService
+  services.JobApplicationService
     .findByRecruiterId(req.user.get('id'))
     .then((applications) => {
       res.body = applications.toJSON();

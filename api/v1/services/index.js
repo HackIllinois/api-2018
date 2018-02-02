@@ -5,7 +5,7 @@ module.exports = {
   MailService: require('./MailService'),
   PermissionService: require('./PermissionService'),
   ProjectService: require('./ProjectService'),
-  JobApplicantService: require('./JobApplicantService'),
+  JobApplicationService: require('./JobApplicationService'),
   RegistrationService: require('./RegistrationService'),
   StatsService: require('./StatsService'),
   StorageService: require('./StorageService'),

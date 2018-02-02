@@ -1,11 +1,11 @@
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
-const JobApplicant = require('../models/JobApplicant');
+const JobApplication = require('../models/JobApplication');
 const errors = require('../errors');
 const utils = require('../utils');
 
-module.exports.findByRecruiterId = (recruiterId) => JobApplicant
+module.exports.findByRecruiterId = (recruiterId) => JobApplication
   .findByRecruiterId(recruiterId)
   .then((result) => {
     if (_.isNull(result)) {
@@ -16,7 +16,7 @@ module.exports.findByRecruiterId = (recruiterId) => JobApplicant
     return _Promise.resolve(result);
   });
 
-module.exports.findByAppId = (appId) => JobApplicant
+module.exports.findByAppId = (appId) => JobApplication
   .findByRecruiterId(appId)
   .then((result) => {
     if (_.isNull(result)) {
@@ -27,7 +27,7 @@ module.exports.findByAppId = (appId) => JobApplicant
     return _Promise.resolve(result);
   });
 
-module.exports.findByApplicantId = (applicantId) => JobApplicant
+module.exports.findByApplicantId = (applicantId) => JobApplication
   .findByApplicantId(applicantId)
   .then((result) => {
     if (_.isNull(result)) {
@@ -45,7 +45,7 @@ module.exports.createApplication = (recruiterId, applicantId, comments, favorite
   if (!favorite) {
     favorite = 0;
   }
-  const application = JobApplicant.forge({
+  const application = JobApplication.forge({
     recruiterId: recruiterId,
     applicantId: applicantId,
     comments: comments,
