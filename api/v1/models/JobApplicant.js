@@ -1,13 +1,30 @@
 const Model = require('./Model');
 
 const JobApplicant = Model.extend({
-  tableName: 'job_applicants'
+  tableName: 'job_applicants',
   hasTimestamps: ['created', 'updated'],
   validations: {
-    attendee_id: ['required', 'int'],
+    appId: ['required', 'int'],
+    recruiterId: ['required', 'int'],
+    applicantId: ['required', 'int'],
     comments: ['string'],
-    ratings: ['int']
-  },
+    favorite: ['int']
+  }
 });
+
+JobApplicant.findById = (id) => JobApplicant.where({
+  app_id: id
+})
+  .fetch();
+
+JobApplicant.findByRecruiterId = (id) => JobApplicant.where({
+  recruiter_id: id
+})
+  .fetch();
+
+JobApplicant.findByApplicantId = (id) => JobApplicant.where({
+  applicant_id: id
+})
+  .fetch();
 
 module.export = JobApplicant;

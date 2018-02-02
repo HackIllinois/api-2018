@@ -8,6 +8,7 @@ module.exports = {
   EventCreationRequest: require('./EventCreationRequest'),
   LocationCreationRequest: require('./LocationCreationRequest'),
   MentorRequest: require('./MentorRequest'),
+  JobApplicationRequest: require('./JobApplicationRequest'),
   ProjectRequest: require('./ProjectRequest'),
   ProjectMentorRequest: require('./ProjectMentorRequest'),
   ResetTokenRequest: require('./ResetTokenRequest'),
