@@ -4,8 +4,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const ctx = require('ctx');
-const config = ctx.config();
+const config = require('ctx').config();
 
 const router = require('express').Router();
 function _isAuthenticated(req) {
