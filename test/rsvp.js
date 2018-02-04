@@ -39,8 +39,7 @@ describe('RSVPService', () => {
       testRSVP = {
         'id': 1,
         'attendeeId': 1,
-        'isAttending': true,
-        'type': 'CREATE'
+        'isAttending': true
       };
 
       _forgeRSVP = sinon.spy(AttendeeRSVP, 'forge');
@@ -69,13 +68,6 @@ describe('RSVPService', () => {
         return done();
       }).catch((err) => done(err));
     });
-    it('throws an error for an RSVP in which the type is not present when expected', (done) => {
-      const testRSVPClone = _.clone(testRSVP);
-      delete testRSVPClone.type;
-
-      const RSVP = RSVPService.createRSVP(testAttendee, testUser, testRSVPClone);
-      expect(RSVP).to.eventually.be.rejectedWith(errors.InvalidParameterError).and.notify(done);
-    });
     afterEach((done) => {
       tracker.uninstall();
       done();
@@ -98,8 +90,7 @@ describe('RSVPService', () => {
       const testRSVP = AttendeeRSVP.forge({
         'id': 100,
         'attendeeId': 1,
-        'isAttending': true,
-        'type': 'CREATE'
+        'isAttending': true
       });
 
       _findByAttendeeId = sinon.stub(AttendeeRSVP, 'findByAttendeeId');
@@ -142,13 +133,11 @@ describe('RSVPService', () => {
       testRSVP = {
         'id': 100,
         'attendeeId': 1,
-        'isAttending': true,
-        'type': 'CREATE'
+        'isAttending': true
       };
       testAttendeeRSVP = AttendeeRSVP.forge();
 
       testRSVP.isAttending = false;
-      delete testRSVP.type;
 
       _setRSVP = sinon.spy(AttendeeRSVP.prototype, 'set');
       _saveRSVP = sinon.spy(AttendeeRSVP.prototype, 'save');
@@ -167,13 +156,12 @@ describe('RSVPService', () => {
       });
 
       const RSVP = RSVPService.updateRSVP(testUser, testAttendeeRSVP, testRSVPClone);
-      RSVP.bind(this).then(function() {
+      RSVP.bind(this).then(() => {
         assert(_setRSVP.calledOnce, 'RSVP update not called with right parameters');
         assert(_saveRSVP.calledOnce, 'RSVP save not called');
 
         _attendeeRole = testUser.getRole(utils.roles.ATTENDEE);
         assert(!_attendeeRole.get('active'), 'Role is not unset when attendance is revoked');
-        assert(!this.type, 'Type is not removed when attendance is revoked');
 
         return done();
       }).catch((err) => done(err));
