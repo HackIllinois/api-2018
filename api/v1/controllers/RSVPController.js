@@ -8,7 +8,10 @@ const config = require('ctx').config();
 
 const router = require('express').Router();
 function _isAuthenticated(req) {
-  return req.auth && (req.user !== undefined);
+  if(!(req.auth && (req.user !== undefined))) {
+    return false;
+  }
+  return services.RegistrationService.findAttendeeByUser(req.user).then((attendee) => attendee != null && attendee.get('status') == 'ACCEPTED');
 }
 
 function _removeFromList(rsvpCurrent, rsvpNew) {
