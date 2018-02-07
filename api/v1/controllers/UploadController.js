@@ -12,6 +12,7 @@ const errors = require('../errors');
 const middleware = require('../middleware');
 const services = require('../services');
 const utils = require('../utils');
+const roles = require('../utils/roles');
 
 const Upload = require('../models/Upload');
 const UploadRequest = require('../requests/UploadRequest');
@@ -34,6 +35,10 @@ function _findUpload(req, res, next) {
 
 function _isOwner(req) {
   return req.upload.get('ownerId') === req.user.get('id');
+}
+
+function _allowInactiveNonProfessional(req) {
+  return req.user.hasRoles(roles.NON_PROFESSIONALS, false);
 }
 
 function _makeFileParams(req) {
@@ -105,7 +110,7 @@ router.use(bodyParser.raw({
 }));
 
 router.post('/resume/', middleware.request(UploadRequest), middleware.upload,
-  middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+  middleware.permission(utils.roles.NON_PROFESSIONALS, _allowInactiveNonProfessional), createResumeUpload);
 router.put('/resume/:id(\\d+)', middleware.request(UploadRequest), middleware.upload,
   _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
 router.get('/resume/:id(\\d+)', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
