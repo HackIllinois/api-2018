@@ -97,7 +97,7 @@ router.use(middleware.auth);
 
 router.post('/attendee', middleware.request(requests.RSVPRequest),
   middleware.permission(roles.ATTENDEE, _isValidUser), createRSVP);
-router.get('/attendee/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
+router.get('/attendee/', middleware.permission(roles.ATTENDEE, _isValidUser), fetchRSVPByUser);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchRSVPById);
 router.put('/attendee/', middleware.request(requests.RSVPRequest),
   middleware.permission(roles.ATTENDEE, _isValidUser), updateRSVPByUser);
