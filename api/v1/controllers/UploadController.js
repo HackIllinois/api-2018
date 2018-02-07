@@ -12,6 +12,7 @@ const errors = require('../errors');
 const middleware = require('../middleware');
 const services = require('../services');
 const utils = require('../utils');
+const roles = require('../utils/roles');
 
 const Upload = require('../models/Upload');
 const UploadRequest = require('../requests/UploadRequest');
