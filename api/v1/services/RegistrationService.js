@@ -341,7 +341,7 @@ module.exports.createAttendee = (user, attributes) => {
       }
 
       return Attendee.transaction((t) => UserRole
-        .addRole(user, utils.roles.ATTENDEE, true, t)
+        .addRole(user, utils.roles.ATTENDEE, false, t)
         .then(() => _saveWithRelated(attendee, attributes, t)));
     });
 };
