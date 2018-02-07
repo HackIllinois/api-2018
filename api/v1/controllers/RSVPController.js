@@ -7,8 +7,11 @@ const roles = require('../utils/roles');
 const config = require('ctx').config();
 
 const router = require('express').Router();
-function _isAuthenticated(req) {
-  return req.auth && (req.user !== undefined);
+function _isValidUser(req) {
+  if(!req.auth || req.user == undefined) {
+    return false;
+  }
+  return services.RegistrationService.findAttendeeByUser(req.user).then((attendee) => attendee != null && attendee.get('status') == 'ACCEPTED');
 }
 
 function _removeFromList(rsvpCurrent, rsvpNew) {
@@ -93,11 +96,11 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/attendee', middleware.request(requests.RSVPRequest),
-  middleware.permission(roles.ATTENDEE, _isAuthenticated), createRSVP);
+  middleware.permission(roles.ATTENDEE, _isValidUser), createRSVP);
 router.get('/attendee/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchRSVPById);
 router.put('/attendee/', middleware.request(requests.RSVPRequest),
-  middleware.permission(roles.ATTENDEE), updateRSVPByUser);
+  middleware.permission(roles.ATTENDEE, _isValidUser), updateRSVPByUser);
 
 router.use(middleware.response);
 router.use(middleware.errors);
