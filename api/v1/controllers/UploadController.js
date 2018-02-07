@@ -36,6 +36,10 @@ function _isOwner(req) {
   return req.upload.get('ownerId') === req.user.get('id');
 }
 
+function _allowInactiveAttendee(req) {
+  return req.user.hasRole(roles.ATTENDEE, false);
+}
+
 function _makeFileParams(req) {
   return {
     content: req.body,
@@ -105,7 +109,7 @@ router.use(bodyParser.raw({
 }));
 
 router.post('/resume/', middleware.request(UploadRequest), middleware.upload,
-  middleware.permission(utils.roles.NON_PROFESSIONALS), createResumeUpload);
+  middleware.permission(utils.roles.NON_PROFESSIONALS, _allowInactiveAttendee), createResumeUpload);
 router.put('/resume/:id(\\d+)', middleware.request(UploadRequest), middleware.upload,
   _findUpload, middleware.permission(utils.roles.NONE, _isOwner), replaceResumeUpload);
 router.get('/resume/:id(\\d+)', _findUpload, middleware.permission(utils.roles.ORGANIZERS, _isOwner), getUpload);
