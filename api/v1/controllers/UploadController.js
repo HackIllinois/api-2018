@@ -38,7 +38,7 @@ function _isOwner(req) {
 }
 
 function _allowInactiveNonProfessional(req) {
-  return req.user.hasRole(roles.NON_PROFESSIONALS, false);
+  return req.user.hasRoles(roles.NON_PROFESSIONALS, false);
 }
 
 function _makeFileParams(req) {
