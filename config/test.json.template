@@ -69,6 +69,8 @@
       "acceptance": "acceptance",
       "passwordReset": "password_reset",
       "registrationConfirmation": "registration_confirmation",
+      "rsvpConfirmation": "rsvp_confirmation",
+      "rsvpUpdate": "rsvp_update",
       "test": "test"
     }
   },

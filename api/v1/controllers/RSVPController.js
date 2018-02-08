@@ -34,6 +34,16 @@ function createRSVP(req, res, next) {
       }
       res.body = rsvp.toJSON();
 
+      services.RegistrationService
+        .findAttendeeByUser(req.user)
+        .then((attendee) => {
+          const substitutions = {
+            name: attendee.get('firstName'),
+            isDevelopment: config.isDevelopment
+          };
+          services.MailService.send(req.user.get('email'), config.mail.templates.rsvpConfirmation, substitutions);
+        });
+
       return next();
     })
     .catch((error) => next(error));
@@ -70,6 +80,16 @@ function updateRSVPByUser(req, res, next) {
     .then((attendee) => _updateRSVPByAttendee(req.user, attendee, req.body))
     .then((rsvp) => {
       res.body = rsvp.toJSON();
+
+      services.RegistrationService
+        .findAttendeeByUser(req.user)
+        .then((attendee) => {
+          const substitutions = {
+            name: attendee.get('firstName'),
+            isDevelopment: config.isDevelopment
+          };
+          services.MailService.send(req.user.get('email'), config.mail.templates.rsvpUpdate, substitutions);
+        });
 
       return next();
     })

@@ -71,6 +71,8 @@
       "passwordReset": "password_reset",
       "registrationConfirmation": "registration_confirmation",
       "registrationUpdate": "registration_update",
+      "rsvpConfirmation": "rsvp_confirmation",
+      "rsvpUpdate": "rsvp_update",
       "test": "test"
     }
   },
