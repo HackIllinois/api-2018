@@ -24,15 +24,24 @@ function _addToList(rsvpCurrent, rsvpNew) {
 
 function createRSVP(req, res, next) {
 
+  let attendeeModel;
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => services.RSVPService
-      .createRSVP(attendee, req.user, req.body))
+    .then((attendee) => {
+      attendeeModel = attendee;
+      return services.RSVPService.createRSVP(attendee, req.user, req.body);
+    })
     .then((rsvp) => {
       if (rsvp.get('isAttending')) {
         services.MailService.addToList(req.user, config.mail.lists.attendees);
       }
       res.body = rsvp.toJSON();
+
+      const substitutions = {
+        name: attendeeModel.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpConfirmation, substitutions);
 
       return next();
     })
@@ -65,11 +74,21 @@ function fetchRSVPById(req, res, next) {
 
 function updateRSVPByUser(req, res, next) {
 
+  let attendeeModel;
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => _updateRSVPByAttendee(req.user, attendee, req.body))
+    .then((attendee) => {
+      attendeeModel = attendee;
+      return _updateRSVPByAttendee(req.user, attendee, req.body);
+    })
     .then((rsvp) => {
       res.body = rsvp.toJSON();
+
+      const substitutions = {
+        name: attendeeModel.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpUpdate, substitutions);
 
       return next();
     })
