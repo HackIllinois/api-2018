@@ -26,23 +26,20 @@ function createRSVP(req, res, next) {
 
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => services.RSVPService
-      .createRSVP(attendee, req.user, req.body))
+    .then((attendee) => {
+      const rsvp = services.RSVPService.createRSVP(attendee, req.user, req.body);
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpConfirmation, substitutions);
+      return rsvp;
+    })
     .then((rsvp) => {
       if (rsvp.get('isAttending')) {
         services.MailService.addToList(req.user, config.mail.lists.attendees);
       }
       res.body = rsvp.toJSON();
-
-      services.RegistrationService
-        .findAttendeeByUser(req.user)
-        .then((attendee) => {
-          const substitutions = {
-            name: attendee.get('firstName'),
-            isDevelopment: config.isDevelopment
-          };
-          services.MailService.send(req.user.get('email'), config.mail.templates.rsvpConfirmation, substitutions);
-        });
 
       return next();
     })
@@ -77,19 +74,17 @@ function updateRSVPByUser(req, res, next) {
 
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => _updateRSVPByAttendee(req.user, attendee, req.body))
+    .then((attendee) => {
+      const rsvp = _updateRSVPByAttendee(req.user, attendee, req.body);
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpUpdate, substitutions);
+      return rsvp;
+    })
     .then((rsvp) => {
       res.body = rsvp.toJSON();
-
-      services.RegistrationService
-        .findAttendeeByUser(req.user)
-        .then((attendee) => {
-          const substitutions = {
-            name: attendee.get('firstName'),
-            isDevelopment: config.isDevelopment
-          };
-          services.MailService.send(req.user.get('email'), config.mail.templates.rsvpUpdate, substitutions);
-        });
 
       return next();
     })
