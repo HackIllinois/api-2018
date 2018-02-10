@@ -32,11 +32,22 @@ function getRecruitersApplicants(req, res, next) {
     .catch((error) => next(error));
 }
 
+function updateApplication(req, res, next) {
+  services.JobApplicationService
+    .updateApplication(req.body.appId, req.body.comments, req.body.favorite)
+    .then((application) => {
+      res.body = application.toJSON();
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.get('/:id(\\d+)', middleware.permission(roles.ADMIN, isRecruiter),  getRecruitersApplicants);
-router.post('/apply', middleware.request(requests.JobApplicationRequest), createApplication);
+router.post('/apply', middleware.request(requests.JobApplicationRequest), middleware.permission(roles.ADMIN, isRecruiter), createApplication);
+router.post('/update', middleware.request(requests.JobApplicationUpdateRequest), middleware.permission(roles.ADMIN, isRecruiter), updateApplication);
 
 router.use(middleware.response);
 router.use(middleware.errors);

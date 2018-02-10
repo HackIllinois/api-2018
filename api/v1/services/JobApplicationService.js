@@ -16,8 +16,8 @@ module.exports.findByRecruiterId = (recruiterId) => JobApplication
     return _Promise.resolve(result);
   });
 
-module.exports.findByAppId = (appId) => JobApplication
-  .findByRecruiterId(appId)
+module.exports.findByApplicationId = (appId) => JobApplication
+  .findByApplicationId(appId)
   .then((result) => {
     if (_.isNull(result)) {
       const message = 'An application with the given ID cannot be found';
@@ -58,3 +58,14 @@ module.exports.createApplication = (recruiterId, applicantId, comments, favorite
     .catch(utils.errors.handleValidationError)
     .then(() => application.save());
 };
+
+module.exports.updateApplication = (appId, comments, favorite) => JobApplication
+  .updateApplication(appId, comments, favorite)
+  .then((result) => {
+    if (_.isNull(result)) {
+      const message = 'An application with the given ID cannot be found';
+      const source = 'id';
+      throw new errors.NotFoundError(message, source);
+    }
+    return _Promise.resolve(result);
+  });
