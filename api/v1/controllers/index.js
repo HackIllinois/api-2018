@@ -14,5 +14,4 @@ module.exports = {
   StatsController: require('./StatsController.js'),
   TrackingController: require('./TrackingController.js'),
   MailController: require('./MailController.js'),
-  RoleAssignmentController: require('./RoleAssignmentController.js')
 };

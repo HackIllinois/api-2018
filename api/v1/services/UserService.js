@@ -141,13 +141,10 @@ module.exports.resetPassword = (user, password) => user
  * @return {Boolean} whether user can assign new role to assignedUser
  */
 module.exports.canAssign = (user, assignedUser, newRole, originUser) => {
-  return maxRole(user.related('roles').toJSON())
-          > ROLE_VALUE_MAP[newRole]
-      && maxRole(user.related('roles').toJSON())
-          > maxRole(assignedUser.related('roles').toJSON())
+  return maxRole(user.related('roles').toJSON()) > ROLE_VALUE_MAP[newRole]
+      && maxRole(user.related('roles').toJSON()) > maxRole(assignedUser.related('roles').toJSON())
       && _.isUndefined(originUser)
-      && (maxRole(assignedUser.related('roles').toJSON()) > 0
-        || assignedUser.hasRole(roles.VOLUNTEER));
+      && (maxRole(assignedUser.related('roles').toJSON()) > 0 || assignedUser.hasRole(roles.VOLUNTEER));
 };
 
 /**

@@ -37,7 +37,6 @@ v1.use('/stats', controllers.StatsController.router);
 v1.use('/tracking', controllers.TrackingController.router);
 v1.use('/mail', controllers.MailController.router);
 v1.use('/event', controllers.EventController.router);
-v1.use('/assign', controllers.RoleAssignmentController.router);
 
 // logs resolved requests (the request once processed by various middleware) and outgoing responses
 v1.use((req, res, next) => {

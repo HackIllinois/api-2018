@@ -8,6 +8,7 @@ const requests = require('../requests');
 const scopes = require('../utils/scopes');
 const mail = require('../utils/mail');
 const roles = require('../utils/roles');
+const errors = require('../errors');
 
 const router = require('express').Router();
 
@@ -87,6 +88,35 @@ function requestPasswordReset(req, res, next) {
     .catch((error) => next(error));
 }
 
+function assignNewRole(req, res, next) {
+  services.UserService
+    .findUserById(req.body.id)
+    .then((assignedUser) => {
+      if (services.UserService
+        .canAssign(req.user, assignedUser, req.body.role, req.originUser)) {
+
+        services.UserService.addRole(assignedUser, req.body.role, true)
+          .then(() => {
+            services.UserService
+              .findUserById(assignedUser.id)
+              .then((updatedUser) => {
+                let updatedUserJson = updatedUser.toJSON();
+                updatedUserJson.roles = updatedUser.related("roles").toJSON();
+                res.body = updatedUserJson;
+                return next();
+              })
+              .catch((error) => next(error));
+          })
+          .catch((error) => next(error));
+
+      } else {
+        return next(new errors.UnauthorizedError());
+      }
+    })
+    .catch((error) => next(error));
+}
+
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -97,6 +127,8 @@ router.post('/accredited', middleware.request(requests.AccreditedUserCreationReq
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
+router.post('/assign', middleware.request(requests.RoleAssignmentRequest), middleware.permission(roles.ORGANIZERS), assignNewRole);
+
 
 router.use(middleware.response);
 router.use(middleware.errors);
