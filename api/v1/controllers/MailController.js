@@ -6,7 +6,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('ctx').config();
 
 const router = require('express').Router();
 
@@ -14,7 +14,7 @@ const ACCEPTANCE_LISTS = ['wave1', 'wave2', 'wave3', 'wave4', 'wave5'];
 
 function sendMailinglist(req, res, next) {
   const listName = req.body.listName;
-  const mailList = mail.lists[listName];
+  const mailList = config.mail.lists[listName];
   const template = req.body.template;
 
   services.MailService.checkIfSent(mailList)

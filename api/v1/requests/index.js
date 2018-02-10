@@ -18,4 +18,5 @@ module.exports = {
   RSVPRequest: require('./RSVPRequest'),
   UniversalTrackingRequest: require('./UniversalTrackingRequest'),
   RoleAssignmentRequest: require('./RoleAssignmentRequest')
+  UserContactInfoRequest: require('./UserContactInfoRequest')
 };

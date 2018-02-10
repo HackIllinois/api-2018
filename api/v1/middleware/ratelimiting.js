@@ -1,5 +1,6 @@
-const cache = require('../../cache').instance();
-const config = require('../../config');
+const ctx = require('ctx');
+const cache = ctx.cache().instance();
+const config = ctx.config();
 
 const BruteLimiter = require('express-brute');
 

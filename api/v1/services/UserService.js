@@ -159,3 +159,12 @@ module.exports.addRole = (user, role, active) => UserRole
     .then((updatedUser) => {
       return updatedUser;
     });
+module.exports.updateContactInfo = (user, newEmail) => {
+  if(!_.isNull(user.get('password'))) {
+    const message = 'Cannot update the contact info of a Basic user';
+    const source = 'user';
+    throw new errors.UnprocessableRequestError(message, source);
+  }
+
+  return user.setContactInfo(newEmail);
+};

@@ -12,6 +12,7 @@ const UserRole = require('../models/UserRole');
 const MailService = require('../services/MailService');
 const errors = require('../errors');
 const utils = require('../utils');
+const config = require('ctx').config();
 
 /**
  * Persists (insert or update) a model instance and creates (insert only) any
@@ -166,9 +167,9 @@ function _addToMailingList(attendee, decision) {
     }
 
     promises = [];
-    promises.push(MailService.addToList(user, utils.mail.lists[listName]));
+    promises.push(MailService.addToList(user, config.mail.lists[listName]));
     if (decision.status == 'ACCEPTED' && attendee.hasLightningInterest) {
-      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+      promises.push(MailService.addToList(user, config.mail.lists.lightningTalks));
     }
 
     return _Promise.all(promises);
@@ -179,40 +180,40 @@ function _addToMailingList(attendee, decision) {
     const newListName = 'wave' + decision.wave;
 
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists[oldListName]));
-    promises.push(MailService.addToList(user, utils.mail.lists[newListName]));
+    promises.push(MailService.removeFromList(user, config.mail.lists[oldListName]));
+    promises.push(MailService.addToList(user, config.mail.lists[newListName]));
     return _Promise.all(promises);
   }
   // applicant accepted off of waitlist (or removed from rejected)
   else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
     const waveListName = 'wave' + decision.wave;
-    const outgoingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    const outgoingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
 
     promises = [];
     promises.push(MailService.removeFromList(user, outgoingList));
-    promises.push(MailService.addToList(user, utils.mail.lists[waveListName]));
+    promises.push(MailService.addToList(user, config.mail.lists[waveListName]));
     if (attendee.hasLightningInterest) {
-      promises.push(MailService.addToList(user, utils.mail.lists.lightningTalks));
+      promises.push(MailService.addToList(user, config.mail.lists.lightningTalks));
     }
     return _Promise.all(promises);
   }
   // applicant rejected off of waitlist
   else if (attendee.status === 'WAITLISTED' && decision.status === 'REJECTED') {
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists.waitlisted));
-    promises.push(MailService.addToList(user, utils.mail.lists.rejected));
+    promises.push(MailService.removeFromList(user, config.mail.lists.waitlisted));
+    promises.push(MailService.addToList(user, config.mail.lists.rejected));
     return _Promise.all(promises);
   }
   // move applicant from accepted to rejected or waitlisted
   else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
     const oldWaveName = 'wave' + attendee.wave;
-    const incomingList = (attendee.status === 'WAITLISTED') ? utils.mail.lists.waitlisted : utils.mail.lists.rejected;
+    const incomingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
 
     promises = [];
-    promises.push(MailService.removeFromList(user, utils.mail.lists[oldWaveName]));
+    promises.push(MailService.removeFromList(user, config.mail.lists[oldWaveName]));
     promises.push(MailService.addToList(user, incomingList));
     if (attendee.hasLightningInterest) {
-      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+      MailService.removeFromList(user, config.mail.lists.lightningTalks);
     }
 
     return _Promise.all(promises);
@@ -222,18 +223,15 @@ function _addToMailingList(attendee, decision) {
 }
 
 /**
- * Determines whether or not an attendee has at least one
- * project or ecosystem interest
- * @param  {Array}  projects	the projects list (or undefined)
- * @param  {Array}  ecosystemInterests the ecosystem interests list (or undefined)
+ * Returns true, since proejcts and ecosystems have been removed
  * @return {Boolean} whether or not the pairing is valid
  */
-function _hasValidAttendeeAssignment(projects, ecosystemInterests) {
-  return (!!projects && projects.length > 0) || (!!ecosystemInterests && ecosystemInterests.length > 0);
+function _hasValidAttendeeAssignment(osContributors) {
+  return !!osContributors && osContributors.length > 0;
 }
 
 /**
- * Registers a mentor and their project ideas for the given user
+ * Registers a mentor
  * @param  {Object} user the user for which a mentor will be registered
  * @param  {Object} attributes a JSON object holding the mentor attributes
  * @return {Promise<Mentor>} the mentor with related ideas
@@ -292,7 +290,7 @@ module.exports.findMentorById = (id) => Mentor.findById(id)
     });
 
 /**
- * Updates a mentor and their project ideas by relational user
+ * Updates a mentor
  * @param  {Mentor} mentor the mentor to be updated
  * @param  {Object} attributes a JSON object holding the mentor registration attributes
  * @return {Promise} resolving to an object in the same format as attributes, holding the saved models
@@ -321,9 +319,9 @@ module.exports.updateMentor = (mentor, attributes) => {
  * @throws {InvalidParameterError} when an attendee exists for the specified user
  */
 module.exports.createAttendee = (user, attributes) => {
-  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-    const message = 'One project or ecosystem interest must be provided';
-    const source = ['projects', 'ecosystemInterests'];
+  if (!_hasValidAttendeeAssignment(attributes.osContributors)) {
+    const message = 'One interest must be provided';
+    const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
@@ -410,15 +408,15 @@ module.exports.updateAttendee = (attendee, attributes) => {
   // some attendee registration attributes are optional, but we need to
   // be sure that they are at least considered for removal during adjustment
   attributes = _.merge(attributes, {
-    'ecosystemInterests': [],
-    'projects': [],
-    'extras': [],
-    'collaborators': []
+    'longForm': [],
+    'collaborators': [],
+    'extraInfo': [],
+    'osContributors': []
   });
 
-  if (!_hasValidAttendeeAssignment(attributes.projects, attributes.ecosystemInterests)) {
-    const message = 'One project or ecosystem interest must be provided';
-    const source = ['projects', 'ecosystemInterests'];
+  if (!_hasValidAttendeeAssignment(attributes.osContributors)) {
+    const message = 'One interest must be provided';
+    const source = [];
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
@@ -433,9 +431,9 @@ module.exports.updateAttendee = (attendee, attributes) => {
     if (attendee.get('status') !== 'ACCEPTED') {
       // we do not add attendees to this list until they have been accepted
     } else if (attendeeAttrs.hasLightningInterest) {
-      MailService.addToList(user, utils.mail.lists.lightningTalks);
+      MailService.addToList(user, config.mail.lists.lightningTalks);
     } else {
-      MailService.removeFromList(user, utils.mail.lists.lightningTalks);
+      MailService.removeFromList(user, config.mail.lists.lightningTalks);
     }
   }
 

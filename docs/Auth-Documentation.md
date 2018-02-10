@@ -162,6 +162,7 @@ URL Parameters
 | Parameter  | Description                                                                                           | Required |
 |------------|-------------------------------------------------------------------------------------------------------|----------|
 | `code`     | A valid Github access code                                                                            | Yes      |
+| `mobile`   | Whether to use hackillinois:// as the final oauth redirect                                            | No       |
 
 Request Parameters
 

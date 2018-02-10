@@ -1,5 +1,6 @@
-const config = require('./config');
-const logger = require('./logging');
+const ctx = require('ctx');
+const config = ctx.config();
+const logger = ctx.logger();
 const v1 = require('./v1');
 
 logger.info('starting superuser setup check in the background');

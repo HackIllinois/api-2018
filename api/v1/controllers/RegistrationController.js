@@ -6,7 +6,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('ctx').config();
 const errors = require('../errors');
 
 const attendeeQueryCategories = ['firstName', 'lastName', 'graduationYear', 'school', 'status', 'wave', 'finalized'];
@@ -16,6 +16,10 @@ const router = require('express')
 
 function _isAuthenticated(req) {
   return req.auth && (req.user !== undefined);
+}
+
+function _allowInactiveAttendee(req) {
+  return req.user.hasRole(roles.ATTENDEE, false);
 }
 
 function _validateGetAttendeesRequest(page, count, category, ascending) {
@@ -50,7 +54,6 @@ function _deleteExtraAttendeeParams(req) {
   delete req.body.attendee.reviewer;
   delete req.body.attendee.reviewTime;
   delete req.body.attendee.acceptedEcosystemId;
-  delete req.body.attendee.acceptanceType;
   return req;
 }
 
@@ -126,8 +129,17 @@ function createAttendee(req, res, next) {
   req = _deleteExtraAttendeeParams(req);
 
   services.RegistrationService.createAttendee(req.user, req.body)
+    .tap((attendee) => {
+      services.MailService.addToList(req.user, config.mail.lists.applicants);
+
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+      return null;
+    })
     .then((attendee) => {
-      services.MailService.addToList(req.user, mail.lists.applicants);
       res.body = attendee.toJSON();
 
       return next();
@@ -164,6 +176,14 @@ function updateAttendeeByUser(req, res, next) {
   services.RegistrationService
     .findAttendeeByUser(req.user)
     .then((attendee) => services.RegistrationService.updateAttendee(attendee, req.body))
+    .tap((attendee) => {
+      const substitutions = {
+        name: attendee.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+      return null;
+    })
     .then((attendee) => {
       res.body = attendee.toJSON();
       delete res.body.reviewer;
@@ -308,7 +328,6 @@ function fetchAttendeeForHost(req, res, next) {
       res.body.diet = attendee.get('diet');
       res.body.status = attendee.get('status');
       res.body.school = attendee.get('school');
-      res.body.acceptanceType = attendee.get('acceptanceType');
       res.body.acceptedEcosystemId = attendee.get('acceptedEcosystemId');
 
       return next();
@@ -330,13 +349,13 @@ router.put('/mentor/:id(\\d+)', middleware.request(requests.MentorRequest),
 
 router.post('/attendee', middleware.request(requests.AttendeeRequest),
   middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
-router.get('/attendee', middleware.permission(roles.ATTENDEE), fetchAttendeeByUser);
+router.get('/attendee', middleware.permission(roles.ATTENDEE, _allowInactiveAttendee), fetchAttendeeByUser);
 router.get('/attendee/all', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
 router.get('/attendee/search', middleware.permission(roles.ORGANIZERS), searchAttendees);
 router.get('/attendee/filter', middleware.permission(roles.ORGANIZERS), filterAttendees);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
 router.put('/attendee', middleware.request(requests.AttendeeRequest),
-  middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
+  middleware.permission(roles.ATTENDEE, _allowInactiveAttendee), updateAttendeeByUser);
 router.put('/attendee/decision/:id(\\d+)', middleware.request(requests.AttendeeDecisionRequest),
   middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),

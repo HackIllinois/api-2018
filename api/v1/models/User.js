@@ -187,6 +187,14 @@ User.prototype.hasPassword = function(password) {
     });
 };
 
+User.prototype.setContactInfo = function(newEmail) {
+  this.set({
+    email: newEmail
+  });
+
+  return this.save();
+};
+
 /**
  * Serializes this User
  * @return {Object} the serialized form of this User

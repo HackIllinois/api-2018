@@ -59,7 +59,7 @@ router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
 router.get('/', getEvents);
-router.get('/location/all', middleware.permission(roles.ORGANIZERS), getAllLocations);
+router.get('/location/all', getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
 
 router.use(middleware.response);

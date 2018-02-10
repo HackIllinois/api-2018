@@ -8,16 +8,14 @@ const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN', 'GLUTEN_FREE'];
 const PROFESSIONAL_INTERESTS = ['NONE', 'INTERNSHIP', 'FULLTIME', 'BOTH'];
 const GENDERS = ['MALE', 'FEMALE', 'NON_BINARY', 'OTHER'];
 const TRANSPORTATION_OPTIONS = ['NOT_NEEDED', 'BUS_REQUESTED', 'IN_STATE', 'OUT_OF_STATE', 'INTERNATIONAL'];
-const ACCEPTANCE_TYPES = ['CREATE', 'CONTRIBUTE'];
 
 const Model = require('./Model');
 const Upload = require('./Upload');
-const AttendeeProjectInterest = require('./AttendeeProjectInterest');
-const AttendeeProject = require('./AttendeeProject');
-const AttendeeExtraInfo = require('./AttendeeExtraInfo');
-const AttendeeEcosystemInterest = require('./AttendeeEcosystemInterest');
+const AttendeeLongForm = require('./AttendeeLongForm');
 const AttendeeRequestedCollaborator = require('./AttendeeRequestedCollaborator');
 const AttendeeRSVP = require('./AttendeeRSVP');
+const AttendeeExtraInfo = require('./AttendeeExtraInfo');
+const AttendeeOSContributor = require('./AttendeeOSContributor');
 const Attendee = Model.extend({
   tableName: 'attendees',
   idAttribute: 'id',
@@ -36,7 +34,7 @@ const Attendee = Model.extend({
     professionalInterest: ['required', 'string', validators.in(PROFESSIONAL_INTERESTS)],
     github: ['required', 'string', 'maxLength:50'],
     linkedin: ['required', 'string', 'maxLength:50'],
-    interests: ['required', 'string', 'maxLength:255'],
+    interests: ['string', 'maxLength:255'],
     priority: ['integer', 'max:10'],
     status: ['string', validators.in(STATUSES)],
     wave: ['integer', 'max:5'],
@@ -44,21 +42,16 @@ const Attendee = Model.extend({
     reviewTime: [ 'date' ],
     isNovice: ['required', 'boolean'],
     isPrivate: ['required', 'boolean'],
-    phoneNumber: ['string', 'maxLength:15'],
-    acceptanceType: ['string', validators.in(ACCEPTANCE_TYPES)],
-    acceptedEcosystemId: [ 'integer' ]
+    phoneNumber: ['string', 'maxLength:15']
   },
-  interests: function() {
-    return this.hasMany(AttendeeProjectInterest);
+  longForm: function() {
+    return this.hasMany(AttendeeLongForm);
   },
-  projects: function() {
-    return this.hasMany(AttendeeProject);
-  },
-  ecosystemInterests: function() {
-    return this.hasMany(AttendeeEcosystemInterest);
-  },
-  extras: function() {
+  extraInfo: function() {
     return this.hasMany(AttendeeExtraInfo);
+  },
+  osContributors: function() {
+    return this.hasMany(AttendeeOSContributor);
   },
   collaborators: function() {
     return this.hasMany(AttendeeRequestedCollaborator);
@@ -76,7 +69,7 @@ const Attendee = Model.extend({
 
 
 /**
- * Finds an attendee by its relational user's id, joining in its related project ideas
+ * Finds an attendee by its relational user's id
  * @param  {Number|String} userId	the ID of the attendee's relational user
  * @return {Promise<Model>}	a Promise resolving to the resulting Attendee or null
  */
@@ -85,7 +78,7 @@ Attendee.findByUserId = function(userId) {
     user_id: userId
   })
     .fetch({
-      withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+      withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -102,7 +95,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
       user_id: userId
     })
       .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+        withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {
@@ -128,7 +121,7 @@ Attendee.fetchWithResumeByUserId = function(userId) {
 };
 
 /**
- * Finds an attendee by its ID, joining in its related project ideas
+ * Finds an attendee by its ID
  * @param  {Number|String} id	the ID of the model with the appropriate type
  * @return {Promise<Model>}		a Promise resolving to the resulting model or null
  */
@@ -137,7 +130,7 @@ Attendee.findById = function(id) {
     id: id
   })
     .fetch({
-      withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp']
+      withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp']
     });
 };
 
@@ -153,7 +146,7 @@ Attendee.fetchWithResumeById = function(id) {
       id: id
     })
       .fetch({
-        withRelated: ['projects', 'ecosystemInterests', 'extras', 'collaborators', 'rsvp'],
+        withRelated: ['longForm', 'extraInfo', 'osContributors', 'collaborators', 'rsvp'],
         transacting: t
       })
       .then((a) => {

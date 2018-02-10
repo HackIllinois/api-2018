@@ -4,11 +4,14 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
-const mail = require('../utils/mail');
+const config = require('ctx').config();
 
 const router = require('express').Router();
-function _isAuthenticated(req) {
-  return req.auth && (req.user !== undefined);
+function _isValidUser(req) {
+  if(!req.auth || req.user == undefined) {
+    return false;
+  }
+  return services.RegistrationService.findAttendeeByUser(req.user).then((attendee) => attendee != null && attendee.get('status') == 'ACCEPTED');
 }
 
 function _removeFromList(rsvpCurrent, rsvpNew) {
@@ -20,19 +23,25 @@ function _addToList(rsvpCurrent, rsvpNew) {
 }
 
 function createRSVP(req, res, next) {
-  if (!req.body.isAttending) {
-    delete req.body.type;
-  }
 
+  let attendeeModel;
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => services.RSVPService
-      .createRSVP(attendee, req.user, req.body))
+    .then((attendee) => {
+      attendeeModel = attendee;
+      return services.RSVPService.createRSVP(attendee, req.user, req.body);
+    })
     .then((rsvp) => {
       if (rsvp.get('isAttending')) {
-        services.MailService.addToList(req.user, mail.lists.attendees);
+        services.MailService.addToList(req.user, config.mail.lists.attendees);
       }
       res.body = rsvp.toJSON();
+
+      const substitutions = {
+        name: attendeeModel.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpConfirmation, substitutions);
 
       return next();
     })
@@ -46,9 +55,6 @@ function fetchRSVPByUser(req, res, next) {
       .findRSVPByAttendee(attendee))
     .then((rsvp) => {
       res.body = rsvp.toJSON();
-      if (!res.body.type) {
-        delete res.body.type;
-      }
 
       return next();
     })
@@ -60,9 +66,6 @@ function fetchRSVPById(req, res, next) {
     .getRSVPById(req.params.id)
     .then((rsvp) => {
       res.body = rsvp.toJSON();
-      if (!res.body.type) {
-        delete res.body.type;
-      }
 
       return next();
     })
@@ -70,15 +73,22 @@ function fetchRSVPById(req, res, next) {
 }
 
 function updateRSVPByUser(req, res, next) {
-  if (!req.body.isAttending) {
-    delete req.body.type;
-  }
 
+  let attendeeModel;
   services.RegistrationService
     .findAttendeeByUser(req.user)
-    .then((attendee) => _updateRSVPByAttendee(req.user, attendee, req.body))
+    .then((attendee) => {
+      attendeeModel = attendee;
+      return _updateRSVPByAttendee(req.user, attendee, req.body);
+    })
     .then((rsvp) => {
       res.body = rsvp.toJSON();
+
+      const substitutions = {
+        name: attendeeModel.get('firstName'),
+        isDevelopment: config.isDevelopment
+      };
+      services.MailService.send(req.user.get('email'), config.mail.templates.rsvpUpdate, substitutions);
 
       return next();
     })
@@ -91,10 +101,10 @@ function _updateRSVPByAttendee(user, attendee, newRSVP) {
     .then((rsvp) => services.RSVPService.updateRSVP(user, rsvp, newRSVP)
       .then((updatedRSVP) => {
         if (_addToList(rsvp, newRSVP)) {
-          services.MailService.addToList(user, mail.lists.attendees);
+          services.MailService.addToList(user, config.mail.lists.attendees);
         }
         if (_removeFromList(rsvp, newRSVP)) {
-          services.MailService.removeFromList(user, mail.lists.attendees);
+          services.MailService.removeFromList(user, config.mail.lists.attendees);
         }
 
         return updatedRSVP;
@@ -105,11 +115,11 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/attendee', middleware.request(requests.RSVPRequest),
-  middleware.permission(roles.ATTENDEE, _isAuthenticated), createRSVP);
-router.get('/attendee/', middleware.permission(roles.ATTENDEE), fetchRSVPByUser);
+  middleware.permission(roles.ATTENDEE, _isValidUser), createRSVP);
+router.get('/attendee/', middleware.permission(roles.ATTENDEE, _isValidUser), fetchRSVPByUser);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchRSVPById);
 router.put('/attendee/', middleware.request(requests.RSVPRequest),
-  middleware.permission(roles.ATTENDEE), updateRSVPByUser);
+  middleware.permission(roles.ATTENDEE, _isValidUser), updateRSVPByUser);
 
 router.use(middleware.response);
 router.use(middleware.errors);

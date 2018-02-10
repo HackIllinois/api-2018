@@ -6,7 +6,6 @@ const config = require('../../config');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const scopes = require('../utils/scopes');
-const mail = require('../utils/mail');
 const roles = require('../utils/roles');
 const errors = require('../errors');
 
@@ -20,6 +19,10 @@ const router = require('express').Router();
  */
 function isRequester(req) {
   return req.user.get('id') == req.params.id;
+}
+
+function isAuthenticated(req) {
+  return req.auth && (req.user !== undefined);
 }
 
 function createUser(req, res, next) {
@@ -48,12 +51,28 @@ function createAccreditedUser(req, res, next) {
     .catch((error) => next(error));
 }
 
+function getAuthenticatedUser(req, res, next) {
+  services.UserService
+    .findUserById(req.user.get('id'))
+    .then((user) => {
+      res.body = {
+        user: user.toJSON(),
+        roles: user.related('roles').toJSON()
+      };
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
 function getUser(req, res, next) {
   services.UserService
     .findUserById(req.params.id)
     .then((user) => {
-      res.body = user.toJSON();
-
+      res.body = {
+        user: user.toJSON(),
+        roles: user.related('roles').toJSON()
+      };
       return next();
     })
     .catch((error) => next(error));
@@ -79,13 +98,23 @@ function requestPasswordReset(req, res, next) {
         token: tokenVal,
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.body.email, mail.templates.passwordReset, substitutions);
+      services.MailService.send(req.body.email, config.mail.templates.passwordReset, substitutions);
+      return null;
     })
     .then(() => {
       res.body = {};
       return next();
     })
     .catch((error) => next(error));
+}
+function updateContactInfo(req, res, next) {
+  services.UserService.updateContactInfo(req.user, req.body.newEmail)
+  .then((result) => {
+    res.body = result.toJSON();
+
+    return next();
+  })
+  .catch((error) => next(error));
 }
 
 function assignNewRole(req, res, next) {
@@ -116,7 +145,6 @@ function assignNewRole(req, res, next) {
     .catch((error) => next(error));
 }
 
-
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -125,10 +153,14 @@ router.post('/', middleware.request(requests.BasicAuthRequest),
 router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
   middleware.permission(roles.ORGANIZERS), createAccreditedUser);
 router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
+router.get('/', middleware.permission(roles.NONE, isAuthenticated), getAuthenticatedUser);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
-router.post('/assign', middleware.request(requests.RoleAssignmentRequest), middleware.permission(roles.ORGANIZERS), assignNewRole);
+router.post('/assign', middleware.request(requests.RoleAssignmentRequest),
+ middleware.permission(roles.ORGANIZERS), assignNewRole);
 
+router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest),
+  middleware.permission(roles.NONE, isAuthenticated), updateContactInfo);
 
 router.use(middleware.response);
 router.use(middleware.errors);
