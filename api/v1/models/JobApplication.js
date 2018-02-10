@@ -5,14 +5,14 @@ const JobApplication = Model.extend({
   hasTimestamps: ['created', 'updated'],
   idAttribute: 'app_id',
   validations: {
-    recruiterId: ['required', 'integer'],
-    applicantId: ['required', 'integer'],
+    recruiterId: ['integer'],
+    applicantId: ['integer'],
     comments: ['string'],
     favorite: ['integer']
   }
 });
 
-JobApplication.findById = (id) => JobApplication.where({
+JobApplication.findByApplicationId = (id) => JobApplication.where({
   app_id: id
 })
   .fetch();
@@ -26,5 +26,10 @@ JobApplication.findByApplicantId = (id) => JobApplication.where({
   applicant_id: id
 })
   .fetchAll();
+
+JobApplication.updateApplication = (appId, comments, favorite) => JobApplication
+    .where({app_id: appId})
+    .save({comments:comments,favorite:favorite},{patch:true});
+
 
 module.exports = JobApplication;
