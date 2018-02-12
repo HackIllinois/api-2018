@@ -71,23 +71,6 @@ function _populateRSVPs(cb) {
     .then(cb);
 }
 
-
-/**
- * Queries Attendee rsvp types interests and performs a callback on the results
- * @param  {Function} cb the function to process the query results with
- * @return {Promise} resolving to the return value of the callback
- */
-function _populateRSVPTypes(cb) {
-  return AttendeeRSVP.query((qb) => {
-    qb.select('type as name')
-        .count('is_attending as count')
-        .from('attendee_rsvps')
-        .groupBy('type');
-  })
-    .fetchAll()
-    .then(cb);
-}
-
 /**
  * Queries an attendee attribute and counts the unique entries
  * @param  {String} attribute the attribute to query for
