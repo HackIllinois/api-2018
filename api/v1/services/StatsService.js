@@ -41,7 +41,7 @@ module.exports.incrementStat = function (category, stat, field) {
       _incrementCachedStat(category, stat, field);
     }
   });
-  if(category == 'liveevent' && category == 'events') {
+  if(category == 'live_event' && category == 'events') {
     return new _Promise();
   } 
   return Stat.increment(category, stat, field);
@@ -71,9 +71,9 @@ function _resetCachedStat() {
   stats['rsvp']['isNovice'] = {};
   stats['rsvp']['major'] = {};
   stats['rsvp']['attendees'] = {};
-  stats['liveevent'] = {};
-  stats['liveevent']['attendees'] = {};
-  stats['liveevent']['events'] = {};
+  stats['live_event'] = {};
+  stats['live_event']['attendees'] = {};
+  stats['live_event']['events'] = {};
   return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
 }
 
@@ -217,15 +217,15 @@ function _readStatsFromDatabase() {
     }));
 
 
-    queries.push(_findAll('liveevent', 'attendees').then((collection) => {
+    queries.push(_findAll('live_event', 'attendees').then((collection) => {
       collection.forEach((model) => {
-        stats['liveevent']['attendees'][model.get('field')] = model.get('count');
+        stats['live_event']['attendees'][model.get('field')] = model.get('count');
       });
     }));
 
     queries.push(TrackingEvent.findAll().then((collection) => {
       collection.forEach((model) => {
-        stats['liveevent']['events'][model.get('name')] = model.get('count');
+        stats['live_event']['events'][model.get('name')] = model.get('count');
       });
     }));
 
@@ -259,6 +259,6 @@ module.exports.fetchRSVPStats = function() {
   return _fetchAllStats().then((stats) => stats['rsvp']);
 };
 
-module.exports.fetchLiveEventStats = function() {
-  return _fetchAllStats().then((stats) => stats['liveevent']);
+module.exports.fetchLive_EventStats = function() {
+  return _fetchAllStats().then((stats) => stats['live_event']);
 };

@@ -69,7 +69,7 @@ module.exports.addEventParticipant = (participantId) => {
 
       currentEvent = result;
 
-      StatsService.incrementStat('liveevent', 'events', currentEvent);
+      StatsService.incrementStat('live_event', 'events', currentEvent);
 
       return cache.getAsync(TRACKING_NAMESPACE + participantId);
     })
