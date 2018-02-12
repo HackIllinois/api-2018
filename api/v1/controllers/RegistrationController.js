@@ -18,6 +18,10 @@ function _isAuthenticated(req) {
   return req.auth && (req.user !== undefined);
 }
 
+function _allowInactiveAttendee(req) {
+  return req.user.hasRole(roles.ATTENDEE, false);
+}
+
 function _validateGetAttendeesRequest(page, count, category, ascending) {
   if (_.isNaN(page)) {
     const message = 'Invalid page parameter';
@@ -132,7 +136,8 @@ function createAttendee(req, res, next) {
         name: attendee.get('firstName'),
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationConfirmation, substitutions);
+      return null;
     })
     .then((attendee) => {
       res.body = attendee.toJSON();
@@ -176,7 +181,8 @@ function updateAttendeeByUser(req, res, next) {
         name: attendee.get('firstName'),
         isDevelopment: config.isDevelopment
       };
-      return services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+      services.MailService.send(req.user.get('email'), config.mail.templates.registrationUpdate, substitutions);
+      return null;
     })
     .then((attendee) => {
       res.body = attendee.toJSON();
@@ -343,13 +349,13 @@ router.put('/mentor/:id(\\d+)', middleware.request(requests.MentorRequest),
 
 router.post('/attendee', middleware.request(requests.AttendeeRequest),
   middleware.permission(roles.NONE, _isAuthenticated), createAttendee);
-router.get('/attendee', middleware.permission(roles.ATTENDEE), fetchAttendeeByUser);
+router.get('/attendee', middleware.permission(roles.ATTENDEE, _allowInactiveAttendee), fetchAttendeeByUser);
 router.get('/attendee/all', middleware.permission(roles.ORGANIZERS), getAttendeeBatch);
 router.get('/attendee/search', middleware.permission(roles.ORGANIZERS), searchAttendees);
 router.get('/attendee/filter', middleware.permission(roles.ORGANIZERS), filterAttendees);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchAttendeeById);
 router.put('/attendee', middleware.request(requests.AttendeeRequest),
-  middleware.permission(roles.ATTENDEE), updateAttendeeByUser);
+  middleware.permission(roles.ATTENDEE, _allowInactiveAttendee), updateAttendeeByUser);
 router.put('/attendee/decision/:id(\\d+)', middleware.request(requests.AttendeeDecisionRequest),
   middleware.permission(roles.ORGANIZERS), updateAttendeeDecision);
 router.put('/attendee/:id(\\d+)', middleware.request(requests.AttendeeRequest),
