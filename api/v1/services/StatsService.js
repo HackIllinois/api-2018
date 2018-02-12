@@ -268,9 +268,6 @@ module.exports.fetchRSVPStats = () => cache.hasKey(STATS_RSVP_HEADER + STATS_CAC
       const RSVPsQuery = _populateRSVPs(_populateStats('rsvps', stats));
       queries.push(RSVPsQuery);
 
-      const RSVPTypesQuery = _populateRSVPTypes(_populateStats('type', stats));
-      queries.push(RSVPTypesQuery);
-
       return _Promise.all(queries)
           .then(() => cache.storeString(STATS_RSVP_HEADER + STATS_CACHE_KEY, JSON.stringify(stats))
               .then(() => {
