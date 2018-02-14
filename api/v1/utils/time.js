@@ -16,6 +16,4 @@ module.exports.secondsToHHMMSS = (numSeconds) => {
   return ((h > 0 ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s);
 };
 
-module.exports.convertISOTimeToMySQLTime = (isotime) => {
-	return new Date(isotime).toISOString().substring(0, 19).replace('T', ' ');
-};
+module.exports.convertISOTimeToMySQLTime = (isotime) => new Date(isotime).toISOString().substring(0, 19).replace('T', ' ');
