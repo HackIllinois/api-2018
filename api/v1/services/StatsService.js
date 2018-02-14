@@ -42,7 +42,11 @@ function _populateStats(key, stats) {
  */
 function _populateStatsField(key, stats) {
   return function(result) {
-    stats[key] = result.attributes.count;
+    if(result.attributes == null) {
+      stats[key] = result[0][0]['count(*)'];
+    } else {
+      stats[key] = result.attributes.count;
+    }
   };
 }
 
@@ -96,17 +100,7 @@ function _populateAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingAttendeeAttribute(attribute, cb) {
-  return Attendee.query((qb) => {
-    qb.select(attribute + ' as name')
-        .count(attribute + ' as count')
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('attendees.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
-        })
-        .groupBy(attribute);
-  })
-    .fetchAll()
-    .then(cb);
+  return knex.raw('select count(*) from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id group by a.' + attribute + ';').then(cb);
 }
 
 /**
@@ -115,16 +109,7 @@ function _populateAttendingAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendees(cb) {
-  return Attendee.query((qb) => {
-    qb.count('a.id as attending')
-        .from('attendees as a')
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
-        });
-  })
-    .fetch()
-    .then(cb);
+  return knex.raw('select count(*) from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id;').then(cb);
 }
 
 /**
