@@ -27,9 +27,15 @@ const STATS_REG_HEADER = 'registration';
 function _populateStats(key, stats) {
   return function(result) {
     stats[key] = {};
-    _.forEach(result.models, (model) => {
-      stats[key][model.attributes.name] = model.attributes.count;
-    });
+    if(result.models == null) {
+      _.forEach(result, (res) => {
+        stats[key][res.atr] = res.count;
+      });
+    } else {
+      _.forEach(result.models, (model) => {
+        stats[key][model.attributes.name] = model.attributes.count;
+      });
+    }
   };
 }
 
@@ -100,7 +106,9 @@ function _populateAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingAttendeeAttribute(attribute, cb) {
-  return knex.raw('select count(*) from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id group by a.' + attribute + ';').then(cb);
+  return knex.raw('select ' + attribute + ' as atr, count(*) as count from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id where ar.is_attending = 1 group by a.' + attribute + ';').then((result) => {
+    cb(result[0]);
+  });
 }
 
 /**
