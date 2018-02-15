@@ -1,4 +1,4 @@
-CREATE TABLE `job_applications` (
+CREATE TABLE `recruiter_interests` (
   `app_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `recruiter_id` INT UNSIGNED NOT NULL,
   `applicant_id` INT UNSIGNED NOT NULL,
