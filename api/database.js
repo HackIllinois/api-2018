@@ -10,8 +10,7 @@ const KNEX_CONFIG = {
     port: config.database.primary.port,
     user: config.database.primary.user,
     password: config.database.primary.password,
-    database: config.database.primary.name,
-    timezone: 'UTC'
+    database: config.database.primary.name
   },
   pool: {
     min: config.database.primary.pool.min,
