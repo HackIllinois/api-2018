@@ -112,15 +112,6 @@ function _populateAttendingAttendeeAttribute(attribute, cb) {
 }
 
 /**
- * Queries the total number of attendees
- * @param  {Function} cb the function to process the query results with
- * @return {Promise} resolving to the return value of the callback
- */
-function _populateAttendees(cb) {
-  return knex.raw('select count(*) from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id;').then(cb);
-}
-
-/**
  * Queries the current stats for tracked events
  * @param  {Function} cb the function to process the query results with
  * @return {Promise} resolving to the return value of the callback
@@ -191,9 +182,6 @@ module.exports.fetchRegistrationStats = () => cache.hasKey(STATS_REG_HEADER + ST
 
       const isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
       queries.push(isNoviceQuery);
-
-      const attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
-      queries.push(attendeeQuery);
 
       const statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
       queries.push(statusQuery);
