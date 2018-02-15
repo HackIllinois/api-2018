@@ -23,7 +23,6 @@ function getRecruitersApplicants(req, res, next) {
     .findByRecruiterId(req.user.get('id'))
     .then((applications) => {
       res.body = applications.toJSON();
-      console.log(req.user.get('id'));
       return next();
     })
     .catch((error) => next(error));
