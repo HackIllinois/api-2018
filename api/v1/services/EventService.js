@@ -35,6 +35,8 @@ module.exports.getEvents = (getActive) => {
 
 module.exports.createEvent = (params) => {
   const event = params.event;
+  event.startTime = utils.time.convertISOTimeToMySQLTime(event.startTime);
+  event.endTime = utils.time.convertISOTimeToMySQLTime(event.endTime);
   const locations = params.eventLocations;
 
   return Event.transaction((t) => new Event(event)
