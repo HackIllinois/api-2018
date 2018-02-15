@@ -1,10 +1,6 @@
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
-const ctx = require('ctx');
-const database = ctx.database();
-const knex = database.connection();
-
 const Attendee = require('../models/Attendee');
 const AttendeeRSVP = require('../models/AttendeeRSVP');
 const CheckIn = require('../models/CheckIn');
@@ -27,15 +23,9 @@ const STATS_REG_HEADER = 'registration';
 function _populateStats(key, stats) {
   return function(result) {
     stats[key] = {};
-    if(result.models == null) {
-      _.forEach(result, (res) => {
-        stats[key][res.atr] = res.count;
-      });
-    } else {
-      _.forEach(result.models, (model) => {
-        stats[key][model.attributes.name] = model.attributes.count;
-      });
-    }
+    _.forEach(result.models, (model) => {
+      stats[key][model.attributes.name] = model.attributes.count;
+    });
   };
 }
 
@@ -48,11 +38,7 @@ function _populateStats(key, stats) {
  */
 function _populateStatsField(key, stats) {
   return function(result) {
-    if(result.attributes == null) {
-      stats[key] = result[0][0]['count(*)'];
-    } else {
-      stats[key] = result.attributes.count;
-    }
+    stats[key] = result.attributes.count;
   };
 }
 
@@ -106,9 +92,13 @@ function _populateAttendeeAttribute(attribute, cb) {
  * @return {Promise} resolving to the return value of the callback
  */
 function _populateAttendingAttendeeAttribute(attribute, cb) {
-  return knex.raw('select ' + attribute + ' as atr, count(*) as count from attendees a inner join attendee_rsvps as ar on ar.attendee_id=a.id where ar.is_attending = 1 group by a.' + attribute + ';').then((result) => {
-    cb(result[0]);
-  });
+  return Attendee.query((qb) => {
+    qb.select(attribute + ' as name')
+        .count(attribute + ' as count')
+        .innerJoin('attendee_rsvps', 'attendees.id', 'attendee_rsvps.attendee_id')
+        .where('attendee_rsvps.is_attending', '1')
+        .groupBy(attribute);
+  }).fetchAll().then(cb);
 }
 
 /**
