@@ -8,12 +8,8 @@ const roles = require('../utils/roles');
 
 const router = require('express').Router();
 
-function isRecruiter(req) {
-  return req.user.get('id') == req.params.id && req.user.hasRole(roles.PROFESSIONALS);
-}
-
 function createApplication(req, res, next) {
-  services.JobApplicationService
+  services.RecruiterInterestService
     .createApplication(req.user.get('id'), req.body.applicantId, req.body.comments, req.body.favorite)
     .then((application) => {
       res.body = application.toJSON();
@@ -23,17 +19,18 @@ function createApplication(req, res, next) {
 }
 
 function getRecruitersApplicants(req, res, next) {
-  services.JobApplicationService
-    .findByRecruiterId(req.params.id)
+  services.RecruiterInterestService
+    .findByRecruiterId(req.user.get('id'))
     .then((applications) => {
       res.body = applications.toJSON();
+      console.log(req.user.get('id'));
       return next();
     })
     .catch((error) => next(error));
 }
 
 function updateApplication(req, res, next) {
-  services.JobApplicationService
+  services.RecruiterInterestService
     .updateApplication(req.body.appId, req.body.comments, req.body.favorite)
     .then((application) => {
       res.body = application.toJSON();
@@ -45,9 +42,9 @@ function updateApplication(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.get('/:id(\\d+)', middleware.permission(roles.ADMIN, isRecruiter),  getRecruitersApplicants);
-router.post('/apply', middleware.request(requests.JobApplicationRequest), middleware.permission(roles.ADMIN, isRecruiter), createApplication);
-router.post('/update', middleware.request(requests.JobApplicationUpdateRequest), middleware.permission(roles.ADMIN, isRecruiter), updateApplication);
+router.get('/', middleware.permission(roles.PROFESSIONALS),  getRecruitersApplicants);
+router.post('/apply', middleware.request(requests.RecruiterInterestRequest), middleware.permission(roles.PROFESSIONALS), createApplication);
+router.put('/update', middleware.request(requests.RecruiterInterestUpdateRequest), middleware.permission(roles.PROFESSIONALS), updateApplication);
 
 router.use(middleware.response);
 router.use(middleware.errors);

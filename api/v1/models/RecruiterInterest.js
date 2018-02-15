@@ -1,7 +1,7 @@
 const Model = require('./Model');
 
-const JobApplication = Model.extend({
-  tableName: 'job_applications',
+const RecruiterInterest = Model.extend({
+  tableName: 'recruiter_interests',
   hasTimestamps: ['created', 'updated'],
   idAttribute: 'app_id',
   validations: {
@@ -12,24 +12,24 @@ const JobApplication = Model.extend({
   }
 });
 
-JobApplication.findByApplicationId = (id) => JobApplication.where({
+RecruiterInterest.findByApplicationId = (id) => RecruiterInterest.where({
   app_id: id
 })
   .fetch();
 
-JobApplication.findByRecruiterId = (id) => JobApplication.where({
+RecruiterInterest.findByRecruiterId = (id) => RecruiterInterest.where({
   recruiter_id: id
 })
   .fetchAll();
 
-JobApplication.findByApplicantId = (id) => JobApplication.where({
+RecruiterInterest.findByApplicantId = (id) => RecruiterInterest.where({
   applicant_id: id
 })
   .fetchAll();
 
-JobApplication.updateApplication = (appId, comments, favorite) => JobApplication
+RecruiterInterest.updateApplication = (appId, comments, favorite) => RecruiterInterest
     .where({app_id: appId})
     .save({comments:comments,favorite:favorite},{patch:true});
 
 
-module.exports = JobApplication;
+module.exports = RecruiterInterest;
