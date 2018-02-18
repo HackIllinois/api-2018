@@ -143,7 +143,6 @@ Request
 ```
 {
     "name": "Siebel Center",
-    "shortName": "Siebel",
     "latitude": 40.1138,
     "longitude": 88.2249
 }
@@ -155,7 +154,6 @@ Response:
   "meta": null,
   "data": {
     "name": "siebel center",
-    "shortName": "Siebel",
     "latitude": 40.1138,
     "longitude": 88.2249,
     "id": 1
