@@ -1,10 +1,6 @@
 const _Promise = require('bluebird');
 const _ = require('lodash');
 
-const ctx = require('ctx');
-const database = ctx.database();
-const knex = database.connection();
-
 const Attendee = require('../models/Attendee');
 const AttendeeRSVP = require('../models/AttendeeRSVP');
 const CheckIn = require('../models/CheckIn');
@@ -99,32 +95,10 @@ function _populateAttendingAttendeeAttribute(attribute, cb) {
   return Attendee.query((qb) => {
     qb.select(attribute + ' as name')
         .count(attribute + ' as count')
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('attendees.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
-        })
+        .innerJoin('attendee_rsvps', 'attendees.id', 'attendee_rsvps.attendee_id')
+        .where('attendee_rsvps.is_attending', '1')
         .groupBy(attribute);
-  })
-    .fetchAll()
-    .then(cb);
-}
-
-/**
- * Queries the total number of attendees
- * @param  {Function} cb the function to process the query results with
- * @return {Promise} resolving to the return value of the callback
- */
-function _populateAttendees(cb) {
-  return Attendee.query((qb) => {
-    qb.count('a.id as attending')
-        .from('attendees as a')
-        .innerJoin('attendee_rsvps as ar', function() {
-          this.on('a.status', '=', knex.raw('?', [ 'ACCEPTED' ]))
-            .andOn('ar.is_attending', '=', knex.raw('?', [ '1' ]));
-        });
-  })
-    .fetch()
-    .then(cb);
+  }).fetchAll().then(cb);
 }
 
 /**
@@ -198,9 +172,6 @@ module.exports.fetchRegistrationStats = () => cache.hasKey(STATS_REG_HEADER + ST
 
       const isNoviceQuery = _populateAttendeeAttribute('is_novice', _populateStats('isNovice', stats));
       queries.push(isNoviceQuery);
-
-      const attendeeQuery = _populateAttendees(_populateStatsField('attendees', stats));
-      queries.push(attendeeQuery);
 
       const statusQuery = _populateAttendeeAttribute('status', _populateStats('status', stats));
       queries.push(statusQuery);
