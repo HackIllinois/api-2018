@@ -8,6 +8,10 @@ const roles = require('../utils/roles');
 
 const router = require('express').Router();
 
+function isAuthenticated(req) {
+  return req.auth && (req.user !== undefined);
+}
+
 function createLocation(req, res, next) {
   services.EventService.createLocation(req.body)
     .then((result) => {
@@ -88,9 +92,9 @@ router.get('/', getEvents);
 router.get('/location/all', getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
 
-router.post('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), createEventFavorite);
-router.get('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), getEventFavorites);
-router.delete('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), deleteEventFavorite);
+router.post('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.NONE, isAuthenticated), createEventFavorite);
+router.get('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.NONE, isAuthenticated), getEventFavorites);
+router.delete('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.NONE, isAuthenticated), deleteEventFavorite);
 
 router.use(middleware.response);
 router.use(middleware.errors);
