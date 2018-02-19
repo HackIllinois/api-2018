@@ -73,7 +73,7 @@ module.exports.updateRSVP = (user, rsvp, attributes) => {
     .catch(CheckitError, utils.errors.handleValidationError)
     .then(() => {
       const userRole = user.getRole(utils.roles.ATTENDEE);
-      UserRole.setActive(userRole, rsvp.get('isAttending')); //eslint-disable-line no-unused-expressions
+      UserRole.setActive(userRole, rsvp.get('isAttending'));
 
       return rsvp.save();
     });
