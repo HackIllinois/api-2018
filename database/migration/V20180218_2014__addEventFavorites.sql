@@ -5,6 +5,7 @@ CREATE TABLE `event_favorites` (
 	PRIMARY KEY (`id`),
 	INDEX `fk_event_favorites_attendee_id_idx` (`attendee_id` ASC),
 	INDEX `fk_event_favorites_event_id_idx` (`event_id` ASC),
+	CONSTRAINT `event_favorite_UNIQUE` UNIQUE (`attendee_id`, `event_id`),
 	CONSTRAINT `fk_event_favorites_attendee_id`
 		FOREIGN KEY (`attendee_id`)
 		REFERENCES `attendees` (`user_id`)
