@@ -54,6 +54,32 @@ function getEvents(req, res, next) {
     .catch((error) => next(error));
 }
 
+function createEventFavorite(req, res, next) {
+  services.EventService.createEventFavorite(req.user.get('id'), req.body)
+    .then((result) => {
+      res.body = result.toJSON();
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
+function getEventFavorites(req, res, next) {
+  services.EventService.getEventFavorites(req.user.get('id'))
+    .then((result) => {
+      res.body = result.toJSON();
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
+function deleteEventFavorite(req, res, next) {
+  services.EventService.deleteEventFavorite(req.user.get('id'), req.body)
+    .then(() => next())
+    .catch((error) => next(error));
+}
+
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
@@ -61,6 +87,10 @@ router.post('/', middleware.request(requests.EventCreationRequest), middleware.p
 router.get('/', getEvents);
 router.get('/location/all', getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);
+
+router.post('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), createEventFavorite);
+router.get('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), getEventFavorites);
+router.delete('/favorite', middleware.request(requests.EventFavoriteRequest), middleware.permission(roles.ATTENDEE), deleteEventFavorite);
 
 router.use(middleware.response);
 router.use(middleware.errors);

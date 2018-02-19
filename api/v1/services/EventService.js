@@ -4,6 +4,7 @@ const utils = require('../utils');
 const Location = require('../models/Location');
 const Event = require('../models/Event');
 const EventLocation = require('../models/EventLocation');
+const EventFavorite = require('../models/EventFavorite');
 
 module.exports.getAllLocations = () => Location.fetchAll();
 
@@ -67,3 +68,15 @@ module.exports.createEvent = (params) => {
       utils.errors.handleDuplicateEntryError('An event with the given name already exists', 'name')
     );
 };
+
+module.exports.createEventFavorite = (userId, params) => {
+  params.attendee_id = userId;
+  const eventFavorite = EventFavorite.forge(params);
+
+  return eventFavorite.save();
+};
+
+module.exports.getEventFavorites = (userId) => EventFavorite.findByAttendeeId(userId);
+
+module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByAttendeeAndEventId(userId, params.event_id)
+    .then((model) => model.destroy());
