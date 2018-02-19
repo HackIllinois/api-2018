@@ -176,7 +176,7 @@ Headers <br />
 
 | Header        | Description           | Required  |
 | ------------- | --------------------- | --------- |
-| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+| `Authorization` | a valid authentication token| Yes |
 
 Request
 ```
@@ -191,7 +191,7 @@ Response:
     "meta": null,
     "data": {
         "eventId": 9,
-        "attendeeId": 1,
+        "userId": 1,
         "id": 23
     }
 }
@@ -213,7 +213,7 @@ Headers <br />
 
 | Header        | Description           | Required  |
 | ------------- | --------------------- | --------- |
-| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+| `Authorization` | a valid authentication token| Yes |
 
 Response:
 ```
@@ -222,12 +222,12 @@ Response:
     "data": [
         {
             "id": 10,
-            "attendeeId": 1,
+            "userId": 1,
             "eventId": 8
         },
         {
             "id": 23,
-            "attendeeId": 1,
+            "userId": 1,
             "eventId": 9
         }
     ]
@@ -243,7 +243,7 @@ Headers <br />
 
 | Header        | Description           | Required  |
 | ------------- | --------------------- | --------- |
-| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+| `Authorization` | a valid authentication token| Yes |
 
 Request
 ```
