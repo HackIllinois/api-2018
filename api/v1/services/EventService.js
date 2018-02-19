@@ -73,7 +73,11 @@ module.exports.createEventFavorite = (userId, params) => {
   params.attendee_id = userId;
   const eventFavorite = EventFavorite.forge(params);
 
-  return eventFavorite.save();
+  return eventFavorite.save()
+    .catch(
+      utils.errors.DuplicateEntryError,
+      utils.errors.handleDuplicateEntryError('A event favorite with the given event id already exists', 'event_id')
+    );
 };
 
 module.exports.getEventFavorites = (userId) => EventFavorite.findByAttendeeId(userId);
