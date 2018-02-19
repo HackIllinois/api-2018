@@ -73,7 +73,7 @@ module.exports.createEvent = (params) => {
 };
 
 module.exports.createEventFavorite = (userId, params) => {
-  params.attendeeId = userId;
+  params.userId = userId;
   const eventFavorite = EventFavorite.forge(params);
 
   return eventFavorite.save()
@@ -88,9 +88,9 @@ module.exports.createEventFavorite = (userId, params) => {
     });
 };
 
-module.exports.getEventFavorites = (userId) => EventFavorite.findByAttendeeId(userId);
+module.exports.getEventFavorites = (userId) => EventFavorite.findByUserId(userId);
 
-module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByAttendeeAndEventId(userId, params.eventId)
+module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByUserAndEventId(userId, params.eventId)
     .then((model) => {
       if(_.isNull(model)) {
         const message = 'An event favorite with the given event id does not exist';

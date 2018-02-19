@@ -4,7 +4,7 @@ const EventFavorite = Model.extend({
   tableName: 'event_favorites',
   idAttribute: 'id',
   validations: {
-    attendeeId: ['required', 'integer'],
+    userId: ['required', 'integer'],
     eventId: ['required', 'integer']
   }
 });
@@ -16,16 +16,16 @@ EventFavorite.findById = function(id) {
     .fetch();
 };
 
-EventFavorite.findByAttendeeId = function(attendee_id) {
+EventFavorite.findByUserId = function(user_id) {
   return EventFavorite.where({
-    attendee_id: attendee_id
+    user_id: user_id
   })
     .fetchAll();
 };
 
-EventFavorite.findByAttendeeAndEventId = function(attendee_id, event_id) {
+EventFavorite.findByUserAndEventId = function(user_id, event_id) {
   return EventFavorite.where({
-    attendee_id: attendee_id,
+    user_id: user_id,
     event_id: event_id
   })
     .fetch();
