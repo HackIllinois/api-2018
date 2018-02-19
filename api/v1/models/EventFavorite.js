@@ -23,7 +23,7 @@ EventFavorite.findByUserId = function(user_id) {
     .fetchAll();
 };
 
-EventFavorite.findByUserAndEventId = function(user_id, event_id) {
+EventFavorite.findByUserFavoriteEvent = function(user_id, event_id) {
   return EventFavorite.where({
     user_id: user_id,
     event_id: event_id
