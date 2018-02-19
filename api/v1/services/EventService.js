@@ -80,7 +80,11 @@ module.exports.createEventFavorite = (userId, params) => {
     .catch(
       utils.errors.DuplicateEntryError,
       utils.errors.handleDuplicateEntryError('A event favorite with the given event id already exists', 'eventId')
-    );
+    ).catch(() => {
+      const message = 'An event with the given event id does not exist';
+      const source = 'eventId';
+      throw new errors.InvalidParameterError(message, source);
+    });
 };
 
 module.exports.getEventFavorites = (userId) => EventFavorite.findByAttendeeId(userId);
