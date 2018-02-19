@@ -4,8 +4,8 @@ const EventFavorite = Model.extend({
   tableName: 'event_favorites',
   idAttribute: 'id',
   validations: {
-    attendee_id: ['required', 'integer'],
-    event_id: ['required', 'integer']
+    attendeeId: ['required', 'integer'],
+    eventId: ['required', 'integer']
   }
 });
 

@@ -73,23 +73,23 @@ module.exports.createEvent = (params) => {
 };
 
 module.exports.createEventFavorite = (userId, params) => {
-  params.attendee_id = userId;
+  params.attendeeId = userId;
   const eventFavorite = EventFavorite.forge(params);
 
   return eventFavorite.save()
     .catch(
       utils.errors.DuplicateEntryError,
-      utils.errors.handleDuplicateEntryError('A event favorite with the given event id already exists', 'event_id')
+      utils.errors.handleDuplicateEntryError('A event favorite with the given event id already exists', 'eventId')
     );
 };
 
 module.exports.getEventFavorites = (userId) => EventFavorite.findByAttendeeId(userId);
 
-module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByAttendeeAndEventId(userId, params.event_id)
+module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByAttendeeAndEventId(userId, params.eventId)
     .then((model) => {
       if(_.isNull(model)) {
         const message = 'An event favorite with the given event id does not exist';
-        const source = 'event_id';
+        const source = 'eventId';
         throw new errors.InvalidParameterError(message, source);
       }
       return model.destroy();

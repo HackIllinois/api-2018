@@ -1,8 +1,8 @@
 const Request = require('./Request');
 
-const bodyRequired = [ 'event_id' ];
+const bodyRequired = [ 'eventId' ];
 const bodyValidations = {
-  'event_id': ['required', 'number']
+  'eventId': ['required', 'number']
 };
 
 function EventFavoriteRequest(headers, body) {
