@@ -168,3 +168,102 @@ Errors: <br />
 | InvalidParameterError | `name` | a location with that name has already been created |
 
 ---
+
+**POST /v1/event/favorite** <br />
+Creates an event favorite for the user with the given event id
+
+Headers <br />
+
+| Header        | Description           | Required  |
+| ------------- | --------------------- | --------- |
+| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+
+Request
+```
+{
+  "eventId": 9
+}
+```
+
+Response:
+```
+{
+    "meta": null,
+    "data": {
+        "eventId": 9,
+        "attendeeId": 1,
+        "id": 23
+    }
+}
+```
+
+Errors: <br />
+
+| Error        | Source | Cause  |
+| ------------ | ------ | ------ |
+| InvalidParameterError | `eventId` | A event favorite with the given event id already exists |
+| InvalidParameterError | `eventId` | An event with the given event id does not exist |
+
+---
+
+**GET /v1/event/favorite** <br />
+Gets the event favorites for the user
+
+Headers <br />
+
+| Header        | Description           | Required  |
+| ------------- | --------------------- | --------- |
+| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+
+Response:
+```
+{
+    "meta": null,
+    "data": [
+        {
+            "id": 10,
+            "attendeeId": 1,
+            "eventId": 8
+        },
+        {
+            "id": 23,
+            "attendeeId": 1,
+            "eventId": 9
+        }
+    ]
+}
+```
+
+---
+
+**DELETE /v1/event/favorite** <br />
+Deletes an event favorite for the user with the given event id
+
+Headers <br />
+
+| Header        | Description           | Required  |
+| ------------- | --------------------- | --------- |
+| `Authorization` | a valid authentication token from an ATTENDEE| Yes |
+
+Request
+```
+{
+  "eventId": 9
+}
+```
+
+Response:
+```
+{
+    "meta": null,
+    "data": {}
+}
+```
+
+Errors: <br />
+
+| Error        | Source | Cause  |
+| ------------ | ------ | ------ |
+| InvalidParameterError | `eventId` | An event favorite with the given event id does not exist |
+
+---
