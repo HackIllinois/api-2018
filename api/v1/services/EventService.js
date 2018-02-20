@@ -77,10 +77,7 @@ module.exports.createEvent = (params) => {
 };
 
 function _writeToCache(userId) {
-  return EventFavorite.findByUserId(userId).then((models) => {
-    console.log(models.toJSON());
-    return cache.storeString(EVENT_FAVORITES_CACHE_KEY + userId, JSON.stringify(models.toJSON()));
-  })
+  return EventFavorite.findByUserId(userId).then((models) => cache.storeString(EVENT_FAVORITES_CACHE_KEY + userId, JSON.stringify(models.toJSON())));
 }
 
 module.exports.createEventFavorite = (userId, params) => {
@@ -97,27 +94,17 @@ module.exports.createEventFavorite = (userId, params) => {
       const source = 'eventId';
       throw new errors.InvalidParameterError(message, source);
     })
-    .then((model) => {
-      return _writeToCache(userId).then(() => {
-        return model;
-      });
-    });
+    .then((model) => _writeToCache(userId).then(() => model));
 };
 
-module.exports.getEventFavorites = (userId) => {
-  return cache.hasKey(EVENT_FAVORITES_CACHE_KEY + userId).then((hasKey) => {
-    if(hasKey) {
-      return cache.getString(EVENT_FAVORITES_CACHE_KEY + userId)
+module.exports.getEventFavorites = (userId) => cache.hasKey(EVENT_FAVORITES_CACHE_KEY + userId).then((hasKey) => {
+  if(hasKey) {
+    return cache.getString(EVENT_FAVORITES_CACHE_KEY + userId)
           .then((object) => JSON.parse(object));
-    } else {
-      return EventFavorite.findByUserId(userId).then((models) => {
-        return _writeToCache(userId).then(() => {
-          return models.toJSON();
-        });
-      });
-    }
-  })
-};
+  } 
+  return EventFavorite.findByUserId(userId).then((models) => _writeToCache(userId).then(() => models.toJSON()));
+    
+});
 
 module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByUserFavoriteEvent(userId, params.eventId)
     .then((model) => {
@@ -126,9 +113,5 @@ module.exports.deleteEventFavorite = (userId, params) => EventFavorite.findByUse
         const source = 'eventId';
         throw new errors.InvalidParameterError(message, source);
       }
-      return model.destroy().then((model) => {
-        return _writeToCache(userId).then(() => {
-          return model;
-        });
-      });
+      return model.destroy().then((model) => _writeToCache(userId).then(() => model));
     });
