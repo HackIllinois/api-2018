@@ -51,7 +51,7 @@ function getEvents(req, res, next) {
   const activeOnly = (req.query.active == '1');
   services.EventService.getEvents(activeOnly)
     .then((result) => {
-      res.body = result.toJSON();
+      res.body = result;
 
       return next();
     })
@@ -71,7 +71,7 @@ function createEventFavorite(req, res, next) {
 function getEventFavorites(req, res, next) {
   services.EventService.getEventFavorites(req.user.get('id'))
     .then((result) => {
-      res.body = result.toJSON();
+      res.body = result;
 
       return next();
     })
