@@ -16,28 +16,24 @@ None
 Response
 ```
 {
-  "meta": null,
-  "data": [
-    {
-      "id": 1,
-      "name": "Breakfast",
-      "shortName": "BF",
-      "tracking": 1,
-      "description": "You get food",
-      "created": "2017-02-24T19:53:06.000Z",
-      "updated": "2017-02-24T19:53:06.000Z",
-      "startTime": "2015-01-22T09:37:34.000Z",
-      "endTime": "2017-02-22T09:59:34.000Z",
-      "tag": "HACKATHON",
-      "locations": [
+    "meta": null,
+    "data": [
         {
-          "id": 1,
-          "eventId": 1,
-          "locationId": 1
+            "id": 8,
+            "name": "Breakfast",
+            "description": "You get food",
+            "startTime": "2015-01-22T03:37:34.000Z",
+            "endTime": "2017-02-22T03:59:34.000Z",
+            "tag": "PRE_EVENT",
+            "locations": [
+                {
+                    "id": 7,
+                    "eventId": 8,
+                    "locationId": 1
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
 ```
 
@@ -85,44 +81,40 @@ Headers <br />
 Request
 ```
 {
-	"event" : {
-		"name": "Breakfast",
-		"shortName": "BF",
-		"description": "You get food",
-		"tracking": true,
-		"tag": "HACKATHON",
-		"startTime": "2015-01-22 03:37:34",
-		"endTime": "2017-02-22 03:59:34"
-	},
-	"eventLocations": [{
-		"locationId": 1
-	}]
+  "event" : {
+    "name": "Breakfast",
+    "description": "You get food",
+    "tag": "PRE_EVENT",
+    "startTime": "2015-01-22T09:37:34.000+0600",
+    "endTime": "2017-02-22T09:59:34.000+0600"
+  },
+  "eventLocations": [{
+    "locationId": 1
+  }]
 }
 ```
 
 Response:
 ```
 {
-  "meta": null,
-  "data": {
-    "id": 2,
-    "name": "Breakfast",
-    "shortName": "BF",
-    "tracking": 1,
-    "description": "You get food",
-    "created": "2017-02-24T19:53:06.000Z",
-    "updated": "2017-02-24T19:53:06.000Z",
-    "startTime": "2015-01-22T09:37:34.000Z",
-    "endTime": "2017-02-22T09:59:34.000Z",
-    "tag": "HACKATHON",
-    "locations": [
-      {
-        "id": 4,
-        "eventId": 2,
-        "locationId": 1
-      }
-    ]
-  }
+    "meta": null,
+    "data": {
+        "event": {
+            "name": "Breakfast",
+            "description": "You get food",
+            "tag": "PRE_EVENT",
+            "startTime": "2015-01-22 03:37:34",
+            "endTime": "2017-02-22 03:59:34",
+            "id": 8
+        },
+        "eventLocations": [
+            {
+                "locationId": 1,
+                "eventId": 8,
+                "id": 7
+            }
+        ]
+    }
 }
 ```
 
@@ -151,7 +143,6 @@ Request
 ```
 {
     "name": "Siebel Center",
-    "shortName": "Siebel",
     "latitude": 40.1138,
     "longitude": 88.2249
 }
@@ -163,7 +154,6 @@ Response:
   "meta": null,
   "data": {
     "name": "siebel center",
-    "shortName": "Siebel",
     "latitude": 40.1138,
     "longitude": 88.2249,
     "id": 1
