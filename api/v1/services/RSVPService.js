@@ -29,14 +29,14 @@ module.exports.createRSVP = (attendee, user, attributes) => {
 
   if(attributes.isAttending) {
     StatsService.incrementStat('rsvp', 'school', attendee.get('school'))
-    .then(() => StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation'))
-    .then(() => StatsService.incrementStat('rsvp', 'diet', attendee.get('diet'))
-    .then(() => StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize'))
-    .then(() => StatsService.incrementStat('rsvp', 'gender', attendee.get('gender'))
-    .then(() => StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear'))
-    .then(() => StatsService.incrementStat('rsvp', 'major', attendee.get('major'))
-    .then(() => StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0)
-    .then(() => StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
+    .then(() => StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')))
+    .then(() => StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')))
+    .then(() => StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')))
+    .then(() => StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')))
+    .then(() => StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')))
+    .then(() => StatsService.incrementStat('rsvp', 'major', attendee.get('major')))
+    .then(() => StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0))
+    .then(() => StatsService.incrementStat('rsvp', 'attendees', 'count'));
   }
 
   attributes.attendeeId = attendee.get('id');
@@ -88,24 +88,24 @@ module.exports.updateRSVP = (user, rsvp, attributes) => {
   RegistrationService.findAttendeeByUser(user).then((attendee) => {
     if(!oldAttending && newAttending) {
       StatsService.incrementStat('rsvp', 'school', attendee.get('school'))
-      .then(() => StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation'))
-      .then(() => StatsService.incrementStat('rsvp', 'diet', attendee.get('diet'))
-      .then(() => StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize'))
-      .then(() => StatsService.incrementStat('rsvp', 'gender', attendee.get('gender'))
-      .then(() => StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear'))
-      .then(() => StatsService.incrementStat('rsvp', 'major', attendee.get('major'))
-      .then(() => StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0)
-      .then(() => StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
+      .then(() => StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')))
+      .then(() => StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')))
+      .then(() => StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')))
+      .then(() => StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')))
+      .then(() => StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')))
+      .then(() => StatsService.incrementStat('rsvp', 'major', attendee.get('major')))
+      .then(() => StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0))
+      .then(() => StatsService.incrementStat('rsvp', 'attendees', 'count'));
     } else if(oldAttending && !newAttending) {
       StatsService.decrementStat('rsvp', 'school', attendee.get('school'))
-      .then(() => StatsService.decrementStat('rsvp', 'transportation', attendee.get('transportation'))
-      .then(() => StatsService.decrementStat('rsvp', 'diet', attendee.get('diet'))
-      .then(() => StatsService.decrementStat('rsvp', 'shirtSize', attendee.get('shirtSize'))
-      .then(() => StatsService.decrementStat('rsvp', 'gender', attendee.get('gender'))
-      .then(() => StatsService.decrementStat('rsvp', 'graduationYear', attendee.get('graduationYear'))
-      .then(() => StatsService.decrementStat('rsvp', 'major', attendee.get('major'))
-      .then(() => StatsService.decrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0)
-      .then(() => StatsService.decrementStat('rsvp', 'attendees', 'count')))))))));
+      .then(() => StatsService.decrementStat('rsvp', 'transportation', attendee.get('transportation')))
+      .then(() => StatsService.decrementStat('rsvp', 'diet', attendee.get('diet')))
+      .then(() => StatsService.decrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')))
+      .then(() => StatsService.decrementStat('rsvp', 'gender', attendee.get('gender')))
+      .then(() => StatsService.decrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')))
+      .then(() => StatsService.decrementStat('rsvp', 'major', attendee.get('major')))
+      .then(() => StatsService.decrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0))
+      .then(() => StatsService.decrementStat('rsvp', 'attendees', 'count'));
     }
   });
 
