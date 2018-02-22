@@ -327,16 +327,19 @@ module.exports.createAttendee = (user, attributes) => {
     return _Promise.reject(new errors.InvalidParameterError(message, source));
   }
 
-  StatsService.incrementStat('registration', 'transportation', attributes.attendee.transportation);
-  StatsService.incrementStat('registration', 'diet', attributes.attendee.diet);
-  StatsService.incrementStat('registration', 'shirt_size', attributes.attendee.shirtSize);
-  StatsService.incrementStat('registration', 'gender', attributes.attendee.gender);
-  StatsService.incrementStat('registration', 'is_novice', attributes.attendee.isNovice);
-  StatsService.incrementStat('registration', 'status', attributes.attendee.status);
-  StatsService.incrementStat('registration', 'attendees', 'count');
-  StatsService.incrementStat('registration', 'school', attributes.attendee.school);
-  StatsService.incrementStat('registration', 'graduation_year', attributes.attendee.graduationYear);
-  StatsService.incrementStat('registration', 'major', attributes.attendee.major);
+  const statAttributes = attributes.attendee;
+
+  StatsService.incrementStat('registration', 'school', statAttributes.school).then(() =>
+    StatsService.incrementStat('registration', 'transportation', statAttributes.transportation).then(() =>
+      StatsService.incrementStat('registration', 'diet', statAttributes.diet).then(() => 
+        StatsService.incrementStat('registration', 'shirtSize', statAttributes.shirtSize).then(() =>
+          StatsService.incrementStat('registration', 'gender', statAttributes.gender).then(() =>
+            StatsService.incrementStat('registration', 'graduationYear', statAttributes.graduationYear).then(() =>
+              StatsService.incrementStat('registration', 'major', statAttributes.major).then(() =>
+                StatsService.incrementStat('registration', 'isNovice', statAttributes.isNovice ? 1 : 0).then(() =>
+                  StatsService.incrementStat('registration', 'attendees', 'count').then(() =>
+                    StatsService.incrementStat('registration', 'status', 'PENDING'))))))))));
+  
 
   const attendeeAttrs = attributes.attendee;
   delete attributes.attendee;

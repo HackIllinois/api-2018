@@ -62,7 +62,7 @@ module.exports.createCheckIn = (attributes) => {
   const credentialsRequested = attributes.credentialsRequested;
   delete attributes.credentialsRequested;
 
-  StatsService.incrementStat('live_event', 'attendees', 'count');
+  StatsService.incrementStat('liveEvent', 'attendees', 'count');
 
   return CheckIn.transaction((t) => new CheckIn(attributes)
       .save(null, {

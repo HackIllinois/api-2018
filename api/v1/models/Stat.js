@@ -66,10 +66,10 @@ Stat.increment = (category, stat, field, amount) => {
     amount = 1;
   }
 
-  const s = Stat.query((qb) => {
-    qb.where('category', '=', category);
-    qb.where('stat', '=', stat);
-    qb.where('field', '=', field);
+  const s = Stat.where({
+    category: category,
+    stat: stat,
+    field: field
   }).fetch();
 
   return s.then((model) => {

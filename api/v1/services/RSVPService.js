@@ -26,16 +26,16 @@ module.exports.getRSVPById = (id) => RSVP.findById(id);
  */
 module.exports.createRSVP = (attendee, user, attributes) => {
 
-  StatsService.incrementStat('rsvp', 'school', attendee.get('school'));
-  StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation'));
-  StatsService.incrementStat('rsvp', 'diet', attendee.get('diet'));
-  StatsService.incrementStat('rsvp', 'shirt_size', attendee.get('shirtSize'));
-  StatsService.incrementStat('rsvp', 'gender', attendee.get('gender'));
-  StatsService.incrementStat('rsvp', 'graduation_year', attendee.get('graduationYear'));
-  StatsService.incrementStat('rsvp', 'major', attendee.get('major'));
-  StatsService.incrementStat('rsvp', 'is_novice', attendee.get('isNovice'));
-  StatsService.incrementStat('rsvp', 'attendees', 'count');
-
+  StatsService.incrementStat('rsvp', 'school', attendee.get('school')).then(() =>
+    StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')).then(() =>
+      StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')).then(() => 
+        StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')).then(() =>
+          StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')).then(() =>
+            StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')).then(() =>
+              StatsService.incrementStat('rsvp', 'major', attendee.get('major')).then(() =>
+                StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0).then(() =>
+                  StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
+  
 
   attributes.attendeeId = attendee.get('id');
   const rsvp = RSVP.forge(attributes);

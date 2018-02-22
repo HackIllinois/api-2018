@@ -41,8 +41,8 @@ module.exports.incrementStat = function (category, stat, field) {
       _incrementCachedStat(category, stat, field);
     }
   });
-  if(category == 'live_event' && category == 'events') {
-    return new _Promise();
+  if(category == 'liveEvent' && category == 'events') {
+    return _Promise.resolve(true);
   } 
   return Stat.increment(category, stat, field);
   
@@ -71,9 +71,9 @@ function _resetCachedStat() {
   stats['rsvp']['isNovice'] = {};
   stats['rsvp']['major'] = {};
   stats['rsvp']['attendees'] = {};
-  stats['live_event'] = {};
-  stats['live_event']['attendees'] = {};
-  stats['live_event']['events'] = {};
+  stats['liveEvent'] = {};
+  stats['liveEvent']['attendees'] = {};
+  stats['liveEvent']['events'] = {};
   return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
 }
 
@@ -119,7 +119,7 @@ function _readStatsFromDatabase() {
       });
     }));
 
-    queries.push(_findAll('registration', 'shirt_size').then((collection) => {
+    queries.push(_findAll('registration', 'shirtSize').then((collection) => {
       collection.forEach((model) => {
         stats['registration']['shirtSize'][model.get('field')] = model.get('count');
       });
@@ -131,13 +131,13 @@ function _readStatsFromDatabase() {
       });
     }));
 
-    queries.push(_findAll('registration', 'graduation_year').then((collection) => {
+    queries.push(_findAll('registration', 'graduationYear').then((collection) => {
       collection.forEach((model) => {
         stats['registration']['graduationYear'][model.get('field')] = model.get('count');
       });
     }));
 
-    queries.push(_findAll('registration', 'is_novice').then((collection) => {
+    queries.push(_findAll('registration', 'isNovice').then((collection) => {
       collection.forEach((model) => {
         stats['registration']['isNovice'][model.get('field')] = model.get('count');
       });
@@ -180,7 +180,7 @@ function _readStatsFromDatabase() {
       });
     }));
 
-    queries.push(_findAll('rsvp', 'shirt_size').then((collection) => {
+    queries.push(_findAll('rsvp', 'shirtSize').then((collection) => {
       collection.forEach((model) => {
         stats['rsvp']['shirtSize'][model.get('field')] = model.get('count');
       });
@@ -192,13 +192,13 @@ function _readStatsFromDatabase() {
       });
     }));
 
-    queries.push(_findAll('rsvp', 'graduation_year').then((collection) => {
+    queries.push(_findAll('rsvp', 'graduationYear').then((collection) => {
       collection.forEach((model) => {
         stats['rsvp']['graduationYear'][model.get('field')] = model.get('count');
       });
     }));
 
-    queries.push(_findAll('rsvp', 'is_novice').then((collection) => {
+    queries.push(_findAll('rsvp', 'isNovice').then((collection) => {
       collection.forEach((model) => {
         stats['rsvp']['isNovice'][model.get('field')] = model.get('count');
       });
@@ -217,15 +217,15 @@ function _readStatsFromDatabase() {
     }));
 
 
-    queries.push(_findAll('live_event', 'attendees').then((collection) => {
+    queries.push(_findAll('liveEvent', 'attendees').then((collection) => {
       collection.forEach((model) => {
-        stats['live_event']['attendees'][model.get('field')] = model.get('count');
+        stats['liveEvent']['attendees'][model.get('field')] = model.get('count');
       });
     }));
 
     queries.push(TrackingEvent.findAll().then((collection) => {
       collection.forEach((model) => {
-        stats['live_event']['events'][model.get('name')] = model.get('count');
+        stats['liveEvent']['events'][model.get('name')] = model.get('count');
       });
     }));
 
@@ -259,6 +259,6 @@ module.exports.fetchRSVPStats = function() {
   return _fetchAllStats().then((stats) => stats['rsvp']);
 };
 
-module.exports.fetchLive_EventStats = function() {
-  return _fetchAllStats().then((stats) => stats['live_event']);
+module.exports.fetchLiveEventStats = function() {
+  return _fetchAllStats().then((stats) => stats['liveEvent']);
 };
