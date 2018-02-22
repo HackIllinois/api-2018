@@ -90,6 +90,23 @@ module.exports.findUserByEmail = (email) => User
     });
 
 /**
+ * Finds a user by querying for the given github handle
+ * @param  {String} github the github handle to query
+ * @return {Promise} resolving to the associated User model
+ * @throws {NotFoundError} when the requested user cannot be found
+ */
+module.exports.findUserByGitHubHandle = (handle) => User
+    .findByGitHubHandle(handle)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'A user with the given github cannot be found';
+        const source = 'handle';
+        throw new errors.NotFoundError(message, source);
+      }
+      return _Promise.resolve(result);
+    });
+
+/**
  * Verifies that the provided password matches the user's password
  * @param  {User} user a User model
  * @param  {String} password the value to verify
