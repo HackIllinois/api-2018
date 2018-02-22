@@ -1,1 +1,1 @@
-DROP TABLE `job_applications`;
+DROP TABLE `recruiter_interests`;
