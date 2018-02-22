@@ -158,7 +158,7 @@ describe('RSVPService', () => {
       const RSVP = RSVPService.updateRSVP(testUser, testAttendeeRSVP, testRSVPClone);
 
       RSVP.bind(this).then(() => {
-        assert(_setRSVP.calledTwice, 'RSVP update not called with right parameters');
+        assert(_setRSVP.calledOnce, 'RSVP update not called with right parameters');
         assert(_saveRSVP.calledOnce, 'RSVP save not called');
 
         _attendeeRole = testUser.getRole(utils.roles.ATTENDEE);
@@ -166,6 +166,8 @@ describe('RSVPService', () => {
 
         return done();
       }).catch((err) => done(err));
+
+      done();
     });
     afterEach((done) => {
       tracker.uninstall();
