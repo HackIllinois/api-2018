@@ -4,7 +4,7 @@ Provides utilities for applicant decisions
 
 
 **GET /v1/registration/attendee/all?category=x&ascending=x&page=x&count=x** <br />
-Retrieve all attendees 
+Retrieve all attendees
 
 Headers <br />
 
@@ -104,7 +104,7 @@ Errors: <br>
 ---
 
 **GET /v1/registration/attendee/search?category=x&ascending=x&page=x&count=x&query=x** <br />
-Retrieve all attendees 
+Retrieve all attendees
 
 Headers <br />
 

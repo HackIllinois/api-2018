@@ -104,6 +104,23 @@ module.exports.findUserByEmail = (email) => User
     });
 
 /**
+ * Finds a user by querying for the given github handle
+ * @param  {String} github the github handle to query
+ * @return {Promise} resolving to the associated User model
+ * @throws {NotFoundError} when the requested user cannot be found
+ */
+module.exports.findUserByGitHubHandle = (handle) => User
+    .findByGitHubHandle(handle)
+    .then((result) => {
+      if (_.isNull(result)) {
+        const message = 'A user with the given github cannot be found';
+        const source = 'handle';
+        throw new errors.NotFoundError(message, source);
+      }
+      return _Promise.resolve(result);
+    });
+
+/**
  * Verifies that the provided password matches the user's password
  * @param  {User} user a User model
  * @param  {String} password the value to verify
@@ -134,17 +151,20 @@ module.exports.resetPassword = (user, password) => user
 
 /**
  * Adds role to a user
- * @param  {User} u_.isUndefined(originUser)ser assigning new role
+ * @param  {User} user assigning new role
  * @param  {User} assignedUser the assigned User's model
  * @param  {Role} newRole the new role
  * @param  {User} originUser the original user to determine if impersonated
  * @return {Boolean} whether user can assign new role to assignedUser
  */
 module.exports.canAssign = (user, assignedUser, newRole, originUser) => {
-  return maxRole(user.related('roles').toJSON()) > ROLE_VALUE_MAP[newRole]
-      && maxRole(user.related('roles').toJSON()) > maxRole(assignedUser.related('roles').toJSON())
+  let maxUserRole = maxRole(user.related('roles').toJSON());
+  let maxAssigneeRole = maxRole(assignedUser.related('roles').toJSON());
+
+  return maxUserRole > ROLE_VALUE_MAP[newRole]
+      && maxUserRole > maxAssigneeRole
       && _.isUndefined(originUser)
-      && (maxRole(assignedUser.related('roles').toJSON()) > 0 || assignedUser.hasRole(roles.VOLUNTEER));
+      && (maxAssigneeRole > 0 || assignedUser.hasRole(roles.VOLUNTEER));
 };
 
 /**
@@ -159,6 +179,7 @@ module.exports.addRole = (user, role, active) => UserRole
     .then((updatedUser) => {
       return updatedUser;
     });
+
 module.exports.updateContactInfo = (user, newEmail) => {
   if(!_.isNull(user.get('password'))) {
     const message = 'Cannot update the contact info of a Basic user';

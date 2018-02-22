@@ -13,6 +13,7 @@ module.exports = {
   MailingListUser: require('./MailingListUser'),
   User: require('./User'),
   UserRole: require('./UserRole'),
+  RecruiterInterest: require('./RecruiterInterest'),
   Token: require('./Token'),
   Mentor: require('./Mentor'),
   MentorProjectIdea: require('./MentorProjectIdea'),
