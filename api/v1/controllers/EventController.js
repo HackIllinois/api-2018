@@ -47,6 +47,12 @@ function createEvent(req, res, next) {
     .catch((error) => next(error));
 }
 
+function deleteEvent(req, res, next) {
+  services.EventService.deleteEvent(req.body)
+    .then(() => next())
+    .catch((error) => next(error));
+}
+
 function getEvents(req, res, next) {
   const activeOnly = (req.query.active == '1');
   services.EventService.getEvents(activeOnly)
@@ -88,6 +94,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
+router.delete('/', middleware.request(requests.EventDeletionRequest), middleware.permission(roles.ORGANIZERS), deleteEvent);
 router.get('/', getEvents);
 router.get('/location/all', getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);

@@ -76,6 +76,16 @@ module.exports.createEvent = (params) => {
     );
 };
 
+module.exports.deleteEvent = (params) => Event.findById(params.eventId).then((model) => {
+  if (_.isNull(model)) {
+    const message = 'An event with the given eventId does not exist';
+    const source = 'eventId';
+    throw new errors.InvalidParameterError(message, source);
+  }
+  model.related('locations').forEach((location) => location.destroy());
+  return model.destroy();
+});
+
 function _writeToCache(userId) {
   return EventFavorite.findByUserId(userId).then((models) => cache.storeString(EVENT_FAVORITES_CACHE_KEY + userId, JSON.stringify(models.toJSON())));
 }

@@ -1,11 +1,11 @@
 const Request = require('./Request');
 
-const bodyRequired = ['appId'];
-const bodyAllowed = [ 'comments', 'favorite']
+const bodyRequired = [ 'appId' ];
+const bodyAllowed = ['comments', 'favorite'];
 const bodyValidations = {
   'appId': ['required', 'naturalNonZero'],
   'comments': ['string', 'maxLength:255'],
-  'favorite': ['natural']
+  'favorite': [ 'natural' ]
 };
 
 function RecruiterInterestUpdateRequest(headers, body) {
@@ -13,7 +13,7 @@ function RecruiterInterestUpdateRequest(headers, body) {
 
   this.bodyRequired = bodyRequired;
   this.bodyValidations = bodyValidations;
-  this.bodyAllowed = bodyAllowed
+  this.bodyAllowed = bodyAllowed;
 }
 
 RecruiterInterestUpdateRequest.prototype = Object.create(Request.prototype);
