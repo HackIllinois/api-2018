@@ -48,7 +48,7 @@
     "lists": {
       "test": { "name": "test", "id": "test" },
       "idlers": { "name": "idlers", "id": "idlers-2017" },
-      "attendees": { "name": "attendees", "id": "attendees-2017" },
+      "applicants": { "name": "applicants", "id": "applicants-2017" },
       "accepted": { "name": "accepted", "id": "accepted-2017" },
       "lightningTalks": { "name": "lightning_talks", "id": "lightning-talks-2017" },
       "waitlisted": { "name": "waitlisted", "id": "waitlisted-2017" },
