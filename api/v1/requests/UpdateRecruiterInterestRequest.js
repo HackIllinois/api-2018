@@ -1,14 +1,13 @@
 const Request = require('./Request');
 
-const bodyRequired = [ 'attendeeUserId' ];
+const bodyRequired = [];
 const bodyAllowed = ['comments', 'favorite'];
 const bodyValidations = {
-  'attendeeUserId': ['required', 'integer'],
   'comments': ['string', 'maxLength:255'],
   'favorite': [ 'boolean' ]
 };
 
-function RecruiterInterestRequest(headers, body) {
+function UpdateRecruiterInterestRequest(headers, body) {
   Request.call(this, headers, body);
 
   this.bodyRequired = bodyRequired;
@@ -16,7 +15,7 @@ function RecruiterInterestRequest(headers, body) {
   this.bodyAllowed = bodyAllowed;
 }
 
-RecruiterInterestRequest.prototype = Object.create(Request.prototype);
-RecruiterInterestRequest.prototype.constructor = RecruiterInterestRequest;
+UpdateRecruiterInterestRequest.prototype = Object.create(Request.prototype);
+UpdateRecruiterInterestRequest.prototype.constructor = UpdateRecruiterInterestRequest;
 
-module.exports = RecruiterInterestRequest;
+module.exports = UpdateRecruiterInterestRequest;
