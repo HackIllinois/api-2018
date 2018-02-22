@@ -94,7 +94,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
-router.delete('/', middleware.request(requests.EventDeleteRequest), middleware.permission(roles.ORGANIZERS), deleteEvent);
+router.delete('/', middleware.request(requests.EventDeletionRequest), middleware.permission(roles.ORGANIZERS), deleteEvent);
 router.get('/', getEvents);
 router.get('/location/all', getAllLocations);
 router.post('/location', middleware.request(requests.LocationCreationRequest), middleware.permission(roles.ORGANIZERS), createLocation);

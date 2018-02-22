@@ -5,14 +5,14 @@ const bodyValidations = {
   'name': ['required', 'string']
 };
 
-function EventDeleteRequest(headers, body) {
+function EventDeletionRequest(headers, body) {
   Request.call(this, headers, body);
 
   this.bodyRequired = bodyRequired;
   this.bodyValidations = bodyValidations;
 }
 
-EventDeleteRequest.prototype = Object.create(Request.prototype);
-EventDeleteRequest.prototype.constructor = EventDeleteRequest;
+EventDeletionRequest.prototype = Object.create(Request.prototype);
+EventDeletionRequest.prototype.constructor = EventDeletionRequest;
 
-module.exports = EventDeleteRequest;
+module.exports = EventDeletionRequest;
