@@ -88,6 +88,17 @@ function getUserByEmail(req, res, next) {
     .catch((error) => next(error));
 }
 
+function getUserByGithubHandle(req, res, next) {
+  services.UserService
+    .findUserByGitHubHandle(req.params.handle)
+    .then((user) => {
+      res.body = user.toJSON();
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
 function requestPasswordReset(req, res, next) {
   services.UserService
     .findUserByEmail(req.body.email)
@@ -128,6 +139,7 @@ router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPas
 router.get('/', middleware.permission(roles.NONE, isAuthenticated), getAuthenticatedUser);
 router.get('/:id(\\d+)', middleware.permission(roles.HOSTS, isRequester), getUser);
 router.get('/email/:email', middleware.permission(roles.HOSTS), getUserByEmail);
+router.get('/github/:handle', middleware.permission(roles.HOSTS), getUserByGithubHandle);
 router.put('/contactinfo', middleware.request(requests.UserContactInfoRequest),
   middleware.permission(roles.NONE, isAuthenticated), updateContactInfo);
 
