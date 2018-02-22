@@ -27,18 +27,18 @@ module.exports.findByApplicationId = (appId) => RecruiterInterest
     return _Promise.resolve(result);
   });
 
-module.exports.findByApplicantId = (applicantId) => RecruiterInterest
-  .findByApplicantId(applicantId)
+module.exports.findByAttendeeId = (attendeeId) => RecruiterInterest
+  .findByAttendeeId(attendeeId)
   .then((result) => {
     if (_.isNull(result)) {
-      const message = 'An applicant with the given ID cannot be found';
+      const message = 'An attendee with the given ID cannot be found';
       const source = 'id';
       throw new errors.NotFoundError(message, source);
     }
     return _Promise.resolve(result);
   });
 
-module.exports.createApplication = (recruiterId, applicantId, comments, favorite) => {
+module.exports.createApplication = (recruiterId, attendeeId, comments, favorite) => {
   if (!comments) {
     comments = "";
   }
@@ -48,7 +48,7 @@ module.exports.createApplication = (recruiterId, applicantId, comments, favorite
 
   const application = RecruiterInterest.forge({
     recruiterId: recruiterId,
-    applicantId: applicantId,
+    attendeeId: attendeeId,
     comments: comments,
     favorite: favorite
   });

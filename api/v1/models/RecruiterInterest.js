@@ -6,7 +6,7 @@ const RecruiterInterest = Model.extend({
   idAttribute: 'app_id',
   validations: {
     recruiterId: ['integer'],
-    applicantId: ['integer'],
+    attendeeId: ['integer'],
     comments: ['string'],
     favorite: ['integer']
   }
@@ -22,8 +22,8 @@ RecruiterInterest.findByRecruiterId = (id) => RecruiterInterest.where({
 })
   .fetchAll();
 
-RecruiterInterest.findByApplicantId = (id) => RecruiterInterest.where({
-  applicant_id: id
+RecruiterInterest.findByAttendeeId = (id) => RecruiterInterest.where({
+  attendee_id: id
 })
   .fetchAll();
 

@@ -1,6 +1,6 @@
 ### Purpose
 
-Provides utilities for applicant decisions
+Provides utilities for attendee decisions
 
 
 **GET /v1/registration/attendee/all?category=x&ascending=x&page=x&count=x** <br />
@@ -123,7 +123,7 @@ Request Parameters <br />
 | `count` | the number of projects by page | No |
 | `category` | the category to sort by | No |
 | `ascending` | 0 or 1 depending on what order to sort by | No |
-| `query` | either the first or last name of the applicant | Yes |
+| `query` | either the first or last name of the attendee | Yes |
 
 
 Response

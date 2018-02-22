@@ -130,7 +130,7 @@ function createAttendee(req, res, next) {
 
   services.RegistrationService.createAttendee(req.user, req.body)
     .tap((attendee) => {
-      services.MailService.addToList(req.user, config.mail.lists.applicants);
+      services.MailService.addToList(req.user, config.mail.lists.attendees);
 
       const substitutions = {
         name: attendee.get('firstName'),
