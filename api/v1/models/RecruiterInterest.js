@@ -5,14 +5,14 @@ const RecruiterInterest = Model.extend({
   hasTimestamps: ['created', 'updated'],
   idAttribute: 'app_id',
   validations: {
-    recruiterId: ['integer'],
-    attendeeId: ['integer'],
+    recruiterId: ['required','integer'],
+    attendeeId: ['required','integer'],
     comments: ['string'],
     favorite: ['integer']
   }
 });
 
-RecruiterInterest.findByApplicationId = (id) => RecruiterInterest.where({
+RecruiterInterest.findById = (id) => RecruiterInterest.where({
   app_id: id
 })
   .fetch();
@@ -27,7 +27,7 @@ RecruiterInterest.findByAttendeeId = (id) => RecruiterInterest.where({
 })
   .fetchAll();
 
-RecruiterInterest.updateApplication = (appId, comments, favorite) => RecruiterInterest
+RecruiterInterest.updateInterest = (appId, comments, favorite) => RecruiterInterest
     .where({app_id: appId})
     .save({comments:comments,favorite:favorite},{patch:true});
 

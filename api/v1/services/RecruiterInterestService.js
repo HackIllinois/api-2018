@@ -16,11 +16,11 @@ module.exports.findByRecruiterId = (recruiterId) => RecruiterInterest
     return _Promise.resolve(result);
   });
 
-module.exports.findByApplicationId = (appId) => RecruiterInterest
-  .findByApplicationId(appId)
+module.exports.findById = (id) => RecruiterInterest
+  .findById(id)
   .then((result) => {
     if (_.isNull(result)) {
-      const message = 'An application with the given ID cannot be found';
+      const message = 'An interest with the given ID cannot be found';
       const source = 'id';
       throw new errors.NotFoundError(message, source);
     }
@@ -38,29 +38,29 @@ module.exports.findByAttendeeId = (attendeeId) => RecruiterInterest
     return _Promise.resolve(result);
   });
 
-module.exports.createApplication = (recruiterId, attendeeId, comments, favorite) => {
-  if (!comments) {
+module.exports.createInterest = (recruiterId, attendeeId, comments, favorite) => {
+  if (_.isUndefined(comments)) {
     comments = "";
   }
-  if (!favorite) {
+  if (_.isUndefined(favorite)) {
     favorite = 0;
   }
 
-  const application = RecruiterInterest.forge({
+  const interest = RecruiterInterest.forge({
     recruiterId: recruiterId,
     attendeeId: attendeeId,
     comments: comments,
     favorite: favorite
   });
 
-  return application
+  return interest
     .validate()
     .catch(utils.errors.handleValidationError)
-    .then(() => application.save());
+    .then(() => interest.save());
 };
 
-module.exports.updateApplication = (appId, comments, favorite) => RecruiterInterest
-  .updateApplication(appId, comments, favorite)
+module.exports.updateInterest = (id, comments, favorite) => RecruiterInterest
+  .updateInterest(id, comments, favorite)
   .then((result) => {
     if (_.isNull(result)) {
       const message = 'An application with the given ID cannot be found';
