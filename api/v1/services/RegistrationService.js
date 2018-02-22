@@ -329,16 +329,16 @@ module.exports.createAttendee = (user, attributes) => {
 
   const statAttributes = attributes.attendee;
 
-  StatsService.incrementStat('registration', 'school', statAttributes.school).then(() =>
-    StatsService.incrementStat('registration', 'transportation', statAttributes.transportation).then(() =>
-      StatsService.incrementStat('registration', 'diet', statAttributes.diet).then(() => 
-        StatsService.incrementStat('registration', 'shirtSize', statAttributes.shirtSize).then(() =>
-          StatsService.incrementStat('registration', 'gender', statAttributes.gender).then(() =>
-            StatsService.incrementStat('registration', 'graduationYear', statAttributes.graduationYear).then(() =>
-              StatsService.incrementStat('registration', 'major', statAttributes.major).then(() =>
-                StatsService.incrementStat('registration', 'isNovice', statAttributes.isNovice ? 1 : 0).then(() =>
-                  StatsService.incrementStat('registration', 'attendees', 'count').then(() =>
-                    StatsService.incrementStat('registration', 'status', 'PENDING'))))))))));
+  StatsService.incrementStat('registration', 'school', statAttributes.school)
+  .then(() => StatsService.incrementStat('registration', 'transportation', statAttributes.transportation)
+  .then(() => StatsService.incrementStat('registration', 'diet', statAttributes.diet)
+  .then(() => StatsService.incrementStat('registration', 'shirtSize', statAttributes.shirtSize)
+  .then(() => StatsService.incrementStat('registration', 'gender', statAttributes.gender)
+  .then(() => StatsService.incrementStat('registration', 'graduationYear', statAttributes.graduationYear)
+  .then(() => StatsService.incrementStat('registration', 'major', statAttributes.major)
+  .then(() => StatsService.incrementStat('registration', 'isNovice', statAttributes.isNovice ? 1 : 0)
+  .then(() => StatsService.incrementStat('registration', 'attendees', 'count')
+  .then(() => StatsService.incrementStat('registration', 'status', 'PENDING'))))))))));
   
 
   const attendeeAttrs = attributes.attendee;
