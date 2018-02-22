@@ -1,8 +1,8 @@
 const Request = require('./Request');
 
-const bodyRequired = [ 'name' ];
+const bodyRequired = [ 'eventId' ];
 const bodyValidations = {
-  'name': ['required', 'string']
+  'eventId': ['required', 'number']
 };
 
 function EventDeletionRequest(headers, body) {

@@ -76,10 +76,10 @@ module.exports.createEvent = (params) => {
     );
 };
 
-module.exports.deleteEvent = (params) => Event.findByName(params.name).then((model) => {
+module.exports.deleteEvent = (params) => Event.findById(params.eventId).then((model) => {
   if (_.isNull(model)) {
-    const message = 'An event with the given name does not exist';
-    const source = 'name';
+    const message = 'An event with the given eventId does not exist';
+    const source = 'eventId';
     throw new errors.InvalidParameterError(message, source);
   }
   model.related('locations').forEach((location) => location.destroy());
