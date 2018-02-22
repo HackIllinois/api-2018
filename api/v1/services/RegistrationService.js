@@ -174,7 +174,7 @@ function _addToMailingList(attendee, decision) {
 
     return _Promise.all(promises);
   }
-  // applicant's wave was changed
+  // attendee's wave was changed
   else if (attendee.wave != decision.wave && attendee.status === decision.status && decision.status === 'ACCEPTED') {
     const oldListName = 'wave' + attendee.wave;
     const newListName = 'wave' + decision.wave;
@@ -184,7 +184,7 @@ function _addToMailingList(attendee, decision) {
     promises.push(MailService.addToList(user, config.mail.lists[newListName]));
     return _Promise.all(promises);
   }
-  // applicant accepted off of waitlist (or removed from rejected)
+  // attendee accepted off of waitlist (or removed from rejected)
   else if ((attendee.status === 'WAITLISTED' || attendee.status === 'REJECTED') && decision.status === 'ACCEPTED') {
     const waveListName = 'wave' + decision.wave;
     const outgoingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
@@ -197,14 +197,14 @@ function _addToMailingList(attendee, decision) {
     }
     return _Promise.all(promises);
   }
-  // applicant rejected off of waitlist
+  // attendee rejected off of waitlist
   else if (attendee.status === 'WAITLISTED' && decision.status === 'REJECTED') {
     promises = [];
     promises.push(MailService.removeFromList(user, config.mail.lists.waitlisted));
     promises.push(MailService.addToList(user, config.mail.lists.rejected));
     return _Promise.all(promises);
   }
-  // move applicant from accepted to rejected or waitlisted
+  // move attendee from accepted to rejected or waitlisted
   else if (attendee.status === 'ACCEPTED' && decision.status !== 'ACCEPTED') {
     const oldWaveName = 'wave' + attendee.wave;
     const incomingList = (attendee.status === 'WAITLISTED') ? config.mail.lists.waitlisted : config.mail.lists.rejected;
