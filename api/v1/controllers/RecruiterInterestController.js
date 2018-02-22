@@ -8,14 +8,10 @@ const roles = require('../utils/roles');
 
 const router = require('express').Router();
 
-const _ = require('lodash');
-
 function createApplication(req, res, next) {
-  console.log(req.body.attendeeId);
   services.RegistrationService
     .findAttendeeById(req.body.attendeeId, false)
     .then((attendeeId) => {
-      console.log(attendeeId);
       services.RecruiterInterestService
         .createApplication(req.user.get('id'), attendeeId.get('id'), req.body.comments, req.body.favorite)
         .then((application) => {
