@@ -48,6 +48,21 @@ module.exports.incrementStat = function (category, stat, field) {
   
 };
 
+module.exports.decrementStat = function (category, stat, field) {
+  cache.hasKey(STATS_CACHE_KEY).then((hasKey) => {
+    if (!hasKey) {
+      _resetCachedStat().then(() => _decrementCachedStat(category, stat, field));
+    } else {
+      _decrementCachedStat(category, stat, field);
+    }
+  });
+  if(category == 'liveEvent' && category == 'events') {
+    return _Promise.resolve(true);
+  } 
+  return Stat.increment(category, stat, field, -1);
+  
+};
+
 function _resetCachedStat() {
   const stats = {};
   stats['registration'] = {};
@@ -92,6 +107,25 @@ function _incrementCachedStat(category, stat, field) {
       stats[category][stat][field] = 0;
     }
     stats[category][stat][field] += 1;
+    return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
+  });
+}
+
+function _decrementCachedStat(category, stat, field) {
+  cache.getString(STATS_CACHE_KEY).then((object) => JSON.parse(object)).then((stats) => {
+    if(stats == null) {
+      stats = {};
+    }
+    if(stats[category] == null) {
+      stats[category] = {};
+    }
+    if(stats[category][stat] == null) {
+      stats[category][stat] = {};
+    }
+    if(stats[category][stat][field] == null) {
+      stats[category][stat][field] = 0;
+    }
+    stats[category][stat][field] -= 1;
     return cache.storeString(STATS_CACHE_KEY, JSON.stringify(stats));
   });
 }

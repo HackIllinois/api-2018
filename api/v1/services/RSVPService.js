@@ -8,6 +8,7 @@ const errors = require('../errors');
 const utils = require('../utils');
 
 const StatsService = require('../services/StatsService');
+const RegistrationService = require('../services/RegistrationService');
 
 /**
  * Gets an rsvp by its id
@@ -26,16 +27,17 @@ module.exports.getRSVPById = (id) => RSVP.findById(id);
  */
 module.exports.createRSVP = (attendee, user, attributes) => {
 
-  StatsService.incrementStat('rsvp', 'school', attendee.get('school')).then(() =>
-    StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')).then(() =>
-      StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')).then(() => 
-        StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')).then(() =>
-          StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')).then(() =>
-            StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')).then(() =>
-              StatsService.incrementStat('rsvp', 'major', attendee.get('major')).then(() =>
-                StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0).then(() =>
-                  StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
-  
+  if(attributes.isAttending) {
+    StatsService.incrementStat('rsvp', 'school', attendee.get('school')).then(() =>
+      StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')).then(() =>
+        StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')).then(() => 
+          StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')).then(() =>
+            StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')).then(() =>
+              StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')).then(() =>
+                StatsService.incrementStat('rsvp', 'major', attendee.get('major')).then(() =>
+                  StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0).then(() =>
+                    StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
+  }
 
   attributes.attendeeId = attendee.get('id');
   const rsvp = RSVP.forge(attributes);
@@ -81,6 +83,32 @@ module.exports.findRSVPByAttendee = (attendee) => RSVP
  * @returns {Promise} the resolved RSVP
  */
 module.exports.updateRSVP = (user, rsvp, attributes) => {
+  const oldAttending = rsvp.get('isAttending');
+  const newAttending = attributes.isAttending;
+  RegistrationService.findAttendeeByUser(user).then((attendee) => {
+    if(!oldAttending && newAttending) {
+      StatsService.incrementStat('rsvp', 'school', attendee.get('school')).then(() =>
+        StatsService.incrementStat('rsvp', 'transportation', attendee.get('transportation')).then(() =>
+          StatsService.incrementStat('rsvp', 'diet', attendee.get('diet')).then(() => 
+            StatsService.incrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')).then(() =>
+              StatsService.incrementStat('rsvp', 'gender', attendee.get('gender')).then(() =>
+                StatsService.incrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')).then(() =>
+                  StatsService.incrementStat('rsvp', 'major', attendee.get('major')).then(() =>
+                    StatsService.incrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0).then(() =>
+                      StatsService.incrementStat('rsvp', 'attendees', 'count')))))))));
+    } else if(oldAttending && !newAttending) {
+      StatsService.decrementStat('rsvp', 'school', attendee.get('school')).then(() =>
+        StatsService.decrementStat('rsvp', 'transportation', attendee.get('transportation')).then(() =>
+          StatsService.decrementStat('rsvp', 'diet', attendee.get('diet')).then(() => 
+            StatsService.decrementStat('rsvp', 'shirtSize', attendee.get('shirtSize')).then(() =>
+              StatsService.decrementStat('rsvp', 'gender', attendee.get('gender')).then(() =>
+                StatsService.decrementStat('rsvp', 'graduationYear', attendee.get('graduationYear')).then(() =>
+                  StatsService.decrementStat('rsvp', 'major', attendee.get('major')).then(() =>
+                    StatsService.decrementStat('rsvp', 'isNovice', attendee.get('isNovice') ? 1 : 0).then(() =>
+                      StatsService.decrementStat('rsvp', 'attendees', 'count')))))))));
+    }
+  });
+
   rsvp.set(attributes);
 
   return rsvp
