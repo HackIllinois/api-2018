@@ -40,7 +40,7 @@ module.exports.findByAttendeeId = (attendeeId) => RecruiterInterest
 
 module.exports.createInterest = (recruiterId, attendeeId, comments, favorite) => {
   if (_.isUndefined(comments)) {
-    comments = "";
+    comments = '';
   }
   if (_.isUndefined(favorite)) {
     favorite = 0;
