@@ -5,6 +5,7 @@ const services = require('../services');
 const middleware = require('../middleware');
 const requests = require('../requests');
 const roles = require('../utils/roles');
+const config = require('ctx').config();
 
 const router = require('express').Router();
 
@@ -57,6 +58,15 @@ function createCheckIn(req, res, next) {
   req.body.userId = req.params.id;
   services.CheckInService
     .createCheckIn(req.body)
+    .tap((model) => services.UserService.findUserById(model.checkin.get('userId'))
+      .then((user) => {
+        const substitutions = {
+          isDevelopment: config.isDevelopment
+        };
+        services.MailService.send(user.get('email'), config.mail.templates.slackInvite, substitutions);
+        return null;
+      }
+    ))
     .then((response) => {
       response.checkin = response.checkin.toJSON();
       if (!_.isNil(response.credentials)) {
