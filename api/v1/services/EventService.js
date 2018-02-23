@@ -93,6 +93,11 @@ module.exports.updateEvent = (params) => {
   const locations = params.eventLocations;
 
   return Event.findById(event.id).then((model) => {
+    if (_.isNull(model)) {
+      const message = 'An event with the given eventId does not exist';
+      const source = 'eventId';
+      throw new errors.InvalidParameterError(message, source);
+    }
     model.related('locations').forEach((location) => location.destroy());
     model.set(event);
 
