@@ -11,14 +11,12 @@ const router = require('express').Router();
 function createInterest(req, res, next) {
   services.RegistrationService
     .findAttendeeById(req.body.attendeeUserId, false)
-    .then((attendee) => {
-      return services.RecruiterInterestService
+    .then((attendee) => services.RecruiterInterestService
         .createInterest(req.user.get('id'), attendee.get('id'), req.body.comments, req.body.favorite)
         .then((result) => {
           res.body = result.toJSON();
           return next();
-        });
-    })
+        }))
     .catch((error) => next(error));
 }
 

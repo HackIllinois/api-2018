@@ -11,7 +11,14 @@ const utils = require('../utils');
  * @param {integer} id the id of the RSVP to find
  * @returns {Promise} the resolved rsvp
  */
-module.exports.getRSVPById = (id) => RSVP.findById(id);
+module.exports.getRSVPById = (id) => RSVP.findByAttendeeId(id).then((model) => {
+  if (_.isNull(model)) {
+    const message = 'An RSVP cannot be found for the given attendee';
+    const source = 'attendeeId';
+    throw new errors.NotFoundError(message, source);
+  }
+  return model;
+});
 
 /**
  * Creates an RSVP and sets the users attendee role to active
