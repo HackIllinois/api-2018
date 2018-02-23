@@ -73,6 +73,7 @@
       "registrationUpdate": "registration_update",
       "rsvpConfirmation": "rsvp_confirmation",
       "rsvpUpdate": "rsvp_update",
+      "slackInvite": "slack_invite",
       "test": "test"
     }
   },
