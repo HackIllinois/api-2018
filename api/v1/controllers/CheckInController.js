@@ -64,6 +64,7 @@ function createCheckIn(req, res, next) {
           isDevelopment: config.isDevelopment
         };
         services.MailService.send(user.get('email'), config.mail.templates.slackInvite, substitutions);
+        return null;
       }
     ))
     .then((response) => {
