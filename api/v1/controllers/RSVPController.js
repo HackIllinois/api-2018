@@ -62,6 +62,17 @@ function fetchRSVPByUser(req, res, next) {
 }
 
 function fetchRSVPById(req, res, next) {
+  services.RSVPService
+    .getRSVPById(req.params.id)
+    .then((rsvp) => {
+      res.body = rsvp.toJSON();
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
+function fetchRSVPByUserId(req, res, next) {
   services.RegistrationService
     .findAttendeeById(req.params.id)
     .then((attendee) => services.RSVPService
@@ -120,6 +131,7 @@ router.post('/attendee', middleware.request(requests.RSVPRequest),
   middleware.permission(roles.ATTENDEE, _isValidUser), createRSVP);
 router.get('/attendee/', middleware.permission(roles.ATTENDEE, _isValidUser), fetchRSVPByUser);
 router.get('/attendee/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchRSVPById);
+router.get('/attendee/user/:id(\\d+)', middleware.permission(roles.ORGANIZERS), fetchRSVPByUserId);
 router.put('/attendee/', middleware.request(requests.RSVPRequest),
   middleware.permission(roles.ATTENDEE, _isValidUser), updateRSVPByUser);
 
