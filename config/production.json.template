@@ -106,8 +106,5 @@
   "limit": {
     "count": 50,
     "window": 60
-  },
-  "slack": {
-    "secret": "secret-slack-token"
   }
 }
