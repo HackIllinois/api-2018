@@ -10,7 +10,7 @@ module.exports = {
   EventDeletionRequest: require('./EventDeletionRequest'),
   LocationCreationRequest: require('./LocationCreationRequest'),
   MentorRequest: require('./MentorRequest'),
-  RecruiterInterestUpdateRequest: require('./RecruiterInterestUpdateRequest'),
+  UpdateRecruiterInterestRequest: require('./UpdateRecruiterInterestRequest'),
   RecruiterInterestRequest: require('./RecruiterInterestRequest'),
   ProjectRequest: require('./ProjectRequest'),
   ProjectMentorRequest: require('./ProjectMentorRequest'),

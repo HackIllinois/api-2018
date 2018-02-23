@@ -11,14 +11,12 @@ const router = require('express').Router();
 function createInterest(req, res, next) {
   services.RegistrationService
     .findAttendeeById(req.body.attendeeUserId, false)
-    .then((attendee) => {
-      services.RecruiterInterestService
+    .then((attendee) => services.RecruiterInterestService
         .createInterest(req.user.get('id'), attendee.get('id'), req.body.comments, req.body.favorite)
         .then((result) => {
           res.body = result.toJSON();
           return next();
-        });
-    })
+        }))
     .catch((error) => next(error));
 }
 
@@ -34,7 +32,7 @@ function getRecruitersInterests(req, res, next) {
 
 function updateRecruiterInterest(req, res, next) {
   services.RecruiterInterestService
-    .updateInterest(req.body.appId, req.body.comments, req.body.favorite)
+    .updateInterest(req.params.id, req.body.comments, req.body.favorite)
     .then((result) => {
       res.body = result.toJSON();
       return next();
@@ -45,9 +43,9 @@ function updateRecruiterInterest(req, res, next) {
 router.use(bodyParser.json());
 router.use(middleware.auth);
 
-router.get('/', middleware.permission(roles.PROFESSIONALS), getRecruitersInterests);
-router.post('/apply', middleware.request(requests.RecruiterInterestRequest), middleware.permission(roles.PROFESSIONALS), createInterest);
-router.put('/update', middleware.request(requests.RecruiterInterestUpdateRequest), middleware.permission(roles.PROFESSIONALS), updateRecruiterInterest);
+router.get('/interest/all', middleware.permission(roles.PROFESSIONALS), getRecruitersInterests);
+router.post('/interest', middleware.request(requests.RecruiterInterestRequest), middleware.permission(roles.PROFESSIONALS), createInterest);
+router.put('/interest/:id(\\d+)', middleware.request(requests.UpdateRecruiterInterestRequest), middleware.permission(roles.PROFESSIONALS), updateRecruiterInterest);
 
 router.use(middleware.response);
 router.use(middleware.errors);

@@ -86,6 +86,7 @@ module.exports.deleteEvent = (params) => Event.findById(params.eventId).then((mo
   return model.destroy();
 });
 
+
 module.exports.updateEvent = (params) => {
   const event = params.event;
   event.startTime = utils.time.convertISOTimeToMySQLTime(event.startTime);
