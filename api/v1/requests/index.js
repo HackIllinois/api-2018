@@ -6,6 +6,7 @@ module.exports = {
   BasicAuthRequest: require('./BasicAuthRequest'),
   EcosystemCreationRequest: require('./EcosystemCreationRequest'),
   EventCreationRequest: require('./EventCreationRequest'),
+  EventUpdateRequest: require('./EventUpdateRequest'),
   EventDeletionRequest: require('./EventDeletionRequest'),
   LocationCreationRequest: require('./LocationCreationRequest'),
   MentorRequest: require('./MentorRequest'),
