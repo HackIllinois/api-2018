@@ -86,6 +86,32 @@ module.exports.deleteEvent = (params) => Event.findById(params.eventId).then((mo
   return model.destroy();
 });
 
+
+module.exports.updateEvent = (params) => {
+  const event = params.event;
+  event.startTime = utils.time.convertISOTimeToMySQLTime(event.startTime);
+  event.endTime = utils.time.convertISOTimeToMySQLTime(event.endTime);
+  const locations = params.eventLocations;
+
+  return Event.findById(event.id).then((model) => {
+    if (_.isNull(model)) {
+      const message = 'An event with the given eventId does not exist';
+      const source = 'eventId';
+      throw new errors.InvalidParameterError(message, source);
+    }
+    model.related('locations').forEach((location) => location.destroy());
+    model.set(event);
+
+    return _Promise.map(locations, (location) => {
+      location.eventId = model.id;
+      return new EventLocation(location).save();
+    }).then((locationResult) => model.save().then((result) => ({
+      'event': result,
+      'eventLocations': locationResult
+    })));
+  });
+};
+
 function _writeToCache(userId) {
   return EventFavorite.findByUserId(userId).then((models) => cache.storeString(EVENT_FAVORITES_CACHE_KEY + userId, JSON.stringify(models.toJSON())));
 }
