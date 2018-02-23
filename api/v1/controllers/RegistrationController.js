@@ -322,6 +322,7 @@ function fetchAttendeeForHost(req, res, next) {
     .then((user) => services.RegistrationService.findAttendeeByUser(user, false))
     .then((attendee) => {
       res.body = {};
+      res.body.id = attendee.get('id');
       res.body.firstName = attendee.get('firstName');
       res.body.lastName = attendee.get('lastName');
       res.body.shirtSize = attendee.get('shirtSize');
