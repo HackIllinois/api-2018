@@ -81,6 +81,7 @@ overrides['REDIS_HOST'] = 'redis.host';
 overrides['REDIS_PORT'] = 'redis.port';
 overrides['RATELIMIT_COUNT'] = 'limit.count';
 overrides['RATELIMIT_WINDOW'] = 'limit.window';
+overrides['SLACK_SECRET'] = 'slack.secret';
 handleEnvironmentOverrides(config, overrides);
 handleAWSOverrides(config);
 
@@ -92,6 +93,7 @@ if (!config.isProduction) {
   requireds.delete(overrides['GITHUB_MOBILE_REDIRECT']);
   requireds.delete(overrides['RATELIMIT_COUNT']);
   requireds.delete(overrides['RATELIMIT_WINDOW']);
+  requireds.delete(overrides['SLACK_SECRET']);
 }
 handleEnvironmentRequireds(config, requireds);
 
