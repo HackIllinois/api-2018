@@ -53,6 +53,22 @@ function deleteEvent(req, res, next) {
     .catch((error) => next(error));
 }
 
+function updateEvent(req, res, next) {
+  services.EventService.updateEvent(req.body)
+    .then((result) => {
+      result.event = result.event.toJSON();
+      delete result.event.locations;
+      if (!_.isNil(result.eventLocations)) {
+        _.map(result.eventLocations, (location) => location.toJSON());
+      }
+
+      res.body = result;
+
+      return next();
+    })
+    .catch((error) => next(error));
+}
+
 function getEvents(req, res, next) {
   const activeOnly = (req.query.active == '1');
   services.EventService.getEvents(activeOnly)
@@ -94,6 +110,7 @@ router.use(bodyParser.json());
 router.use(middleware.auth);
 
 router.post('/', middleware.request(requests.EventCreationRequest), middleware.permission(roles.ORGANIZERS), createEvent);
+router.put('/', middleware.request(requests.EventUpdateRequest), middleware.permission(roles.ORGANIZERS), updateEvent);
 router.delete('/', middleware.request(requests.EventDeletionRequest), middleware.permission(roles.ORGANIZERS), deleteEvent);
 router.get('/', getEvents);
 router.get('/location/all', getAllLocations);
