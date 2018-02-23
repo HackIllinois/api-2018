@@ -62,8 +62,10 @@ function fetchRSVPByUser(req, res, next) {
 }
 
 function fetchRSVPById(req, res, next) {
-  services.RSVPService
-    .getRSVPById(req.params.id)
+  services.RegistrationService
+    .findAttendeeById(req.params.id)
+    .then((attendee) => services.RSVPService
+      .findRSVPByAttendee(attendee))
     .then((rsvp) => {
       res.body = rsvp.toJSON();
 
