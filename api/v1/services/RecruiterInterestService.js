@@ -56,10 +56,10 @@ module.exports.createInterest = (recruiterId, attendeeId, comments, favorite) =>
   return interest
     .validate()
     .catch(utils.errors.handleValidationError)
-    .then(() => interest.save());
+    .then(() => interest.save())
     .catch(
       utils.errors.DuplicateEntryError,
-      utils.errors.handleDuplicateEntryError('An interest with the given attendee and recruiter exists', 'attendeeUserId')
+      utils.errors.handleDuplicateEntryError('An interest with the given attendee and recruiter exists', 'attendeeUserId'));
 
 };
 
