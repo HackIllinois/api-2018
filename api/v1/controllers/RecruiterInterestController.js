@@ -12,7 +12,7 @@ function createInterest(req, res, next) {
   services.RegistrationService
     .findAttendeeById(req.body.attendeeUserId, false)
     .then((attendee) => {
-      services.RecruiterInterestService
+      return services.RecruiterInterestService
         .createInterest(req.user.get('id'), attendee.get('id'), req.body.comments, req.body.favorite)
         .then((result) => {
           res.body = result.toJSON();
